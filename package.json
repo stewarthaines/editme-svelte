@@ -1,0 +1,41 @@
+{
+  "name": "editme-svelte",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test:stories": "vitest run --config .storybook/vitest.config.ts",
+    "screenshots": "node scripts/capture-screenshots.js"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.0",
+    "@storybook/addon-a11y": "^9.0.5",
+    "@storybook/addon-docs": "^9.0.5",
+    "@storybook/addon-svelte-csf": "^5.0.3",
+    "@storybook/addon-vitest": "^9.0.5",
+    "@storybook/svelte-vite": "^9.0.5",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/jest-image-snapshot": "^6.4.0",
+    "@vitest/browser": "^3.2.2",
+    "@vitest/coverage-v8": "^3.2.2",
+    "jest-image-snapshot": "^6.5.1",
+    "playwright": "^1.52.0",
+    "storybook": "^9.0.5",
+    "svelte": "^5.28.1",
+    "svelte-check": "^4.1.6",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.2.0",
+    "vitest": "^3.2.2"
+  }
+}

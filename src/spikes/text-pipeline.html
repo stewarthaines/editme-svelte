@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text Pipeline Spike</title>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #f8f9fa;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: white;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background: #343a40;
+        color: white;
+        border-bottom: 1px solid #495057;
+      }
+
+      .toolbar button {
+        background: #495057;
+        color: white;
+        border: 1px solid #6c757d;
+        padding: 8px 16px;
+        margin-right: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+
+      .toolbar button:hover {
+        background: #6c757d;
+      }
+
+      .toolbar button.active {
+        background: #007bff;
+        border-color: #007bff;
+      }
+
+      .status {
+        margin-left: auto;
+        font-size: 14px;
+        color: #adb5bd;
+      }
+
+      .main-content {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .left-pane,
+      .right-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .left-pane {
+        border-right: 1px solid #dee2e6;
+      }
+
+      .pane-header {
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        font-size: 14px;
+      }
+
+      #iframe-container {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      #iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .preview-content {
+        flex: 1;
+        padding: 20px;
+        overflow: auto;
+        background: white;
+      }
+
+      .preview-content h1,
+      .preview-content h2,
+      .preview-content h3 {
+        margin-top: 0;
+      }
+
+      .error-panel {
+        display: none;
+        background: #f8d7da;
+        border-top: 1px solid #f5c6cb;
+        padding: 15px;
+        color: #721c24;
+        max-height: 150px;
+        overflow: auto;
+      }
+
+      .error {
+        margin-bottom: 8px;
+        font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+        font-size: 13px;
+      }
+
+      .error-panel.visible {
+        display: block;
+      }
+
+      .splitter {
+        width: 4px;
+        background: #dee2e6;
+        cursor: col-resize;
+        position: relative;
+      }
+
+      .splitter:hover {
+        background: #007bff;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .main-content {
+          flex-direction: column;
+        }
+
+        .splitter {
+          height: 4px;
+          width: auto;
+          cursor: row-resize;
+        }
+
+        .left-pane,
+        .right-pane {
+          flex: none;
+          height: 50vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="toolbar">
+        <button data-mode="text" class="active">Text</button>
+        <button data-mode="transformText">Transform Text</button>
+        <button data-mode="transformDOM">Transform DOM</button>
+        <div class="status" id="main-status">Ready</div>
+      </div>
+
+      <div class="main-content">
+        <div class="left-pane">
+          <div class="pane-header">Editor</div>
+          <div id="iframe-container"></div>
+        </div>
+        <div class="splitter"></div>
+        <div class="right-pane">
+          <div class="pane-header">Preview</div>
+          <div class="preview-content" id="preview">
+            <p><em>Preview will appear here...</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-panel" id="error-panel"></div>
+    </div>
+
+    <script type="text/javascript">
+      const IFRAME_TEMPLATE = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: #fff;
+    }
+    
+    .editor-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    .editor-status { 
+      padding: 8px 12px; 
+      background: #f8f9fa; 
+      border-bottom: 1px solid #dee2e6;
+      font-size: 12px; 
+      color: #6c757d;
+      font-weight: 500;
+    }
+    
+    #editor {
+      flex: 1;
+      border: none;
+      padding: 15px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      background: #fff;
+    }
+    
+    #editor:focus {
+      background: #fefefe;
+    }
+    
+    #editor.text-mode {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-container">
+    <div class="editor-status" id="status">Ready</div>
+    <textarea id="editor" placeholder="Enter content or script here..."></textarea>
+  </div>
+  
+  <script type="text/javascript">
+    let currentMode = 'text';
+    let transformTextScript = '';
+    let transformDomScript = '';
+    let currentText = '';
+    let debounceTimer = null;
+    
+    // Default transform scripts
+    function getDefaultTransformText() {
+      return \`// Transform plain text to HTML
+const result = plainText
+  .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+  .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+  .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+  .replace(/\\\`\\\`\\\`([a-zA-Z0-9]*?)\\\\n([\\\\s\\\\S]*?)\\\\n\\\`\\\`\\\`/gim, function(match, lang, code) {
+    return lang ? \\\`<pre class="language-\\\${lang}"><code>\\\${code}</code></pre>\\\` : \\\`<pre><code>\\\${code}</code></pre>\\\`;
+  })
+  .replace(/\\\\*\\\\*(.*?)\\\\*\\\\*/gim, '<strong>$1</strong>')
+  .replace(/\\\\*(.*?)\\\\*/gim, '<em>$1</em>')
+  .replace(/\\\\n\\\\n/gim, '</p><p>')
+  .replace(/\\\\n/gim, '<br>');
+  
+return '<p>' + result + '</p>';\`;
+    }
+    
+    function getDefaultTransformDom() {
+      return \`// Transform the DOM
+const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+headings.forEach((heading, index) => {
+  if (!heading.id) {
+    const text = heading.textContent || '';
+    const id = text
+      .toLowerCase()
+      .replace(/[^a-z0-9\\\\\\\\s-]/g, '')
+      .replace(/\\\\\\\\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || \\\`heading-\\\${index + 1}\\\`;
+    heading.id = id;
+    heading.style.borderLeft = '3px solid #007bff';
+    heading.style.paddingLeft = '10px';
+  }
+});
+
+return document;\`;
+    }
+    
+    // Transform execution functions
+    function executeTransformText(plainText, script) {
+      try {
+        // Create a safe execution context
+        const func = new Function('plainText', script);
+        const result = func(plainText);
+        return String(result || '');
+      } catch (error) {
+        throw { 
+          stage: 'text', 
+          message: error.message, 
+          line: getErrorLine(error),
+          stack: error.stack
+        };
+      }
+    }
+    
+    function executeTransformDom(htmlString, script) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(
+          \`<!DOCTYPE html><html><head></head><body>\${htmlString}</body></html>\`, 
+          'text/html'
+        );
+        
+        const func = new Function('document', script);
+        const result = func(doc);
+        
+        // Return the body content
+        return result.body.innerHTML;
+      } catch (error) {
+        throw { 
+          stage: 'dom', 
+          message: error.message, 
+          line: getErrorLine(error),
+          stack: error.stack
+        };
+      }
+    }
+    
+    function getErrorLine(error) {
+      if (error.stack) {
+        const match = error.stack.match(/:(\\d+):/);
+        return match ? parseInt(match[1]) : null;
+      }
+      return null;
+    }
+    
+    function runPipeline(text) {
+      try {
+        updateStatus('Processing...');
+        
+        let html = text;
+        let warnings = [];
+        
+        // Step 1: Transform text if script exists
+        if (transformTextScript.trim()) {
+          try {
+            html = executeTransformText(text, transformTextScript);
+          } catch (error) {
+            updateStatus('Error in text transform');
+            return { success: false, html: '', errors: [error], warnings };
+          }
+        } else {
+          // Default: treat as HTML or add basic paragraph wrapping
+          if (!html.trim().startsWith('<')) {
+            html = \`<p>\${html.replace(/\\n\\n/g, '</p><p>').replace(/\\n/g, '<br>')}</p>\`;
+          }
+        }
+        
+        // Step 2: Transform DOM if script exists  
+        if (transformDomScript.trim()) {
+          try {
+            html = executeTransformDom(html, transformDomScript);
+          } catch (error) {
+            updateStatus('Error in DOM transform');
+            return { success: false, html: '', errors: [error], warnings };
+          }
+        }
+        
+        updateStatus('Complete');
+        return { success: true, html, errors: [], warnings };
+        
+      } catch (error) {
+        updateStatus('Unexpected error: ' + error.message);
+        return { 
+          success: false, 
+          html: '', 
+          errors: [{ stage: 'pipeline', message: error.message }], 
+          warnings: [] 
+        };
+      }
+    }
+    
+    function updateStatus(message) {
+      document.getElementById('status').textContent = message;
+    }
+    
+    function updateEditorForMode() {
+      const editor = document.getElementById('editor');
+      
+      // Update editor content and styling based on current mode
+      switch (currentMode) {
+        case 'text':
+          editor.placeholder = 'Enter your plain text content here...';
+          editor.value = currentText;
+          editor.className = 'text-mode';
+          break;
+        case 'transformText':
+          editor.placeholder = 'Enter transformText.js script...';
+          editor.value = transformTextScript;
+          editor.className = '';
+          break;
+        case 'transformDOM':
+          editor.placeholder = 'Enter transformDom.js script...';
+          editor.value = transformDomScript;
+          editor.className = '';
+          break;
+      }
+    }
+    
+    function triggerPipelineUpdate() {
+      const editor = document.getElementById('editor');
+      
+      // Update our stored values
+      if (currentMode === 'text') {
+        currentText = editor.value;
+      } else if (currentMode === 'transformText') {
+        transformTextScript = editor.value;
+      } else if (currentMode === 'transformDOM') {
+        transformDomScript = editor.value;
+      }
+      
+      // Run pipeline with current text
+      const result = runPipeline(currentText);
+      parent.postMessage({ type: 'RESULT', payload: result }, '*');
+    }
+    
+    // PostMessage communication with parent
+    window.addEventListener('message', (event) => {
+      const { type, payload } = event.data;
+      
+      switch (type) {
+        case 'SET_MODE':
+          currentMode = payload;
+          updateEditorForMode();
+          break;
+          
+        case 'RUN_PIPELINE':
+          triggerPipelineUpdate();
+          break;
+      }
+    });
+    
+    // Auto-update on content changes
+    document.getElementById('editor').addEventListener('input', () => {
+      // Clear previous timer
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+      
+      // Set new timer
+      debounceTimer = setTimeout(() => {
+        triggerPipelineUpdate();
+      }, 300);
+    });
+    
+    // Initialize with default content
+    currentText = '# Hello World\\n\\nThis is **bold** text.\\n\\n## Subheading\\n\\nWith some *italic* text.';
+    transformTextScript = getDefaultTransformText();
+    transformDomScript = getDefaultTransformDom();
+    
+    // Signal ready to parent
+    parent.postMessage({ type: 'READY' }, '*');
+  </sc` + `ript>
+</body>
+</html>`;
+
+      // Main application class
+      class TextPipelineSpike {
+        constructor() {
+          this.state = {
+            currentMode: "text",
+          };
+          this.iframe = null;
+          this.iframeReady = false;
+          this.init();
+        }
+
+        init() {
+          this.createIframe();
+          this.setupEventListeners();
+          this.setupSplitter();
+        }
+
+        createIframe() {
+          const container = document.getElementById("iframe-container");
+          this.iframe = document.createElement("iframe");
+          this.iframe.style.width = "100%";
+          this.iframe.style.height = "100%";
+          this.iframe.style.border = "none";
+
+          // Use blob URL to embed iframe content
+          const blob = new Blob([IFRAME_TEMPLATE], { type: "text/html" });
+          const blobURL = URL.createObjectURL(blob);
+          this.iframe.src = blobURL;
+
+          container.appendChild(this.iframe);
+
+          // Clean up blob URL when iframe is removed (optional)
+          this.iframe.addEventListener("load", () => {
+            URL.revokeObjectURL(blobURL);
+          });
+
+          this.iframe.addEventListener("error", (e) => {
+            console.error("Iframe failed to load:", e);
+          });
+
+          // Setup iframe communication
+          window.addEventListener("message", (event) => {
+            this.handleIframeMessage(event.data);
+          });
+        }
+
+        handleIframeMessage(message) {
+          const { type, payload } = message;
+
+          switch (type) {
+            case "READY":
+              this.iframeReady = true;
+              this.sendToIframe("SET_MODE", this.state.currentMode);
+              this.updateMainStatus("Ready");
+              // Trigger initial pipeline run
+              setTimeout(() => {
+                this.sendToIframe("RUN_PIPELINE");
+              }, 100);
+              break;
+
+            case "RESULT":
+              if (!payload.success) {
+                console.error("Transform failed with errors:", payload.errors);
+                payload.errors.forEach((error, index) => {
+                  console.error(`Error ${index + 1}:`, error);
+                });
+              }
+              this.updatePreview(payload);
+              break;
+          }
+        }
+
+        sendToIframe(type, payload) {
+          if (this.iframe && this.iframe.contentWindow && this.iframeReady) {
+            this.iframe.contentWindow.postMessage({ type, payload }, "*");
+          }
+        }
+
+        setupEventListeners() {
+          // Mode switching buttons
+          document.querySelectorAll("[data-mode]").forEach((button) => {
+            button.addEventListener("click", () => {
+              this.switchMode(button.dataset.mode);
+            });
+          });
+        }
+
+        setupSplitter() {
+          const splitter = document.querySelector(".splitter");
+          const leftPane = document.querySelector(".left-pane");
+          const rightPane = document.querySelector(".right-pane");
+          let isResizing = false;
+
+          splitter.addEventListener("mousedown", (e) => {
+            isResizing = true;
+            document.body.style.cursor = "col-resize";
+            e.preventDefault();
+          });
+
+          document.addEventListener("mousemove", (e) => {
+            if (!isResizing) return;
+
+            const containerRect = document
+              .querySelector(".main-content")
+              .getBoundingClientRect();
+            const leftWidth =
+              ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+            if (leftWidth > 20 && leftWidth < 80) {
+              leftPane.style.flex = `0 0 ${leftWidth}%`;
+              rightPane.style.flex = `0 0 ${100 - leftWidth}%`;
+            }
+          });
+
+          document.addEventListener("mouseup", () => {
+            isResizing = false;
+            document.body.style.cursor = "";
+          });
+        }
+
+        switchMode(mode) {
+          this.state.currentMode = mode;
+
+          // Update button states
+          document.querySelectorAll("[data-mode]").forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.mode === mode);
+          });
+
+          // Update iframe
+          this.sendToIframe("SET_MODE", mode);
+
+          // Update main status
+          const modeNames = {
+            text: "Text Editor",
+            transformText: "Transform Text Script",
+            transformDOM: "Transform DOM Script",
+          };
+          this.updateMainStatus(`Mode: ${modeNames[mode]}`);
+        }
+
+        updateMainStatus(message) {
+          document.getElementById("main-status").textContent = message;
+        }
+
+        updatePreview(result) {
+          const preview = document.getElementById("preview");
+          const errorPanel = document.getElementById("error-panel");
+
+          if (result.success) {
+            preview.innerHTML =
+              result.html || "<p><em>No content to display</em></p>";
+            errorPanel.classList.remove("visible");
+            this.updateMainStatus("Transform complete");
+          } else {
+            preview.innerHTML =
+              "<p><em>Transform failed - see errors below</em></p>";
+            errorPanel.classList.add("visible");
+            errorPanel.innerHTML = result.errors
+              .map((err) => {
+                let errorMsg = `<strong>${err.stage} transform error:</strong> ${err.message}`;
+                if (err.line) {
+                  errorMsg += ` (line ${err.line})`;
+                }
+                return `<div class="error">${errorMsg}</div>`;
+              })
+              .join("");
+            this.updateMainStatus("Transform failed");
+          }
+
+          // Handle warnings
+          if (result.warnings && result.warnings.length > 0) {
+            // Could add warning display here
+          }
+        }
+      }
+
+      // Initialize when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        new TextPipelineSpike();
+      });
+    </script>
+  </body>
+</html>
