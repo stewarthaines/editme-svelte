@@ -114,6 +114,7 @@ EDITME/ (editor-specific files)
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run test:stories` - Run Storybook tests with Vitest
 - `npm run screenshots` - Capture component screenshots
+- Use proper ES module imports (await import()) instead of require() for mocked modules
 
 ### Storybook
 
