@@ -32,3 +32,6 @@ __screenshots__/
 # Storybook
 *storybook.log
 storybook-static
+
+# Coverage reports
+coverage

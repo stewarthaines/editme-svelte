@@ -23,6 +23,7 @@ This is a Svelte-based EPUB editor that runs in modern browsers, replacing a pre
 - All static resources inlined by Vite build system
 
 ### Code Style Preferences
+
 - **XML/HTML Parsing**: Use `DOMParser` and `querySelector` instead of regular expressions for robust parsing
 - Browser-native APIs preferred over regex for structured data handling
 
@@ -54,35 +55,34 @@ Plain text source → transformText.js → transformDom.js → XHTML → Preview
 1. File Storage API (OPFS + IndexedDB fallback)
 2. EPUB Unpacking (Compression Streams)
 3. EPUB Packaging (ZIP creation)
-4. Workspace Management
+4. Workspace & OPF Manager
 
 ### Phase 2: Data & UI
 
-5. Content.opf Parser/Generator
-6. Blob URL Manager
-7. Layout System (resizable panels)
-8. Navigation Router
+5. Blob URL Manager
+6. Layout System (resizable panels)
+7. Navigation Router
 
 ### Phase 3: Content Management
 
-9. Manifest View (file listing)
-10. Metadata Editor (form-based)
-11. Spine Item Manager (chapter ordering)
-12. Theme System (light/dark mode)
+8. Manifest View (file listing)
+9. Metadata Editor (form-based)
+10. Spine Item Manager (chapter ordering)
+11. Theme System (light/dark mode)
 
 ### Phase 4: Text Processing
 
-13. Transform Pipeline (dynamic function execution)
-14. Text Editor (debounced preview updates)
-15. Error Handling (transform failures)
+12. Transform Pipeline (dynamic function execution)
+13. Text Editor (debounced preview updates)
+14. Error Handling (transform failures)
 
 ### Phase 5: Preview & Polish
 
-16. Device Preview (responsive + multi-device)
-17. Preview Iframe (blob URL substitution)
-18. Navigation Editor (TOC editing)
-19. Storage Quota Monitor
-20. Audio Clip Editor
+15. Device Preview (responsive + multi-device)
+16. Preview Iframe (blob URL substitution)
+17. Navigation Editor (TOC editing)
+18. Storage Quota Monitor
+19. Audio Clip Editor
 
 ## Active EPUB Format
 
@@ -131,7 +131,7 @@ EDITME/ (editor-specific files)
 
 ### Location: `src/lib/zip/`
 
-The ZIP library is complete and fully tested, ready for Features 02 & 03 implementation.
+The ZIP library is complete and fully tested, ready for Features 2 & 3 implementation.
 
 #### Core Files:
 
@@ -177,7 +177,69 @@ const zipBlob = await writer.buildBlob();
 
 ### Integration Notes:
 
-- Ready for File Storage API integration (Feature 01)
+- Ready for File Storage API integration (Feature 1)
 - Supports OPFS and IndexedDB storage backends
 - Handles workspace-based file organization
 - Compatible with blob URL management for previews
+
+## API Documentation Standards
+
+### Writing API Documentation
+
+When implementing new features, create comprehensive API documentation in `src/lib/{feature}/API.md` following these standards:
+
+#### Required Sections:
+
+1. **Overview** - Brief description of main classes and purpose
+2. **Class Documentation** - Each public class with constructor and methods
+3. **Method Documentation** - Input/Output/Side Effects/Usage examples for each method
+4. **Type Definitions** - All publicly useful interfaces and types
+5. **Common Integration Patterns** - Real-world usage examples
+6. **Error Handling** - Exception types and error handling patterns
+
+#### Documentation Style:
+
+````typescript
+#### methodName()
+
+```typescript
+methodName(param: Type): Promise<ReturnType>
+```
+
+**Input:**
+- `param: Type` - Description of parameter
+
+**Output:** `Promise<ReturnType>` - Description of return value
+
+**Side Effects:** List any side effects (file creation, state changes, etc.)
+
+**Usage:**
+
+```typescript
+const example = new ClassName();
+const result = await example.methodName(value);
+console.log('Result:', result);
+```
+````
+
+#### Key Guidelines:
+
+- **Focus on Integration**: Show how the API integrates with other features
+- **Practical Examples**: Include real-world usage patterns, not toy examples
+- **Error Scenarios**: Document common error cases and handling
+- **Browser Compatibility**: Note any browser-specific behavior or limitations
+- **Performance Notes**: Highlight performance characteristics and optimization tips
+
+#### Examples to Follow:
+
+- `src/lib/epub/API.md` - Comprehensive EPUB library documentation
+- `src/lib/storage/API.md` - File Storage API with backend detection details
+
+#### When to Create API Docs:
+
+- **New feature implementation** - Always create API.md for new `src/lib/{feature}/` modules
+- **Public API changes** - Update existing API.md when interfaces change
+- **Integration points** - Document any APIs that other features will consume
+- **Complex workflows** - Show end-to-end integration patterns
+
+API documentation should be created **after implementation and tests are working**, not as an afterthought. It helps clarify API design decisions and serves as integration reference for dependent features.
