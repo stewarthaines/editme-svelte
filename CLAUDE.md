@@ -99,6 +99,11 @@ EDITME/ (editor-specific files)
 - `npm run test:stories` - Run Storybook tests with Vitest
 - `npm run screenshots` - Capture component screenshots
 
+### Storybook
+- `npm run storybook` - Start Storybook development server
+- `npm run build-storybook` - Build Storybook for production
+- See `STORYBOOK.md` for backend feature demonstration patterns
+
 ### Linting
 - `npm run lint` - ESLint check
 - `npm run typecheck` - TypeScript validation

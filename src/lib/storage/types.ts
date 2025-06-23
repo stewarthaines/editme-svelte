@@ -31,6 +31,9 @@ export interface WorkspaceMetadata {
  * implementation details of OPFS vs IndexedDB storage.
  */
 export interface StorageBackend {
+	// Initialization
+	init?(): Promise<void>;
+	
 	// Workspace management
 	createWorkspace(id: string): Promise<void>;
 	deleteWorkspace(id: string): Promise<void>;
@@ -116,13 +119,13 @@ export interface StorageEvents {
 export interface WorkerMessage {
 	type: WorkerMessageType;
 	id: number;
-	data?: any;
+	data?: unknown;
 }
 
 export interface WorkerResponse {
 	type: WorkerMessageType;
 	id: number;
-	result: OperationResult<any>;
+	result: OperationResult<unknown>;
 }
 
 export enum WorkerMessageType {
@@ -207,8 +210,38 @@ export interface StorageCapabilities {
 export interface FeatureDetector {
 	detectCapabilities(): Promise<StorageCapabilities>;
 	detectOptimalBackend(): Promise<BackendType>;
+	testOPFSAvailable(): Promise<boolean>;
 	testOPFSAsync(): Promise<boolean>;
 	testOPFSSync(): Promise<boolean>;
 	testOPFSSyncWorker(): Promise<boolean>;
 	testIndexedDB(): Promise<boolean>;
+	testStorageEstimate(): Promise<boolean>;
+}
+
+/**
+ * Directory traversal and creation utilities
+ */
+export interface DirectoryUtils {
+	ensureDirectoryPath(handle: OPFSDirectoryHandle, path: string): Promise<OPFSDirectoryHandle>;
+	getFileFromPath(handle: OPFSDirectoryHandle, path: string): Promise<OPFSFileHandle>;
+	listDirectoryContents(handle: OPFSDirectoryHandle, basePath?: string): Promise<string[]>;
+}
+
+/**
+ * Storage quota and monitoring
+ */
+export interface QuotaManager {
+	getCurrentQuota(): Promise<StorageQuota>;
+	estimateFileSize(content: ArrayBuffer): number;
+	checkQuotaBeforeWrite(content: ArrayBuffer): Promise<boolean>;
+	onQuotaExceeded(handler: (quota: StorageQuota) => void): void;
+}
+
+/**
+ * Event emitter for storage events
+ */
+export interface StorageEventEmitter {
+	on<K extends keyof StorageEvents>(event: K, handler: (data: StorageEvents[K]) => void): void;
+	off<K extends keyof StorageEvents>(event: K, handler: (data: StorageEvents[K]) => void): void;
+	emit<K extends keyof StorageEvents>(event: K, data: StorageEvents[K]): void;
 }

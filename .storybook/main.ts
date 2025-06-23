@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/svelte-vite';
+import path from 'path';
 
 const config: StorybookConfig = {
   "stories": [
@@ -15,6 +16,14 @@ const config: StorybookConfig = {
   "framework": {
     "name": "@storybook/svelte-vite",
     "options": {}
+  },
+  "viteFinal": async (config) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '$lib': path.resolve(__dirname, '../src/lib'),
+    };
+    return config;
   }
 };
 export default config;

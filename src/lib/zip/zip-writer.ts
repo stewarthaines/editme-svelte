@@ -6,7 +6,7 @@ import type { ZipWriterEntry, AddFileOptions, DosTime, SupportedDataType } from 
  */
 export class ZipWriter {
 	#entries: ZipWriterEntry[] = [];
-	private static _crcTable: number[] | null = null;
+	private static _crcTable: number[] = [];
 
 	constructor() {
 		this.#entries = [];
@@ -31,11 +31,11 @@ export class ZipWriter {
 		if (data instanceof ArrayBuffer) {
 			arrayBuffer = data;
 		} else if (data instanceof Uint8Array) {
-			arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+			arrayBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
 		} else if (data instanceof Blob) {
 			arrayBuffer = await data.arrayBuffer();
 		} else if (typeof data === 'string') {
-			arrayBuffer = new TextEncoder().encode(data).buffer;
+			arrayBuffer = new TextEncoder().encode(data).buffer as ArrayBuffer;
 		} else {
 			throw new Error('Unsupported data type');
 		}
@@ -290,8 +290,8 @@ export class ZipWriter {
 	 * Gets or creates the CRC32 lookup table
 	 */
 	#getCRC32Table(): number[] {
-		if (!ZipWriter._crcTable) {
-			const table = Array.from({length: 256});
+		if (ZipWriter._crcTable.length === 0) {
+			const table: number[] = Array.from({length: 256}, () => 0);
 			for (let i = 0; i < 256; i++) {
 				let crc = i;
 				for (let j = 0; j < 8; j++) {

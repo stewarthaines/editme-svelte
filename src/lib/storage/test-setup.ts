@@ -80,21 +80,21 @@ export class MockBrowserAPIs {
  * Mock OPFS file handle implementation
  */
 export class MockOPFSFileHandle implements OPFSFileHandle {
-	kind: 'file' = 'file';
+	kind = 'file' as const;
 	
 	constructor(
 		public name: string,
 		private content: ArrayBuffer = new ArrayBuffer(0)
 	) {}
 
-	async createWritable(): Promise<any> {
+	async createWritable(): Promise<{ write: unknown; close: unknown }> {
 		return {
 			write: vi.fn(),
 			close: vi.fn()
 		};
 	}
 
-	async createSyncAccessHandle(): Promise<any> {
+	async createSyncAccessHandle(): Promise<Record<string, unknown>> {
 		return {
 			read: vi.fn(),
 			write: vi.fn(),
@@ -114,7 +114,7 @@ export class MockOPFSFileHandle implements OPFSFileHandle {
  * Mock OPFS directory handle implementation
  */
 export class MockOPFSDirectoryHandle implements OPFSDirectoryHandle {
-	kind: 'directory' = 'directory';
+	kind = 'directory' as const;
 	private files = new Map<string, MockOPFSFileHandle>();
 	private directories = new Map<string, MockOPFSDirectoryHandle>();
 
@@ -148,7 +148,7 @@ export class MockOPFSDirectoryHandle implements OPFSDirectoryHandle {
 		throw new Error(`Directory not found: ${name}`);
 	}
 
-	async removeEntry(name: string, options?: { recursive?: boolean }): Promise<void> {
+	async removeEntry(name: string, _options?: { recursive?: boolean }): Promise<void> {
 		if (this.files.has(name)) {
 			this.files.delete(name);
 			return;
@@ -274,7 +274,7 @@ export class TestDataGenerator {
 		const text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(
 			Math.ceil(size / 56)
 		).substring(0, size);
-		return new TextEncoder().encode(text);
+		return new TextEncoder().encode(text).buffer as ArrayBuffer;
 	}
 
 	static createBinaryContent(size: number = 1024): ArrayBuffer {
@@ -289,13 +289,13 @@ export class TestDataGenerator {
 	static createEPUBStructure(): Map<string, ArrayBuffer> {
 		const files = new Map<string, ArrayBuffer>();
 		
-		files.set('mimetype', new TextEncoder().encode('application/epub+zip'));
+		files.set('mimetype', new TextEncoder().encode('application/epub+zip').buffer as ArrayBuffer);
 		files.set('META-INF/container.xml', new TextEncoder().encode(`<?xml version="1.0"?>
 <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
   <rootfiles>
     <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
   </rootfiles>
-</container>`));
+</container>`).buffer as ArrayBuffer);
 		
 		files.set('OEBPS/content.opf', new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
@@ -311,7 +311,7 @@ export class TestDataGenerator {
   <spine>
     <itemref idref="chapter1"/>
   </spine>
-</package>`));
+</package>`).buffer as ArrayBuffer);
 		
 		files.set('OEBPS/chapter1.xhtml', new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
@@ -323,7 +323,7 @@ export class TestDataGenerator {
   <h1>Chapter 1</h1>
   <p>This is the first chapter of the test EPUB.</p>
 </body>
-</html>`));
+</html>`).buffer as ArrayBuffer);
 		
 		return files;
 	}
@@ -362,7 +362,7 @@ export class TestHelpers {
 	}
 
 	static stringToArrayBuffer(str: string): ArrayBuffer {
-		return new TextEncoder().encode(str);
+		return new TextEncoder().encode(str).buffer as ArrayBuffer;
 	}
 
 	static async waitForCondition(

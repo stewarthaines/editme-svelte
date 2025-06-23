@@ -1,0 +1,266 @@
+/* 
+  Template CSS for Backend Feature Demo Components
+  
+  Copy this file and rename to match your feature:
+  - backend-feature-demo.css -> your-feature-demo.css
+  - Import in your demo component: import './your-feature-demo.css';
+  - Customize colors and styling as needed
+*/
+
+.backend-feature-demo {
+  font-family: system-ui, -apple-system, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.demo-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+  font-size: 1.5rem;
+}
+
+.demo-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.demo-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .demo-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Control Panel */
+.control-panel {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  color: #1f2937;
+}
+
+.section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.button-group button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-group button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.button-group button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* State Display */
+.state-display {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.state-display pre {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #374151;
+  white-space: pre-wrap;
+}
+
+/* Results List */
+.results-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.result-item {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.result-item:last-child {
+  margin-bottom: 0;
+}
+
+.result-item strong {
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.result-item pre {
+  margin: 0.5rem 0 0 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #6b7280;
+  white-space: pre-wrap;
+}
+
+/* Console Log */
+.log-console {
+  background: #1f2937;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  height: fit-content;
+  max-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-header {
+  background: #374151;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-header h3 {
+  margin: 0;
+  color: #f9fafb;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.log-header button {
+  background: #4b5563;
+  color: #f9fafb;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.log-header button:hover {
+  background: #6b7280;
+}
+
+.log-content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.log-entry {
+  margin-bottom: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.log-time {
+  color: #9ca3af;
+  font-weight: normal;
+  flex-shrink: 0;
+}
+
+.log-message {
+  flex: 1;
+}
+
+/* Log entry types */
+.log-info .log-message {
+  color: #60a5fa;
+}
+
+.log-success .log-message {
+  color: #4ade80;
+}
+
+.log-error .log-message {
+  color: #f87171;
+}
+
+.log-action .log-message {
+  color: #fbbf24;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .backend-feature-demo {
+    padding: 0.5rem;
+  }
+  
+  .demo-content {
+    gap: 1rem;
+  }
+  
+  .control-panel {
+    padding: 1rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .button-group button {
+    width: 100%;
+  }
+}

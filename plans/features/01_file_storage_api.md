@@ -19,37 +19,36 @@ Implements browser-local file storage using OPFS with dual API support for cross
 
 ```
 src/lib/storage/
-├── FileStorageAPI.js          // Main implementation class
-├── FileStorageError.js        // Error classes and codes
-├── storage-utils.js           // Helper functions (path handling, etc.)
-└── index.js                   // Public exports
-
-tests/
-├── lib/
-│   └── storage/
-│       ├── FileStorageAPI.test.js     // Main API tests
-│       ├── FileStorageError.test.js   // Error handling tests
-│       └── storage-utils.test.js      // Utility function tests
-└── integration/
-    └── storage/
-        └── file-storage-integration.test.js  // Cross-browser OPFS tests
+├── index.ts                    // Main exports and backend implementations
+├── types.ts                    // TypeScript interfaces and types
+├── feature-detector.ts         // Comprehensive capability detection
+├── worker-manager.ts           // OPFS sync worker management
+├── opfs-worker.js             // JavaScript worker script (imported as ?raw)
+├── test-setup.ts              // Testing utilities and mocks
+├── file-storage.test.ts        // Core API functionality tests
+├── feature-detection.test.ts   // Feature detection logic tests
+├── integration.test.ts         // Cross-browser integration tests
+├── opfs-worker.test.ts        // Worker script functionality tests
+└── worker.test.ts             // Worker manager tests
 ```
 
 ## Primary Implementation
 
-- **File**: `src/lib/storage/FileStorageAPI.js`
+- **File**: `src/lib/storage/index.ts`
 - **Export**: `FileStorageAPI` class
 - **Usage**: `import { FileStorageAPI } from '$lib/storage'`
 
 ## Technical Approach
 
-- Main thread implementation where available
-- Triple API support: createWritable (where available: http Chrome/Firefox/Edge, file:// firefox), IndexedDB (for file:// on Chrome/Edge) and createSyncAccessHandle (Safari)
-- OPFS and IndexedDB implementations
-- Prefer OPFS where available because of direct access to file resource via blob urls
-- Workspace isolation using `workspaces/` subdirectory structure
-- Root namespace reserved for packaging, temp files, and other operations
-- Quota monitoring using StorageManager API
+- **Multi-Backend Architecture**: Automatic backend selection via factory pattern
+- **OPFS Implementation**: Main thread (async) and worker-based (sync) support
+- **IndexedDB Fallback**: Universal compatibility for file:// protocol and older browsers
+- **Worker Manager**: Dedicated worker management for OPFS sync operations in Safari
+- **Feature Detection**: Comprehensive capability testing with parallel execution and caching
+- **Workspace Isolation**: Files organized under `workspaces/` subdirectory structure
+- **Event-Driven Monitoring**: Storage events for quota warnings and backend changes
+- **Error Handling**: Structured error system with specific error codes and recovery strategies
+- **Testing Infrastructure**: Extensive mocking and testing utilities for cross-browser scenarios
 
 ## API Design
 
@@ -78,6 +77,11 @@ interface FileStorageAPI {
   // Storage monitoring
   getQuota(): Promise<{ used: number; available: number }>;
   estimateWorkspaceSize(workspaceId: string): Promise<number>;
+  
+  // Utility methods
+  writeTextFile(workspaceId: string, path: string, content: string): Promise<void>;
+  readTextFile(workspaceId: string, path: string): Promise<string>;
+  fileExists(workspaceId: string, path: string): Promise<boolean>;
 }
 ```
 
@@ -188,6 +192,139 @@ for await (const [name, handle] of workspacesDir.entries()) {
 - **`packaging/`** - Intermediate files during EPUB creation/export
 - **Root level** - Available for app-level configuration and metadata
 
+## Architecture Components
+
+### Storage Backend Factory
+
+```typescript
+class StorageBackendFactory {
+  static async detectStorageBackend(): Promise<BackendType>;
+  static async create(): Promise<StorageBackend>;
+  static async getCapabilities(): Promise<StorageCapabilities>;
+  static clearCache(): void;
+}
+```
+
+**Purpose**: Automatically detects optimal storage backend and creates appropriate implementation.
+
+**Backend Priority**: 
+1. OPFS Async (Chrome/Firefox/Edge main thread)
+2. OPFS Sync Worker (Safari, file:// restrictions)  
+3. IndexedDB (Universal fallback)
+
+### Feature Detection System
+
+```typescript
+class FeatureDetector {
+  async detectCapabilities(): Promise<StorageCapabilities>;
+  async detectOptimalBackend(): Promise<BackendType>;
+  async testOPFSAvailable(): Promise<boolean>;
+  async testOPFSAsync(): Promise<boolean>;
+  async testOPFSSync(): Promise<boolean>;
+  async testOPFSSyncWorker(): Promise<boolean>;
+  async testIndexedDB(): Promise<boolean>;
+  async testStorageEstimate(): Promise<boolean>;
+  clearCache(): void;
+}
+```
+
+**Features**:
+- Parallel capability testing for performance
+- Real browser testing with actual API calls
+- Capability result caching
+- Worker-based sync testing with timeout handling
+- Graceful fallback on test failures
+
+### Worker Manager (OPFS Sync)
+
+```typescript
+// Worker Manager (main thread)
+class OPFSWorkerManager {
+  async createWorkspace(id: string): Promise<OperationResult>;
+  async writeFile(workspaceId: string, path: string, content: ArrayBuffer): Promise<OperationResult>;
+  async readFile(workspaceId: string, path: string): Promise<OperationResult>;
+  // ... other operations
+  destroy(): void;
+}
+
+// Worker Script (opfs-worker.js)
+import workerScript from './opfs-worker.js?raw';
+```
+
+**Purpose**: Manages Web Worker for OPFS sync access handle operations (Safari).
+
+**Architecture**:
+- **Separate JavaScript Worker File**: `opfs-worker.js` (plain JavaScript for browser compatibility)
+- **Vite `?raw` Import**: Worker script imported as string at build time
+- **Blob URL Creation**: Dynamic worker creation from imported JavaScript
+- **Type-Safe Communication**: Structured message/response interfaces (TypeScript types in main thread)
+
+**Implementation Pattern**:
+```typescript
+// Worker Manager imports JavaScript worker as raw string
+import workerScript from './opfs-worker.js?raw';
+
+class OPFSWorkerManager {
+  private initWorker(): void {
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const workerURL = URL.createObjectURL(blob);
+    this.worker = new Worker(workerURL);
+    URL.revokeObjectURL(workerURL);
+  }
+}
+```
+
+**Features**:
+- **Message-based communication** with type safety
+- **Operation timeouts** and error handling
+- **Resource cleanup** and worker lifecycle management
+- **Structured result objects** with success/error states
+- **Individual function testability** - worker functions can be tested independently
+- **Browser compatibility** - plain JavaScript avoids TypeScript interface syntax errors
+- **Better maintainability** - separate file enables better code organization
+
+### Storage Event System
+
+```typescript
+interface StorageEvents {
+  'quota-warning': { used: number; available: number; threshold: number };
+  'quota-exceeded': { used: number; available: number };
+  'backend-changed': { from: BackendType; to: BackendType };
+  'workspace-created': { workspaceId: string };
+  'workspace-deleted': { workspaceId: string };
+  'file-written': { workspaceId: string; path: string; size: number };
+  'file-deleted': { workspaceId: string; path: string };
+}
+```
+
+**Purpose**: Event-driven architecture for storage monitoring and notifications.
+
+### Testing Infrastructure
+
+```typescript
+class MockBrowserAPIs {
+  static setupGlobalMocks(): void;
+  static mockNavigator(): any;
+  static mockIndexedDB(): any;
+  // ... other browser API mocks
+}
+
+class TestDataGenerator {
+  static createWorkspaceId(): string;
+  static createTextContent(size: number): ArrayBuffer;
+  static createEPUBStructure(): Map<string, ArrayBuffer>;
+  // ... other test data generators
+}
+
+class PerformanceTestHelpers {
+  static async measureTime<T>(operation: () => Promise<T>): Promise<{ result: T; duration: number }>;
+  static async runConcurrent<T>(operations: (() => Promise<T>)[], maxConcurrency: number): Promise<T[]>;
+  // ... other performance utilities
+}
+```
+
+**Purpose**: Comprehensive testing utilities for cross-browser compatibility and performance testing.
+
 ## Error Handling
 
 ### Error Types
@@ -200,16 +337,19 @@ class FileStorageError extends Error {
   }
 }
 
-// Specific error codes
-const ErrorCodes = {
-  QUOTA_EXCEEDED: "QUOTA_EXCEEDED",
-  PERMISSION_DENIED: "PERMISSION_DENIED",
-  FILE_NOT_FOUND: "FILE_NOT_FOUND",
-  WORKSPACE_NOT_FOUND: "WORKSPACE_NOT_FOUND",
-  OPFS_NOT_SUPPORTED: "OPFS_NOT_SUPPORTED",
-  INVALID_PATH: "INVALID_PATH",
-  STORAGE_CORRUPTION: "STORAGE_CORRUPTION",
-};
+// Enhanced error code system
+enum StorageErrorCode {
+  NOT_INITIALIZED = 'NOT_INITIALIZED',
+  BACKEND_UNAVAILABLE = 'BACKEND_UNAVAILABLE',
+  QUOTA_EXCEEDED = 'QUOTA_EXCEEDED',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+  FILE_NOT_FOUND = 'FILE_NOT_FOUND',
+  WORKSPACE_NOT_FOUND = 'WORKSPACE_NOT_FOUND',
+  INVALID_PATH = 'INVALID_PATH',
+  OPERATION_TIMEOUT = 'OPERATION_TIMEOUT',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+}
 ```
 
 ### Error Handling Examples
@@ -237,29 +377,102 @@ if (quota.used / quota.available > 0.9) {
 
 ## Testing Considerations
 
-- Test both OPFS APIs (createWritable and createSyncAccessHandle)
-- Test quota exceeded scenarios
-- Verify workspace isolation
-- Performance benchmarks for large files
-- Cross-browser compatibility (Chrome, Firefox, Safari, Edge)
-- File:// protocol compatibility testing
+### Comprehensive Test Coverage (52 Tests)
+- **Core API Functionality**: All storage operations across backends
+- **Feature Detection Logic**: Capability testing with browser simulation
+- **Cross-Browser Scenarios**: Chrome, Firefox, Safari, Edge compatibility
+- **Worker Management**: OPFS sync worker communication and lifecycle
+- **Worker Script Testing**: Individual worker function testing with JavaScript compatibility
+- **Error Handling**: All error codes and recovery scenarios
+- **Performance Testing**: Concurrent operations and large file handling
+- **Data Type Compatibility**: ArrayBuffer, text encoding, binary data
+- **Mock Infrastructure**: Complete browser API simulation
+- **Build System Integration**: Vite `?raw` import testing with JavaScript worker files
+
+### Test Files Structure
+- `file-storage.test.ts` - Core functionality and data handling (14 tests)
+- `feature-detection.test.ts` - Backend selection and capability logic (13 tests)  
+- `integration.test.ts` - Cross-browser integration scenarios (13 tests)
+- `opfs-worker.test.ts` - Worker script functionality and importability (9 tests)
+- `worker.test.ts` - Worker manager lifecycle and communication (3 tests)
+
+### Worker Testing Architecture
+```typescript
+// Test JavaScript worker import
+const workerScript = await import('./opfs-worker.js?raw');
+expect(typeof workerScript.default).toBe('string');
+
+// Test worker function patterns through simulation
+const simulateCreateWorkspace = async (workspaceId: string) => {
+  // Simulate worker logic for testing
+};
+
+// Test message handling patterns
+const simulateMessageHandler = (messageType: string, data: any, id: number) => {
+  // Test worker communication protocol
+};
+```
 
 ## Performance Benefits
 
-- **Simple Architecture**: All operations run on main thread for easier debugging
-- **Fast Operations**: No message passing overhead between threads
-- **Direct Control**: Immediate error handling and response
-- **Lightweight**: No worker initialization or management overhead
-- **Better Organization**: Structured namespace prevents file conflicts and enables efficient cleanup
-- **Scalable Architecture**: Root namespace available for additional features (packaging, caching, etc.)
+- **Intelligent Backend Selection**: Automatic optimization based on browser capabilities
+- **Parallel Feature Detection**: All capability tests run concurrently for faster initialization
+- **Capability Caching**: Feature detection results cached to avoid repeated testing
+- **Worker Management**: Efficient worker lifecycle for OPFS sync operations when needed
+- **Main Thread Optimization**: OPFS async operations on main thread when available
+- **Structured Error Handling**: Specific error codes enable optimized error recovery
+- **Event-Driven Architecture**: Non-blocking storage monitoring and notifications
 - **Workspace Isolation**: Each EPUB project completely isolated from others
+- **Memory Efficient**: ArrayBuffer-based operations with minimal copying
 
 ## Implementation Notes
 
-- Start with basic OPFS support detection during app initialization
-- Implement all operations on main thread (read, write, list, delete)
-- Add quota monitoring after basic operations work
-- Consider chunking for very large files (>100MB)
+### Development Approach
+- **Factory Pattern**: StorageBackendFactory automatically selects optimal backend
+- **Feature Detection First**: Comprehensive capability testing before backend creation
+- **Worker Fallback**: OPFS sync worker for Safari and file:// protocol restrictions
+- **Type Safety**: Full TypeScript implementation with strict type checking
+- **Event-Driven Design**: Storage events for monitoring and notifications
+- **Comprehensive Testing**: 52 tests covering all functionality and edge cases
+- **Build System Integration**: Vite `?raw` imports for JavaScript worker files
+
+### Build System Integration
+```typescript
+// TypeScript declarations for raw imports
+declare module '*.js?raw' {
+  const content: string;
+  export default content;
+}
+
+// Worker import and usage
+import workerScript from './opfs-worker.js?raw';
+
+class OPFSWorkerManager {
+  private initWorker(): void {
+    // JavaScript worker file imported as-is (no TypeScript compilation needed)
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const workerURL = URL.createObjectURL(blob);
+    this.worker = new Worker(workerURL);
+    URL.revokeObjectURL(workerURL);
+  }
+}
+```
+
+**Benefits**:
+- **Browser Compatibility**: Plain JavaScript avoids TypeScript interface syntax errors in workers
+- **Direct Import**: No compilation needed - JavaScript files imported as-is
+- **Type Safety in Main Thread**: TypeScript interfaces used for message communication from main thread
+- **Testability**: Worker functions can be tested individually and imported for testing
+- **Maintainability**: Separate files enable better code organization and debugging
+
+**Important Note**: The worker script must be plain JavaScript (`.js`) rather than TypeScript (`.ts`) because when imported as raw text and executed in a Web Worker, browsers cannot parse TypeScript interfaces. TypeScript type safety is maintained in the main thread through proper interface definitions for worker communication.
+
+### Production Considerations
+- **Automatic Fallback**: Graceful degradation from OPFS → IndexedDB
+- **Resource Management**: Proper cleanup of workers and event listeners
+- **Error Recovery**: Structured error handling with specific recovery strategies
+- **Performance Monitoring**: Built-in performance measurement utilities
+- **Memory Management**: Efficient ArrayBuffer operations with minimal copying
 
 ## Implementation Pattern
 

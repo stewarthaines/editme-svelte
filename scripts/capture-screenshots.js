@@ -2,6 +2,23 @@ import { chromium } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
 
+/**
+ * Automated Screenshot Capture for Storybook Stories
+ * 
+ * This script captures screenshots of all configured Storybook stories.
+ * 
+ * To add new stories:
+ * 1. Add story configuration to the `stories` array below
+ * 2. Use the story ID format: category-story-name--variant-name
+ * 3. Find story IDs by visiting the story in Storybook and checking the URL
+ * 
+ * For backend feature demos with play functions:
+ * - Use longer timeout (8000ms) to allow interactions to complete
+ * - The play function will run automatically before screenshot
+ * 
+ * Usage: npm run screenshots
+ */
+
 const screenshotsDir = path.resolve(process.cwd(), '__screenshots__');
 
 if (!fs.existsSync(screenshotsDir)) {
@@ -17,11 +34,14 @@ const stories = [
   { name: 'header-logged-out', url: 'http://localhost:6006/iframe.html?args=&id=example-header--logged-out&viewMode=story' },
   { name: 'page-logged-in', url: 'http://localhost:6006/iframe.html?args=&id=example-page--logged-in&viewMode=story' },
   { name: 'page-logged-out', url: 'http://localhost:6006/iframe.html?args=&id=example-page--logged-out&viewMode=story' },
+  { name: 'storage-demo-interactive', url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--interactive-demo&viewMode=story' },
+  { name: 'storage-demo-with-data', url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--demo-with-sample-data&viewMode=story' },
 ];
+
 
 async function captureScreenshots() {
   const browser = await chromium.launch();
-  const page = await browser.newPage({screen: {width: 800, height: 600}});
+  const page = await browser.newPage({screen: {width: 1200, height: 800}});
   
   console.log('📸 Capturing screenshots...');
   
@@ -29,7 +49,13 @@ async function captureScreenshots() {
     try {
       console.log(`Capturing ${story.name}...`);
       await page.goto(story.url);
-      await page.waitForTimeout(1000); // Wait for story to load
+      
+      // For storage demos, wait longer for interactions to complete
+      if (story.name.includes('storage-demo')) {
+        await page.waitForTimeout(8000); // Wait for play function to complete
+      } else {
+        await page.waitForTimeout(1000); // Standard wait for other stories
+      }
       
       const screenshotPath = path.join(screenshotsDir, `${story.name}.png`);
       await page.screenshot({ 
