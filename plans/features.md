@@ -11,7 +11,7 @@ Based on the overview specification, here's a breakdown of features that can be 
 - Storage quota monitoring and error handling
 - Workspace folder management with unique IDs
 
-### 2. EPUB Unpacking
+### 2. EPUB Unpacking ✅ COMPLETE
 
 - Compression Streams API for ZIP extraction
 - Malformed EPUB detection and error reporting
@@ -19,7 +19,7 @@ Based on the overview specification, here's a breakdown of features that can be 
 - Validation of required EPUB structure (mimetype, META-INF/content.opf)
 - **Storybook**: Basic unpacking demos with various EPUB types and error scenarios
 
-### 3. EPUB Packaging
+### 3. EPUB Packaging ✅ COMPLETE
 
 - Create valid EPUB files from workspace content
 - Proper mimetype handling (uncompressed first entry)
@@ -173,8 +173,8 @@ Based on the overview specification, here's a breakdown of features that can be 
 ### Phase 1: Foundation
 
 1. File Storage API ✅ COMPLETE
-2. EPUB Unpacking
-3. EPUB Packaging
+2. EPUB Unpacking ✅ COMPLETE
+3. EPUB Packaging ✅ COMPLETE
 4. Workspace Management
 
 **Goal**: Basic EPUB load/save functionality with persistent storage

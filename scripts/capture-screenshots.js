@@ -36,6 +36,12 @@ const stories = [
   { name: 'page-logged-out', url: 'http://localhost:6006/iframe.html?args=&id=example-page--logged-out&viewMode=story' },
   { name: 'storage-demo-interactive', url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--interactive-demo&viewMode=story' },
   { name: 'storage-demo-with-data', url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--demo-with-sample-data&viewMode=story' },
+  { name: 'epub-unpacker-interactive', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--interactive-demo&viewMode=story' },
+  { name: 'epub-unpacker-with-data', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--demo-with-sample-data&viewMode=story' },
+  { name: 'epub-unpacker-error-scenarios', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--error-scenarios&viewMode=story' },
+  { name: 'epub-packager-basic-demo', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--basic-demo&viewMode=story' },
+  { name: 'epub-packager-without-progress', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--without-progress&viewMode=story' },
+  { name: 'epub-packager-progress-only', url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--progress-only&viewMode=story' },
 ];
 
 
@@ -50,8 +56,8 @@ async function captureScreenshots() {
       console.log(`Capturing ${story.name}...`);
       await page.goto(story.url);
       
-      // For storage demos, wait longer for interactions to complete
-      if (story.name.includes('storage-demo')) {
+      // For backend feature demos, wait longer for interactions to complete
+      if (story.name.includes('storage-demo') || story.name.includes('epub-')) {
         await page.waitForTimeout(8000); // Wait for play function to complete
       } else {
         await page.waitForTimeout(1000); // Standard wait for other stories

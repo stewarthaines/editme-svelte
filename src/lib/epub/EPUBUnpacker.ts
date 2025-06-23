@@ -128,21 +128,27 @@ export class EPUBUnpacker {
 					const blob = await containerEntry.extract();
 					const containerXml = await blob.text();
 					
-					const rootfileInfo = this.parseContainerXml(containerXml);
-					if (rootfileInfo.error) {
-						errors.push(rootfileInfo.error);
-					} else if (rootfileInfo.rootfilePath) {
-						rootfilePath = rootfileInfo.rootfilePath;
-						
-						// Extract package directory from rootfile path
-						const pathParts = rootfilePath.split('/');
-						if (pathParts.length > 1) {
-							packageDirectory = pathParts.slice(0, -1).join('/');
-						}
-						
-						// Check if the rootfile actually exists in the ZIP
-						if (!fileNames.includes(rootfilePath)) {
-							errors.push(`Rootfile specified in container.xml not found: ${rootfilePath}`);
+					// Validate container.xml structure first
+					const xmlValidation = this.validateXML(containerXml);
+					if (!xmlValidation.isValid) {
+						errors.push(`Invalid XML in container.xml: ${xmlValidation.error}`);
+					} else {
+						const rootfileInfo = this.parseContainerXml(containerXml);
+						if (rootfileInfo.error) {
+							errors.push(rootfileInfo.error);
+						} else if (rootfileInfo.rootfilePath) {
+							rootfilePath = rootfileInfo.rootfilePath;
+							
+							// Extract package directory from rootfile path
+							const pathParts = rootfilePath.split('/');
+							if (pathParts.length > 1) {
+								packageDirectory = pathParts.slice(0, -1).join('/');
+							}
+							
+							// Check if the rootfile actually exists in the ZIP
+							if (!fileNames.includes(rootfilePath)) {
+								errors.push(`Rootfile specified in container.xml not found: ${rootfilePath}`);
+							}
 						}
 					}
 				}
@@ -166,17 +172,27 @@ export class EPUBUnpacker {
 			}
 		}
 
-		// 5. Try to detect EPUB version from rootfile if available
+		// 5. Try to detect EPUB version from rootfile and validate OPF XML
 		if (rootfilePath && fileNames.includes(rootfilePath)) {
 			try {
 				const opfEntry = zip.entries.find(entry => entry.fileName === rootfilePath);
 				if (opfEntry) {
 					const blob = await opfEntry.extract();
 					const opfContent = await blob.text();
-					detectedVersion = this.detectEPUBVersion(opfContent);
+					
+					// Validate OPF XML structure
+					const xmlValidation = this.validateXML(opfContent);
+					if (!xmlValidation.isValid) {
+						errors.push(`Invalid XML in OPF file (${rootfilePath}): ${xmlValidation.error}`);
+					} else {
+						detectedVersion = this.detectEPUBVersion(opfContent);
+						if (!detectedVersion) {
+							warnings.push('Could not detect EPUB version from OPF file');
+						}
+					}
 				}
 			} catch {
-				warnings.push('Failed to detect EPUB version from OPF file');
+				errors.push(`Failed to read or parse OPF file: ${rootfilePath}`);
 			}
 		}
 
@@ -234,6 +250,31 @@ export class EPUBUnpacker {
 			return { rootfilePath };
 		} catch (err) {
 			return { error: `Failed to parse container.xml: ${err instanceof Error ? err.message : 'Unknown error'}` };
+		}
+	}
+
+	/**
+	 * Validates XML content using DOMParser
+	 */
+	private validateXML(xmlContent: string): { isValid: boolean; error?: string } {
+		try {
+			if (!globalThis.DOMParser) {
+				return { isValid: false, error: 'DOMParser not available' };
+			}
+			
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(xmlContent, 'application/xml');
+			
+			// Check for XML parsing errors
+			const parserError = doc.querySelector('parsererror');
+			if (parserError) {
+				const errorText = parserError.textContent || 'Unknown XML parsing error';
+				return { isValid: false, error: errorText };
+			}
+			
+			return { isValid: true };
+		} catch (error) {
+			return { isValid: false, error: error instanceof Error ? error.message : 'XML validation failed' };
 		}
 	}
 

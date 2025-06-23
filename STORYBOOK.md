@@ -321,6 +321,44 @@ npm run test:stories        # Run story-based tests
 - Include screenshots in feature documentation
 - Reference interactive demos in technical specs
 
+## Story Syntax Guidelines
+
+### ✅ **Correct Story Patterns**
+
+```svelte
+<!-- Simple story - RECOMMENDED -->
+<Story name="Basic Demo">
+  <ComponentName prop={value} />
+</Story>
+
+<!-- Story with play function -->
+<Story 
+  name="Interactive Demo"
+  play={async ({ canvasElement }) => {
+    // Interaction logic
+  }}
+>
+  <ComponentName />
+</Story>
+```
+
+### ❌ **Problematic Patterns**
+
+```svelte
+<!-- AVOID: args and parameters props cause compilation errors -->
+<Story 
+  name="Demo"
+  args={{ prop: value }}
+  parameters={{ docs: { description: "..." } }}
+>
+  <ComponentName />
+</Story>
+```
+
+**Issue**: Using `args` and `parameters` props directly on `<Story>` components causes Storybook compilation failures with "Failed to fetch dynamically imported module" errors.
+
+**Solution**: Pass props directly to the component and use the `defineMeta` configuration for story-level parameters.
+
 ## Best Practices
 
 ### ✅ **Do**
@@ -337,6 +375,7 @@ npm run test:stories        # Run story-based tests
 - Forget reset functionality (leads to state accumulation)
 - Overload a single demo (keep focused on one feature)
 - Skip documentation in story descriptions
+- Use `args` and `parameters` props directly on `<Story>` components (causes compilation errors)
 
 ## Advanced Patterns
 

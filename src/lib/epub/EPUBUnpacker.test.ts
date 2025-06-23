@@ -275,7 +275,7 @@ describe('EPUBUnpacker', () => {
 			const result = await unpacker.validateEPUBStructure(mockZip);
 
 			expect(result.isValid).toBe(false);
-			expect(result.errors).toContain('Invalid XML in container.xml');
+			expect(result.errors).toContain('Invalid XML in container.xml: Parse error');
 		});
 	});
 

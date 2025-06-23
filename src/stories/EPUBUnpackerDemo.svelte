@@ -45,6 +45,8 @@
     if (target.files && target.files[0]) {
       uploadedEPUB = target.files[0];
       addLog('info', `Uploaded file: ${uploadedEPUB.name} (${(uploadedEPUB.size / 1024).toFixed(1)} KB)`);
+      addLog('info', `File type: ${uploadedEPUB.type}, Constructor: ${uploadedEPUB.constructor.name}`);
+      addLog('info', `Has arrayBuffer method: ${typeof uploadedEPUB.arrayBuffer === 'function'}`);
     }
   }
 
@@ -52,16 +54,79 @@
   async function processUploadedEPUB() {
     if (!uploadedEPUB || !unpacker || isLoading) return;
     
+    // Verify it's actually a File object
+    if (!(uploadedEPUB instanceof File)) {
+      addLog('error', 'Invalid file object - not a File instance');
+      return;
+    }
+    
+    // Check if arrayBuffer method exists
+    if (typeof uploadedEPUB.arrayBuffer !== 'function') {
+      addLog('error', 'File object missing arrayBuffer method - browser compatibility issue');
+      return;
+    }
+    
     isLoading = true;
     addLog('action', `Processing uploaded EPUB: ${uploadedEPUB.name}`);
     
     try {
-      const arrayBuffer = await uploadedEPUB.arrayBuffer();
-      await processEPUBData(arrayBuffer, `Custom EPUB: ${uploadedEPUB.name}`);
+      await processEPUBFile(uploadedEPUB, `Custom EPUB: ${uploadedEPUB.name}`);
     } catch (error: unknown) {
       addLog('error', `Failed to process upload: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       isLoading = false;
+    }
+  }
+
+  // Process EPUB file (for real File objects)
+  async function processEPUBFile(file: File, name: string, analysisOnly = false) {
+    if (!unpacker || !storage) {
+      addLog('error', 'Unpacker or storage not initialized');
+      return;
+    }
+
+    try {
+      if (analysisOnly) {
+        // Analysis mode - just validate structure
+        addLog('action', `Analyzing EPUB structure...`);
+        const analysis = await unpacker.analyzeEPUB(file);
+        analysisResults = analysis;
+        
+        addLog('success', `Analysis complete: ${analysis.fileCount} files, ${(analysis.totalSize / 1024).toFixed(1)} KB`);
+        addLog('info', `Valid EPUB: ${analysis.isValid ? 'Yes' : 'No'}`);
+        
+        if (analysis.validation.errors.length > 0) {
+          analysis.validation.errors.forEach(error => addLog('error', `Validation: ${error}`));
+        }
+        if (analysis.validation.warnings.length > 0) {
+          analysis.validation.warnings.forEach(warning => addLog('info', `Warning: ${warning}`));
+        }
+      } else {
+        // Full unpacking mode
+        if (!currentWorkspace) {
+          currentWorkspace = `epub-demo-${Date.now()}`;
+          await storage.createWorkspace(currentWorkspace);
+          addLog('info', `Created workspace: ${currentWorkspace}`);
+        }
+        
+        const result = await unpacker.unpackEPUB(file, currentWorkspace);
+        
+        if (result.success) {
+          addLog('success', `Unpacked ${result.processedFiles} files to workspace`);
+          if (result.extractedFiles) {
+            result.extractedFiles.slice(0, 5).forEach(file => 
+              addLog('info', `Extracted: ${file}`)
+            );
+            if (result.extractedFiles.length > 5) {
+              addLog('info', `... and ${result.extractedFiles.length - 5} more files`);
+            }
+          }
+        } else {
+          addLog('error', `Failed to unpack ${name}: ${result.error}`);
+        }
+      }
+    } catch (error: unknown) {
+      addLog('error', `Failed to unpack ${name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -88,9 +153,13 @@
   // Core EPUB processing logic
   async function processEPUBData(arrayBuffer: ArrayBuffer, name: string, analysisOnly = false) {
     try {
+      // Convert ArrayBuffer to File object for API compatibility
+      const blob = new Blob([arrayBuffer], { type: 'application/epub+zip' });
+      const file = new File([blob], `${name}.epub`, { type: 'application/epub+zip' });
+      
       if (analysisOnly) {
         // Analysis mode - don't extract files
-        const analysis = await unpacker.analyzeEPUB(arrayBuffer);
+        const analysis = await unpacker.analyzeEPUB(file);
         analysisResults = analysis;
         validationResults = analysis.validation;
         
@@ -111,7 +180,7 @@
           addLog('info', `Created workspace: ${currentWorkspace}`);
         }
         
-        const result = await unpacker.unpackEPUB(arrayBuffer, currentWorkspace);
+        const result = await unpacker.unpackEPUB(file, currentWorkspace);
         
         if (result.success) {
           extractedFiles = result.extractedFiles || [];

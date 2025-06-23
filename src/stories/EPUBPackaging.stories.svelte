@@ -3,7 +3,7 @@
   import EPUBPackagingDemo from './EPUBPackagingDemo.svelte';
 
   const { Story } = defineMeta({
-    title: 'Features/EPUB Packaging',
+    title: 'Backend/EPUB Packager',
     component: EPUBPackagingDemo,
     tags: ['autodocs'],
     parameters: {
@@ -58,75 +58,16 @@ The generated EPUB can be opened in any standard EPUB reader.
 </script>
 
 <!-- Basic Demo Story -->
-<Story 
-  name="Basic Demo"
-  args={{
-    showProgress: true,
-    allowDownload: true
-  }}
-  parameters={{
-    docs: {
-      description: {
-        story: `
-### Basic EPUB Packaging Demo
-
-This story demonstrates the core EPUB packaging workflow with a simple but complete EPUB structure.
-
-**Features shown:**
-- Workspace file listing with MIME types
-- Real-time progress tracking during packaging
-- Packaging results with compression statistics
-- Direct download functionality
-
-**Try it:** Click the "Package EPUB" button to see the packaging process in action. The progress indicator will show each phase of the operation, and you can download the resulting EPUB file.
-        `
-      }
-    }
-  }}
->
+<Story name="Basic Demo">
   <EPUBPackagingDemo showProgress={true} allowDownload={true} />
 </Story>
 
 <!-- Without Progress Demo -->
-<Story 
-  name="Without Progress"
-  args={{
-    showProgress: false,
-    allowDownload: true
-  }}
-  parameters={{
-    docs: {
-      description: {
-        story: `
-### Packaging Without Progress Display
-
-This variant shows the same packaging functionality but without the progress indicator, demonstrating how the feature works when progress tracking is disabled.
-        `
-      }
-    }
-  }}
->
+<Story name="Without Progress">
   <EPUBPackagingDemo showProgress={false} allowDownload={true} />
 </Story>
 
 <!-- Progress Only Demo -->
-<Story 
-  name="Progress Only"
-  args={{
-    showProgress: true,
-    allowDownload: false
-  }}
-  parameters={{
-    docs: {
-      description: {
-        story: `
-### Progress Tracking Only
-
-This variant focuses on the progress tracking capabilities, showing detailed information about the packaging process without the download functionality.
-        `
-      }
-    }
-  }}
->
+<Story name="Progress Only">
   <EPUBPackagingDemo showProgress={true} allowDownload={false} />
 </Story>
