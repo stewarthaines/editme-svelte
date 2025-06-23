@@ -37,15 +37,17 @@ export const BASIC_EPUB_WORKSPACE: MockWorkspace = {
 			path: 'OEBPS/content.opf',
 			content: `<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid">
-	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/">
 		<dc:title>Demo EPUB Book</dc:title>
 		<dc:creator>Storybook Demo</dc:creator>
 		<dc:language>en</dc:language>
 		<dc:identifier id="uid">demo-epub-2024</dc:identifier>
 		<dc:publisher>EDITME Demo</dc:publisher>
 		<dc:date>2024-01-01</dc:date>
+		<meta property="dcterms:modified">${new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')}</meta>
 	</metadata>
 	<manifest>
+		<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
 		<item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
 		<item id="styles" href="styles.css" media-type="text/css"/>
 	</manifest>
@@ -54,6 +56,26 @@ export const BASIC_EPUB_WORKSPACE: MockWorkspace = {
 	</spine>
 </package>`,
 			mimeType: 'application/oebps-package+xml'
+		},
+		{
+			path: 'OEBPS/nav.xhtml',
+			content: `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+	<title>Navigation</title>
+	<link rel="stylesheet" type="text/css" href="styles.css"/>
+</head>
+<body>
+	<nav epub:type="toc" id="toc">
+		<h1>Table of Contents</h1>
+		<ol>
+			<li><a href="chapter1.xhtml">Chapter 1: Introduction</a></li>
+		</ol>
+	</nav>
+</body>
+</html>`,
+			mimeType: 'application/xhtml+xml'
 		},
 		{
 			path: 'OEBPS/chapter1.xhtml',
