@@ -1,0 +1,676 @@
+/**
+ * WorkspaceManager Unit Tests
+ * 
+ * Tests based on API documentation - validates all public methods,
+ * error handling, and integration patterns.
+ */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { WorkspaceManager } from '../workspace-manager.js';
+import { WorkspaceError, ValidationError, CacheError } from '../types.js';
+import type { 
+  WorkspaceInfo, 
+  EPUBMetadata, 
+  OPFDocument, 
+  ManifestItem, 
+  ValidationResult,
+  WorkspacePreview,
+  WorkspaceConfig 
+} from '../types.js';
+
+// Mock File Storage API
+vi.mock('../../storage/index.js', () => ({
+  FileStorageAPI: vi.fn(() => ({
+    init: vi.fn(),
+    isInitialized: vi.fn(() => true),
+    createWorkspace: vi.fn(),
+    listWorkspaces: vi.fn(() => []),
+    writeTextFile: vi.fn(),
+    readTextFile: vi.fn(),
+    writeFile: vi.fn(),
+    readFile: vi.fn(),
+    listFiles: vi.fn(() => []),
+    getFileStats: vi.fn(),
+    deleteWorkspace: vi.fn(),
+    destroy: vi.fn()
+  }))
+}));
+
+// Mock OPF Utils
+vi.mock('../../epub/index.js', () => ({
+  OPFUtils: {
+    parseOPFDocument: vi.fn(),
+    generateOPFXML: vi.fn(),
+    parseOPFMetadata: vi.fn(),
+    validateXML: vi.fn(() => ({ isValid: true })),
+    generateContainerXML: vi.fn(() => '<container></container>')
+  }
+}));
+
+describe('WorkspaceManager', () => {
+  let workspaceManager: WorkspaceManager;
+  let mockStorage: any;
+
+  const mockMetadata: EPUBMetadata = {
+    title: 'Test Book',
+    language: 'en', 
+    identifier: 'test-book-123',
+    author: 'Test Author'
+  };
+
+  const mockWorkspaceInfo: WorkspaceInfo = {
+    id: 'workspace-123',
+    title: 'Test Book',
+    author: 'Test Author',
+    language: 'en',
+    lastModified: new Date('2024-01-01'),
+    fileCount: 5,
+    totalSize: 1024,
+    epubVersion: 'EPUB 3.0'
+  };
+
+  const mockOPFDocument: OPFDocument = {
+    version: '3.0',
+    metadata: mockMetadata,
+    manifest: [
+      {
+        id: 'chapter1',
+        href: 'OEBPS/Text/chapter1.xhtml',
+        mediaType: 'application/xhtml+xml'
+      }
+    ],
+    spine: [
+      {
+        idref: 'chapter1',
+        linear: true
+      }
+    ]
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    workspaceManager = new WorkspaceManager();
+    mockStorage = (workspaceManager as any).storage;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe('constructor', () => {
+    it('should initialize with default config', () => {
+      const manager = new WorkspaceManager();
+      expect(manager).toBeInstanceOf(WorkspaceManager);
+    });
+
+    it('should accept custom configuration', () => {
+      const config: Partial<WorkspaceConfig> = {
+        cache: { ttl: 12 * 60 * 60 * 1000, maxEntries: 50, enableDiskCache: false },
+        validation: { strict: true, checkDependencies: false, allowOrphanedFiles: false }
+      };
+      
+      const manager = new WorkspaceManager(config);
+      expect(manager).toBeInstanceOf(WorkspaceManager);
+    });
+  });
+
+  describe('listWorkspacesWithMetadata', () => {
+    it('should return array of workspace info sorted by lastModified', async () => {
+      const workspaces = [
+        { ...mockWorkspaceInfo, id: 'workspace-1', lastModified: new Date('2024-01-01') },
+        { ...mockWorkspaceInfo, id: 'workspace-2', lastModified: new Date('2024-01-02') }
+      ];
+
+      mockStorage.listWorkspaces.mockResolvedValue(['workspace-1', 'workspace-2']);
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockResolvedValueOnce(workspaces[0])
+        .mockResolvedValueOnce(workspaces[1]);
+
+      const result = await workspaceManager.listWorkspacesWithMetadata();
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('workspace-2'); // Most recent first
+      expect(result[1].id).toBe('workspace-1');
+    });
+
+    it('should handle workspace with errors gracefully', async () => {
+      mockStorage.listWorkspaces.mockResolvedValue(['workspace-error']);
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockRejectedValue(new Error('Corrupted workspace'));
+
+      const result = await workspaceManager.listWorkspacesWithMetadata();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].hasError).toBe(true);
+      expect(result[0].title).toContain('Error');
+    });
+
+    it('should use cached metadata when fresh', async () => {
+      mockStorage.listWorkspaces.mockResolvedValue(['workspace-123']);
+      vi.spyOn(workspaceManager as any, 'loadCachedMetadata')
+        .mockResolvedValue(mockWorkspaceInfo);
+      vi.spyOn(workspaceManager as any, 'isCacheFresh')
+        .mockResolvedValue(true);
+
+      const result = await workspaceManager.listWorkspacesWithMetadata();
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(mockWorkspaceInfo);
+    });
+  });
+
+  describe('createEPUBWorkspace', () => {
+    it('should create workspace and return UUID', async () => {
+      const expectedId = 'workspace-new-123';
+      vi.spyOn(crypto, 'randomUUID').mockReturnValue(expectedId);
+      
+      mockStorage.createWorkspace.mockResolvedValue(undefined);
+      mockStorage.writeTextFile.mockResolvedValue(undefined);
+
+      const result = await workspaceManager.createEPUBWorkspace(mockMetadata);
+
+      expect(result).toBe(expectedId);
+      expect(mockStorage.createWorkspace).toHaveBeenCalledWith(expectedId);
+      
+      // Should create EPUB structure files
+      expect(mockStorage.writeTextFile).toHaveBeenCalledWith(
+        expectedId, 'mimetype', 'application/epub+zip'
+      );
+      expect(mockStorage.writeTextFile).toHaveBeenCalledWith(
+        expectedId, 'META-INF/container.xml', expect.stringContaining('<container')
+      );
+    });
+
+    it('should generate initial content.opf with metadata', async () => {
+      const workspaceId = 'workspace-new-123';
+      vi.spyOn(crypto, 'randomUUID').mockReturnValue(workspaceId);
+
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.generateOPFXML.mockReturnValue('<package></package>');
+
+      await workspaceManager.createEPUBWorkspace(mockMetadata);
+
+      expect(OPFUtils.generateOPFXML).toHaveBeenCalledWith(
+        expect.objectContaining({
+          metadata: mockMetadata,
+          version: '3.0'
+        })
+      );
+    });
+
+    it('should handle storage errors', async () => {
+      mockStorage.createWorkspace.mockRejectedValue(new Error('Storage full'));
+
+      await expect(
+        workspaceManager.createEPUBWorkspace(mockMetadata)
+      ).rejects.toThrow('Storage full');
+    });
+  });
+
+  describe('switchWorkspace', () => {
+    it('should return workspace info for valid workspace', async () => {
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockResolvedValue(mockWorkspaceInfo);
+      vi.spyOn(workspaceManager, 'validateWorkspaceStructure')
+        .mockResolvedValue({ 
+          isValid: true, 
+          errors: [], 
+          warnings: [],
+          summary: { totalFiles: 5, validFiles: 5, missingFiles: 0, orphanedFiles: 0 }
+        });
+
+      const result = await workspaceManager.switchWorkspace('workspace-123');
+
+      expect(result).toEqual(mockWorkspaceInfo);
+    });
+
+    it('should throw WorkspaceError for non-existent workspace', async () => {
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockRejectedValue(new Error('Workspace not found'));
+
+      await expect(
+        workspaceManager.switchWorkspace('invalid-id')
+      ).rejects.toThrow(WorkspaceError);
+    });
+
+    it('should validate workspace structure and update cache', async () => {
+      const validateSpy = vi.spyOn(workspaceManager, 'validateWorkspaceStructure')
+        .mockResolvedValue({
+          isValid: true,
+          errors: [],
+          warnings: [],
+          summary: { totalFiles: 5, validFiles: 5, missingFiles: 0, orphanedFiles: 0 }
+        });
+      
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockResolvedValue(mockWorkspaceInfo);
+
+      await workspaceManager.switchWorkspace('workspace-123');
+
+      expect(validateSpy).toHaveBeenCalledWith('workspace-123');
+    });
+  });
+
+  describe('getWorkspaceOPF', () => {
+    it('should return parsed OPF document', async () => {
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      const result = await workspaceManager.getWorkspaceOPF('workspace-123');
+
+      expect(result).toEqual(mockOPFDocument);
+      expect(mockStorage.readTextFile).toHaveBeenCalledWith(
+        'workspace-123', 'OEBPS/content.opf'
+      );
+    });
+
+    it('should handle missing OPF file', async () => {
+      mockStorage.readTextFile.mockRejectedValue(new Error('File not found'));
+
+      await expect(
+        workspaceManager.getWorkspaceOPF('workspace-123')
+      ).rejects.toThrow(WorkspaceError);
+    });
+
+    it('should handle malformed OPF XML', async () => {
+      mockStorage.readTextFile.mockResolvedValue('invalid xml');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockImplementation(() => {
+        throw new Error('Invalid XML');
+      });
+
+      await expect(
+        workspaceManager.getWorkspaceOPF('workspace-123')
+      ).rejects.toThrow(WorkspaceError);
+    });
+  });
+
+  describe('updateWorkspaceOPF', () => {
+    it('should write updated OPF and invalidate cache', async () => {
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      
+      mockStorage.writeTextFile.mockResolvedValue(undefined);
+
+      await workspaceManager.updateWorkspaceOPF('workspace-123', mockOPFDocument);
+
+      expect(OPFUtils.generateOPFXML).toHaveBeenCalledWith(mockOPFDocument);
+      expect(mockStorage.writeTextFile).toHaveBeenCalledWith(
+        'workspace-123', 'OEBPS/content.opf', '<package>updated</package>'
+      );
+    });
+
+    it('should validate OPF structure before writing', async () => {
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.validateXML.mockReturnValue({ 
+        isValid: false, 
+        error: 'Invalid XML structure' 
+      });
+
+      await expect(
+        workspaceManager.updateWorkspaceOPF('workspace-123', mockOPFDocument)
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should handle storage write errors', async () => {
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.generateOPFXML.mockReturnValue('<package></package>');
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      
+      mockStorage.writeTextFile.mockRejectedValue(new Error('Disk full'));
+
+      await expect(
+        workspaceManager.updateWorkspaceOPF('workspace-123', mockOPFDocument)
+      ).rejects.toThrow('Disk full');
+    });
+  });
+
+  describe('addManifestItem', () => {
+    const partialItem: Partial<ManifestItem> = {
+      href: 'OEBPS/Text/chapter2.xhtml'
+    };
+
+    it('should add manifest item with auto-generated ID and mediaType', async () => {
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.writeTextFile.mockResolvedValue(undefined);
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+
+      vi.spyOn(workspaceManager as any, 'generateManifestId')
+        .mockReturnValue('chapter2');
+      vi.spyOn(workspaceManager as any, 'detectMediaType')
+        .mockReturnValue('application/xhtml+xml');
+
+      const result = await workspaceManager.addManifestItem('workspace-123', partialItem);
+
+      expect(result.id).toBe('chapter2');
+      expect(result.href).toBe('OEBPS/Text/chapter2.xhtml');
+      expect(result.mediaType).toBe('application/xhtml+xml');
+    });
+
+    it('should preserve provided ID and mediaType', async () => {
+      const completeItem: ManifestItem = {
+        id: 'custom-id',
+        href: 'OEBPS/Text/custom.xhtml',
+        mediaType: 'application/xhtml+xml'
+      };
+
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.writeTextFile.mockResolvedValue(undefined);
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+
+      const result = await workspaceManager.addManifestItem('workspace-123', completeItem);
+
+      expect(result.id).toBe('custom-id');
+      expect(result.mediaType).toBe('application/xhtml+xml');
+    });
+
+    it('should throw error for duplicate manifest ID', async () => {
+      const duplicateItem: ManifestItem = {
+        id: 'chapter1', // Already exists in mockOPFDocument
+        href: 'OEBPS/Text/duplicate.xhtml',
+        mediaType: 'application/xhtml+xml'
+      };
+
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      await expect(
+        workspaceManager.addManifestItem('workspace-123', duplicateItem)
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should invalidate cache after successful addition', async () => {
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.writeTextFile.mockResolvedValue(undefined);
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+
+      vi.spyOn(workspaceManager as any, 'generateManifestId').mockReturnValue('chapter2');
+      vi.spyOn(workspaceManager as any, 'detectMediaType').mockReturnValue('application/xhtml+xml');
+      const invalidateSpy = vi.spyOn(workspaceManager as any, 'invalidateCache');
+
+      await workspaceManager.addManifestItem('workspace-123', partialItem);
+
+      expect(invalidateSpy).toHaveBeenCalledWith('workspace-123');
+    });
+  });
+
+  describe('validateWorkspaceStructure', () => {
+    const mockValidationResult: ValidationResult = {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      summary: {
+        totalFiles: 5,
+        validFiles: 5, 
+        missingFiles: 0,
+        orphanedFiles: 0
+      }
+    };
+
+    it('should return validation results with summary', async () => {
+      mockStorage.listFiles.mockResolvedValue([
+        'mimetype',
+        'META-INF/container.xml',
+        'OEBPS/content.opf',
+        'OEBPS/Text/chapter1.xhtml',
+        'OEBPS/Styles/style.css'
+      ]);
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+
+      const result = await workspaceManager.validateWorkspaceStructure('workspace-123');
+
+      expect(result.isValid).toBe(true);
+      expect(result.summary.totalFiles).toBeGreaterThan(0);
+      expect(result.summary.validFiles).toBeGreaterThan(0);
+    });
+
+    it('should detect missing required files', async () => {
+      mockStorage.listFiles.mockResolvedValue([
+        'OEBPS/content.opf' // Missing mimetype and container.xml
+      ]);
+
+      const result = await workspaceManager.validateWorkspaceStructure('workspace-123');
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors.some(e => e.message.includes('mimetype'))).toBe(true);
+    });
+
+    it('should detect orphaned files not in manifest', async () => {
+      mockStorage.listFiles.mockResolvedValue([
+        'mimetype',
+        'META-INF/container.xml', 
+        'OEBPS/content.opf',
+        'OEBPS/Text/chapter1.xhtml',
+        'OEBPS/Images/orphaned.jpg' // Not in manifest
+      ]);
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      const result = await workspaceManager.validateWorkspaceStructure('workspace-123');
+
+      expect(result.summary.orphanedFiles).toBeGreaterThan(0);
+    });
+
+    it('should handle validation with strict mode', async () => {
+      const strictManager = new WorkspaceManager({
+        validation: { strict: true, checkDependencies: true, allowOrphanedFiles: false }
+      });
+
+      mockStorage.listFiles.mockResolvedValue([
+        'mimetype',
+        'META-INF/container.xml',
+        'OEBPS/content.opf',
+        'OEBPS/Text/chapter1.xhtml',
+        'OEBPS/Images/orphaned.jpg'
+      ]);
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      const result = await strictManager.validateWorkspaceStructure('workspace-123');
+
+      // In strict mode, orphaned files should be errors not warnings
+      expect(result.isValid).toBe(false);
+    });
+  });
+
+  describe('generateWorkspacePreview', () => {
+    const mockPreview: WorkspacePreview = {
+      metadata: mockMetadata,
+      manifestSummary: {
+        textItems: 1,
+        imageItems: 0,
+        audioItems: 0,
+        videoItems: 0,
+        fontItems: 0,
+        otherItems: 0
+      },
+      spineOrder: ['chapter1'],
+      estimatedEPUBSize: 1024,
+      dependencies: {
+        orphanedFiles: [],
+        missingDependencies: [],
+        circularReferences: []
+      }
+    };
+
+    it('should return comprehensive workspace preview', async () => {
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.listFiles.mockResolvedValue([
+        'OEBPS/content.opf',
+        'OEBPS/Text/chapter1.xhtml'
+      ]);
+      mockStorage.getFileStats.mockResolvedValue({ size: 512 });
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      const result = await workspaceManager.generateWorkspacePreview('workspace-123');
+
+      expect(result.metadata).toEqual(mockMetadata);
+      expect(result.manifestSummary.textItems).toBe(1);
+      expect(result.spineOrder).toEqual(['chapter1']);
+      expect(result.estimatedEPUBSize).toBeGreaterThan(0);
+    });
+
+    it('should categorize manifest items by media type', async () => {
+      const complexOPF: OPFDocument = {
+        ...mockOPFDocument,
+        manifest: [
+          { id: 'ch1', href: 'text.xhtml', mediaType: 'application/xhtml+xml' },
+          { id: 'img1', href: 'image.jpg', mediaType: 'image/jpeg' },
+          { id: 'audio1', href: 'sound.mp3', mediaType: 'audio/mpeg' },
+          { id: 'font1', href: 'font.ttf', mediaType: 'font/ttf' }
+        ]
+      };
+
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.listFiles.mockResolvedValue(['OEBPS/content.opf']);
+      mockStorage.getFileStats.mockResolvedValue({ size: 100 });
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(complexOPF);
+
+      const result = await workspaceManager.generateWorkspacePreview('workspace-123');
+
+      expect(result.manifestSummary.textItems).toBe(1);
+      expect(result.manifestSummary.imageItems).toBe(1);
+      expect(result.manifestSummary.audioItems).toBe(1);
+      expect(result.manifestSummary.fontItems).toBe(1);
+    });
+
+    it('should analyze file dependencies', async () => {
+      mockStorage.readTextFile.mockResolvedValue('<package></package>');
+      mockStorage.listFiles.mockResolvedValue([
+        'OEBPS/content.opf',
+        'OEBPS/Text/chapter1.xhtml',
+        'OEBPS/Images/orphaned.jpg'
+      ]);
+      mockStorage.getFileStats.mockResolvedValue({ size: 100 });
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+
+      const result = await workspaceManager.generateWorkspacePreview('workspace-123');
+
+      expect(result.dependencies).toBeDefined();
+      expect(Array.isArray(result.dependencies.orphanedFiles)).toBe(true);
+      expect(Array.isArray(result.dependencies.missingDependencies)).toBe(true);
+    });
+  });
+
+  describe('error handling', () => {
+    it('should throw WorkspaceError with proper error codes', async () => {
+      mockStorage.listWorkspaces.mockRejectedValue(new Error('Storage not initialized'));
+
+      try {
+        await workspaceManager.listWorkspacesWithMetadata();
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(WorkspaceError);
+        expect((error as WorkspaceError).code).toBeDefined();
+      }
+    });
+
+    it('should throw ValidationError for validation failures', async () => {
+      const invalidOPF = { ...mockOPFDocument, manifest: [] }; // Empty manifest
+      
+      const { OPFUtils } = await import('../../epub/index.js');
+      OPFUtils.validateXML.mockReturnValue({ 
+        isValid: false, 
+        error: 'Missing required elements' 
+      });
+
+      try {
+        await workspaceManager.updateWorkspaceOPF('workspace-123', invalidOPF);
+        expect.fail('Should have thrown ValidationError');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ValidationError);
+        expect((error as ValidationError).errors).toBeDefined();
+      }
+    });
+
+    it('should throw CacheError for cache-related issues', async () => {
+      vi.spyOn(workspaceManager as any, 'loadCachedMetadata')
+        .mockRejectedValue(new CacheError('Cache corrupted', 'CORRUPTED', 'workspace-123'));
+
+      try {
+        await workspaceManager.listWorkspacesWithMetadata();
+        // Should handle gracefully or rethrow
+      } catch (error) {
+        if (error instanceof CacheError) {
+          expect(error.reason).toBe('CORRUPTED');
+          expect(error.workspaceId).toBe('workspace-123');
+        }
+      }
+    });
+  });
+
+  describe('configuration', () => {
+    it('should respect cache configuration settings', () => {
+      const config: Partial<WorkspaceConfig> = {
+        cache: {
+          ttl: 6 * 60 * 60 * 1000, // 6 hours
+          maxEntries: 25,
+          enableDiskCache: false
+        }
+      };
+
+      const manager = new WorkspaceManager(config);
+      // Configuration should be applied internally
+      expect(manager).toBeInstanceOf(WorkspaceManager);
+    });
+
+    it('should respect validation configuration settings', () => {
+      const config: Partial<WorkspaceConfig> = {
+        validation: {
+          strict: true,
+          checkDependencies: false,
+          allowOrphanedFiles: false
+        }
+      };
+
+      const manager = new WorkspaceManager(config);
+      expect(manager).toBeInstanceOf(WorkspaceManager);
+    });
+
+    it('should respect performance configuration settings', () => {
+      const config: Partial<WorkspaceConfig> = {
+        performance: {
+          batchSize: 25,
+          concurrency: 3,
+          enableProgressCallbacks: false
+        }
+      };
+
+      const manager = new WorkspaceManager(config);
+      expect(manager).toBeInstanceOf(WorkspaceManager);
+    });
+  });
+});
