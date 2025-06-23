@@ -1,4 +1,4 @@
-# 11. Metadata Editor
+# 10. Metadata Editor
 
 ## Overview
 Form-based interface for editing EPUB metadata with grouped fields, immediate mode editing, and proper validation for required fields.
@@ -10,7 +10,7 @@ Form-based interface for editing EPUB metadata with grouped fields, immediate mo
 - Required field validation (Title, Language, Identifier)
 
 ## Dependencies
-- **#5 Content.opf Parser** - for metadata structure and validation
+- **#4 Workspace & OPF Manager** - for metadata structure and validation
 
 ## Technical Approach
 - Grouped form layout with collapsible sections

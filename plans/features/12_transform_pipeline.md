@@ -1,4 +1,4 @@
-# 13. Transform Pipeline
+# 12. Transform Pipeline
 
 ## Overview
 Executes transformText.js and transformDom.js as dynamic functions to convert plain text sources into XHTML spine items with proper error handling.
@@ -10,7 +10,7 @@ Executes transformText.js and transformDom.js as dynamic functions to convert pl
 - XHTML template generation with proper structure
 
 ## Dependencies
-- **#6 Blob URL Manager** - for loading transform scripts
+- **#5 Blob URL Manager** - for loading transform scripts
 
 ## Technical Approach
 - Dynamic function execution in sandboxed context

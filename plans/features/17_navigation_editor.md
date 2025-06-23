@@ -1,4 +1,4 @@
-# 18. Navigation Editor
+# 17. Navigation Editor
 
 ## Overview
 Split-pane interface for editing EPUB navigation with raw markup editor and rendered preview, supporting both auto-generation and manual editing.
@@ -10,8 +10,8 @@ Split-pane interface for editing EPUB navigation with raw markup editor and rend
 - Live preview updates
 
 ## Dependencies
-- **#5 Content.opf Parser** - for spine item data
-- **#13 Transform Pipeline** - for content processing
+- **#4 Workspace & OPF Manager** - for spine item data
+- **#12 Transform Pipeline** - for content processing
 
 ## Technical Approach
 - Split editor layout with source and preview panes

@@ -1,4 +1,4 @@
-# 17. Preview Iframe
+# 16. Preview Iframe
 
 ## Overview
 Displays transformed XHTML content in an iframe with blob URL substitution for static resources, real-time updates, and device-specific viewport sizing.
@@ -10,8 +10,8 @@ Displays transformed XHTML content in an iframe with blob URL substitution for s
 - Device-specific viewport sizing
 
 ## Dependencies
-- **#13 Transform Pipeline** - for content generation
-- **#14 Text Editor** - for content updates
+- **#12 Transform Pipeline** - for content generation
+- **#13 Text Editor** - for content updates
 
 ## Technical Approach
 - Sandboxed iframe for content security

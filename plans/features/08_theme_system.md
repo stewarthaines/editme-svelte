@@ -1,4 +1,4 @@
-# 09. Theme System
+# 08. Theme System
 
 ## Overview
 Implements light/dark mode theming with browser preference detection, user toggle functionality, and localStorage persistence.

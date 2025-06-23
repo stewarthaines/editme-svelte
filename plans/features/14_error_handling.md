@@ -1,4 +1,4 @@
-# 15. Error Handling
+# 14. Error Handling
 
 ## Overview
 Comprehensive error detection, reporting, and recovery system for transform failures and other application errors with user-friendly messaging.
@@ -10,7 +10,7 @@ Comprehensive error detection, reporting, and recovery system for transform fail
 - User-friendly error reporting
 
 ## Dependencies
-- **#6 Blob URL Manager** - for error page blob creation
+- **#5 Blob URL Manager** - for error page blob creation
 
 ## Technical Approach
 - Centralized error handling system

@@ -1,4 +1,4 @@
-# 16. Device Preview
+# 15. Device Preview
 
 ## Overview
 Multi-device preview system with responsive mode and specific device viewport emulation, including orientation toggles and dropdown selection.
@@ -10,8 +10,8 @@ Multi-device preview system with responsive mode and specific device viewport em
 - Portrait/landscape orientation toggle
 
 ## Dependencies
-- **#13 Transform Pipeline** - for content to preview
-- **#14 Text Editor** - for real-time updates
+- **#12 Transform Pipeline** - for content to preview
+- **#13 Text Editor** - for real-time updates
 
 ## Technical Approach
 - CSS viewport simulation for device dimensions

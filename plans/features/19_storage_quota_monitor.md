@@ -1,4 +1,4 @@
-# 20. Storage Quota Monitor
+# 19. Storage Quota Monitor
 
 ## Overview
 Monitors browser storage usage and quota limits, providing warnings, usage breakdowns, and cleanup suggestions to prevent storage-related failures.

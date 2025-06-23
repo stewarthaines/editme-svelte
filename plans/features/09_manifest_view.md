@@ -1,4 +1,4 @@
-# 10. Manifest View
+# 09. Manifest View
 
 ## Overview
 Provides a table-based interface for viewing and managing all EPUB manifest items with content preview capabilities and item creation/editing functionality.
@@ -11,7 +11,7 @@ Provides a table-based interface for viewing and managing all EPUB manifest item
 - content.opf display as text item
 
 ## Dependencies
-- **#5 Content.opf Parser** - for reading manifest data
+- **#4 Workspace & OPF Manager** - for reading manifest data
 
 ## Technical Approach
 - Data table with sortable columns

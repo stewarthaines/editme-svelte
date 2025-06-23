@@ -1,4 +1,4 @@
-# 14. Text Editor
+# 13. Text Editor
 
 ## Overview
 Provides a textarea-based editor for plain text sources with debounced preview updates, auto-save functionality, and association with XHTML spine items.
@@ -10,7 +10,7 @@ Provides a textarea-based editor for plain text sources with debounced preview u
 - Association with corresponding XHTML spine item
 
 ## Dependencies
-- **#13 Transform Pipeline** - for converting text to preview
+- **#12 Transform Pipeline** - for converting text to preview
 
 ## Technical Approach
 - Iframe-based editor for security isolation

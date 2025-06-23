@@ -1,4 +1,4 @@
-# 12. Spine Item Manager
+# 11. Spine Item Manager
 
 ## Overview
 Manages the EPUB spine (reading order) with drag-and-drop reordering, item operations, and association with plain text source files.
@@ -10,7 +10,7 @@ Manages the EPUB spine (reading order) with drag-and-drop reordering, item opera
 - Association with plain text source files
 
 ## Dependencies
-- **#5 Content.opf Parser** - for spine data management
+- **#4 Workspace & OPF Manager** - for spine data management
 
 ## Technical Approach
 - Sortable list component with drag-and-drop

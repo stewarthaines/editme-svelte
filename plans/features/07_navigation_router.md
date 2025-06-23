@@ -1,4 +1,4 @@
-# 08. Navigation Router
+# 07. Navigation Router
 
 ## Overview
 Manages navigation between different views (manifest, metadata, spine, navigation) with state management, transitions, and active state indicators.

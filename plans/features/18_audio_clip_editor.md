@@ -1,4 +1,4 @@
-# 19. Audio Clip Editor
+# 18. Audio Clip Editor
 
 ## Overview
 Specialized editor for audio manifest items with timestamp selection, clip range definition, and playback controls for audio content creation.

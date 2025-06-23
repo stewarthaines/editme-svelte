@@ -1,4 +1,4 @@
-# 06. Blob URL Manager
+# 05. Blob URL Manager
 
 ## Overview
 Converts manifest items from storage into blob URLs and substitutes them in XHTML content for preview iframe usage. Enables preview iframes to load EPUB assets (CSS, JS, SVG) using standard relative URLs without modifying the original EPUB HTML structure.

@@ -1,4 +1,4 @@
-# 07. Layout System
+# 06. Layout System
 
 ## Overview
 Implements the main application layout with collapsible sidebar and resizable panels, supporting both mouse and touch interactions with state persistence.
