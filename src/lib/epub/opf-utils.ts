@@ -5,6 +5,8 @@
  * Extracted from EPUBPackager and EPUBUnpacker for reuse by WorkspaceManager.
  */
 
+/// <reference lib="dom" />
+
 export interface EPUBMetadata {
 	title: string;
 	author?: string;
@@ -122,37 +124,39 @@ export class OPFUtils {
 	}
 
 	/**
-	 * Parses OPF content to extract metadata using regex (for compatibility)
+	 * Parses OPF Document to extract metadata using namespace-aware DOM methods
 	 */
-	static parseOPFMetadata(opfContent: string): EPUBMetadata {
-		// Extract required metadata fields
-		const titleMatch = opfContent.match(/<dc:title[^>]*>(.*?)<\/dc:title>/i);
-		const languageMatch = opfContent.match(/<dc:language[^>]*>(.*?)<\/dc:language>/i);
-		const identifierMatch = opfContent.match(/<dc:identifier[^>]*>(.*?)<\/dc:identifier>/i);
+	static parseOPFMetadata(doc: Document): EPUBMetadata {
+		const DC_NS = 'http://purl.org/dc/elements/1.1/';
+		
+		// Extract required metadata fields using namespace-aware methods
+		const titleElements = doc.getElementsByTagNameNS(DC_NS, 'title');
+		const languageElements = doc.getElementsByTagNameNS(DC_NS, 'language');
+		const identifierElements = doc.getElementsByTagNameNS(DC_NS, 'identifier');
 
 		// Check for required fields
-		if (!titleMatch) {
+		if (titleElements.length === 0 || !titleElements[0].textContent?.trim()) {
 			throw new Error('Missing required dc:title in OPF metadata');
 		}
-		if (!languageMatch) {
+		if (languageElements.length === 0 || !languageElements[0].textContent?.trim()) {
 			throw new Error('Missing required dc:language in OPF metadata');
 		}
-		if (!identifierMatch) {
+		if (identifierElements.length === 0 || !identifierElements[0].textContent?.trim()) {
 			throw new Error('Missing required dc:identifier in OPF metadata');
 		}
 
 		// Extract optional fields
-		const authorMatch = opfContent.match(/<dc:creator[^>]*>(.*?)<\/dc:creator>/i);
-		const publisherMatch = opfContent.match(/<dc:publisher[^>]*>(.*?)<\/dc:publisher>/i);
-		const dateMatch = opfContent.match(/<dc:date[^>]*>(.*?)<\/dc:date>/i);
+		const authorElements = doc.getElementsByTagNameNS(DC_NS, 'creator');
+		const publisherElements = doc.getElementsByTagNameNS(DC_NS, 'publisher');
+		const dateElements = doc.getElementsByTagNameNS(DC_NS, 'date');
 
 		return {
-			title: titleMatch[1].trim(),
-			author: authorMatch?.[1]?.trim(),
-			language: languageMatch[1].trim(),
-			identifier: identifierMatch[1].trim(),
-			publisher: publisherMatch?.[1]?.trim(),
-			date: dateMatch?.[1]?.trim()
+			title: titleElements[0].textContent!.trim(),
+			author: authorElements.length > 0 ? authorElements[0].textContent?.trim() : undefined,
+			language: languageElements[0].textContent!.trim(),
+			identifier: identifierElements[0].textContent!.trim(),
+			publisher: publisherElements.length > 0 ? publisherElements[0].textContent?.trim() : undefined,
+			date: dateElements.length > 0 ? dateElements[0].textContent?.trim() : undefined
 		};
 	}
 
@@ -173,7 +177,7 @@ export class OPFUtils {
 		const version = packageElement?.getAttribute('version') || '2.0';
 
 		// Parse metadata
-		const metadata = this.parseOPFMetadata(opfContent);
+		const metadata = this.parseOPFMetadata(doc);
 
 		// Parse manifest
 		const manifest: ManifestItem[] = [];

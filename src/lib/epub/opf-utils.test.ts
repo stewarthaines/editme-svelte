@@ -16,7 +16,8 @@ beforeAll(() => {
 								return { textContent: 'Mismatched tag' };
 							}
 							return null;
-						}
+						},
+						getElementsByTagNameNS: () => []
 					};
 				}
 				
@@ -77,6 +78,37 @@ beforeAll(() => {
 										return null;
 									}}
 								];
+							}
+						}
+						return [];
+					},
+					getElementsByTagNameNS: (namespace: string, localName: string) => {
+						const DC_NS = 'http://purl.org/dc/elements/1.1/';
+						if (namespace === DC_NS) {
+							// Handle Dublin Core elements
+							if (localName === 'title' && xmlStr.includes('<dc:title>')) {
+								const match = xmlStr.match(/<dc:title[^>]*>(.*?)<\/dc:title>/);
+								return match ? [{ textContent: match[1] }] : [];
+							}
+							if (localName === 'language' && xmlStr.includes('<dc:language>')) {
+								const match = xmlStr.match(/<dc:language[^>]*>(.*?)<\/dc:language>/);
+								return match ? [{ textContent: match[1] }] : [];
+							}
+							if (localName === 'identifier' && xmlStr.includes('<dc:identifier')) {
+								const match = xmlStr.match(/<dc:identifier[^>]*>(.*?)<\/dc:identifier>/);
+								return match ? [{ textContent: match[1] }] : [];
+							}
+							if (localName === 'creator' && xmlStr.includes('<dc:creator>')) {
+								const match = xmlStr.match(/<dc:creator[^>]*>(.*?)<\/dc:creator>/);
+								return match ? [{ textContent: match[1] }] : [];
+							}
+							if (localName === 'publisher' && xmlStr.includes('<dc:publisher>')) {
+								const match = xmlStr.match(/<dc:publisher[^>]*>(.*?)<\/dc:publisher>/);
+								return match ? [{ textContent: match[1] }] : [];
+							}
+							if (localName === 'date' && xmlStr.includes('<dc:date>')) {
+								const match = xmlStr.match(/<dc:date[^>]*>(.*?)<\/dc:date>/);
+								return match ? [{ textContent: match[1] }] : [];
 							}
 						}
 						return [];
@@ -173,7 +205,9 @@ describe('OPFUtils', () => {
   </metadata>
 </package>`;
 
-			const metadata = OPFUtils.parseOPFMetadata(opfContent);
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(opfContent, 'application/xml');
+			const metadata = OPFUtils.parseOPFMetadata(doc);
 			expect(metadata.title).toBe('Test Book');
 			expect(metadata.language).toBe('en');
 			expect(metadata.identifier).toBe('test-book-123');
@@ -192,7 +226,9 @@ describe('OPFUtils', () => {
   </metadata>
 </package>`;
 
-			const metadata = OPFUtils.parseOPFMetadata(opfContent);
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(opfContent, 'application/xml');
+			const metadata = OPFUtils.parseOPFMetadata(doc);
 			expect(metadata.author).toBe('Test Author');
 			expect(metadata.publisher).toBe('Test Publisher');
 			expect(metadata.date).toBe('2023-01-01');
@@ -207,7 +243,9 @@ describe('OPFUtils', () => {
   </metadata>
 </package>`;
 
-			expect(() => OPFUtils.parseOPFMetadata(opfContent)).toThrow('Missing required dc:title in OPF metadata');
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(opfContent, 'application/xml');
+			expect(() => OPFUtils.parseOPFMetadata(doc)).toThrow('Missing required dc:title in OPF metadata');
 		});
 	});
 

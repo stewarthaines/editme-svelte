@@ -183,7 +183,11 @@ export class EPUBPackager {
 		}
 
 		const opfContent = decoder.decode(opfFile.content);
-		return OPFUtils.parseOPFMetadata(opfContent);
+		
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(opfContent, 'application/xml');
+		
+		return OPFUtils.parseOPFMetadata(doc);
 	}
 
 

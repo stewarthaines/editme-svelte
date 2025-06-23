@@ -2,11 +2,12 @@
 
 ## Overview
 
-The EPUB library provides two main classes for handling EPUB files:
+The EPUB library provides classes for handling EPUB files and XML processing:
 - **EPUBUnpacker**: Extracts EPUB files to workspace storage
 - **EPUBPackager**: Creates EPUB files from workspace content
+- **OPFUtils**: Static utilities for OPF and EPUB XML operations
 
-Both classes integrate with the File Storage API and ZIP library for browser-native EPUB processing.
+All classes integrate with the File Storage API and ZIP library for browser-native EPUB processing.
 
 ## EPUBUnpacker
 
@@ -139,6 +140,131 @@ generateFilename(metadata: EPUBMetadata): string
 **Input:** `EPUBMetadata` object with title, author, etc.
 
 **Output:** `string` - Sanitized filename
+
+**Side Effects:** None
+
+## OPFUtils
+
+Static utility class for OPF (Open Packaging Format) and EPUB XML operations. All methods are static and namespace-aware.
+
+### Methods
+
+#### parseContainerXml()
+
+```typescript
+static parseContainerXml(containerXml: string): ContainerInfo
+```
+
+**Input:**
+- `containerXml: string` - Container.xml content as string
+
+**Output:** `ContainerInfo` - Contains `rootfilePath` or `error`
+
+**Side Effects:** None (read-only parsing)
+
+**Usage:**
+
+```typescript
+const containerInfo = OPFUtils.parseContainerXml(containerContent);
+if (containerInfo.rootfilePath) {
+  console.log('OPF file at:', containerInfo.rootfilePath);
+} else {
+  console.error('Error:', containerInfo.error);
+}
+```
+
+#### parseOPFMetadata()
+
+```typescript
+static parseOPFMetadata(doc: Document): EPUBMetadata
+```
+
+**Input:**
+- `doc: Document` - Parsed XML Document containing OPF content
+
+**Output:** `EPUBMetadata` - Extracted metadata object
+
+**Side Effects:** None (read-only parsing)
+
+**Namespace Requirements:** Uses `getElementsByTagNameNS()` with Dublin Core namespace (`http://purl.org/dc/elements/1.1/`)
+
+**Usage:**
+
+```typescript
+const parser = new DOMParser();
+const doc = parser.parseFromString(opfContent, 'application/xml');
+const metadata = OPFUtils.parseOPFMetadata(doc);
+
+console.log('Title:', metadata.title);
+console.log('Author:', metadata.author);
+console.log('Language:', metadata.language);
+```
+
+#### parseOPFDocument()
+
+```typescript
+static parseOPFDocument(opfContent: string): OPFDocument
+```
+
+**Input:**
+- `opfContent: string` - Complete OPF file content
+
+**Output:** `OPFDocument` - Full OPF structure with metadata, manifest, spine
+
+**Side Effects:** None (read-only parsing)
+
+**Usage:**
+
+```typescript
+const opfDoc = OPFUtils.parseOPFDocument(opfContent);
+console.log('EPUB version:', opfDoc.version);
+console.log('Manifest items:', opfDoc.manifest.length);
+console.log('Spine items:', opfDoc.spine.length);
+```
+
+#### generateOPFXML()
+
+```typescript
+static generateOPFXML(opfDocument: OPFDocument): string
+```
+
+**Input:**
+- `opfDocument: OPFDocument` - Complete OPF structure
+
+**Output:** `string` - Valid OPF XML content
+
+**Side Effects:** None
+
+**Usage:**
+
+```typescript
+const xml = OPFUtils.generateOPFXML(opfDocument);
+await storage.writeTextFile(workspaceId, 'OEBPS/content.opf', xml);
+```
+
+#### validateXML()
+
+```typescript
+static validateXML(xmlContent: string): XMLValidationResult
+```
+
+**Input:**
+- `xmlContent: string` - XML content to validate
+
+**Output:** `XMLValidationResult` - Validation status and error details
+
+**Side Effects:** None
+
+#### detectEPUBVersion()
+
+```typescript
+static detectEPUBVersion(opfContent: string): string | undefined
+```
+
+**Input:**
+- `opfContent: string` - OPF content to analyze
+
+**Output:** `string | undefined` - EPUB version string ('EPUB 2.0', 'EPUB 3.0') or undefined
 
 **Side Effects:** None
 
