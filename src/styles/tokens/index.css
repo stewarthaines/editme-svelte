@@ -1,0 +1,41 @@
+/*
+  Design Tokens Index
+  
+  This file imports all design token files to make them available
+  throughout the application. Import this file to access all tokens.
+*/
+
+/* Import all token categories */
+@import './colors.css';
+@import './spacing.css';
+@import './typography.css';
+@import './elevation.css';
+@import './motion.css';
+
+/* 
+  Design Token Usage Guidelines:
+  
+  1. Always use semantic color tokens (--color-text-primary) 
+     instead of primitive colors (--color-neutral-900)
+  
+  2. Use spacing tokens (--space-4) for consistent spacing
+  
+  3. Use typography combinations (--text-body-md + --leading-normal)
+     for consistent text styling
+  
+  4. Use elevation tokens (--elevation-card-raised) for shadows
+  
+  5. Use motion tokens (--transition-button) for animations
+  
+  Example component usage:
+  
+  .my-component {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    padding: var(--space-4);
+    font-size: var(--text-body-md);
+    line-height: var(--leading-normal);
+    box-shadow: var(--elevation-card-raised);
+    transition: var(--transition-button);
+  }
+*/

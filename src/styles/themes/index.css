@@ -1,0 +1,60 @@
+/*
+  Theme System Index
+  
+  This file imports all theme-related CSS files to create
+  a complete theming system with light/dark mode support.
+*/
+
+/* Import theme base system first */
+@import './theme-base.css';
+
+/* Import theme variations */
+@import './light.css';
+@import './dark.css';
+
+/*
+  Theme Usage Guide:
+  
+  1. Apply theme via data attribute on root element:
+     <html data-theme="light">  // Force light theme
+     <html data-theme="dark">   // Force dark theme
+     <html data-theme="auto">   // Follow system preference
+     <html>                     // No attribute = follow system preference
+  
+  2. Theme switching in JavaScript:
+     document.documentElement.setAttribute('data-theme', 'dark');
+  
+  3. Theme switching in Svelte:
+     <script>
+       import { themeStore } from '$lib/stores/theme';
+     </script>
+     
+     <div data-theme={$themeStore.current}>
+       <!-- App content -->
+     </div>
+  
+  4. Using theme-aware colors in components:
+     .my-component {
+       background: var(--color-bg-primary);
+       color: var(--color-text-primary);
+       border: 1px solid var(--color-border-default);
+     }
+  
+  5. Theme-specific overrides (if needed):
+     .my-component {
+       // Default styles using semantic tokens
+     }
+     
+     [data-theme="dark"] .my-component {
+       // Dark theme specific overrides (rarely needed)
+     }
+  
+  Features:
+  - Automatic system preference detection
+  - Smooth transitions between themes
+  - High contrast mode support
+  - Reduced motion support
+  - Print-friendly styling
+  - Accessible focus indicators
+  - Theme-aware scrollbars
+*/

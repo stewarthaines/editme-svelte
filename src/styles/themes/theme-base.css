@@ -1,0 +1,232 @@
+/*
+  Theme Base System
+  
+  This file provides the foundation for theme switching and management.
+  It sets up the theme switching mechanism and global theme behaviors.
+*/
+
+/* ============================================
+   THEME SWITCHING MECHANISM
+   ============================================ */
+
+/* Apply theme transitions to all elements */
+*,
+*::before,
+*::after {
+  transition: var(--transition-theme);
+}
+
+/* Disable transitions during theme initialization to prevent flash */
+.theme-initializing *,
+.theme-initializing *::before,
+.theme-initializing *::after {
+  transition: none !important;
+}
+
+/* ============================================
+   COLOR SCHEME META TAG SUPPORT
+   ============================================ */
+
+/* Ensure the color-scheme property is set for browser UI theming */
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="auto"] {
+  color-scheme: light dark;
+}
+
+/* ============================================
+   THEME-AWARE SCROLLBARS
+   ============================================ */
+
+/* Webkit scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Firefox scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) var(--color-bg-secondary);
+}
+
+/* ============================================
+   SELECTION COLORS
+   ============================================ */
+
+::selection {
+  background-color: var(--color-bg-accent);
+  color: var(--color-text-primary);
+}
+
+::-moz-selection {
+  background-color: var(--color-bg-accent);
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   FOCUS VISIBLE STYLES
+   ============================================ */
+
+/* Remove default browser focus styles */
+*:focus {
+  outline: none;
+}
+
+/* Add custom focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Special focus styles for interactive elements */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  box-shadow: var(--shadow-focus-primary);
+}
+
+/* ============================================
+   HIGH CONTRAST MODE SUPPORT
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* Increase contrast in high contrast mode */
+    --color-text-primary: var(--color-black);
+    --color-text-secondary: var(--color-neutral-800);
+    --color-bg-primary: var(--color-white);
+    --color-border-default: var(--color-neutral-900);
+    --color-border-focus: var(--color-primary-900);
+  }
+  
+  [data-theme="dark"] {
+    --color-text-primary: var(--color-white);
+    --color-text-secondary: var(--color-neutral-200);
+    --color-bg-primary: var(--color-black);
+    --color-border-default: var(--color-white);
+    --color-border-focus: var(--color-primary-300);
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  /* Force light theme for printing */
+  * {
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  
+  /* Hide interactive elements in print */
+  button,
+  .nav,
+  .sidebar,
+  [role="navigation"] {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable theme transitions for users who prefer reduced motion */
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  /* Keep only essential transitions */
+  *:focus-visible {
+    transition: box-shadow 0.1s ease !important;
+  }
+}
+
+/* ============================================
+   THEME LOADING STATES
+   ============================================ */
+
+/* Hide content until theme is loaded to prevent flash */
+.theme-loading {
+  visibility: hidden;
+}
+
+.theme-loaded {
+  visibility: visible;
+}
+
+/* Smooth appearance once theme is ready */
+.theme-ready {
+  transition: var(--transition-theme);
+}
+
+/* ============================================
+   SYSTEM THEME DETECTION UTILITIES
+   ============================================ */
+
+/* Classes for theme detection and management */
+.theme-light {
+  /* Applied when light theme is active */
+}
+
+.theme-dark {
+  /* Applied when dark theme is active */
+}
+
+.theme-system {
+  /* Applied when following system preference */
+}
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+/* Ensure sufficient contrast for interactive elements */
+button,
+input,
+select,
+textarea,
+[role="button"] {
+  border: var(--border-width-1) solid var(--color-border-default);
+}
+
+/* Visible focus indicators for all interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
