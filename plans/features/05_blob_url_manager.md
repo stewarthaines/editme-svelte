@@ -6,50 +6,147 @@ Converts manifest items from storage into blob URLs and substitutes them in XHTM
 ## Requirements
 - Convert manifest items to blob URLs for preview
 - Handle different content types (text, image, audio, video)
-- Resource cleanup and memory management
+- Simple memory management with workspace-based cleanup
 - **URL substitution for preview iframe** - Replace relative EPUB URLs with blob URLs
 - Preserve original EPUB HTML structure (no manual URL modification)
-- Support standard EPUB asset references: `styles/page.css`, `scripts/responsive.js`, `images/play.svg`
+- Support standard EPUB asset references: `images/play.svg`, `scripts/responsive.js`
+- Hard limit of 100 blob URLs with user notification on limit
+- Minimal error handling with fixed error indicators
 
 ## Dependencies
-- **#1 File Storage API** - for reading manifest item content
+- **#1 File Storage API** - for reading manifest item content and direct file access
 
 ## Technical Approach
-- Create blob objects from stored file content
-- Generate blob URLs with proper MIME types
-- Track created URLs for cleanup
+- **OPFS Optimization**: Direct File object blob URLs for zero-copy performance
+- **Dual-path creation**: Direct file access (OPFS) vs content reading (IndexedDB)
+- Generate blob URLs with consistent MIME type detection
+- Track created URLs for simple workspace-based cleanup
 - **Parse and substitute resource references in XHTML content**
 - Process XHTML before sending to preview iframe
 - Maintain mapping between relative paths and blob URLs
-- Handle nested CSS @import statements and relative references
+- Enforce 100 blob URL limit with user notification
+- CSS processing handled by caller (not included in this manager)
 
 ## API Design
 ```typescript
 interface BlobURLManager {
+  // Workspace management
+  setActiveWorkspace(workspaceId: string): void
+  
   // Blob creation
-  createBlobURL(workspaceId: string, filePath: string, mimeType: string): Promise<string>
+  createBlobURL(filePath: string): Promise<string>
   createBlobFromContent(content: ArrayBuffer | string, mimeType: string): string
   
-  // URL management
+  // URL management  
   revokeBlobURL(url: string): void
-  revokeAllURLs(): void
+  cleanup(): void // Revoke all URLs for current workspace
   
   // Content processing
-  substituteResourceURLs(xhtmlContent: string, workspaceId: string): Promise<string>
-  processXHTMLForPreview(xhtmlContent: string, workspaceId: string): Promise<string>
-  processCSSContent(cssContent: string, basePath: string, workspaceId: string): Promise<string>
+  processXHTMLForPreview(xhtmlContent: string): Promise<string>
   
   // Utilities
   getMimeType(filePath: string): string
   isResourcePath(href: string): boolean
+  getBlobURLCount(): number
+  isAtCapacity(): boolean
+  
+  // Events (via callback, no event emitter)
+  onCapacityReached?: () => void
+}
+
+interface BlobURLManagerConfig {
+  maxBlobURLs: number // Default: 100
+  fileStorage: FileStorageAPI
+  onCapacityReached?: () => void
 }
 
 interface BlobURLRegistry {
   urls: Map<string, string>  // filePath -> blobURL
   created: Map<string, Date> // track creation time
-  cleanup(): void
+  count: number
+  maxCount: number
+}
+
+// Error classes
+export class BlobURLError extends Error {
+  constructor(message: string, public code: string) {
+    super(message)
+    this.name = 'BlobURLError'
+  }
+}
+
+export class BlobURLCapacityError extends BlobURLError {
+  constructor(currentCount: number, maxCount: number) {
+    super(`Blob URL capacity exceeded: ${currentCount}/${maxCount}`, 'CAPACITY_EXCEEDED')
+  }
+}
+
+export class XHTMLProcessingError extends BlobURLError {
+  constructor(message: string, public originalError?: Error) {
+    super(message, 'XHTML_PROCESSING_ERROR')
+  }
+}
+
+// Extended File Storage API for OPFS optimization
+interface FileStorageAPI {
+  // Existing methods
+  readFile(workspaceId: string, filePath: string): Promise<ArrayBuffer>
+  writeFile(workspaceId: string, filePath: string, content: ArrayBuffer | string): Promise<void>
+  deleteFile(workspaceId: string, filePath: string): Promise<void>
+  
+  // OPFS optimization methods
+  supportsDirectBlobURLs(): boolean
+  getFile(workspaceId: string, filePath: string): Promise<File>
 }
 ```
+
+## OPFS Optimization Strategy
+
+### Performance Benefits
+- **Zero-copy blob creation** - Direct File object access without ArrayBuffer copying
+- **Instant blob URLs** - No memory transfer for large assets (images, audio, video)
+- **Lower memory usage** - Files stay in OPFS, not duplicated in memory
+- **Better for large files** - No memory limits for image/media blob creation
+
+### Backend Detection
+```typescript
+// Automatic detection based on File Storage API capabilities
+if (fileStorage.supportsDirectBlobURLs()) {
+  // OPFS path: Safari, Firefox, Chrome+Edge on http://
+  // Use direct File objects (zero-copy)
+} else {
+  // IndexedDB path: Chrome+Edge on https://, fallback scenarios  
+  // Use traditional content reading (with memory copy)
+}
+```
+
+### Dual-Path Implementation
+```typescript
+async createBlobURL(filePath: string): Promise<string> {
+  try {
+    if (this.fileStorage.supportsDirectBlobURLs()) {
+      // OPFS: Direct file access (zero-copy)
+      const file = await this.fileStorage.getFile(this.activeWorkspaceId, filePath)
+      const mimeType = this.getMimeType(filePath) // Always use our detection
+      const correctedFile = new File([file], file.name, { type: mimeType })
+      return URL.createObjectURL(correctedFile)
+    } else {
+      // IndexedDB: Traditional content reading
+      const content = await this.fileStorage.readFile(this.activeWorkspaceId, filePath)
+      const mimeType = this.getMimeType(filePath)
+      const blob = new Blob([content], { type: mimeType })
+      return URL.createObjectURL(blob)
+    }
+  } catch (error) {
+    throw new BlobURLError(`Failed to create blob URL for ${filePath}: ${error.message}`, 'CREATION_FAILED')
+  }
+}
+```
+
+### MIME Type Consistency
+- **Always use our detection** - Ignore File.type property for consistency
+- **Override File object type** - Create new File with correct MIME type
+- **Consistent behavior** - Both OPFS and IndexedDB paths use same MIME logic
 
 ## MIME Type Detection
 ```typescript
@@ -85,46 +182,34 @@ const MIME_TYPES = {
 
 ## Resource URL Substitution Strategy
 
-### XHTML Processing
+### XHTML Processing (Simplified)
 1. **Parse XHTML content** for resource references using DOM parser
-2. **Find asset elements**: `<link>`, `<img>`, `<audio>`, `<video>`, `<script>`
+2. **Find asset elements**: `<img>`, `<audio>`, `<video>`, `<script>`, `<link>`
 3. **Extract relative URLs**: `href` and `src` attributes
-4. **Resolve to manifest paths**: Convert `styles/page.css` → `OEBPS/styles/page.css`
-5. **Create blob URLs**: Generate blob URL for each manifest item
-6. **Replace in content**: Substitute original URLs with blob URLs
-7. **Preserve absolute URLs**: Leave `http://`, `data:`, blob URLs unchanged
+4. **Resolve to manifest paths**: Convert `images/play.svg` → `OEBPS/images/play.svg`
+5. **Check capacity**: Stop processing if 100 blob URL limit reached
+6. **Create blob URLs**: Generate blob URL for each manifest item
+7. **Replace in content**: Substitute original URLs with blob URLs
+8. **Preserve absolute URLs**: Leave `http://`, `data:`, `blob:` URLs unchanged
+9. **Error handling**: Throw error if DOM parsing fails
 
-### CSS Processing with Base Path Resolution
-- **Extract CSS file directory** for relative path resolution
-- **Parse CSS for @import** statements and url() references  
-- **Resolve relative paths** from CSS file's directory context
-- **Create blob URLs** for referenced assets (fonts, images)
-- **Replace URLs** in CSS content before creating CSS blob
+### CSS Processing
+- **Not handled by this manager** - CSS url() substitution is the caller's responsibility
+- **Simple blob creation only** - CSS files get blob URLs but content is not processed
 
 ```typescript
-function resolveCSSAssetPath(cssFilePath: string, relativeUrl: string): string {
-  // Extract directory from CSS file path
-  // OEBPS/styles/page.css -> OEBPS/styles/
-  const cssDir = cssFilePath.substring(0, cssFilePath.lastIndexOf('/'))
-  
-  // Resolve relative path from CSS directory
-  // ../images/bg.jpg from OEBPS/styles/ -> OEBPS/images/bg.jpg
-  return resolvePath(cssDir, relativeUrl)
+// Simplified path resolution for XHTML assets only
+function resolveManifestPath(relativeUrl: string, basePath = 'OEBPS'): string {
+  // Convert relative URL to manifest path
+  // images/play.svg -> OEBPS/images/play.svg
+  return `${basePath}/${relativeUrl}`
 }
 
-function resolvePath(basePath: string, relativePath: string): string {
-  const parts = basePath.split('/')
-  const relativeParts = relativePath.split('/')
-  
-  for (const part of relativeParts) {
-    if (part === '..') {
-      parts.pop()
-    } else if (part !== '.') {
-      parts.push(part)
-    }
-  }
-  
-  return parts.join('/')
+function isRelativeURL(url: string): boolean {
+  return !url.startsWith('http') && 
+         !url.startsWith('data:') && 
+         !url.startsWith('blob:') &&
+         !url.startsWith('/') // Absolute paths
 }
 ```
 
@@ -143,53 +228,83 @@ function resolvePath(basePath: string, relativePath: string): string {
 
 ## URL Substitution Workflow
 
-### 1. XHTML Processing Pipeline
+### 1. XHTML Processing Pipeline (Simplified)
 ```typescript
-async function processXHTMLForPreview(xhtmlContent: string, workspaceId: string): Promise<string> {
-  // 1. Parse XHTML with DOMParser
-  const doc = parser.parseFromString(xhtmlContent, 'application/xhtml+xml')
+async function processXHTMLForPreview(xhtmlContent: string): Promise<string> {
+  // 1. Check capacity before processing
+  if (this.isAtCapacity()) {
+    this.onCapacityReached?.()
+    throw new BlobURLCapacityError(this.getBlobURLCount(), this.maxBlobURLs)
+  }
   
-  // 2. Find all asset references
+  // 2. Parse XHTML with DOMParser - throw error if fails
+  const doc = new DOMParser().parseFromString(xhtmlContent, 'application/xhtml+xml')
+  
+  if (doc.documentElement.tagName === 'parsererror') {
+    throw new XHTMLProcessingError('Invalid XHTML content')
+  }
+  
+  // 3. Find all asset references
   const assetElements = findAssetElements(doc)
   
-  // 3. Create blob URLs for each asset
-  const substitutions = await createBlobURLsForAssets(assetElements, workspaceId)
-  
-  // 4. Replace URLs in DOM
-  applyURLSubstitutions(doc, substitutions)
+  // 4. Create blob URLs for each asset (check capacity for each)
+  await processAssetElements(assetElements)
   
   // 5. Serialize back to string
   return new XMLSerializer().serializeToString(doc)
 }
 ```
 
-### 2. Blob Creation Process
-1. **Read file content** from storage (OPFS/IndexedDB)
-2. **Determine MIME type** from file extension
-3. **Process content** if needed (CSS url() substitution)
-4. **Create Blob object** with proper type
+### 2. Optimized Blob Creation Process
+1. **Detect storage backend** capabilities (OPFS vs IndexedDB)
+2. **OPFS path**: Get File object directly (zero-copy)
+3. **IndexedDB path**: Read content then create Blob (memory copy)
+4. **Apply consistent MIME type** using our detection logic
 5. **Generate blob URL** using URL.createObjectURL()
 6. **Register URL** for cleanup tracking
-7. **Cache blob URL** for reuse
-8. **Return blob URL** for substitution
+7. **Return blob URL** for substitution
 
-### 3. CSS Content Processing
+**Performance Comparison:**
+- **OPFS**: `getFile() → new File() → URL.createObjectURL()` (instant)
+- **IndexedDB**: `readFile() → new Blob() → URL.createObjectURL()` (memory copy)
+
+### 3. Optimized Capacity Management
 ```typescript
-async function processCSSContent(cssContent: string, basePath: string, workspaceId: string): Promise<string> {
-  // Find url() references in CSS
-  const urlMatches = cssContent.match(/url\(["']?([^"'\)]+)["']?\)/g)
-  
-  // Create blob URLs for referenced assets
-  for (const match of urlMatches) {
-    const assetPath = extractURLFromMatch(match)
-    if (isRelativeURL(assetPath)) {
-      const manifestPath = resolveManifestPath(assetPath, basePath)
-      const blobURL = await createBlobURL(workspaceId, manifestPath)
-      cssContent = cssContent.replace(match, `url(${blobURL})`)
-    }
+async function createBlobURL(filePath: string): Promise<string> {
+  // Check if we're at capacity
+  if (this.getBlobURLCount() >= this.maxBlobURLs) {
+    this.onCapacityReached?.()
+    throw new BlobURLCapacityError(this.getBlobURLCount(), this.maxBlobURLs)
   }
   
-  return cssContent
+  // Check if already cached
+  if (this.registry.urls.has(filePath)) {
+    return this.registry.urls.get(filePath)!
+  }
+  
+  // Create new blob URL using optimal path
+  let blobURL: string
+  
+  if (this.fileStorage.supportsDirectBlobURLs()) {
+    // OPFS: Zero-copy approach
+    const file = await this.fileStorage.getFile(this.activeWorkspaceId, filePath)
+    const mimeType = this.getMimeType(filePath)
+    const correctedFile = new File([file], file.name, { type: mimeType })
+    blobURL = URL.createObjectURL(correctedFile)
+  } else {
+    // IndexedDB: Traditional approach
+    const content = await this.fileStorage.readFile(this.activeWorkspaceId, filePath)
+    const mimeType = this.getMimeType(filePath)
+    const blob = new Blob([content], { type: mimeType })
+    blobURL = URL.createObjectURL(blob)
+  }
+  
+  // Register for cleanup
+  this.registry.urls.set(filePath, blobURL)
+  this.registry.created.set(filePath, new Date())
+  this.registry.count++
+  
+  return blobURL
 }
 ```
 
@@ -239,54 +354,49 @@ function resolveManifestPath(relativeUrl: string, basePath = 'OEBPS'): string {
 }
 ```
 
-## Memory Management
-- Track all created blob URLs
-- Implement cleanup on workspace switch
-- Set cleanup timeouts for unused URLs
-- Monitor memory usage
-- Revoke URLs when no longer needed
+## Memory Management (Simplified)
 
-## Caching Strategy
+### Workspace-Based Cleanup
+- **Simple strategy**: Clean up all blob URLs when switching workspaces
+- **No timeouts**: URLs persist until workspace switch or manual cleanup
+- **Hard limit**: Maximum 100 blob URLs, stop creating new ones when reached
+- **User notification**: Callback when capacity is reached
 
-### Blob URL Cache
-- **Cache blob URLs** by manifest file path
-- **Reuse existing blob URLs** for same content
-- **Invalidate cache** when workspace files are modified
-- **LRU eviction** for memory management
-- **Track file modification** timestamps for cache validation
+### Memory Monitoring
+- **Check memory before large files**: Use basic memory availability check
+- **No complex monitoring**: Simple blob URL counting only
+- **Manual cleanup**: Optional cleanup() method for explicit cleanup
 
-### Processed Content Cache
-- **Cache processed XHTML** after URL substitution
-- **Cache processed CSS** with resolved blob URLs
-- **Invalidate on workspace change** or file updates
-- **Memory-aware caching** with size limits
+## Caching Strategy (Simplified)
 
-```typescript
-interface BlobURLCache {
-  // manifestPath -> { blobURL, created, lastAccessed }
-  urls: Map<string, CachedBlobURL>
-  
-  // xhtmlPath -> { processedContent, dependencies, created }
-  processedContent: Map<string, CachedContent>
-  
-  // Track memory usage
-  totalMemory: number
-  maxMemory: number
-}
-```
+### Memory-Only Blob URL Cache
+- **Cache blob URLs** by manifest file path in memory only
+- **Reuse existing blob URLs** for same content within workspace
+- **Content-based invalidation**: New blob content invalidates cached URL
+- **Simple cleanup**: Clear all on workspace switch
+- **No persistence**: Cache lost on page refresh (acceptable for transient URLs)
 
-## Error Handling Strategy
+### No Content Processing Cache
+- **No XHTML caching**: Process XHTML fresh each time (minimal overhead)
+- **No CSS processing**: CSS url() substitution handled by caller
+- **Simple approach**: Focus on blob URL creation and caching only
+
+## Error Handling Strategy (Simplified)
 
 ### Missing Asset Handling
 **CSS/JavaScript Files Missing:**
 - Log console warning with file path
-- Leave original relative URL in content (will 404 in browser)
+- Leave original relative URL in content (browser will show 404)
 - Continue processing other assets
 
 **Image/Media Files Missing:**
-- Replace src with error icon data URL
-- Log console warning
-- Use inline SVG error icon for visibility
+- Replace src with fixed error icon data URL
+- Log console warning  
+- Use simple red circle SVG error icon
+
+**XHTML Processing Errors:**
+- Throw XHTMLProcessingError if DOM parsing fails
+- No regex fallback - fail fast and clearly
 
 ```typescript
 const ERROR_ICON_SVG = `data:image/svg+xml,${encodeURIComponent(`
@@ -316,29 +426,38 @@ async function handleMissingAsset(element: Element, assetPath: string): Promise<
 - **DOM parsing errors**: Fall back to regex substitution
 - **CSS parsing failures**: Return original CSS content
 
-## Performance Considerations
+## Performance Considerations (Optimized)
 
-### Optimization Strategies
+### OPFS Performance Benefits
+- **Zero-copy blob creation** - Direct File objects eliminate memory copying
+- **Instant large file handling** - Multi-MB images/audio create blob URLs instantly
+- **Lower memory footprint** - Files stay in OPFS, not duplicated in RAM
+- **Better browser responsiveness** - No blocking memory transfers
+
+### General Optimization Strategies  
 - **Lazy blob creation** - Only create blobs when assets are referenced
-- **Batch processing** - Process all assets in XHTML document together
-- **Avoid duplicates** - Reuse blob URLs for identical content
-- **DOM parsing** - Use DOMParser instead of regex for accuracy
-- **Parallel processing** - Create multiple blob URLs concurrently
-- **Memory monitoring** - Track blob URL memory usage
-- **Cleanup scheduling** - Automatic cleanup of unused blob URLs
+- **Avoid duplicates** - Reuse blob URLs for identical file paths
+- **DOM parsing** - Use DOMParser only (no regex fallback)
+- **Single-file processing** - Process one XHTML file at a time
+- **Backend-aware processing** - Use optimal path based on storage backend
+- **Capacity limits** - Stop at 100 blob URLs to prevent memory issues
 
 ### Efficient URL Substitution
 ```typescript
-// Process all asset elements in single DOM traversal
-async function processAllAssets(doc: Document, workspaceId: string): Promise<void> {
-  const assetPromises: Promise<void>[] = []
-  
-  // Process different element types in parallel
-  assetPromises.push(processLinkElements(doc, workspaceId))
-  assetPromises.push(processScriptElements(doc, workspaceId))
-  assetPromises.push(processImageElements(doc, workspaceId))
-  
-  await Promise.all(assetPromises)
+// Simple sequential processing (no parallel complexity)
+async function processAssetElements(elements: Element[]): Promise<void> {
+  for (const element of elements) {
+    const src = element.getAttribute('src') || element.getAttribute('href')
+    if (src && isRelativeURL(src)) {
+      try {
+        const manifestPath = resolveManifestPath(src)
+        const blobURL = await this.createBlobURL(manifestPath)
+        element.setAttribute(element.hasAttribute('src') ? 'src' : 'href', blobURL)
+      } catch (error) {
+        handleAssetError(element, src, error)
+      }
+    }
+  }
 }
 ```
 
@@ -377,113 +496,154 @@ class BlobURLManager {
 - Verify MIME type detection
 - Test error handling scenarios
 
-## Implementation Steps
+## File Structure
 
-### Phase 1: Basic Blob Creation
+The blob URL manager will be implemented in `src/lib/blob-url/` using kebab-case file naming:
+
+```
+src/lib/blob-url/
+├── index.ts                    # Main exports and public API
+├── blob-url-manager.ts         # BlobURLManager class - core operations
+├── url-substitution.ts         # XHTML processing and URL substitution
+├── mime-types.ts               # MIME type detection utilities
+├── types.ts                    # All TypeScript interfaces and types
+├── utils.ts                    # Helper functions and utilities
+├── API.md                      # Comprehensive API documentation
+└── test/                       # Test files
+    ├── blob-url-manager.test.ts
+    ├── url-substitution.test.ts
+    └── mime-types.test.ts
+```
+
+## Implementation Steps (Simplified)
+
+### Phase 1: Core Blob Management
 1. **File Storage Integration** - Read manifest items from storage
 2. **MIME Type Detection** - Accurate content type mapping
 3. **Blob URL Generation** - Basic blob creation and URL generation
-4. **Cleanup Framework** - URL tracking and revocation system
+4. **Capacity Management** - 100 URL limit with user notification
 
-### Phase 2: URL Substitution
+### Phase 2: XHTML Processing
 1. **DOM Parser Integration** - Parse XHTML with proper XML handling
 2. **Asset Element Detection** - Find all elements with asset references
 3. **URL Classification** - Identify relative vs absolute URLs
 4. **Basic Substitution** - Replace relative URLs with blob URLs
 
-### Phase 3: CSS Processing
-1. **CSS Parsing** - Extract url() references from stylesheets
-2. **Relative Path Resolution** - Handle CSS-relative asset paths
-3. **Nested Processing** - Process @import and url() recursively
-4. **CSS Blob Creation** - Generate blob URLs for processed CSS
-
-### Phase 4: Optimization
-1. **Caching Layer** - Implement blob URL and content caching
-2. **Memory Management** - Automatic cleanup and memory monitoring
-3. **Performance Tuning** - Parallel processing and batching
-4. **Error Recovery** - Graceful handling of missing assets
+### Phase 3: Error Handling & Cleanup
+1. **Missing Asset Handling** - Error icons and console warnings
+2. **Workspace Cleanup** - Simple cleanup on workspace switch
+3. **Error Classes** - Proper error types and messaging
+4. **Integration Testing** - Test with File Storage API and Transform Pipeline
 
 ## API Integration
 
 ### File Storage Integration
 ```typescript
-// Dependency injection pattern
+// Simple dependency injection
 class BlobURLManager {
-  constructor(private fileStorage: FileStorageAPI) {}
+  constructor(private config: BlobURLManagerConfig) {
+    this.fileStorage = config.fileStorage
+    this.maxBlobURLs = config.maxBlobURLs || 100
+    this.onCapacityReached = config.onCapacityReached
+  }
   
   private async readFile(filePath: string): Promise<ArrayBuffer | string> {
     if (!this.activeWorkspaceId) {
-      throw new Error('No active workspace set')
+      throw new BlobURLError('No active workspace set', 'NO_WORKSPACE')
     }
     return this.fileStorage.readFile(this.activeWorkspaceId, filePath)
   }
 }
 
 // Usage with file storage
-const blobURLManager = new BlobURLManager(fileStorage)
+const blobURLManager = new BlobURLManager({
+  fileStorage,
+  maxBlobURLs: 100,
+  onCapacityReached: () => alert('Blob URL limit reached!')
+})
 blobURLManager.setActiveWorkspace('workspace-123')
 ```
 
-### Preview Integration
+### Transform Pipeline Integration
 ```typescript
-// Usage in preview iframe creation
-async function createPreviewIframe(xhtmlPath: string): Promise<HTMLIFrameElement> {
-  // 1. Ensure workspace is set
-  blobURLManager.setActiveWorkspace(currentWorkspaceId)
+// Transform Pipeline calls blob manager as needed
+class TransformPipeline {
+  constructor(private blobURLManager: BlobURLManager) {}
   
-  // 2. Read original XHTML from storage
-  const originalXHTML = await fileStorage.readFile(currentWorkspaceId, xhtmlPath)
-  
-  // 3. Process XHTML with blob URL substitution
-  const processedXHTML = await blobURLManager.processXHTMLForPreview(originalXHTML)
-  
-  // 4. Create iframe with processed content
-  const iframe = document.createElement('iframe')
-  iframe.srcdoc = processedXHTML
-  
-  return iframe
+  async transformForPreview(xhtmlContent: string): Promise<string> {
+    // 1. Apply text transforms first
+    let transformedContent = await this.applyTextTransforms(xhtmlContent)
+    
+    // 2. Apply DOM transforms
+    transformedContent = await this.applyDOMTransforms(transformedContent)
+    
+    // 3. Process with blob URL substitution
+    transformedContent = await this.blobURLManager.processXHTMLForPreview(transformedContent)
+    
+    return transformedContent
+  }
 }
 
-// Workspace switching
+// Simple workspace switching
 function switchWorkspace(newWorkspaceId: string): void {
   blobURLManager.setActiveWorkspace(newWorkspaceId) // Automatically cleans up old URLs
-  // ... update UI for new workspace
+  // Transform pipeline automatically gets new workspace context
 }
 ```
 
-## Testing Priority
+## Testing Priority (Simplified)
 
 ### Core Functionality
 - **Asset substitution accuracy** - Verify all relative URLs are replaced correctly
 - **Content integrity** - Ensure XHTML structure and content are preserved
-- **CSS base path resolution** - Test relative paths from different CSS locations
+- **Capacity management** - Test 100 blob URL limit and user notification
 - **Error handling** - Missing assets show appropriate warnings/icons
 
 ### Integration Testing
-- **File storage integration** - Test with OPFS and IndexedDB backends
+- **File storage integration** - Test with both OPFS and IndexedDB backends
+- **Backend detection** - Verify correct path selection based on `supportsDirectBlobURLs()`
+- **OPFS optimization** - Test zero-copy blob creation with large files
 - **Workspace switching** - Verify cleanup on workspace change
-- **Preview iframe integration** - Test complete workflow
+- **Transform pipeline integration** - Test blob URL substitution after transforms
 
-### Edge Cases
-- **Malformed XHTML** - Test parser error handling
-- **Complex CSS** - Nested @import and url() references
+### Simplified Edge Cases
+- **Malformed XHTML** - Test parser error throwing (no fallback)
 - **Mixed content** - Absolute and relative URLs in same document
-- **Large files** - Performance with many asset references
+- **Capacity limits** - Behavior when 100 URL limit is reached
 
 ### Error Scenarios
 ```typescript
-// Test cases for missing assets
-test('missing CSS shows console warning', async () => {
+// Test cases for simplified error handling
+test('missing CSS shows console warning and preserves URL', async () => {
   const xhtml = '<link rel="stylesheet" href="missing.css">'
   const processed = await blobURLManager.processXHTMLForPreview(xhtml)
   expect(console.warn).toHaveBeenCalledWith('Missing asset: OEBPS/missing.css')
   expect(processed).toContain('href="missing.css"') // Original URL preserved
 })
 
-test('missing image shows error icon', async () => {
+test('missing image shows fixed error icon', async () => {
   const xhtml = '<img src="missing.jpg" alt="test">'
   const processed = await blobURLManager.processXHTMLForPreview(xhtml)
   expect(processed).toContain('data:image/svg+xml')
   expect(processed).toContain('alt="Missing: OEBPS/missing.jpg"')
+})
+
+test('capacity limit throws error and calls callback', async () => {
+  const onCapacityReached = jest.fn()
+  const manager = new BlobURLManager({ fileStorage, maxBlobURLs: 2, onCapacityReached })
+  
+  // Fill capacity
+  await manager.createBlobURL('file1.jpg')
+  await manager.createBlobURL('file2.jpg')
+  
+  // Should throw on third
+  await expect(manager.createBlobURL('file3.jpg')).rejects.toThrow(BlobURLCapacityError)
+  expect(onCapacityReached).toHaveBeenCalled()
+})
+
+test('malformed XHTML throws error without fallback', async () => {
+  const invalidXHTML = '<div><span>unclosed tags'
+  await expect(blobURLManager.processXHTMLForPreview(invalidXHTML))
+    .rejects.toThrow(XHTMLProcessingError)
 })
 ```
