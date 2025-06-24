@@ -57,6 +57,7 @@ interface BlobURLManager {
 interface BlobURLManagerConfig {
   maxBlobURLs: number // Default: 100
   fileStorage: FileStorageAPI
+  basePath: string // EPUB content base path (e.g., "OEBPS" from WorkspacePathInfo)
   onCapacityReached?: () => void
 }
 
@@ -149,35 +150,16 @@ async createBlobURL(filePath: string): Promise<string> {
 - **Consistent behavior** - Both OPFS and IndexedDB paths use same MIME logic
 
 ## MIME Type Detection
+
+Uses shared MIME type utility from `src/lib/utils/mime-types.ts` (extracted from EPUBPackager):
+
 ```typescript
-const MIME_TYPES = {
-  // Text
-  '.html': 'text/html',
-  '.xhtml': 'application/xhtml+xml',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.txt': 'text/plain',
-  '.json': 'application/json',
-  
-  // Images
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.webp': 'image/webp',
-  
-  // Audio
-  '.mp3': 'audio/mpeg',
-  '.wav': 'audio/wav',
-  '.ogg': 'audio/ogg',
-  '.m4a': 'audio/mp4',
-  
-  // Video
-  '.mp4': 'video/mp4',
-  '.webm': 'video/webm',
-  '.ogg': 'video/ogg'
-}
+import { getMimeType } from '../utils/mime-types.js';
+
+// Consistent MIME type detection across the application
+const mimeType = getMimeType('chapter.xhtml'); // "application/xhtml+xml"
+const cssType = getMimeType('style.css');      // "text/css" 
+const imageType = getMimeType('cover.jpg');    // "image/jpeg"
 ```
 
 ## Resource URL Substitution Strategy
@@ -186,7 +168,7 @@ const MIME_TYPES = {
 1. **Parse XHTML content** for resource references using DOM parser
 2. **Find asset elements**: `<img>`, `<audio>`, `<video>`, `<script>`, `<link>`
 3. **Extract relative URLs**: `href` and `src` attributes
-4. **Resolve to manifest paths**: Convert `images/play.svg` → `OEBPS/images/play.svg`
+4. **Resolve to workspace paths**: Convert `images/play.svg` → `{basePath}/images/play.svg`
 5. **Check capacity**: Stop processing if 100 blob URL limit reached
 6. **Create blob URLs**: Generate blob URL for each manifest item
 7. **Replace in content**: Substitute original URLs with blob URLs
@@ -198,11 +180,12 @@ const MIME_TYPES = {
 - **Simple blob creation only** - CSS files get blob URLs but content is not processed
 
 ```typescript
-// Simplified path resolution for XHTML assets only
-function resolveManifestPath(relativeUrl: string, basePath = 'OEBPS'): string {
-  // Convert relative URL to manifest path
-  // images/play.svg -> OEBPS/images/play.svg
-  return `${basePath}/${relativeUrl}`
+// Path resolution using configured base path from workspace
+function resolveManifestPath(relativeUrl: string, basePath: string): string {
+  // Convert relative URL to full workspace path
+  // images/play.svg + "OEBPS" -> OEBPS/images/play.svg
+  // styles/main.css + "content" -> content/styles/main.css  
+  return basePath ? `${basePath}/${relativeUrl}` : relativeUrl
 }
 
 function isRelativeURL(url: string): boolean {
@@ -505,15 +488,16 @@ src/lib/blob-url/
 ├── index.ts                    # Main exports and public API
 ├── blob-url-manager.ts         # BlobURLManager class - core operations
 ├── url-substitution.ts         # XHTML processing and URL substitution
-├── mime-types.ts               # MIME type detection utilities
 ├── types.ts                    # All TypeScript interfaces and types
 ├── utils.ts                    # Helper functions and utilities
 ├── API.md                      # Comprehensive API documentation
 └── test/                       # Test files
     ├── blob-url-manager.test.ts
     ├── url-substitution.test.ts
-    └── mime-types.test.ts
+    └── utils.test.ts
 ```
+
+**Note:** MIME type detection uses the shared utility `src/lib/utils/mime-types.ts` (extracted from EPUBPackager) for consistency across features.
 
 ## Implementation Steps (Simplified)
 
@@ -555,9 +539,13 @@ class BlobURLManager {
   }
 }
 
-// Usage with file storage
+// Usage with file storage and workspace path info
+const workspaceManager = new WorkspaceManager();
+const pathInfo = await workspaceManager.getWorkspacePathInfo('workspace-123');
+
 const blobURLManager = new BlobURLManager({
   fileStorage,
+  basePath: pathInfo.basePath, // e.g., "OEBPS"
   maxBlobURLs: 100,
   onCapacityReached: () => alert('Blob URL limit reached!')
 })

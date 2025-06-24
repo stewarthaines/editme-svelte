@@ -8,6 +8,7 @@
 import { ZipWriter, downloadBlob } from '../zip/index.js';
 import { FileStorageAPI } from '../storage/index.js';
 import { OPFUtils, type EPUBMetadata } from './opf-utils.js';
+import { getMimeType } from '../utils/mime-types.js';
 
 export { type EPUBMetadata } from './opf-utils.js';
 
@@ -153,7 +154,7 @@ export class EPUBPackager {
 					path,
 					content,
 					size: content.byteLength,
-					mimeType: this.getMimeType(path)
+					mimeType: getMimeType(path)
 				});
 			} catch (error) {
 				// Skip files that can't be read but don't fail the entire operation
@@ -213,30 +214,6 @@ export class EPUBPackager {
 		return { method: 0x08, reason: 'Default compression' };
 	}
 
-	private getMimeType(fileName: string): string {
-		const ext = fileName.split('.').pop()?.toLowerCase();
-		
-		const mimeTypes: Record<string, string> = {
-			'html': 'text/html',
-			'xhtml': 'application/xhtml+xml',
-			'xml': 'application/xml',
-			'css': 'text/css',
-			'js': 'application/javascript',
-			'txt': 'text/plain',
-			'opf': 'application/oebps-package+xml',
-			'ncx': 'application/x-dtbncx+xml',
-			'jpg': 'image/jpeg',
-			'jpeg': 'image/jpeg',
-			'png': 'image/png',
-			'gif': 'image/gif',
-			'webp': 'image/webp',
-			'mp3': 'audio/mpeg',
-			'mp4': 'video/mp4',
-			'epub': 'application/epub+zip'
-		};
-
-		return mimeTypes[ext || ''] || 'application/octet-stream';
-	}
 
 	generateFilename(metadata: EPUBMetadata): string {
 		const title = this.sanitizeFilename(metadata.title || 'Untitled');

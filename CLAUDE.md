@@ -196,4 +196,43 @@ console.log('Result:', result);
 - **Integration points** - Document any APIs that other features will consume
 - **Complex workflows** - Show end-to-end integration patterns
 
-API documentation should be created **after implementation and tests are working**, not as an afterthought. It helps clarify API design decisions and serves as integration reference for dependent features.
+## Feature Development Process
+
+The project follows a structured development process to ensure high-quality, well-documented features:
+
+### 1. Feature Planning & Specification
+
+- Start with detailed feature plan in `plans/features/{number}_{name}.md`
+- Collaborate on requirements, technical approach, and integration points
+- Define API interfaces, error handling, and performance considerations
+- Clarify implementation details through iterative discussion
+
+### 2. API Documentation
+
+- Create comprehensive `src/lib/{feature}/API.md` **before implementation**
+- Document all public methods with Input/Output/Side Effects/Usage examples
+- Include error scenarios, edge cases, and integration patterns
+- Add testing considerations and internal API details for unit test development
+
+### 3. Unit Test Development
+
+- Write comprehensive unit tests based on the API documentation **before implementation**
+- Cover all methods, error scenarios, edge cases, and integration points
+- Test internal behavior, caching, error handling, and state management
+- Ensure tests validate the API contract defined in documentation
+
+### 4. Implementation
+
+- Implement the feature following the API specification exactly
+- Code should pass all unit tests without requiring test modifications
+- Focus on meeting the documented API contract and behavior
+- Implementation validates that the API design is practical and complete
+
+### 5. Storybook Story Creation
+
+- Create interactive Storybook stories demonstrating the feature
+- Show integration patterns, error scenarios, and real-world usage
+- Follow patterns in `STORYBOOK.md` for backend feature demonstrations
+- Stories serve as live documentation and manual testing interface
+
+This process ensures features are well-designed, thoroughly tested, and properly documented before implementation begins. The API documentation serves as a contract that guides both test development and implementation.
