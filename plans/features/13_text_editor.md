@@ -439,6 +439,139 @@ const handleKeyboardShortcut = (event: KeyboardEvent) => {
 - Test with large documents
 - Test performance under heavy editing
 
+## Line-Numbered Editor Architecture
+
+### Layout Structure
+```css
+.line-numbered-editor {
+  display: flex;
+  overflow: hidden;  /* Prevents scrollbar overlap */
+  position: relative;
+}
+
+.line-numbers-gutter {
+  width: 50px;
+  flex-shrink: 0;    /* Prevents compression */
+  z-index: 1;        /* Stays above textarea */
+  background: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  overflow: hidden;
+  user-select: none;
+}
+
+.textarea-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;   /* Contains scrollbars within textarea */
+}
+
+#editor {
+  box-sizing: border-box;  /* Predictable sizing */
+  overflow: auto;          /* Scrollbars only on textarea */
+}
+```
+
+### Key Design Principles
+- **Fixed gutter width** prevents layout shifts during editing
+- **Flex-shrink: 0** on gutter ensures consistent 50px width
+- **Overflow containment** keeps scrollbars within textarea area
+- **Z-index layering** prevents textarea from overlapping gutter
+- **Font consistency** between gutter and textarea for alignment
+
+## Synchronization Implementation
+
+### Core Functions
+```typescript
+function updateLineNumbers() {
+  if (!lineNumbersElement || !editorElement) return;
+  
+  const content = editorElement.value;
+  const lines = content.split('\n');
+  const lineCount = lines.length;
+  
+  const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1).join('\n');
+  lineNumbersElement.textContent = lineNumbers;
+}
+
+function syncScroll() {
+  if (!lineNumbersElement || !editorElement) return;
+  lineNumbersElement.scrollTop = editorElement.scrollTop;
+}
+```
+
+### Event Management
+```typescript
+function initializeLineNumbers() {
+  // Initial line numbers
+  updateLineNumbers();
+  
+  // Sync scroll events
+  editorElement.addEventListener('scroll', syncScroll);
+  
+  // Update line numbers on content change
+  editorElement.addEventListener('input', updateLineNumbers);
+  
+  // Handle font mode changes
+  const observer = new MutationObserver(() => {
+    updateLineNumbers();
+  });
+  observer.observe(editorElement, { attributes: true, attributeFilter: ['class'] });
+}
+```
+
+### Performance Considerations
+- **Debounced updates** for input events (300ms)
+- **RequestAnimationFrame** for smooth scroll synchronization
+- **MutationObserver** for efficient class change detection
+- **Event cleanup** on component unmount
+
+## CSS Best Practices
+
+### Scrollbar Containment
+```css
+/* Main container prevents any overflow */
+.line-numbered-editor {
+  overflow: hidden;
+}
+
+/* Gutter never scrolls horizontally, only vertically via JS */
+.line-numbers-gutter {
+  overflow: hidden;
+}
+
+/* Only textarea has scrollbars */
+.textarea-container {
+  overflow: hidden;
+}
+
+#editor {
+  overflow: auto;  /* Scrollbars contained here */
+}
+```
+
+### Font Consistency
+```css
+/* Shared font properties for alignment */
+.line-numbers-gutter,
+#editor {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Mode-specific font switching */
+.text-mode .line-numbers-gutter,
+.text-mode #editor {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+```
+
+### Responsive Considerations
+- **Fixed gutter width** works on all screen sizes
+- **Flex layout** adapts to container changes
+- **Z-index stacking** prevents mobile scroll issues
+- **Touch-friendly** line number area (non-selectable)
+
 ## Implementation Notes
 - Implement iframe security carefully
 - Test auto-save with various intervals

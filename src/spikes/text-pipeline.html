@@ -213,16 +213,54 @@
       font-weight: 500;
     }
     
-    #editor {
+    .line-numbered-editor {
       flex: 1;
+      display: flex;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .line-numbers-gutter {
+      width: 50px;
+      background: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #6c757d;
+      text-align: right;
+      padding: 15px 8px 15px 4px;
+      overflow: hidden;
+      user-select: none;
+      white-space: pre;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    
+    .textarea-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #editor {
+      width: 100%;
+      height: 100%;
       border: none;
       padding: 15px;
+      margin: 0;
       font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
       font-size: 14px;
       line-height: 1.5;
       resize: none;
       outline: none;
-      background: #fff;
+      background: transparent;
+      overflow: auto;
+      white-space: pre;
+      word-wrap: break-word;
+      box-sizing: border-box;
     }
     
     #editor:focus {
@@ -232,13 +270,63 @@
     #editor.text-mode {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+    
+    .text-mode .line-numbers-gutter {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
   </style>
 </head>
 <body>
   <div class="editor-container">
     <div class="editor-status" id="status">Ready</div>
-    <textarea id="editor" placeholder="Enter content or script here..."></textarea>
+    <div class="line-numbered-editor">
+      <div class="line-numbers-gutter" id="line-numbers">1</div>
+      <div class="textarea-container">
+        <textarea id="editor" placeholder="Enter content or script here..."></textarea>
+      </div>
+    </div>
   </div>
+  
+  <!-- Hidden sample content -->
+  <script type="text/plain" id="sample-text"># Hello World
+
+This is **bold** text.
+
+## Subheading
+
+With some *italic* text.<\/script>
+  
+  <script type="text/plain" id="sample-transform-text">// Transform plain text to HTML
+const result = plainText
+  .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+  .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+  .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+  .replace(/\\*\\*(.*?)\\*\\*/gim, "<strong>$1</strong>")
+  .replace(/\\*(.*?)\\*/gim, "<em>$1</em>")
+  .replace(/\\n\\n/gim, "</p><p>")
+  .replace(/\\n/gim, "<br>");
+  
+return "<p>" + result + "</p>";
+<\/script>
+
+  <script type="text/plain" id="sample-transform-dom">// Transform the DOM
+const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+headings.forEach((heading, index) => {
+  if (!heading.id) {
+    const text = heading.textContent || "";
+    const id = text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "heading-" + (index + 1);
+    heading.id = id;
+    heading.style.borderLeft = "3px solid #007bff";
+    heading.style.paddingLeft = "10px";
+  }
+});
+
+return document;<\/script>
   
   <script type="text/javascript">
     let currentMode = 'text';
@@ -246,44 +334,65 @@
     let transformDomScript = '';
     let currentText = '';
     let debounceTimer = null;
+    let lineNumbersElement = null;
+    let editorElement = null;
     
-    // Default transform scripts
+    // Line numbers management
+    function updateLineNumbers() {
+      if (!lineNumbersElement || !editorElement) return;
+      
+      const content = editorElement.value;
+      const lines = content.split('\\n');
+      const lineCount = lines.length;
+      
+      // Generate line numbers
+      const lineNumbers = Array.from({ length: lineCount }, (_, i) => i + 1).join('\\n');
+      lineNumbersElement.textContent = lineNumbers;
+    }
+    
+    function syncScroll() {
+      if (!lineNumbersElement || !editorElement) return;
+      
+      // Sync line numbers scroll with textarea scroll
+      lineNumbersElement.scrollTop = editorElement.scrollTop;
+    }
+    
+    function initializeLineNumbers() {
+      lineNumbersElement = document.getElementById('line-numbers');
+      editorElement = document.getElementById('editor');
+      
+      if (!lineNumbersElement || !editorElement) {
+        console.error('Line numbers elements not found:', { lineNumbersElement, editorElement });
+        return;
+      }
+      
+      // Initial line numbers
+      updateLineNumbers();
+      
+      // Sync scroll events
+      editorElement.addEventListener('scroll', syncScroll);
+      
+      // Update line numbers on content change
+      editorElement.addEventListener('input', updateLineNumbers);
+      
+      // Handle font mode changes
+      const observer = new MutationObserver(() => {
+        updateLineNumbers();
+      });
+      observer.observe(editorElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    
+    // Get sample content from DOM
+    function getSampleText() {
+      return document.getElementById('sample-text').textContent;
+    }
+    
     function getDefaultTransformText() {
-      return \`// Transform plain text to HTML
-const result = plainText
-  .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-  .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-  .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-  .replace(/\\\`\\\`\\\`([a-zA-Z0-9]*?)\\\\n([\\\\s\\\\S]*?)\\\\n\\\`\\\`\\\`/gim, function(match, lang, code) {
-    return lang ? \\\`<pre class="language-\\\${lang}"><code>\\\${code}</code></pre>\\\` : \\\`<pre><code>\\\${code}</code></pre>\\\`;
-  })
-  .replace(/\\\\*\\\\*(.*?)\\\\*\\\\*/gim, '<strong>$1</strong>')
-  .replace(/\\\\*(.*?)\\\\*/gim, '<em>$1</em>')
-  .replace(/\\\\n\\\\n/gim, '</p><p>')
-  .replace(/\\\\n/gim, '<br>');
-  
-return '<p>' + result + '</p>';\`;
+      return document.getElementById('sample-transform-text').textContent;
     }
     
     function getDefaultTransformDom() {
-      return \`// Transform the DOM
-const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-headings.forEach((heading, index) => {
-  if (!heading.id) {
-    const text = heading.textContent || '';
-    const id = text
-      .toLowerCase()
-      .replace(/[^a-z0-9\\\\\\\\s-]/g, '')
-      .replace(/\\\\\\\\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '') || \\\`heading-\\\${index + 1}\\\`;
-    heading.id = id;
-    heading.style.borderLeft = '3px solid #007bff';
-    heading.style.paddingLeft = '10px';
-  }
-});
-
-return document;\`;
+      return document.getElementById('sample-transform-dom').textContent;
     }
     
     // Transform execution functions
@@ -351,9 +460,6 @@ return document;\`;
           }
         } else {
           // Default: treat as HTML or add basic paragraph wrapping
-          if (!html.trim().startsWith('<')) {
-            html = \`<p>\${html.replace(/\\n\\n/g, '</p><p>').replace(/\\n/g, '<br>')}</p>\`;
-          }
         }
         
         // Step 2: Transform DOM if script exists  
@@ -386,6 +492,7 @@ return document;\`;
     
     function updateEditorForMode() {
       const editor = document.getElementById('editor');
+      const container = editor.closest('.line-numbered-editor');
       
       // Update editor content and styling based on current mode
       switch (currentMode) {
@@ -393,18 +500,24 @@ return document;\`;
           editor.placeholder = 'Enter your plain text content here...';
           editor.value = currentText;
           editor.className = 'text-mode';
+          container.className = 'line-numbered-editor text-mode';
           break;
         case 'transformText':
           editor.placeholder = 'Enter transformText.js script...';
           editor.value = transformTextScript;
           editor.className = '';
+          container.className = 'line-numbered-editor';
           break;
         case 'transformDOM':
           editor.placeholder = 'Enter transformDom.js script...';
           editor.value = transformDomScript;
           editor.className = '';
+          container.className = 'line-numbered-editor';
           break;
       }
+      
+      // Update line numbers after mode change
+      updateLineNumbers();
     }
     
     function triggerPipelineUpdate() {
@@ -454,13 +567,19 @@ return document;\`;
     });
     
     // Initialize with default content
-    currentText = '# Hello World\\n\\nThis is **bold** text.\\n\\n## Subheading\\n\\nWith some *italic* text.';
+    currentText = getSampleText();
     transformTextScript = getDefaultTransformText();
     transformDomScript = getDefaultTransformDom();
     
+    // Initialize line numbers when DOM is ready
+    initializeLineNumbers();
+    
+    // Set initial content in text mode
+    updateEditorForMode();
+    
     // Signal ready to parent
     parent.postMessage({ type: 'READY' }, '*');
-  </sc` + `ript>
+  <\/script>
 </body>
 </html>`;
 
