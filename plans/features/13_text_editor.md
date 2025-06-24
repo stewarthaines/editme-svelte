@@ -1,50 +1,109 @@
 # 13. Text Editor
 
 ## Overview
-Provides a textarea-based editor for plain text sources with debounced preview updates, auto-save functionality, and association with XHTML spine items.
+Provides a flexible editor pane system supporting single or dual-pane editing of text sources, CSS, and JavaScript files with validation, synchronized scrolling, and real-time preview updates.
 
 ## Requirements
-- Textarea in iframe for plain text editing
-- Debounced change event handling
-- Auto-save functionality
-- Association with corresponding XHTML spine item
+- Single/dual pane iframe-based editor with configurable layout
+- Source file selection from current spine item and manifest resources
+- Real-time content validation for CSS and JavaScript
+- Line-numbered textarea with synchronized scrolling
+- Debounced change event handling with validation
+- Auto-save functionality with conflict resolution
+- Per-pane error display with line number references
 
 ## Dependencies
 - **#12 Transform Pipeline** - for converting text to preview
+- **#04 Workspace & OPF Manager** - for manifest file listings
+- **#05 Blob URL Manager** - for preview URL generation
 
 ## Technical Approach
-- Iframe-based editor for security isolation
-- Debounced change events to optimize performance
-- Auto-save with conflict resolution
-- Real-time preview updates via transform pipeline
+- Flexible pane system with configurable single/dual iframe layout
+- Source dropdown populated from spine item text + manifest CSS/JS files
+- Real-time syntax validation for CSS and JavaScript content
+- Line-numbered editor with synchronized scrolling and font consistency
+- Debounced change events with validation pipeline
+- Per-pane error panels with parse error details and line numbers
+- Session persistence for user layout preferences
+- Auto-save with conflict resolution and validation gates
 
 ## API Design
 ```typescript
-interface TextEditor {
-  // Editor management
-  loadEditor(spineItemId: string, sourceFilePath: string): Promise<void>
-  saveContent(): Promise<void>
+interface EditorPane {
+  // Pane management
+  loadFile(filePath: string): Promise<void>
+  saveContent(): Promise<boolean>
   getContent(): string
   setContent(content: string): void
+  getFileType(): 'text' | 'css' | 'javascript'
+  
+  // Validation
+  validateContent(): ValidationResult
+  hasValidContent(): boolean
+  getValidationErrors(): ParseError[]
+  
+  // Editor state
+  focus(): void
+  blur(): void
+  setReadOnly(readOnly: boolean): void
+  getCursorPosition(): { line: number, column: number }
+  
+  // Events
+  onContentChange(callback: (content: string, isValid: boolean) => void): () => void
+  onValidationChange(callback: (errors: ParseError[]) => void): () => void
+}
+
+interface TextEditor {
+  // Pane configuration
+  setPaneMode(mode: 'single' | 'dual'): void
+  setSplitOrientation(orientation: 'horizontal' | 'vertical'): void
+  getPaneMode(): 'single' | 'dual'
+  getSplitOrientation(): 'horizontal' | 'vertical'
+  
+  // File management
+  loadSpineItem(spineItemId: string): Promise<void>
+  getAvailableFiles(): ManifestFile[]
+  getSelectedFiles(): { pane1?: string, pane2?: string }
+  setFileForPane(paneIndex: 1 | 2, filePath: string): Promise<void>
+  
+  // Editor access
+  getPane(index: 1 | 2): EditorPane | null
+  getPrimaryPane(): EditorPane
+  getSecondaryPane(): EditorPane | null
   
   // Auto-save
   enableAutoSave(interval?: number): void
   disableAutoSave(): void
   getAutoSaveStatus(): AutoSaveStatus
   
-  // Change tracking
-  hasUnsavedChanges(): boolean
-  getChangeCount(): number
-  markSaved(): void
-  
-  // Editor state
-  focus(): void
-  blur(): void
-  setReadOnly(readOnly: boolean): void
+  // Session persistence
+  saveLayoutPreferences(): void
+  loadLayoutPreferences(): void
   
   // Events
-  onContentChange(callback: (content: string) => void): () => void
-  onSave(callback: (success: boolean) => void): () => void
+  onPreviewUpdate(callback: (hasValidChanges: boolean) => void): () => void
+  onLayoutChange(callback: (mode: PaneMode, orientation: SplitOrientation) => void): () => void
+}
+
+interface ValidationResult {
+  isValid: boolean
+  errors: ParseError[]
+  warnings?: ParseWarning[]
+}
+
+interface ParseError {
+  line: number
+  column: number
+  message: string
+  severity: 'error' | 'warning'
+  source: string
+}
+
+interface ManifestFile {
+  path: string
+  type: 'text' | 'css' | 'javascript'
+  title?: string
+  isSpineItem: boolean
 }
 
 interface AutoSaveStatus {
@@ -56,12 +115,16 @@ interface AutoSaveStatus {
 }
 
 interface EditorState {
-  content: string
-  cursorPosition: number
-  scrollPosition: number
-  hasChanges: boolean
+  paneMode: 'single' | 'dual'
+  splitOrientation: 'horizontal' | 'vertical'
+  selectedFiles: { pane1?: string, pane2?: string }
+  hasUnsavedChanges: boolean
+  validationErrors: { pane1: ParseError[], pane2: ParseError[] }
   isLoading: boolean
 }
+
+type PaneMode = 'single' | 'dual'
+type SplitOrientation = 'horizontal' | 'vertical'
 ```
 
 ## Editor Component Structure
@@ -73,31 +136,52 @@ interface EditorState {
   const dispatch = createEventDispatcher()
   
   export let spineItemId = ''
-  export let sourceFilePath = ''
   export let readOnly = false
   export let autoSaveInterval = 2000
   
-  let editorFrame
-  let content = ''
+  let paneMode = 'single'
+  let splitOrientation = 'horizontal'
+  let selectedFiles = { pane1: null, pane2: null }
+  let availableFiles = []
+  let pane1Frame, pane2Frame
+  let validationErrors = { pane1: [], pane2: [] }
   let hasUnsavedChanges = false
   let autoSaveEnabled = true
-  let isLoading = true
-  let saveTimeout
   let lastSaved = null
 </script>
 
 <div class="text-editor-container">
   <div class="editor-toolbar">
-    <div class="editor-info">
-      <span class="file-path">{sourceFilePath}</span>
-      {#if hasUnsavedChanges}
-        <span class="unsaved-indicator">●</span>
+    <div class="layout-controls">
+      <button 
+        class="pane-toggle" 
+        class:active={paneMode === 'single'}
+        on:click={() => setPaneMode('single')}
+      >
+        Single
+      </button>
+      <button 
+        class="pane-toggle" 
+        class:active={paneMode === 'dual'}
+        on:click={() => setPaneMode('dual')}
+      >
+        Dual
+      </button>
+      
+      {#if paneMode === 'dual'}
+        <button 
+          class="split-toggle"
+          on:click={toggleSplitOrientation}
+          title="Toggle split orientation"
+        >
+          {splitOrientation === 'horizontal' ? '⬌' : '⬍'}
+        </button>
       {/if}
     </div>
     
     <div class="editor-actions">
-      <button on:click={saveContent} disabled={!hasUnsavedChanges || readOnly}>
-        Save
+      <button on:click={saveAllPanes} disabled={!hasUnsavedChanges || readOnly}>
+        Save All
       </button>
       <button on:click={toggleAutoSave}>
         Auto-save: {autoSaveEnabled ? 'On' : 'Off'}
@@ -108,21 +192,399 @@ interface EditorState {
     </div>
   </div>
   
-  <div class="editor-content">
-    <iframe
-      bind:this={editorFrame}
-      src="about:blank"
-      class="editor-iframe"
-      title="Text Editor"
-      on:load={initializeEditor}
-    ></iframe>
-  </div>
-  
-  <div class="editor-status">
-    <span class="word-count">{getWordCount(content)} words</span>
-    <span class="char-count">{content.length} characters</span>
+  <div class="editor-content" class:dual-pane={paneMode === 'dual'} class:vertical-split={splitOrientation === 'vertical'}>
+    <!-- Primary Pane -->
+    <div class="editor-pane" class:pane-1={true}>
+      <div class="pane-header">
+        <select 
+          bind:value={selectedFiles.pane1} 
+          on:change={(e) => loadFileInPane(1, e.target.value)}
+          class="file-selector"
+        >
+          <option value="">Select file...</option>
+          {#each getAvailableFilesForPane(1) as file}
+            <option value={file.path} disabled={file.path === selectedFiles.pane2}>
+              {file.title || file.path} ({file.type})
+            </option>
+          {/each}
+        </select>
+        
+        {#if hasUnsavedChanges}
+          <span class="unsaved-indicator">●</span>
+        {/if}
+      </div>
+      
+      <div class="pane-content">
+        <iframe
+          bind:this={pane1Frame}
+          src="about:blank"
+          class="editor-iframe"
+          title="Editor Pane 1"
+          on:load={() => initializePane(1)}
+        ></iframe>
+        
+        {#if validationErrors.pane1.length > 0}
+          <div class="error-panel">
+            {#each validationErrors.pane1 as error}
+              <div class="error-item">
+                <span class="error-location">Line {error.line}:</span>
+                <span class="error-message">{error.message}</span>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+    
+    <!-- Secondary Pane (dual mode only) -->
+    {#if paneMode === 'dual'}
+      <div class="pane-splitter"></div>
+      
+      <div class="editor-pane" class:pane-2={true}>
+        <div class="pane-header">
+          <select 
+            bind:value={selectedFiles.pane2} 
+            on:change={(e) => loadFileInPane(2, e.target.value)}
+            class="file-selector"
+          >
+            <option value="">Select file...</option>
+            {#each getAvailableFilesForPane(2) as file}
+              <option value={file.path} disabled={file.path === selectedFiles.pane1}>
+                {file.title || file.path} ({file.type})
+              </option>
+            {/each}
+          </select>
+          
+          {#if hasUnsavedChanges}
+            <span class="unsaved-indicator">●</span>
+          {/if}
+        </div>
+        
+        <div class="pane-content">
+          <iframe
+            bind:this={pane2Frame}
+            src="about:blank"
+            class="editor-iframe"
+            title="Editor Pane 2"
+            on:load={() => initializePane(2)}
+          ></iframe>
+          
+          {#if validationErrors.pane2.length > 0}
+            <div class="error-panel">
+              {#each validationErrors.pane2 as error}
+                <div class="error-item">
+                  <span class="error-location">Line {error.line}:</span>
+                  <span class="error-message">{error.message}</span>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
+```
+
+## Pane Management Implementation
+```typescript
+const setPaneMode = (mode: PaneMode) => {
+  paneMode = mode
+  
+  if (mode === 'single' && selectedFiles.pane2) {
+    // Clear secondary pane when switching to single mode
+    selectedFiles.pane2 = null
+  }
+  
+  // Save layout preference
+  saveLayoutPreferences()
+  
+  dispatch('layout-change', { mode, orientation: splitOrientation })
+}
+
+const toggleSplitOrientation = () => {
+  splitOrientation = splitOrientation === 'horizontal' ? 'vertical' : 'horizontal'
+  saveLayoutPreferences()
+  dispatch('layout-change', { mode: paneMode, orientation: splitOrientation })
+}
+
+const getAvailableFilesForPane = (paneIndex: 1 | 2): ManifestFile[] => {
+  return availableFiles.filter(file => {
+    // Exclude files already selected in other panes
+    const otherPaneFile = paneIndex === 1 ? selectedFiles.pane2 : selectedFiles.pane1
+    return file.path !== otherPaneFile
+  })
+}
+
+const loadFileInPane = async (paneIndex: 1 | 2, filePath: string) => {
+  if (!filePath) return
+  
+  try {
+    const fileContent = await fileStorage.readFile(currentWorkspaceId, filePath)
+    const paneKey = `pane${paneIndex}` as keyof typeof selectedFiles
+    
+    selectedFiles[paneKey] = filePath
+    
+    // Initialize the iframe for this pane
+    const iframe = paneIndex === 1 ? pane1Frame : pane2Frame
+    if (iframe) {
+      await initializePaneContent(iframe, filePath, fileContent)
+    }
+    
+    // Clear validation errors for this pane
+    validationErrors[paneKey] = []
+    
+  } catch (error) {
+    console.error(`Failed to load file ${filePath}:`, error)
+    // Show error notification
+  }
+}
+```
+
+## Content Validation System
+```typescript
+const validateContent = (content: string, fileType: 'text' | 'css' | 'javascript'): ValidationResult => {
+  const errors: ParseError[] = []
+  
+  if (fileType === 'css') {
+    try {
+      // Simple CSS syntax validation
+      const testStyle = document.createElement('style')
+      testStyle.textContent = content
+      document.head.appendChild(testStyle)
+      
+      // Check if CSS was parsed successfully
+      if (testStyle.sheet?.cssRules) {
+        // CSS is valid
+      }
+      
+      document.head.removeChild(testStyle)
+      
+    } catch (error) {
+      errors.push({
+        line: extractLineNumber(error),
+        column: 0,
+        message: error.message,
+        severity: 'error',
+        source: 'css-parser'
+      })
+    }
+  }
+  
+  if (fileType === 'javascript') {
+    try {
+      // JavaScript syntax validation using Function constructor
+      new Function(content)
+      
+    } catch (error) {
+      const lineMatch = error.stack?.match(/Function:(\d+):(\d+)/)
+      errors.push({
+        line: lineMatch ? parseInt(lineMatch[1]) : 1,
+        column: lineMatch ? parseInt(lineMatch[2]) : 0,
+        message: error.message,
+        severity: 'error',
+        source: 'js-parser'
+      })
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+const handleContentChange = (paneIndex: 1 | 2, content: string, fileType: string) => {
+  const paneKey = `pane${paneIndex}` as keyof typeof validationErrors
+  
+  // Always allow text content changes
+  if (fileType === 'text') {
+    validationErrors[paneKey] = []
+    triggerPreviewUpdate()
+    return
+  }
+  
+  // Validate CSS and JavaScript
+  const validation = validateContent(content, fileType as 'css' | 'javascript')
+  validationErrors[paneKey] = validation.errors
+  
+  // Only update preview if content is valid
+  if (validation.isValid) {
+    triggerPreviewUpdate()
+  }
+  
+  // Update auto-save if enabled
+  if (autoSaveEnabled && validation.isValid) {
+    debouncedSave(paneIndex, content)
+  }
+}
+```
+
+## Layout CSS Implementation
+```css
+.text-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.layout-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.pane-toggle {
+  padding: 6px 12px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pane-toggle.active {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+.split-toggle {
+  padding: 6px 8px;
+  margin-left: 8px;
+  font-size: 16px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-primary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.editor-content.dual-pane.vertical-split {
+  flex-direction: column;
+}
+
+.editor-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-primary);
+  gap: 8px;
+}
+
+.file-selector {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border-primary);
+  border-radius: 4px;
+  background: var(--bg-primary);
+}
+
+.pane-content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-iframe {
+  flex: 1;
+  border: none;
+  width: 100%;
+}
+
+.pane-splitter {
+  width: 4px;
+  background: var(--border-primary);
+  cursor: col-resize;
+  flex-shrink: 0;
+}
+
+.editor-content.vertical-split .pane-splitter {
+  width: auto;
+  height: 4px;
+  cursor: row-resize;
+}
+
+.error-panel {
+  background: var(--error-bg);
+  border-top: 1px solid var(--error-border);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.error-item {
+  margin-bottom: 4px;
+}
+
+.error-location {
+  color: var(--error-text);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.error-message {
+  color: var(--text-secondary);
+}
+
+.unsaved-indicator {
+  color: var(--warning-primary);
+  font-weight: bold;
+}
+```
+
+## Session Persistence
+```typescript
+const saveLayoutPreferences = () => {
+  const preferences = {
+    paneMode,
+    splitOrientation,
+    selectedFiles: { ...selectedFiles }
+  }
+  
+  localStorage.setItem(`editor-layout-${spineItemId}`, JSON.stringify(preferences))
+}
+
+const loadLayoutPreferences = () => {
+  try {
+    const stored = localStorage.getItem(`editor-layout-${spineItemId}`)
+    if (stored) {
+      const preferences = JSON.parse(stored)
+      paneMode = preferences.paneMode || 'single'
+      splitOrientation = preferences.splitOrientation || 'horizontal'
+      
+      // Restore file selections if files still exist
+      if (preferences.selectedFiles) {
+        Object.assign(selectedFiles, preferences.selectedFiles)
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load layout preferences:', error)
+  }
+}
 ```
 
 ## Iframe Editor Implementation
