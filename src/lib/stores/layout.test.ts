@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { layoutStore } from './layout.js'
+import { layoutStore, type SidebarSection } from './layout'
 
 // Mock localStorage
 const mockLocalStorage = (() => {
-  let store = {}
+  let store: Record<string, string> = {}
   return {
-    getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value
     }),
     clear: vi.fn(() => {
@@ -171,7 +171,7 @@ describe('Layout Store', () => {
     })
 
     it('should handle all valid section types', () => {
-      const validSections = ['workspace', 'metadata', 'manifest', 'nav', 'spine', 'settings']
+      const validSections: SidebarSection[] = ['workspace', 'metadata', 'manifest', 'nav', 'spine', 'settings']
       
       validSections.forEach(section => {
         layoutStore.setSidebarSection(section)

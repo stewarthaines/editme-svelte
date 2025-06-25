@@ -1,13 +1,33 @@
 import { writable } from 'svelte/store'
+import type { Writable } from 'svelte/store'
+
+// TypeScript interfaces
+export interface SidebarState {
+  isExpanded: boolean
+  activeSection: SidebarSection
+}
+
+export interface LayoutState {
+  sidebar: SidebarState
+  isInitialized: boolean
+}
+
+export interface LayoutStore extends Writable<LayoutState> {
+  initialize(): void
+  toggleSidebar(): void
+  setSidebarSection(section: SidebarSection): void
+}
+
+export type SidebarSection = 'workspace' | 'metadata' | 'manifest' | 'nav' | 'spine' | 'settings'
 
 // Storage keys for persistence
 const STORAGE_KEYS = {
   SIDEBAR_EXPANDED: 'editme_sidebar_expanded',
   SIDEBAR_SECTION: 'editme_sidebar_section'
-}
+} as const
 
 // Default layout state
-const DEFAULT_STATE = {
+const DEFAULT_STATE: LayoutState = {
   sidebar: {
     isExpanded: true,
     activeSection: 'workspace'
@@ -16,21 +36,23 @@ const DEFAULT_STATE = {
 }
 
 // Create the writable store
-function createLayoutStore() {
-  const { subscribe, update } = writable(DEFAULT_STATE)
+function createLayoutStore(): LayoutStore {
+  const { subscribe, set, update } = writable<LayoutState>(DEFAULT_STATE)
   
   return {
     subscribe,
+    set,
+    update,
     
     // Initialize from localStorage
-    initialize() {
-      let savedExpanded = DEFAULT_STATE.sidebar.isExpanded
-      let savedSection = DEFAULT_STATE.sidebar.activeSection
+    initialize(): void {
+      let savedExpanded: boolean = DEFAULT_STATE.sidebar.isExpanded
+      let savedSection: SidebarSection = DEFAULT_STATE.sidebar.activeSection
       
       try {
         const expandedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_EXPANDED)
         if (expandedValue) {
-          savedExpanded = JSON.parse(expandedValue)
+          savedExpanded = JSON.parse(expandedValue) as boolean
         }
       } catch (error) {
         // Ignore localStorage errors and use default
@@ -40,7 +62,7 @@ function createLayoutStore() {
       
       try {
         const sectionValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_SECTION)
-        if (sectionValue) {
+        if (sectionValue && isValidSidebarSection(sectionValue)) {
           savedSection = sectionValue
         }
       } catch (error) {
@@ -60,7 +82,7 @@ function createLayoutStore() {
     },
     
     // Toggle sidebar expanded/collapsed
-    toggleSidebar() {
+    toggleSidebar(): void {
       update(state => {
         const newExpanded = !state.sidebar.isExpanded
         
@@ -82,10 +104,7 @@ function createLayoutStore() {
     },
     
     // Set active sidebar section
-    /**
-     * @param {string} section
-     */
-    setSidebarSection(section) {
+    setSidebarSection(section: SidebarSection): void {
       update(state => {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_SECTION, section)
@@ -104,6 +123,12 @@ function createLayoutStore() {
       })
     }
   }
+}
+
+// Type guard for sidebar sections
+function isValidSidebarSection(value: string): value is SidebarSection {
+  const validSections: SidebarSection[] = ['workspace', 'metadata', 'manifest', 'nav', 'spine', 'settings']
+  return validSections.includes(value as SidebarSection)
 }
 
 export const layoutStore = createLayoutStore()

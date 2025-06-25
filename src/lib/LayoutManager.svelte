@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PaneGroup, Pane, PaneResizer } from 'paneforge'
   import Sidebar from './Sidebar.svelte'
-  import { layoutStore } from './stores/layout.js'
+  import { layoutStore } from './stores/layout'
   
   // Subscribe to layout store
   $: ({ sidebar } = $layoutStore)

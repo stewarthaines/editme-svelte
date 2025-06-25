@@ -1,25 +1,25 @@
 <script lang="ts">
-  import { layoutStore } from './stores/layout.js'
+  import { layoutStore, type SidebarSection } from './stores/layout'
   
   // Props
   export let isExpanded = true
-  export let activeSection = 'workspace'
+  export let activeSection: SidebarSection = 'workspace'
   
   // Sidebar sections configuration
-  const SIDEBAR_SECTIONS = [
+  const SIDEBAR_SECTIONS: Array<{ id: SidebarSection; icon: string; label: string }> = [
     { id: 'workspace', icon: '🏠', label: 'Workspace' },
     { id: 'metadata', icon: '📄', label: 'Metadata' },
     { id: 'manifest', icon: '📋', label: 'Manifest' },
     { id: 'nav', icon: '📖', label: 'Navigation' },
     { id: 'spine', icon: '📖', label: 'Spine Items' },
     { id: 'settings', icon: '⚙️', label: 'Settings' }
-  ]
+  ] as const
   
   function toggleSidebar() {
     layoutStore.toggleSidebar()
   }
   
-  function setSidebarSection(section: string) {
+  function setSidebarSection(section: SidebarSection) {
     layoutStore.setSidebarSection(section)
   }
 </script>
