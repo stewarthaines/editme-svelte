@@ -60,7 +60,10 @@ export default [
         // File API
         File: 'readonly',
         // Performance API
-        performance: 'readonly'
+        performance: 'readonly',
+        // Storage API
+        localStorage: 'readonly',
+        sessionStorage: 'readonly'
       }
     },
     plugins: {
@@ -137,7 +140,10 @@ export default [
         // File API
         File: 'readonly',
         // Performance API
-        performance: 'readonly'
+        performance: 'readonly',
+        // Storage API
+        localStorage: 'readonly',
+        sessionStorage: 'readonly'
       }
     },
     plugins: {

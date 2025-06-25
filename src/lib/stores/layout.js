@@ -17,7 +17,7 @@ const DEFAULT_STATE = {
 
 // Create the writable store
 function createLayoutStore() {
-  const { subscribe, set, update } = writable(DEFAULT_STATE)
+  const { subscribe, update } = writable(DEFAULT_STATE)
   
   return {
     subscribe,
@@ -34,6 +34,7 @@ function createLayoutStore() {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
+        // eslint-disable-next-line no-console
         console.warn('Failed to load sidebar expanded state:', error)
       }
       
@@ -44,6 +45,7 @@ function createLayoutStore() {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
+        // eslint-disable-next-line no-console
         console.warn('Failed to load sidebar section:', error)
       }
       
@@ -65,6 +67,7 @@ function createLayoutStore() {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_EXPANDED, JSON.stringify(newExpanded))
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.warn('Failed to save sidebar expanded state:', error)
         }
         
@@ -79,11 +82,15 @@ function createLayoutStore() {
     },
     
     // Set active sidebar section
+    /**
+     * @param {string} section
+     */
     setSidebarSection(section) {
       update(state => {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_SECTION, section)
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.warn('Failed to save sidebar section:', error)
         }
         

@@ -1,6 +1,6 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { expect, userEvent, within } from 'storybook/test';
+  import { userEvent, within } from 'storybook/test';
   import LayoutManager from '../lib/LayoutManager.svelte';
 
   const { Story } = defineMeta({

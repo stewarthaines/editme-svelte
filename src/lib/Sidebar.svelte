@@ -19,7 +19,7 @@
     layoutStore.toggleSidebar()
   }
   
-  function setSidebarSection(section) {
+  function setSidebarSection(section: string) {
     layoutStore.setSidebarSection(section)
   }
 </script>
@@ -41,7 +41,7 @@
     {/if}
   </div>
   
-  <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+  <nav class="sidebar-nav" aria-label="Main navigation">
     {#each SIDEBAR_SECTIONS as section}
       <button 
         class="sidebar-section" 
@@ -92,7 +92,7 @@
   }
   
   .sidebar.collapsed {
-    /* Width is handled by parent grid */
+    width: 100%;
   }
   
   .sidebar-header {
