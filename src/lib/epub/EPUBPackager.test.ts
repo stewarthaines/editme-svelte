@@ -24,6 +24,23 @@ vi.mock('../storage/index.js', () => ({
 	}))
 }));
 
+// Mock OPFUtils to avoid happy-dom namespace parsing issues
+vi.mock('./opf-utils.js', () => ({
+	OPFUtils: {
+		parseOPFMetadata: vi.fn(() => ({
+			title: 'Test Book',
+			author: 'Test Author',
+			language: 'en',
+			identifier: 'test-book-123',
+			publisher: 'Test Publisher',
+			date: '2024-01-01'
+		})),
+		validateXML: vi.fn(() => ({ isValid: true })),
+		parseContainerXml: vi.fn(() => ({ rootfilePath: 'OEBPS/content.opf' })),
+		parseRootfilePath: vi.fn(() => 'OEBPS/content.opf')
+	}
+}));
+
 describe('EPUBPackager', () => {
 	let packager: EPUBPackager;
 	let mockStorage: any;
@@ -92,7 +109,7 @@ describe('EPUBPackager', () => {
 
 			expect(result.success).toBe(true);
 			expect(result.blob).toBeInstanceOf(Blob);
-			expect(result.filename).toBe('Test Book - Test Author - 2025-06-23.epub');
+			expect(result.filename).toMatch(/^Test Book - Test Author - \d{4}-\d{2}-\d{2}\.epub$/);
 			expect(result.fileCount).toBe(3);
 			expect(result.totalSize).toBe(708);
 			expect(result.processingTime).toBeGreaterThan(0);

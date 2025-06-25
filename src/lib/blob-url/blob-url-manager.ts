@@ -4,6 +4,11 @@
  * Converts manifest items from storage into blob URLs and substitutes them
  * in XHTML content for preview iframe usage. Includes OPFS optimization
  * for zero-copy blob creation.
+ * 
+ * Concurrency Note: This manager is designed for serial usage where blob URL
+ * creation calls are made sequentially. Concurrent calls for the same resource
+ * may result in duplicate blob URLs. The primary usage through XHTML processing
+ * naturally serializes calls by iterating through DOM elements.
  */
 
 import { getMimeType } from '../utils/mime-types.js';
@@ -55,6 +60,11 @@ export class BlobURLManager {
 
   /**
    * Create blob URL for a file using optimal backend path
+   * 
+   * Note: This method is designed for serial usage (one call at a time per resource).
+   * Concurrent calls for the same resource may result in duplicate blob URLs and 
+   * multiple file fetches. In practice, calls are serialized through the XHTML 
+   * processing pipeline which loops through elements sequentially.
    */
   async createBlobURL(filePath: string): Promise<string> {
     // Check capacity before creating
@@ -135,7 +145,8 @@ export class BlobURLManager {
       // Find all asset references
       const assetElements = this.findAssetElements(doc);
 
-      // Process each asset element
+      // Process each asset element sequentially
+      // This serialized loop is the typical usage pattern for createBlobURL calls
       for (const element of assetElements) {
         await this.processAssetElement(element);
       }
