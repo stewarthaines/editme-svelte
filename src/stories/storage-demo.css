@@ -271,10 +271,6 @@
   word-break: break-word;
 }
 
-.log-info .log-message {
-  color: #fff;
-}
-
 .log-success .log-message {
   color: #28a745;
 }
