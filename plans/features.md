@@ -51,7 +51,7 @@ Based on the overview specification, here's a breakdown of features that can be 
 - Minimum/maximum panel sizes
 - State persistence for panel positions
 
-### 7. Navigation Router
+### 7. Navigation Router ✅ COMPLETE
 
 - Switch between views: manifest, metadata, spine, navigation
 - URL state management (if applicable)
@@ -175,8 +175,8 @@ Based on the overview specification, here's a breakdown of features that can be 
 
 5. Blob URL Manager ✅ COMPLETE
 6. Layout System ✅ COMPLETE
-7. Navigation Router
-8. Theme System
+7. Navigation Router ✅ COMPLETE
+8. Theme System ✅ COMPLETE
 
 **Goal**: Core UI structure with presentation layer
 
