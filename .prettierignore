@@ -1,0 +1,24 @@
+# Build outputs
+dist/
+build/
+.svelte-kit/
+storybook-static/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+__screenshots__/
+*.tsbuildinfo
+
+# Config files that should keep their original formatting
+*.config.js
+*.config.ts
+vite.config.ts
+vitest.config.ts
+
+# Temporary files
+.DS_Store
+*.tmp
+*.log
