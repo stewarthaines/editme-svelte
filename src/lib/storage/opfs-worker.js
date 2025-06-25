@@ -3,6 +3,10 @@
  * 
  * Handles OPFS sync access handle operations in a Web Worker.
  * Used primarily on Safari where sync access handles work better in workers.
+ * 
+ * NOTE: This file MUST remain JavaScript (not TypeScript) because it gets
+ * injected as a worker blob URL to support sync access handles in Safari.
+ * Claude/agents should NOT convert this file to TypeScript.
  */
 
 let opfsRoot = null;
