@@ -55,8 +55,7 @@ describe('WorkspaceManager', () => {
   const mockMetadata: EPUBMetadata = {
     title: 'Test Book',
     language: 'en', 
-    identifier: 'test-book-123',
-    author: 'Test Author'
+    identifier: 'test-book-123'
   };
 
   const mockWorkspaceInfo: WorkspaceInfo = {
@@ -94,7 +93,7 @@ describe('WorkspaceManager', () => {
     mockStorage = (workspaceManager as any).storage;
     
     // Mock container.xml content for path resolution
-    mockStorage.readTextFile.mockImplementation((workspaceId: string, path: string) => {
+    mockStorage.readTextFile.mockImplementation((_workspaceId: string, path: string) => {
       if (path === 'META-INF/container.xml') {
         return Promise.resolve('<container><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>');
       }
@@ -173,7 +172,7 @@ describe('WorkspaceManager', () => {
 
   describe('createEPUBWorkspace', () => {
     it('should create workspace and return UUID', async () => {
-      const expectedId = 'workspace-new-123';
+      const expectedId = '12345678-1234-1234-1234-123456789abc';
       vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(expectedId);
       
       mockStorage.createWorkspace.mockResolvedValue(undefined);
@@ -194,11 +193,11 @@ describe('WorkspaceManager', () => {
     });
 
     it('should generate initial content.opf with metadata', async () => {
-      const workspaceId = 'workspace-new-123';
+      const workspaceId = '12345678-1234-1234-1234-123456789abc';
       vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(workspaceId);
 
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.generateOPFXML.mockReturnValue('<package></package>');
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package></package>');
 
       await workspaceManager.createEPUBWorkspace(mockMetadata);
 
@@ -268,7 +267,7 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('<package></package>');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       const result = await workspaceManager.getWorkspaceOPF('workspace-123');
 
@@ -290,7 +289,7 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('invalid xml');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockImplementation(() => {
+      (OPFUtils.parseOPFDocument as any).mockImplementation(() => {
         throw new Error('Invalid XML');
       });
 
@@ -303,8 +302,8 @@ describe('WorkspaceManager', () => {
   describe('updateWorkspaceOPF', () => {
     it('should write updated OPF and invalidate cache', async () => {
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package>updated</package>');
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
       
       mockStorage.writeTextFile.mockResolvedValue(undefined);
 
@@ -318,7 +317,7 @@ describe('WorkspaceManager', () => {
 
     it('should validate OPF structure before writing', async () => {
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.validateXML.mockReturnValue({ 
+      (OPFUtils.validateXML as any).mockReturnValue({ 
         isValid: false, 
         error: 'Invalid XML structure' 
       });
@@ -330,8 +329,8 @@ describe('WorkspaceManager', () => {
 
     it('should handle storage write errors', async () => {
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.generateOPFXML.mockReturnValue('<package></package>');
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package></package>');
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
       
       mockStorage.writeTextFile.mockRejectedValue(new Error('Disk full'));
 
@@ -351,9 +350,9 @@ describe('WorkspaceManager', () => {
       mockStorage.writeTextFile.mockResolvedValue(undefined);
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
-      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package>updated</package>');
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
 
       vi.spyOn(workspaceManager as any, 'generateManifestId')
         .mockReturnValue('chapter2');
@@ -378,9 +377,9 @@ describe('WorkspaceManager', () => {
       mockStorage.writeTextFile.mockResolvedValue(undefined);
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
-      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package>updated</package>');
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
 
       const result = await workspaceManager.addManifestItem('workspace-123', completeItem);
 
@@ -398,7 +397,7 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('<package></package>');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       await expect(
         workspaceManager.addManifestItem('workspace-123', duplicateItem)
@@ -410,9 +409,9 @@ describe('WorkspaceManager', () => {
       mockStorage.writeTextFile.mockResolvedValue(undefined);
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
-      OPFUtils.generateOPFXML.mockReturnValue('<package>updated</package>');
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
+      (OPFUtils.generateOPFXML as any).mockReturnValue('<package>updated</package>');
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
 
       vi.spyOn(workspaceManager as any, 'generateManifestId').mockReturnValue('chapter2');
       vi.spyOn(workspaceManager as any, 'detectMediaType').mockReturnValue('application/xhtml+xml');
@@ -425,7 +424,7 @@ describe('WorkspaceManager', () => {
   });
 
   describe('validateWorkspaceStructure', () => {
-    const mockValidationResult: ValidationResult = {
+    const _mockValidationResult: ValidationResult = {
       isValid: true,
       errors: [],
       warnings: [],
@@ -448,8 +447,8 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('<package></package>');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
-      OPFUtils.validateXML.mockReturnValue({ isValid: true });
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
+      (OPFUtils.validateXML as any).mockReturnValue({ isValid: true });
 
       const result = await workspaceManager.validateWorkspaceStructure('workspace-123');
 
@@ -481,7 +480,7 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('<package></package>');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       const result = await workspaceManager.validateWorkspaceStructure('workspace-123');
 
@@ -503,7 +502,7 @@ describe('WorkspaceManager', () => {
       mockStorage.readTextFile.mockResolvedValue('<package></package>');
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       const result = await strictManager.validateWorkspaceStructure('workspace-123');
 
@@ -513,7 +512,7 @@ describe('WorkspaceManager', () => {
   });
 
   describe('generateWorkspacePreview', () => {
-    const mockPreview: WorkspacePreview = {
+    const _mockPreview: WorkspacePreview = {
       metadata: mockMetadata,
       manifestSummary: {
         textItems: 1,
@@ -541,7 +540,7 @@ describe('WorkspaceManager', () => {
       mockStorage.getFileStats.mockResolvedValue({ size: 512 });
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       const result = await workspaceManager.generateWorkspacePreview('workspace-123');
 
@@ -567,7 +566,7 @@ describe('WorkspaceManager', () => {
       mockStorage.getFileStats.mockResolvedValue({ size: 100 });
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(complexOPF);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(complexOPF);
 
       const result = await workspaceManager.generateWorkspacePreview('workspace-123');
 
@@ -587,7 +586,7 @@ describe('WorkspaceManager', () => {
       mockStorage.getFileStats.mockResolvedValue({ size: 100 });
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.parseOPFDocument.mockReturnValue(mockOPFDocument);
+      (OPFUtils.parseOPFDocument as any).mockReturnValue(mockOPFDocument);
 
       const result = await workspaceManager.generateWorkspacePreview('workspace-123');
 
@@ -614,7 +613,7 @@ describe('WorkspaceManager', () => {
       const invalidOPF = { ...mockOPFDocument, manifest: [] }; // Empty manifest
       
       const { OPFUtils } = await import('../../epub/index.js');
-      OPFUtils.validateXML.mockReturnValue({ 
+      (OPFUtils.validateXML as any).mockReturnValue({ 
         isValid: false, 
         error: 'Missing required elements' 
       });
