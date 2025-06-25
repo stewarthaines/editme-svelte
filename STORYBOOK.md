@@ -276,6 +276,12 @@ src/stories/
 - Traditional UI component documentation
 - Props, events, slots demonstration
 
+### Application Stories
+- `title: 'Application/ComponentName'`
+- Layout and structural components
+- Full application state demonstration
+- Cross-component interaction testing
+
 ### Backend Feature Stories  
 - `title: 'Backend/FeatureName'`
 - API demonstration and testing
@@ -427,6 +433,286 @@ async function demonstrateTransformation() {
 
 This pattern enables rich, interactive documentation for backend features while maintaining the benefits of automated testing and visual documentation through Storybook.
 
+## Layout and Application Story Patterns
+
+### Fullscreen Layout Stories
+
+For layout components and complete application demonstrations, use the fullscreen pattern:
+
+```svelte
+<!-- LayoutComponent.stories.svelte -->
+<script module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import LayoutComponent from '../lib/LayoutComponent.svelte';
+
+  const { Story } = defineMeta({
+    title: 'Application/LayoutComponent',
+    component: LayoutComponent,
+    parameters: {
+      layout: 'fullscreen',  // Essential for layout stories
+      docs: {
+        description: {
+          component: 'Layout component documentation...'
+        }
+      }
+    },
+    tags: ['autodocs']
+  });
+</script>
+```
+
+### Interactive Layout Demonstrations
+
+#### **Sidebar Toggle Pattern**
+
+```svelte
+<Story 
+  name="Collapsed Sidebar" 
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggleButton = canvas.getByLabelText('Toggle sidebar');
+    await userEvent.click(toggleButton);
+  }}
+>
+  <LayoutComponent />
+</Story>
+```
+
+#### **Section Navigation Pattern**
+
+```svelte
+<Story 
+  name="Section Tour"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // Navigate through sections with timing
+    const sections = ['Metadata', 'Manifest', 'Navigation'];
+    for (const sectionName of sections) {
+      const button = canvas.getByTitle(sectionName);
+      await userEvent.click(button);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+  }}
+>
+  <LayoutComponent />
+</Story>
+```
+
+#### **Responsive Layout Testing**
+
+```svelte
+<Story 
+  name="Mobile View"
+  parameters={{
+    viewport: {
+      name: 'tablet'
+    },
+    docs: {
+      description: {
+        story: 'Layout behavior on tablet-sized screens'
+      }
+    }
+  }}
+>
+  <LayoutComponent />
+</Story>
+```
+
+### Application State Documentation
+
+#### **Complete App Demonstration**
+
+```svelte
+<!-- App.stories.svelte -->
+<Story 
+  name="Interactive Demo"
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    
+    // Wait for initialization
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Demonstrate key interactions
+    const sections = ['Metadata', 'Manifest', 'Settings'];
+    for (const section of sections) {
+      const button = canvas.getByTitle(section);
+      await userEvent.click(button);
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }
+    
+    // Toggle layout
+    const toggleButton = canvas.getByLabelText('Toggle sidebar');
+    await userEvent.click(toggleButton);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Return to default state
+    await userEvent.click(toggleButton);
+  }}
+>
+  <AppComponent />
+</Story>
+```
+
+### Layout Story Best Practices
+
+#### **✅ Essential Patterns**
+
+**Fullscreen Parameter:**
+```javascript
+parameters: {
+  layout: 'fullscreen'  // Required for layout components
+}
+```
+
+**Realistic Timing in Play Functions:**
+```javascript
+// Allow time for animations and state changes
+await new Promise(resolve => setTimeout(resolve, 1500));
+```
+
+**Accessibility-Focused Selectors:**
+```javascript
+// Use accessible selectors
+const toggleButton = canvas.getByLabelText('Toggle sidebar');
+const sectionButton = canvas.getByTitle('Metadata');
+const roleButton = canvas.getByRole('button', { name: /settings/i });
+```
+
+**Robust Error Handling:**
+```javascript
+play={async ({ canvasElement }) => {
+  try {
+    // Interaction logic
+  } catch (error) {
+    console.log('Layout demo interaction failed:', error);
+    // Continue to show current state
+  }
+}}
+```
+
+#### **🎯 Layout-Specific Considerations**
+
+**State Persistence:**
+- Layout stories may retain localStorage state between runs
+- Include reset mechanisms or account for previous state
+- Test both fresh and restored state scenarios
+
+**Animation Timing:**
+- CSS transitions need time to complete
+- Use realistic delays (500-1500ms) for visual clarity
+- Match timing to actual CSS transition durations
+
+**Viewport Constraints:**
+- Test minimum and maximum layout sizes
+- Verify responsive breakpoint behavior
+- Include mobile/tablet viewport variants
+
+**Cross-Story State:**
+- Layout state persists across story navigation
+- Consider this when designing demo sequences
+- Reset state explicitly if clean demos are required
+
+### Content-Rich Layout Demos
+
+#### **Placeholder Content Pattern**
+
+```svelte
+<!-- Rich demo content for layout stories -->
+<LayoutManager>
+  <svelte:fragment slot="sidebar-workspace">
+    <div class="demo-content">
+      <h3>📁 Workspace</h3>
+      <p>Current project: <strong>My EPUB</strong></p>
+      <ul>
+        <li>✅ Setup complete</li>
+        <li>🔄 Content in progress</li>
+      </ul>
+    </div>
+  </svelte:fragment>
+  
+  <svelte:fragment slot="left-content">
+    <div class="editor-demo">
+      <h3>Text Editor</h3>
+      <textarea rows="20" placeholder="Content here...">
+# Chapter 1: Introduction
+
+Welcome to EPUB creation...
+      </textarea>
+    </div>
+  </svelte:fragment>
+</LayoutManager>
+```
+
+#### **Styled Demo Components**
+
+```css
+/* Layout story specific styling */
+.demo-content {
+  padding: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.demo-content h3 {
+  margin: 0 0 0.75rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.editor-demo textarea {
+  width: 100%;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.preview-content {
+  padding: 2rem;
+  max-width: 650px;
+  margin: 0 auto;
+  font-family: Georgia, serif;
+  line-height: 1.6;
+}
+```
+
+### Performance in Layout Stories
+
+#### **Efficient Play Functions**
+
+```javascript
+// Batch DOM queries for better performance
+const buttons = {
+  toggle: canvas.getByLabelText('Toggle sidebar'),
+  metadata: canvas.getByTitle('Metadata'),
+  manifest: canvas.getByTitle('Manifest')
+};
+
+// Use consistent timing patterns
+const INTERACTION_DELAY = 800;
+const ANIMATION_DELAY = 500;
+
+for (const [name, button] of Object.entries(buttons)) {
+  await userEvent.click(button);
+  await new Promise(resolve => setTimeout(resolve, INTERACTION_DELAY));
+}
+```
+
+#### **Memory Management**
+
+```javascript
+// Clean up after complex demos if needed
+onDestroy(() => {
+  // Reset any global state
+  // Clear any timers
+  // Remove event listeners
+});
+```
+
+This pattern ensures layout and application stories provide comprehensive visual documentation while maintaining good performance and accessibility standards.
+
 ## Storybook Story Development Guidelines
 
 ### ✅ DO: Follow Component Separation Pattern
@@ -542,6 +828,8 @@ npm run test:stories                # Should pass story tests
 - ✅ `StorageDemo.stories.svelte` - Correct backend demo pattern
 - ✅ `EPUBUnpackerDemo.stories.svelte` - Complex feature demo
 - ✅ `WorkspaceOPFDemo.stories.svelte` - Comprehensive backend showcase
+- ✅ `LayoutManager.stories.svelte` - Fullscreen layout with interactive demos
+- ✅ `App.stories.svelte` - Complete application state demonstration
 - ❌ Avoid mixing patterns from different CSF versions
 
 ### 🔍 Common Failure Scenarios & Solutions

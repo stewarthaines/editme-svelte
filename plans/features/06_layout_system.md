@@ -68,15 +68,21 @@ interface ContentPanesState {
 }
 ```
 
-#### ResizeHandle
-Draggable border component for adjusting content pane split ratio.
+#### PaneForge Integration
+Resizable content panes implemented using PaneForge library components.
 
 ```typescript
-interface ResizeHandleProps {
-  onDrag: (deltaX: number) => void;
-  onDragStart: () => void;
-  onDragEnd: () => void;
-  thickness: number;         // 4px visible thick line
+// PaneForge components used:
+// - PaneGroup: Container for resizable panes
+// - Pane: Individual resizable pane 
+// - PaneResizer: Draggable resize handle between panes
+
+interface PaneForgeConfig {
+  direction: 'horizontal' | 'vertical';
+  autoSaveId: string;        // localStorage key for persistence
+  minSize: number;           // Minimum pane size percentage
+  maxSize: number;           // Maximum pane size percentage
+  defaultSize: number;       // Initial pane size percentage
 }
 ```
 
@@ -121,7 +127,11 @@ interface LayoutActions {
 - Unicode icons for sidebar sections with immediate mode switching
 
 ### Dependencies
-- None (UI foundation feature)
+- **PaneForge** (`paneforge`) - Robust Svelte resizable pane component library
+  - Provides nested pane groups for complex layouts
+  - Built-in localStorage persistence for layout state
+  - Touch and mouse drag support with customizable constraints
+  - Part of svecosystem with active maintenance and comprehensive documentation
 - Will integrate with future router and workspace systems via slots
 
 ## Technical Requirements

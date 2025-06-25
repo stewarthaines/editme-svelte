@@ -49,5 +49,8 @@
     "vite": "^6.3.5",
     "vite-plugin-singlefile": "^2.2.0",
     "vitest": "^3.2.2"
+  },
+  "dependencies": {
+    "paneforge": "^1.0.0"
   }
 }
