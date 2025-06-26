@@ -431,7 +431,28 @@ async function createNewEPUBProject(metadata: EPUBMetadata): Promise<string> {
     mediaType: 'text/css',
   });
 
-  // 5. Validate final structure
+  // 5. Create SOURCE directory with default content
+  const fileStorage = new FileStorage();
+  
+  // Add default settings
+  const defaultSettings = {
+    is_draft: false,
+    draft_id: 0,
+    text_transform: 'SOURCE/extensions/markdown-it/transform.js',
+    dom_transforms: []
+  };
+  await fileStorage.writeFile(workspaceId, 'SOURCE/settings.json', 
+    JSON.stringify(defaultSettings, null, 2));
+  
+  // Add source text for first chapter
+  const defaultChapterContent = `# Chapter 1\n\nStart writing your content here...\n`;
+  await fileStorage.writeFile(workspaceId, 'SOURCE/text/chapter1.txt', defaultChapterContent);
+  
+  // Add default transform script
+  const defaultTransform = `// Default markdown transform\nreturn window.markdownit().render(plainText);`;
+  await fileStorage.writeFile(workspaceId, 'SOURCE/scripts/transform.js', defaultTransform);
+
+  // 6. Validate final structure (excludes SOURCE/ files from orphan checks)
   const validation = await workspaceManager.validateWorkspaceStructure(workspaceId);
   if (!validation.isValid) {
     throw new ValidationError(

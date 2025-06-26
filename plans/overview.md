@@ -14,7 +14,7 @@ The app is designed for accessibility.
 
 The app converts plain text into xhtml required by the EPUB reading system. Each chapter xhtml has a corresponding plain text manifest item associated by id. The plain text source is stored in the EPUB as manifest items outside of the OEBPS folder.
 
-For example a chapter manifest item might be called 'OEBPS/chapter1.xhtml' with an id of 'chapter1' and its plain text source is stored in a manifest item called 'EDITME/src/chapter1.txt' with an id of 'chapter1_txt'.
+For example a chapter manifest item might be called 'OEBPS/chapter1.xhtml' with an id of 'chapter1' and its plain text source is stored in the workspace as 'SOURCE/text/chapter1.txt' (bundled in SOURCE.zip during packaging).
 
 The EPUB file also includes javascript used to transform the plain text to xhtml. This allows the EPUB author to decide what plain text formatting convention to use. Possible formats are markdown, asciidoc, textile or restructuredtext. The choice of which markdown library to use is also open to the author based on their needs.
 
@@ -51,7 +51,7 @@ The left/right panels are dynamically resizeable by dragging the border. This wo
 
 ## EPUB manifest
 
-The app implements an extension to the EPUB standard file structure that I'm calling 'Active EPUB'. It treats mimetype, META-INF/content.opf and OEBPS/ as usual but adds a folder at the root level called 'EDITME' which contains plain text source for each chapter as well as javascript scripts that are run in the app to transform the xhtml. Optionally the EDITME.html app is also stored in this folder so that the published EPUB file includes everything required for maintaining the content in the future.
+The app implements an extension to the EPUB standard file structure that I'm calling 'Active EPUB'. It treats mimetype, META-INF/content.opf and OEBPS/ as usual but adds SOURCE.zip and EDITME.html files at the OEBPS level. SOURCE.zip contains all editor-specific files (plain text sources, transform scripts, extensions, settings) and is extracted to a SOURCE/ directory during editing. The EDITME.html app provides everything required for maintaining the content in the future.
 
 A minimal Active EPUB file might contain these files;
 
@@ -63,15 +63,16 @@ OEBPS/chapter1.xhtml
 OEBPS/chapter2.xhtml
 OEBPS/styles/page.css
 OEBPS/scripts/responsive.js
-EDITME/
-EDITME/ext/markdown-it.min.js
-EDITME/ext/abcjs-basic.js
-EDITME/scripts/transformText.js
-EDITME/scripts/transformDom.js
-EDITME/src/chapter1.txt
-EDITME/src/chapter2.txt
-EDITME/EDITME.html
+OEBPS/SOURCE.zip      # Contains all editor files
+OEBPS/EDITME.html
 ```
+
+**Note**: SOURCE.zip contains the editor workspace files:
+- `SOURCE/text/chapter1.txt`, `SOURCE/text/chapter2.txt` (plain text sources)
+- `SOURCE/scripts/transformText.js` (text transform script)
+- `SOURCE/extensions/markdown-it/` (markdown library)
+- `SOURCE/extensions/abcjs/` (music notation library)
+- `SOURCE/settings.json` (editor configuration)
 
 ## Text editing
 
@@ -91,7 +92,7 @@ textarea iframe content
 The `transformText.js` will be run as a dynamic function in the textarea iframe's context.
 
 ```js
-const codeStringWithArgs = await readFile(workspaceId, 'EDITME/scripts/transformText.js');
+const codeStringWithArgs = await readFile(workspaceId, 'SOURCE/scripts/transformText.js');
 const dynamicFunctionWithArgs = new Function('plainText', codeStringWithArgs);
 const plainText = document.querySelector('textarea').value;
 const transformedText = await dynamicFunctionWithArgs(plainText);

@@ -9,7 +9,8 @@ Manages the EPUB spine (reading order) with drag-and-drop reordering, item opera
 - List of spine items with reorder capability
 - Rename, delete, append operations
 - Drag-and-drop reordering
-- Association with plain text source files
+- Association of spine item with its plain text source file in SOURCE/text
+- Source plain text file always created with new spine item
 
 ## Dependencies
 
@@ -19,8 +20,7 @@ Manages the EPUB spine (reading order) with drag-and-drop reordering, item opera
 
 - Sortable list component with drag-and-drop
 - Modal dialogs for item creation and editing
-- Two-way binding between spine items and source files
-- Visual indicators for spine item status
+- Two-way association between spine items and source files
 
 ## API Design
 
@@ -42,7 +42,6 @@ interface SpineItemManager {
 
   // Source file association
   createSourceFile(spineItemId: string): Promise<string>;
-  linkSourceFile(spineItemId: string, sourceFilePath: string): Promise<void>;
 }
 
 interface SpineItemWithSource {
@@ -183,24 +182,6 @@ interface SpineItemWithSource {
       </label>
     </div>
 
-    <div class="field">
-      <label>
-        <input type="checkbox" bind:checked={newItem.createSource} />
-        Create source text file
-      </label>
-    </div>
-
-    {#if newItem.createSource}
-      <div class="field">
-        <label for="source-format">Source Format</label>
-        <select id="source-format" bind:value={newItem.sourceFormat}>
-          <option value="markdown">Markdown</option>
-          <option value="plain">Plain Text</option>
-          <option value="asciidoc">AsciiDoc</option>
-        </select>
-      </div>
-    {/if}
-
     <div class="modal-actions">
       <button on:click={createSpineItem}>Create</button>
       <button on:click={() => (showCreateModal = false)}>Cancel</button>
@@ -214,25 +195,15 @@ interface SpineItemWithSource {
 ```typescript
 const createSourceFile = async (spineItem: SpineItemWithSource): Promise<void> => {
   const sourceFileName = spineItem.id + '.txt';
-  const sourcePath = `EDITME/src/${sourceFileName}`;
+  const sourcePath = `SOURCE/text/${sourceFileName}`;  // Changed to SOURCE/text/
 
   // Create default content based on spine item title
   const defaultContent = `# ${getDisplayTitle(spineItem)}\n\nContent goes here...\n`;
 
-  // Save source file
+  // Save source file (NOTE: SOURCE/ files are not added to manifest)
   await fileStorage.writeFile(currentWorkspaceId, sourcePath, defaultContent);
 
-  // Update manifest to include source file
-  const sourceManifestItem: ManifestItem = {
-    id: spineItem.id + '_txt',
-    href: sourcePath,
-    mediaType: 'text/plain',
-  };
-
-  await contentOPF.addManifestItem(sourceManifestItem);
-
-  // Update spine item association
-  spineItem.sourceId = sourceManifestItem.id;
+  // Update spine item association (no manifest item needed for SOURCE/ files)
   spineItem.sourcePath = sourcePath;
   spineItem.hasSourceFile = true;
 };
@@ -350,10 +321,14 @@ const handleKeyDown = (event: KeyboardEvent, index: number) => {
 
 - Test drag and drop functionality
 - Test keyboard navigation
-- Test source file creation and linking
+- Test source file creation (in SOURCE/text/ directory)
 - Test spine order persistence
 - Test validation logic
 - Test accessibility with screen readers
+- **SOURCE.zip Integration Testing**:
+  - Test source file creation in SOURCE/text/ directory
+  - Test source file accessibility after SOURCE.zip extraction
+  - Test spine item to source file association persistence
 
 ## Implementation Notes
 

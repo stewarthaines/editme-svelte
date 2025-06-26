@@ -26,6 +26,7 @@ This is a Svelte-based EPUB editor that runs in modern browsers, replacing a pre
 
 - **XML/HTML Parsing**: Use `DOMParser` and `querySelector` instead of regular expressions for robust parsing
 - **CSS & Styling**: Use the comprehensive design system in `src/styles/` - see `plans/features/css_design_system.md` for full documentation
+- **SOURCE.zip Handling**: Use existing ZIP library (`src/lib/zip/`) for SOURCE.zip creation/extraction
 - Browser-native APIs preferred over regex for structured data handling
 
 ### Storage Strategy
@@ -93,12 +94,11 @@ Extension to standard EPUB structure:
 mimetype
 META-INF/content.opf
 OEBPS/ (standard EPUB content)
-EDITME/ (editor-specific files)
-  ├── src/ (plain text sources)
-  ├── scripts/ (transform functions)
-  ├── ext/ (third-party libraries)
-  └── EDITME.html (editor app)
+├── SOURCE.zip (editor source files - extracted to SOURCE/ during editing)
+└── EDITME.html (editor app)
 ```
+
+**Note**: The `SOURCE.zip` file contains all editor-specific files (settings, plain text sources, transform scripts, extensions) and is extracted to a `SOURCE/` directory in the workspace during editing.
 
 ## Commands
 

@@ -37,7 +37,7 @@
     </button>
 
     {#if isExpanded}
-      <h2 class="sidebar-title">EDITME</h2>
+      <h2 class="sidebar-title">EDITME.html</h2>
     {/if}
   </div>
 

@@ -129,22 +129,26 @@ interface WorkspacePreview {
 ## Workspace Creation
 
 - Generate unique workspace IDs using crypto.randomUUID()
-- Create standard EPUB directory structure:
+- Create extended EPUB directory structure:
   ```
   workspace-{id}/
   ├── mimetype
   ├── META-INF/
   │   └── container.xml
-  ├── OEBPS/
-  │   ├── content.opf
-  │   ├── Text/
-  │   ├── Images/
-  │   ├── Styles/
-  │   └── Audio/
-  └── EDITME/
-      ├── src/
-      └── scripts/
+  └── OEBPS/
+      ├── content.opf
+      ├── EDITME.html
+      ├── Text/
+      ├── Images/
+      ├── Styles/
+      ├── Audio/
+      └── SOURCE/
+          ├── settings.json
+          ├── text/
+          ├── extensions/
+          └── scripts/
   ```
+  NOTE: inclusion of SOURCE/ folder which is unpacked from the `OEBPS/SOURCE.zip` manifest item
 - Pre-populate with minimal valid EPUB structure
 - Generate initial content.opf with provided metadata
 
@@ -429,16 +433,18 @@ class ManifestDependencyTracker {
 - Validate all spine item references exist in manifest
 - Support linear/non-linear spine items
 - Handle spine item properties (page-spread-left, etc.)
-- Reorder spine items with simple ui (just button to move item lower in list)
+- Reorder spine items with simple ui
 
 ## Workspace Validation
 
 - Check for required EPUB files (mimetype, container.xml, OPF)
 - Validate OPF structure and required metadata
 - Verify all spine items reference existing manifest items
-- Check for orphaned files not in manifest
+- Check for orphaned files not in manifest (excluding SOURCE/ files)
 - Validate file paths and media types
 - Report validation errors with specific locations
+- **SOURCE.zip Integration**: Handle SOURCE/ files separately from manifest validation
+- SOURCE.zip auto-managed during packaging (not user-visible in manifest)
 
 ## Error Handling
 
@@ -471,6 +477,11 @@ class ManifestDependencyTracker {
 - Validation logic verification
 - Performance testing with large workspaces
 - Concurrent access testing
+- **SOURCE.zip Integration Testing**:
+  - SOURCE.zip creation and extraction workflows
+  - Workspace validation with/without SOURCE/ content
+  - Orphan file detection excluding SOURCE/ files
+  - SOURCE/ content validation (settings.json, structure)
 
 ## File Structure
 

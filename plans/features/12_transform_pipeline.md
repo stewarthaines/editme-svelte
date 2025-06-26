@@ -2,12 +2,14 @@
 
 ## Overview
 
-Executes transformText.js and transformDom.js as dynamic functions to convert plain text sources into XHTML spine items with proper error handling.
+Executes javascript extensions as dynamic functions to convert plain text sources into XHTML spine items with proper error handling.
 
 ## Requirements
 
-- Execute transformText.js as dynamic function
-- Execute transformDom.js for post-processing
+- The script files come from the `SOURCE/scripts` directory and from individual `SOURCE/extensions/<name>/transform.js`
+- The description of which scripts to execute comes from `SOURCE/settings.json` in workspace
+- Execute javascript for text transform as dynamic function
+- Execute javascript for dom transform for post-processing
 - Error handling and user notification
 - XHTML template generation with proper structure
 
@@ -235,24 +237,24 @@ const loadTransformScripts = async (workspaceId: string): Promise<TransformScrip
 
   try {
     // Load transformText.js
-    const transformTextPath = 'EDITME/scripts/transformText.js';
+    const transformTextPath = 'SOURCE/scripts/transformText.js';
     if (await fileExists(workspaceId, transformTextPath)) {
       scripts.transformText = await readFileAsText(workspaceId, transformTextPath);
     }
 
     // Load transformDom.js
-    const transformDomPath = 'EDITME/scripts/transformDom.js';
+    const transformDomPath = 'SOURCE/scripts/transformAbcjs.js';
     if (await fileExists(workspaceId, transformDomPath)) {
       scripts.transformDom = await readFileAsText(workspaceId, transformDomPath);
     }
 
     // Load extension scripts
-    const extensionFiles = await listFiles(workspaceId, 'EDITME/ext/');
+    const extensionFiles = await listFiles(workspaceId, 'SOURCE/extensions/');
     for (const file of extensionFiles) {
       if (file.endsWith('.js')) {
         const name = file.replace('.js', '');
         scripts.extensions = scripts.extensions || {};
-        scripts.extensions[name] = await readFileAsText(workspaceId, `EDITME/ext/${file}`);
+        scripts.extensions[name] = await readFileAsText(workspaceId, `SOURCE/extensions/${file}`);
       }
     }
 
@@ -269,7 +271,7 @@ const loadTransformScripts = async (workspaceId: string): Promise<TransformScrip
 const DEFAULT_TRANSFORM_TEXT = `
 // Default markdown transform using markdown-it
 if (typeof window.markdownit === 'undefined') {
-  throw new Error('markdown-it library not found. Please add markdown-it.min.js to EDITME/ext/');
+  throw new Error('markdown-it library not found. Please add markdown-it.min.js to SOURCE/extensions/');
 }
 
 const md = window.markdownit({
@@ -349,8 +351,10 @@ const createSandboxedFunction = (script: string, allowedGlobals: string[] = []) 
 
 ## Implementation Notes
 
+- **SOURCE.zip Integration**: Scripts loaded from SOURCE/ directory extracted during EPUB unpacking
 - Start with basic function execution
 - Add error handling incrementally
 - Implement sandboxing carefully for security
 - Test with real-world transform scripts
-- Consider supporting multiple markup formats
+- **Extension Loading**: Extensions loaded from `SOURCE/extensions/<name>/transform.js` pattern
+- **Settings Integration**: Transform selection driven by `SOURCE/settings.json` configuration
