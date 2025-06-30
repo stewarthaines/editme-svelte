@@ -162,7 +162,7 @@ export class TransformExecutor {
     ];
 
     dangerousGlobals.forEach(dangerous => {
-      sandboxedGlobals[dangerous] = undefined;
+      delete sandboxedGlobals[dangerous];
     });
 
     return sandboxedGlobals;
@@ -184,8 +184,7 @@ export class TransformExecutor {
       const globalValues = Object.values(globals);
       
       // Wrap script content to execute in restricted scope
-      const wrappedScript = `
-        (function(${globalNames.join(', ')}) {
+      const wrappedScript = `(function(${globalNames.join(', ')}) {
           ${scriptContent}
           
           if (typeof ${functionName} !== 'function') {
@@ -193,8 +192,7 @@ export class TransformExecutor {
           }
           
           return ${functionName};
-        })
-      `;
+        })`;
 
       // Execute the wrapped script to get the function
       const scriptFunction = new Function('return ' + wrappedScript)();

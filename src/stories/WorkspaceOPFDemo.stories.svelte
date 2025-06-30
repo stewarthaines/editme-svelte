@@ -3,7 +3,7 @@
   import WorkspaceOPFDemo from './WorkspaceOPFDemo.svelte';
 
   const { Story } = defineMeta({
-    title: 'Backend Features/Workspace & OPF Manager',
+    title: 'Backend/Workspace & OPF Manager',
     component: WorkspaceOPFDemo,
     tags: ['autodocs'],
     parameters: {
