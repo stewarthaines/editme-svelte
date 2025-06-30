@@ -2,27 +2,80 @@
 
 ## Overview
 
-Executes javascript extensions as dynamic functions to convert plain text sources into XHTML spine items with proper error handling.
+Executes JavaScript transform scripts to convert plain text sources into XHTML spine items with proper error handling and sandboxing. Provides secure, extensible text and DOM transformations using user-defined scripts and 3rd party libraries.
 
 ## Requirements
 
-- The script files come from the `SOURCE/scripts` directory and from individual `SOURCE/extensions/<name>/transform.js`
-- The description of which scripts to execute comes from `SOURCE/settings.json` in workspace
-- Execute javascript for text transform as dynamic function
-- Execute javascript for dom transform for post-processing
-- Error handling and user notification
-- XHTML template generation with proper structure
+### Functional Requirements
+
+- **Script Execution**: Execute JavaScript transform functions in sandboxed context
+- **Pipeline Flow**: Text transform first, then DOM transforms in sequence
+- **Script Loading**: Load transform scripts from `SOURCE/scripts/` directory
+- **Library Support**: Load 3rd party libraries from `SOURCE/extensions/` as globals
+- **Settings Integration**: Configure pipeline via `SOURCE/settings.json`
+- **Error Handling**: Comprehensive error capture with user-friendly messaging
+- **XHTML Generation**: Template system for complete XHTML document creation
+
+### Design Decisions
+
+- **Script Location**: Transform scripts in `SOURCE/scripts/`, libraries in `SOURCE/extensions/`
+- **Execution Order**: Always text transform first, then DOM transforms sequentially
+- **Error Strategy**: Fail-fast - stop on first error with 2-second timeout
+- **Function Pattern**: Top-level functions (transformText, transformDOM) in script files
+- **Library Access**: 3rd party libraries loaded as globals in editor iframe
+- **Context Support**: Manifest item context for advanced features (:toc directive)
+
+### Performance Requirements
+
+- **Timeout**: 2-second maximum execution time per transform
+- **No Caching**: Re-evaluate transform functions each execution  
+- **Memory**: No specific limits, rely on browser constraints
+- **Validation**: Runtime error handling only, no pre-validation
 
 ## Dependencies
 
-- **#5 Blob URL Manager** - for loading transform scripts
+- **#5 Blob URL Manager** - for loading extension libraries as globals
+- **#23 SOURCE.zip** - for script and extension file management
 
 ## Technical Approach
 
-- Dynamic function execution in sandboxed context
-- Pipeline architecture for chained transformations
-- Error capture and user-friendly reporting
-- XHTML template system with variable substitution
+### Directory Structure
+
+```
+SOURCE/
+├── settings.json              # Pipeline configuration
+├── scripts/                   # Transform scripts (app integration)
+│   ├── markdown-transform.js  # Text transform implementation
+│   ├── heading-ids.js         # DOM transform for navigation
+│   └── custom-styling.js      # Additional DOM transforms
+└── extensions/                # 3rd party libraries (loaded as globals)
+    ├── markdown-it/
+    │   ├── markdown-it.min.js  # Markdown processor library
+    │   └── package.json
+    └── abcjs/
+        ├── abcjs-basic.min.js  # Music notation library
+        └── package.json
+```
+
+### Settings Configuration
+
+```json
+{
+  "transform_pipeline": {
+    "text_transform": "markdown-transform.js",
+    "dom_transforms": ["heading-ids.js", "custom-styling.js"]
+  }
+}
+```
+
+### Execution Flow
+
+1. **Load Settings**: Parse `SOURCE/settings.json` for pipeline configuration
+2. **Load Libraries**: Inject extension libraries as globals in iframe
+3. **Text Transform**: Execute single text transform if configured
+4. **DOM Transforms**: Execute DOM transforms sequentially in order
+5. **Template Generation**: Create complete XHTML document with metadata
+6. **Error Handling**: Stop on first failure with detailed error reporting
 
 ## API Design
 
@@ -349,12 +402,128 @@ const createSandboxedFunction = (script: string, allowedGlobals: string[] = []) 
 - Consider Web Workers for heavy processing
 - Monitor memory usage during transforms
 
-## Implementation Notes
+## Transform Function Examples
 
-- **SOURCE.zip Integration**: Scripts loaded from SOURCE/ directory extracted during EPUB unpacking
-- Start with basic function execution
-- Add error handling incrementally
-- Implement sandboxing carefully for security
-- Test with real-world transform scripts
-- **Extension Loading**: Extensions loaded from `SOURCE/extensions/<name>/transform.js` pattern
-- **Settings Integration**: Transform selection driven by `SOURCE/settings.json` configuration
+### Text Transform Script (SOURCE/scripts/markdown-transform.js)
+
+```javascript
+function transformText(plainText, context) {
+  // Access global libraries loaded from SOURCE/extensions/
+  if (typeof markdownit === 'undefined') {
+    throw new Error('markdown-it library not available');
+  }
+  
+  // Initialize markdown processor
+  const md = markdownit({
+    html: true,
+    xhtmlOut: true,
+    breaks: false,
+    linkify: true
+  });
+  
+  // Handle :toc directive using context.manifestItems
+  if (context.manifestItems) {
+    plainText = plainText.replace(
+      /:toc\[([^\]]+)\]\{src="([^"]+)"\}/g,
+      (match, title, pattern) => generateTOC(title, pattern, context.manifestItems)
+    );
+  }
+  
+  return md.render(plainText);
+}
+
+function generateTOC(title, pattern, manifestItems) {
+  // Build table of contents from manifest items
+  return `<h2>${title}</h2><ul>...</ul>`;
+}
+```
+
+### DOM Transform Script (SOURCE/scripts/heading-ids.js)
+
+```javascript
+function transformDOM(document) {
+  // Add IDs to headings for navigation
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      const text = heading.textContent || '';
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/^-|-$/g, '') || `heading-${index + 1}`;
+      
+      heading.id = id;
+    }
+  });
+  
+  return document;
+}
+```
+
+## Implementation Plan
+
+### Phase 1: Core Pipeline Implementation
+
+1. **Create TransformPipeline class** in `src/lib/transform/`
+   - `transform-pipeline.ts` - Main pipeline execution
+   - `transform-manager.ts` - Script loading and settings
+   - `transform-error.ts` - Error handling and messaging
+   - `xhtml-template.ts` - XHTML document generation
+   - `types.ts` - TypeScript interfaces
+   - `index.ts` - Clean exports
+
+2. **Implement core methods**:
+   - `executeTransformPipeline()` - Full pipeline execution
+   - `transformText()` - Text transform execution with context
+   - `transformDOM()` - Sequential DOM transform execution
+   - `generateXHTMLDocument()` - Complete document creation
+
+3. **Add script management**:
+   - `loadTransformScripts()` - Load scripts from SOURCE/scripts/
+   - `loadTransformSettings()` - Parse SOURCE/settings.json
+   - `validateTransformScript()` - Basic script validation
+
+### Phase 2: Integration & Security
+
+1. **Blob URL Manager Integration**:
+   - Load extension libraries from SOURCE/extensions/
+   - Inject libraries as globals in transform execution context
+   - Manage library lifecycle and cleanup
+
+2. **Sandboxing Implementation**:
+   - Remove dangerous globals (eval, Function, setTimeout, etc.)
+   - 2-second timeout enforcement
+   - Error capture and user-friendly messaging
+
+3. **Context Provider**:
+   - Manifest item to blob URL mapping for :toc directive
+   - Workspace and spine item identification
+   - Settings access for advanced transforms
+
+### Phase 3: Error Handling & Testing
+
+1. **Comprehensive Error Handling**:
+   - TransformError class with stage identification
+   - User-friendly error messages
+   - Technical error details for debugging
+   - Graceful degradation strategies
+
+2. **Unit Test Implementation**:
+   - Mock File Storage API and Blob URL Manager
+   - Test transform execution with various scripts
+   - Error scenario testing (timeouts, syntax errors, runtime failures)
+   - Integration tests with SOURCE.zip functionality
+
+## Ready for Implementation
+
+✅ **Complete API Documentation**: `src/lib/transform/API.md` with comprehensive method specifications
+✅ **Technical Specifications Clarified**: All execution flow, security, and integration details defined
+✅ **Function Contracts Established**: Transform function signatures and context requirements
+✅ **Error Handling Strategy**: Complete error classification and user experience flows
+✅ **Integration Patterns**: Clear integration with SOURCE.zip, Blob URL Manager, and Navigation Editor
+✅ **Security Considerations**: Sandboxing approach and library loading strategy
+✅ **Performance Requirements**: Timeout, caching, and execution constraints
+
+**Next Steps**: Implement TransformPipeline class following the documented API contract and integration patterns.
