@@ -1,3 +1,5 @@
+**IMPORTANT: This was an early planning document and is no longer useful for planning or describing the app features.**
+
 # EDITME.html overview
 
 The app runs in all modern browsers (recent Safari, Chromium, Firefox and Edge) and doesn't need to support old browser versions. It can be served by a web server or from the local filesystem via a file: scheme url. All static resources need to be inlined (svg, js, css) by the build system (vite).
