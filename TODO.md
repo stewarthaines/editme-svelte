@@ -1,332 +1,82 @@
-# SOURCE.zip Implementation TODO
+# EPUB Editor Implementation Status
 
-This document provides a focused implementation roadmap for SOURCE.zip functionality. For detailed specifications, see the corresponding feature files in `plans/features/`.
-
-## Overview
-
-The codebase has strong foundations with comprehensive EPUB handling, file storage, and workspace management already implemented. The main work involves:
-
-1. **Bridging existing EPUB workflows** with SOURCE.zip concept → [Feature 23](plans/features/23_source_zip.md)
-2. **Implementing transform pipeline** (currently unbuilt) → [Feature 12](plans/features/12_transform_pipeline.md)
-3. **Modifying existing features** to handle SOURCE/ directory structure
+This document provides a high-level overview of implementation progress. For detailed specifications, see the corresponding feature files in `plans/features/`.
 
 ## Implementation Status
 
-### ✅ Already Implemented (Strong Foundation)
-- **Workspace Manager** - Complete with OPF, manifest, spine management
-- **EPUB Packaging/Unpacking** - Full ZIP handling with compression streams
+### ✅ Core Foundation (Complete)
 - **File Storage API** - OPFS with IndexedDB fallback
+- **EPUB Packaging/Unpacking** - Full ZIP handling with compression streams
+- **Workspace Manager** - Complete with OPF, manifest, spine management
 - **OPF Utilities** - Complete XML parsing and generation
 - **Dependency Tracker** - File reference validation and analysis
 
-### ✅ Recently Implemented
-- **SOURCE.zip Management** - Complete implementation with SourceManager → [Feature 23](plans/features/23_source_zip.md)
-- **Transform Pipeline API** - Documented and unit tested → [Feature 12](plans/features/12_transform_pipeline.md)
+### ✅ Recently Completed
+- **SOURCE.zip Management** - Complete implementation → [Feature 23](plans/features/23_source_zip.md)
+- **Transform Pipeline** - Complete implementation with Storybook demo → [Feature 12](plans/features/12_transform_pipeline.md)
+- **Extension Manager API** - Complete documentation and unit tests → [Feature 26](plans/features/26_extensions_cache.md)
 
-### ❌ Missing (Needs Implementation)
-- **Transform Pipeline Implementation** - Script execution engine → [Feature 12](plans/features/12_transform_pipeline.md)
-- **Extension Manager with Cache** - Unified extension management → [Feature 25](plans/features/25_import_extension.md)
-- **Navigation Editor** - Simplified text-based TOC editing → [Feature 17](plans/features/17_navigation_editor.md)
+### ❌ Pending Implementation
+- **Extension Manager Implementation** - Build execution engine using documented API → [Feature 26](plans/features/26_extensions_cache.md)
+- **Navigation Editor** - Text-based TOC editing → [Feature 17](plans/features/17_navigation_editor.md)
 - **Audio Clip Editor** - Directive-based audio clip handling → [Feature 18](plans/features/18_audio_clip_editor.md)
 
-## Phase 1: Core SOURCE.zip Integration (✅ COMPLETED)
+## Detailed Implementation Documentation
 
-### 1.1 SourceManager Implementation (✅ DONE)
-**Location**: `src/lib/source/`
+The following sections contain detailed technical documentation that has been moved to dedicated feature specifications. Refer to the appropriate feature files for complete implementation details:
 
-**Files Created**:
-```
-src/lib/source/
-├── index.ts              # Main exports
-├── source-manager.ts     # SourceManager class  
-├── types.ts             # SOURCE-related types
-└── source-utils.ts      # Helper utilities
-```
+### SOURCE.zip Implementation (✅ Complete)
+- Complete technical details → [Feature 23 - SOURCE.zip](plans/features/23_source_zip.md)
+- All workspace integration, EPUB packager/unpacker modifications implemented
+- Working end-to-end with Storybook demonstrations
 
-**Key Methods**:
-```typescript
-class SourceManager {
-  async createSourceZip(workspaceId: string): Promise<void>
-  async extractSourceZip(workspaceId: string): Promise<void>
-  async hasSourceFiles(workspaceId: string): Promise<boolean>
-  async validateSourceStructure(workspaceId: string): Promise<SourceValidation>
-}
-```
+### Transform Pipeline Implementation (✅ Complete)
+- Complete technical details → [Feature 12 - Transform Pipeline](plans/features/12_transform_pipeline.md)
+- Sandboxed script execution, text/DOM transforms, XHTML generation implemented
+- Working Storybook demo with sample transformations
 
-### 1.2 Workspace Manager Integration (✅ DONE)
-**File**: `src/lib/workspace/workspace-manager.ts`
+### Extension Manager Implementation (📝 API Ready)
+- Complete API documentation → [Feature 26 - Extension Manager](plans/features/26_extensions_cache.md)
+- Unit tests complete, implementation pending
 
-**Changes Implemented**:
+## Next Implementation Priorities
 
-#### Method: `createEPUBStructure()` (Lines 703-735)
-```typescript
-// CURRENT: Creates basic EPUB structure
-// CHANGE TO: Create SOURCE/ directory with default content
+### Immediate Priority
+1. **Extension Manager Implementation** - Build using documented API and unit tests
+2. **Navigation Editor** - Text-based TOC editing → [Feature 17](plans/features/17_navigation_editor.md)  
+3. **Audio Clip Editor** - Directive-based audio handling → [Feature 18](plans/features/18_audio_clip_editor.md)
 
-async createEPUBStructure(workspaceId: string, metadata: Metadata): Promise<void> {
-  // ... existing EPUB structure creation ...
-  
-  // ADD: Create SOURCE/ directory structure
-  await this.fileStorage.writeFile(workspaceId, 'SOURCE/settings.json', 
-    JSON.stringify(defaultSettings, null, 2));
-  await this.fileStorage.writeFile(workspaceId, 'SOURCE/text/.gitkeep', '');
-  await this.fileStorage.writeFile(workspaceId, 'SOURCE/scripts/.gitkeep', '');
-  await this.fileStorage.writeFile(workspaceId, 'SOURCE/extensions/.gitkeep', '');
-}
-```
+### Future Features (Specification Phase)
+- **Internationalization** → [Feature 27](plans/features/27_internationalisation.md)
+- **First Run Experience** → [Feature 28](plans/features/28_first_run.md)
+- **Application Version Management** → [Feature 29](plans/features/29_app_version.md)
 
-#### Method: `validateWorkspaceStructure()` (Lines 413-557)
-```typescript
-// CURRENT: Checks for orphaned files including EDITME/
-// CHANGE TO: Exclude SOURCE/ files from orphan detection
+## Testing Progress
 
-// ADD: Special handling for SOURCE/ files
-const sourceFiles = allFiles.filter(f => f.startsWith('SOURCE/'));
-const epubFiles = allFiles.filter(f => !f.startsWith('SOURCE/'));
+### ✅ Completed Testing
+- **SOURCE.zip workflows** - Complete end-to-end via Storybook demos
+- **Transform Pipeline** - Working demo with script execution
+- **EPUB pack/unpack integration** - SourceManager integration validated
+- **Extension Manager API** - Comprehensive unit test suite
 
-// Validate EPUB files normally
-const orphanedFiles = epubFiles.filter(file => /* existing logic */);
+### ❌ Pending Testing
+- **Extension Manager implementation** - Implementation testing once built
+- **Navigation/Audio Editors** - Feature testing once implemented
+- **Performance testing** - Large workspace validation
+- **Error handling** - Edge case and recovery scenarios
 
-// Validate SOURCE/ separately if present
-if (sourceFiles.length > 0) {
-  const sourceValidation = await this.sourceManager.validateSourceStructure(workspaceId);
-  // Include source validation in results
-}
-```
+## Implementation Summary
 
-#### Method: `resolveManifestPath()` (Lines 675-683)
-```typescript
-// CURRENT: Resolves file paths for manifest items
-// CHANGE TO: Handle SOURCE.zip special case
+### ✅ Major Completed Features
+- **SOURCE.zip Management** - Complete with workspace integration
+- **Transform Pipeline** - Complete with sandboxed execution and Storybook demo
+- **Extension Manager API** - Complete documentation and comprehensive unit tests
 
-resolveManifestPath(workspaceId: string, href: string): string {
-  // ADD: Special handling for SOURCE.zip
-  if (href === 'SOURCE.zip') {
-    return null; // SOURCE.zip is manifest item but not direct file
-  }
-  
-  // ... existing logic ...
-}
-```
+### 📁 Implementation Details Available
+Detailed technical documentation has been moved to dedicated feature specifications:
+- [Feature 12 - Transform Pipeline](plans/features/12_transform_pipeline.md)
+- [Feature 23 - SOURCE.zip](plans/features/23_source_zip.md) 
+- [Feature 26 - Extension Manager](plans/features/26_extensions_cache.md)
 
-### 1.3 Modify EPUB Packager (Existing)
-**File**: `src/lib/epub/EPUBPackager.ts`
-
-**Changes Required**:
-
-#### Method: `readWorkspaceFiles()` (Lines 146-167)
-```typescript
-// CURRENT: Reads all workspace files directly
-// CHANGE TO: Create SOURCE.zip if SOURCE/ directory exists
-
-async readWorkspaceFiles(workspaceId: string): Promise<WorkspaceFile[]> {
-  const allFiles = await this.fileStorage.listFiles(workspaceId);
-  
-  // Separate SOURCE/ files from EPUB files
-  const sourceFiles = allFiles.filter(f => f.startsWith('SOURCE/'));
-  const epubFiles = allFiles.filter(f => !f.startsWith('SOURCE/'));
-  
-  const workspaceFiles: WorkspaceFile[] = [];
-  
-  // Process EPUB files normally
-  for (const filePath of epubFiles) {
-    // ... existing logic ...
-  }
-  
-  // CREATE SOURCE.zip if SOURCE/ files exist
-  if (sourceFiles.length > 0) {
-    await this.sourceManager.createSourceZip(workspaceId);
-    
-    // Add SOURCE.zip as workspace file
-    const sourceZipContent = await this.fileStorage.readFile(workspaceId, 'SOURCE.zip');
-    workspaceFiles.push({
-      path: 'SOURCE.zip',
-      content: sourceZipContent
-    });
-  }
-  
-  return workspaceFiles;
-}
-```
-
-### 1.4 Modify EPUB Unpacker (Existing)
-**File**: `src/lib/epub/EPUBUnpacker.ts`
-
-**Changes Required**:
-
-#### Method: `extractToWorkspace()` (Lines 225-278)
-```typescript
-// CURRENT: Extracts all files directly to workspace
-// CHANGE TO: Detect and extract SOURCE.zip separately
-
-async extractToWorkspace(zip: Zip, workspaceId: string): Promise<ExtractionResult> {
-  // ... existing extraction logic ...
-  
-  // AFTER extraction, check for SOURCE.zip
-  const sourceZipEntry = zip.entries.find(e => e.filename === 'SOURCE.zip');
-  if (sourceZipEntry) {
-    // Extract SOURCE.zip to workspace temporarily
-    const sourceZipContent = await sourceZipEntry.extractAsArrayBuffer();
-    await this.fileStorage.writeFile(workspaceId, 'SOURCE.zip', sourceZipContent);
-    
-    // Extract SOURCE.zip contents to SOURCE/ directory
-    await this.sourceManager.extractSourceZip(workspaceId);
-    
-    // Remove SOURCE.zip file (keep as manifest item only)
-    await this.fileStorage.deleteFile(workspaceId, 'SOURCE.zip');
-  }
-  
-  return result;
-}
-```
-
-## Phase 2: Transform Pipeline Implementation (New Feature)
-
-**Implementation Details**: See [Feature 12 - Transform Pipeline](plans/features/12_transform_pipeline.md)
-
-**Key Components**:
-- Transform Pipeline execution engine (`src/lib/transform/`)
-- Settings Manager for SOURCE/settings.json
-- Script loader for dynamic extensions
-- Sandboxed script execution environment
-
-**Dependencies**: Blob URL Manager for loading transform scripts
-
-## Phase 3: Content Editing Features
-
-### 3.1 Navigation Editor Implementation
-**Implementation Details**: See [Feature 17 - Navigation Editor](plans/features/17_navigation_editor.md)
-
-**Key Approach**: 
-- Text-based editing leveraging existing spine editor functionality
-- Auto-generation from chapter H1 headings
-- Support for advanced directives
-- Location: `src/lib/navigation/`
-
-### 3.2 Audio Clip Editor Implementation  
-**Implementation Details**: See [Feature 18 - Audio Clip Editor](plans/features/18_audio_clip_editor.md)
-
-**Key Approach**:
-- Simplified directive-based output (no waveform visualization)
-- Timestamp selection and playback rate control
-- Generate `:clip` markdown-style directives
-- Location: `src/lib/audio/`
-
-### 3.3 Update Dependency Tracker (Existing)
-**File**: `src/lib/workspace/dependency-tracker.ts`
-
-**Add New Method**:
-```typescript
-async findSourceDependencies(workspaceId: string): Promise<SourceDependencies> {
-  // Analyze SOURCE/scripts/ and SOURCE/extensions/ for dependencies
-  // Check transform script references in settings.json
-  // Return dependency tree for SOURCE/ files
-}
-```
-
-### 3.4 Create Integration Layer (New)
-**File**: `src/lib/workspace/source-integration.ts`
-**Purpose**: Bridge workspace manager with SOURCE.zip functionality
-
-### 3.5 Update Type Definitions
-**Files**: Various `types.ts` files  
-**Purpose**: Add SOURCE-related interfaces and transform settings types
-
-## Phase 4: Future Features (New)
-
-### 4.1 Internationalization 
-**Status**: Planning phase → [Feature 27](plans/features/27_internationalisation.md)
-**Priority**: Medium
-
-### 4.2 First Run Experience
-**Status**: Planning phase → [Feature 28](plans/features/28_first_run.md)
-**Priority**: Medium
-
-### 4.3 Application Version Management
-**Status**: Planning phase → [Feature 29](plans/features/29_app_version.md)
-**Priority**: Low
-
-## Testing Strategy
-
-### Phase 1 Testing
-- [ ] SOURCE.zip creation from SOURCE/ directory
-- [ ] SOURCE.zip extraction to SOURCE/ directory  
-- [ ] Workspace validation with SOURCE/ files
-- [ ] EPUB packaging with SOURCE.zip
-- [ ] EPUB unpacking with SOURCE.zip detection
-
-### Phase 2 Testing
-- [ ] Transform pipeline script loading
-- [ ] Settings.json parsing and validation
-- [ ] Dynamic script execution
-- [ ] Text and DOM transforms
-
-### Phase 3 Testing
-- [ ] Navigation Editor text-based editing → [Feature 17](plans/features/17_navigation_editor.md)
-- [ ] Audio Clip Editor directive generation → [Feature 18](plans/features/18_audio_clip_editor.md)
-- [ ] Content editing features integration testing
-
-### Phase 4 Testing
-- [ ] Future features integration → [Features 27-29](plans/features/)
-
-### Phase 5 Integration Testing
-- [x] End-to-end SOURCE.zip workflows (via Storybook demo)
-- [x] Integration between EPUBPackager, EPUBUnpacker, and SourceManager
-- [ ] Performance testing with large SOURCE/ directories
-- [ ] Error handling and recovery scenarios
-
-## Implementation Dependencies
-
-### Critical Path:
-1. **SourceManager** → **Workspace Manager modifications** → **EPUB Pack/Unpack updates**
-2. **Transform Pipeline** → **Settings Manager** → **Content Editing Features**
-3. **Navigation/Audio Editors** → **Future Features** → **Integration testing**
-
-### Parallel Development:
-- SOURCE.zip core functionality (Phase 1)
-- Transform pipeline implementation (Phase 2) 
-- Content editing features (Phase 3)
-- Future features planning (Phase 4)
-- Type definitions and integration helpers (Phase 5)
-
-## File Modification Summary
-
-### **Completed Changes** (✅):
-- `src/lib/workspace/workspace-manager.ts` - SOURCE/ directory integration
-- `src/lib/epub/EPUBPackager.ts` - SOURCE.zip creation during packaging
-- `src/lib/epub/EPUBUnpacker.ts` - SOURCE.zip extraction during unpacking
-
-### **New Implementations**:
-- `src/lib/source/` - ✅ Complete SourceManager implementation (~500 lines)
-- `src/lib/transform/` - 📝 API documented, unit tested, needs implementation (~500 lines)
-- `src/lib/navigation/` - ❌ Navigation editor module (~200 lines)
-- `src/lib/audio/` - ❌ Audio clip editor module (~300 lines)
-- `src/lib/extensions/` - ❌ Extension Manager with cache (~400 lines)
-
-### **Supporting Changes** (Existing Files):
-- `src/lib/workspace/dependency-tracker.ts` - 1 new method
-- Various type definition updates
-
-## Next Steps (Updated After SOURCE.zip Implementation)
-
-### **Immediate Priority**:
-1. ✅ **SourceManager implementation** - COMPLETE
-2. ✅ **Workspace SOURCE/ integration** - COMPLETE
-3. ✅ **EPUB pack/unpack workflows** - COMPLETE
-4. **Implement Transform Pipeline** - Build execution engine using documented API
-5. **Extension Manager with Cache** - Implement unified extension management
-
-### **Content Features (Phase 3)**:
-5. **Navigation Editor** - Text-based approach leveraging existing spine editor patterns
-6. **Audio Clip Editor** - Simplified directive-based output, no waveform complexity
-
-### **Future Planning (Phase 4)**:
-7. **Feature specification** - Complete planning for internationalization, first-run, version management
-8. **Integration testing** - End-to-end workflow validation
-
-## Key Implementation Notes
-
-- **Navigation Editor**: Simplified from complex UI to text-based approach using existing transform pipeline
-- **Audio Clip Editor**: Removed waveform visualization complexity, focus on directive generation
-- **Three new features**: Require detailed specification before implementation
-- **Codebase foundation**: Strong existing patterns, most work involves extension rather than rewriting
+### 🚀 Current Status
+The EPUB editor now has a solid foundation with core functionality complete. The next phase focuses on content editing features and extension management implementation.
