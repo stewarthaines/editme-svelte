@@ -178,3 +178,17 @@ export function getCurrentLocaleConfig() {
   const state = get(i18nState);
   return state.locales[state.currentLocale];
 }
+
+/**
+ * Reset i18n system for testing (internal use only)
+ * @internal
+ */
+export function _resetI18nForTesting() {
+  i18nState.set({
+    currentLocale: DEFAULT_LOCALE,
+    locales: LOCALE_CONFIGS,
+    catalogs: {},
+    initialized: false,
+    loading: false
+  });
+}

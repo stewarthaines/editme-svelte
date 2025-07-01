@@ -109,7 +109,7 @@ class TranslationLoader implements I18nLoader {
    */
   private async decompressGzip(compressedData: ArrayBuffer): Promise<string> {
     // Use browser's DecompressionStream if available
-    if ('DecompressionStream' in window) {
+    if ('DecompressionStream' in globalThis) {
       const stream = new DecompressionStream('gzip');
       const writer = stream.writable.getWriter();
       const reader = stream.readable.getReader();
