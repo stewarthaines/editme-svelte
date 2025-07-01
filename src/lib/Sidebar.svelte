@@ -8,12 +8,12 @@
 
   // Sidebar sections configuration
   const SIDEBAR_SECTIONS: Array<{ id: SidebarSection; icon: string; label: string }> = [
-    { id: 'workspace', icon: '🏠', label: 'Workspace' },
-    { id: 'metadata', icon: '📄', label: 'Metadata' },
-    { id: 'manifest', icon: '📋', label: 'Manifest' },
-    { id: 'navigation', icon: '📖', label: 'Navigation' },
-    { id: 'spine', icon: '📖', label: 'Spine Items' },
-    { id: 'settings', icon: '⚙️', label: 'Settings' },
+    { id: 'workspace', icon: '🏠', label: $t('Workspace') },
+    { id: 'metadata', icon: '📄', label: $t('Metadata') },
+    { id: 'manifest', icon: '📋', label: $t('Manifest') },
+    { id: 'navigation', icon: '📖', label: $t('Navigation') },
+    { id: 'spine', icon: '📖', label: $t('Spine Items') },
+    { id: 'settings', icon: '⚙️', label: $t('Settings') },
   ] as const;
 
   function toggleSidebar() {

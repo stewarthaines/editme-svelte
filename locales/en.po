@@ -1,7 +1,16 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"headers: [object Object]\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: EDITME EPUB Editor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-01T07:05:22.848Z\n"
+"PO-Revision-Date: 2025-07-01T07:05:22.849Z\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:108
 msgid "Add/remove manifest items"
@@ -23,24 +32,12 @@ msgstr ""
 msgid "Auto-generation from spine"
 msgstr ""
 
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:112
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:137
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:152
-msgid "Cancel"
-msgstr ""
-
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:116
 msgid "Chapter ordering interface"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/WorkspaceView.svelte:130
 msgid "Create Workspace"
-msgstr ""
-
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:113
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:138
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:153
-msgid "Delete"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:117
@@ -59,22 +56,6 @@ msgstr ""
 msgid "File listing and management"
 msgstr ""
 
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:121
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:122
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:315
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:320
-msgid "Found {count} items"
-msgstr ""
-
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:316
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:321
-msgid "Hello {name}"
-msgstr ""
-
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:126
-msgid "Hello {name}, you have {count} messages"
-msgstr ""
-
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/WorkspaceView.svelte:138
 msgid "Import EPUB"
 msgstr ""
@@ -91,17 +72,24 @@ msgstr ""
 msgid "Main navigation"
 msgstr ""
 
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:13
+msgid "Manifest"
+msgstr ""
+
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:12
+msgid "Metadata"
+msgstr ""
+
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:14
+msgid "Navigation"
+msgstr ""
+
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:112
 msgid "Navigation link management"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:129
 msgid "New capabilities"
-msgstr ""
-
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:117
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:145
-msgid "Nonexistent key"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/WorkspaceView.svelte:134
@@ -120,21 +108,6 @@ msgstr ""
 msgid "Reset all metadata to defaults?"
 msgstr ""
 
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:111
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:136
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:151
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:200
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/i18n.test.ts:245
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:121
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:176
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:183
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:191
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:229
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:285
-#: /Users/stewart/Projects/editme-svelte/src/lib/i18n/test/integration.test.ts:289
-msgid "Save"
-msgstr ""
-
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/MetadataView.svelte:183
 msgid "Save & Continue"
 msgstr ""
@@ -147,8 +120,16 @@ msgstr ""
 msgid "Search and filter files"
 msgstr ""
 
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:16
+msgid "Settings"
+msgstr ""
+
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:118
 msgid "Spine item management"
+msgstr ""
+
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:15
+msgid "Spine Items"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/PlaceholderView.svelte:111
@@ -165,6 +146,10 @@ msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:35
 msgid "Toggle sidebar"
+msgstr ""
+
+#: /Users/stewart/Projects/editme-svelte/src/lib/Sidebar.svelte:11
+msgid "Workspace"
 msgstr ""
 
 #: /Users/stewart/Projects/editme-svelte/src/lib/navigation/views/MetadataView.svelte:46

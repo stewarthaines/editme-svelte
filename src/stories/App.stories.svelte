@@ -11,7 +11,7 @@
       docs: {
         description: {
           component:
-            'The complete EDITME EPUB editor application showing the full layout with sidebar navigation and resizable content panes.',
+            'The complete EDITME EPUB editor application showing the full layout with sidebar navigation and resizable content panes. Features full internationalization (i18n) support with locale switching available in the toolbar.',
         },
       },
     },
