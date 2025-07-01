@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { navigationStore } from '../navigation-store';
   import type { MetadataViewData } from '../types';
+  import { t } from '../../i18n';
 
   // Component implements ViewComponent interface
   let viewData: MetadataViewData = {
@@ -42,7 +43,7 @@
 
   export async function canLeave(): Promise<boolean> {
     if (viewData.hasUnsavedChanges) {
-      return window.confirm('You have unsaved metadata changes. Continue?');
+      return window.confirm(t('You have unsaved metadata changes. Continue?'));
     }
     return true;
   }
@@ -83,7 +84,7 @@
   }
 
   function handleReset() {
-    if (window.confirm('Reset all metadata to defaults?')) {
+    if (window.confirm(t('Reset all metadata to defaults?'))) {
       viewData = {
         title: '',
         author: '',
@@ -101,93 +102,92 @@
 
 <div class="metadata-view">
   <header class="view-header">
-    <h2>EPUB Metadata</h2>
-    <p>Configure basic information about your EPUB publication</p>
+    <h2>{t('EPUB Metadata')}</h2>
+    <p>{t('Configure basic information about your EPUB publication')}</p>
   </header>
 
   <main class="view-content">
     <form class="metadata-form" on:submit|preventDefault={handleSave}>
       <div class="form-section">
-        <h3>Basic Information</h3>
+        <h3>{t('Basic Information')}</h3>
 
         <div class="form-group">
-          <label for="title">Title *</label>
+          <label for="title">{t('Title')} *</label>
           <input
             id="title"
             type="text"
             bind:value={viewData.title}
             on:input={handleInputChange}
-            placeholder="Enter EPUB title"
+            placeholder={t('Enter EPUB title')}
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="author">Author *</label>
+          <label for="author">{t('Author')} *</label>
           <input
             id="author"
             type="text"
             bind:value={viewData.author}
             on:input={handleInputChange}
-            placeholder="Enter author name"
+            placeholder={t('Enter author name')}
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="language">Language</label>
+          <label for="language">{t('Language')}</label>
           <select id="language" bind:value={viewData.language} on:change={handleInputChange}>
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="pt">Portuguese</option>
-            <option value="zh">Chinese</option>
-            <option value="ja">Japanese</option>
-            <option value="ko">Korean</option>
+            <option value="en">{t('English')}</option>
+            <option value="es">{t('Spanish')}</option>
+            <option value="fr">{t('French')}</option>
+            <option value="de">{t('German')}</option>
+            <option value="it">{t('Italian')}</option>
+            <option value="pt">{t('Portuguese')}</option>
+            <option value="zh">{t('Chinese')}</option>
+            <option value="ja">{t('Japanese')}</option>
+            <option value="ko">{t('Korean')}</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="identifier">Identifier *</label>
+          <label for="identifier">{t('Identifier')} *</label>
           <input
             id="identifier"
             type="text"
             bind:value={viewData.identifier}
             on:input={handleInputChange}
-            placeholder="ISBN, URI, or unique identifier"
+            placeholder={t('ISBN, URI, or unique identifier')}
             required
           />
           <small class="form-help">
-            A unique identifier for this EPUB (ISBN, URI, UUID, etc.)
+            {t('A unique identifier for this EPUB (ISBN, URI, UUID, etc.)')}
           </small>
         </div>
       </div>
 
       <div class="form-section">
-        <h3>Publication Details</h3>
+        <h3>{t('Publication Details')}</h3>
         <div class="placeholder-fields">
           <p class="placeholder-text">
-            Additional metadata fields (publisher, date, description, etc.) will be implemented in
-            Phase 3.
+            {t('Additional metadata fields (publisher, date, description, etc.) will be implemented in Phase 3.')}
           </p>
         </div>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" on:click={handleReset}> Reset </button>
+        <button type="button" class="btn btn-secondary" on:click={handleReset}>{t('Reset')}</button>
 
         <button type="submit" class="btn btn-primary" disabled={!isValid}>
           <span class="btn-icon">💾</span>
-          Save & Continue
+          {t('Save & Continue')}
         </button>
       </div>
 
       {#if viewData.hasUnsavedChanges}
         <div class="unsaved-indicator">
           <span class="indicator-icon">⚠️</span>
-          <span>You have unsaved changes</span>
+          <span>{t('You have unsaved changes')}</span>
         </div>
       {/if}
     </form>

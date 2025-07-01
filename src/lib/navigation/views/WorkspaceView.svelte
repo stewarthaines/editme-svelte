@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { navigationStore } from '../navigation-store';
   import type { WorkspaceViewData } from '../types';
+  import { t } from '../../i18n';
 
   // Component implements ViewComponent interface
   let viewData: WorkspaceViewData = {
@@ -40,7 +41,7 @@
 
   export async function canLeave(): Promise<boolean> {
     if (hasUnsavedChanges) {
-      return window.confirm('You have unsaved workspace changes. Continue?');
+      return window.confirm(t('You have unsaved workspace changes. Continue?'));
     }
     return true;
   }
@@ -81,30 +82,30 @@
 
 <div class="workspace-view">
   <header class="view-header">
-    <h2>Workspace Management</h2>
-    <p>Select and manage EPUB workspaces</p>
+    <h2>{t('Workspace Management')}</h2>
+    <p>{t('Select and manage EPUB workspaces')}</p>
   </header>
 
   <main class="view-content">
     <section class="workspace-section">
-      <h3>Current Workspace</h3>
+      <h3>{t('Current Workspace')}</h3>
       {#if viewData.selectedWorkspace}
         <div class="current-workspace">
           <span class="workspace-icon">📁</span>
           <span class="workspace-name">{viewData.selectedWorkspace}</span>
-          <button on:click={() => selectWorkspace('')} class="btn btn-secondary"> Close </button>
+          <button on:click={() => selectWorkspace('')} class="btn btn-secondary">{t('Close')}</button>
         </div>
       {:else}
         <div class="no-workspace">
           <span class="icon">📂</span>
-          <p>No workspace selected</p>
-          <button class="btn btn-primary">Create New Workspace</button>
+          <p>{t('No workspace selected')}</p>
+          <button class="btn btn-primary">{t('Create New Workspace')}</button>
         </div>
       {/if}
     </section>
 
     <section class="recent-section">
-      <h3>Recent Workspaces</h3>
+      <h3>{t('Recent Workspaces')}</h3>
       {#if viewData.recentWorkspaces.length > 0}
         <ul class="recent-list">
           {#each viewData.recentWorkspaces as workspaceId}
@@ -112,13 +113,13 @@
               <button on:click={() => selectWorkspace(workspaceId)} class="recent-workspace">
                 <span class="workspace-icon">📁</span>
                 <span class="workspace-name">{workspaceId}</span>
-                <span class="workspace-date">Last opened: Recently</span>
+                <span class="workspace-date">{t('Last opened')}: {t('Recently')}</span>
               </button>
             </li>
           {/each}
         </ul>
       {:else}
-        <p class="no-recent">No recent workspaces</p>
+        <p class="no-recent">{t('No recent workspaces')}</p>
       {/if}
     </section>
 
@@ -126,15 +127,15 @@
       <div class="action-buttons">
         <button class="btn btn-primary">
           <span class="btn-icon">➕</span>
-          Create Workspace
+          {t('Create Workspace')}
         </button>
         <button class="btn btn-secondary">
           <span class="btn-icon">📁</span>
-          Open Existing
+          {t('Open Existing')}
         </button>
         <button class="btn btn-secondary">
           <span class="btn-icon">📥</span>
-          Import EPUB
+          {t('Import EPUB')}
         </button>
       </div>
     </section>
@@ -142,7 +143,7 @@
     {#if hasUnsavedChanges}
       <div class="unsaved-indicator">
         <span class="indicator-icon">⚠️</span>
-        <span>You have unsaved changes</span>
+        <span>{t('You have unsaved changes')}</span>
       </div>
     {/if}
   </main>
