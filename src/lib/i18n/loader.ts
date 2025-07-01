@@ -3,8 +3,7 @@
  */
 
 import type { I18nLoader, TranslationCatalog } from './types.js';
-import { getFileStorage } from '../storage/index.js';
-import { ZipReader } from '../zip/index.js';
+import { FileStorageAPI } from '../storage/index.js';
 
 // Version tracking for cache invalidation
 const I18N_VERSION = '1.0.0'; // Update when translation format changes
@@ -19,7 +18,7 @@ export function createI18nLoader(): I18nLoader {
 }
 
 class TranslationLoader implements I18nLoader {
-  private storage = getFileStorage();
+  private storage = new FileStorageAPI();
   
   /**
    * Check if translations need to be re-extracted
@@ -32,9 +31,14 @@ class TranslationLoader implements I18nLoader {
         return true;
       }
       
+      // Initialize storage if needed
+      if (!this.storage.isInitialized()) {
+        await this.storage.init();
+      }
+      
       // Check if locale files exist in storage
-      const files = await this.storage.listFiles(LOCALES_WORKSPACE_ID);
-      const localeFiles = files.filter(file => file.name.endsWith('.json'));
+      const filePaths = await this.storage.listFiles(LOCALES_WORKSPACE_ID);
+      const localeFiles = filePaths.filter(path => path.endsWith('.json'));
       
       // We expect 7 locale files
       if (localeFiles.length < 7) {
@@ -54,12 +58,18 @@ class TranslationLoader implements I18nLoader {
    */
   async extractTranslations(): Promise<void> {
     try {
-      console.log('📦 Extracting translations from compressed archive...');
+      console.log('📦 Extracting translations from embedded data...');
       
-      // Fetch translations.zip from static assets
-      const response = await fetch('/translations.zip');
+      // Get embedded translation data URL from global variable
+      const translationsDataUrl = (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+      if (!translationsDataUrl) {
+        throw new Error('Translation data URL not found. Ensure the app was built with i18n:build.');
+      }
+      
+      // Fetch from data URL
+      const response = await fetch(translationsDataUrl);
       if (!response.ok) {
-        throw new Error(`Failed to fetch translations.zip: ${response.status}`);
+        throw new Error(`Failed to fetch translation data: ${response.status}`);
       }
       
       // Decompress the gzipped JSON
@@ -74,7 +84,7 @@ class TranslationLoader implements I18nLoader {
       
       // Extract each locale file
       for (const [filename, content] of Object.entries(archiveData)) {
-        await this.storage.writeFile(
+        await this.storage.writeTextFile(
           LOCALES_WORKSPACE_ID,
           filename,
           content as string
@@ -144,20 +154,26 @@ class TranslationLoader implements I18nLoader {
     try {
       const catalogs: Record<string, TranslationCatalog> = {};
       
+      // Initialize storage if needed
+      if (!this.storage.isInitialized()) {
+        await this.storage.init();
+      }
+      
       // List all JSON files in locales workspace
-      const files = await this.storage.listFiles(LOCALES_WORKSPACE_ID);
-      const localeFiles = files.filter(file => file.name.endsWith('.json'));
+      const filePaths = await this.storage.listFiles(LOCALES_WORKSPACE_ID);
+      const localeFiles = filePaths.filter(path => path.endsWith('.json'));
       
       console.log(`📚 Loading ${localeFiles.length} translation catalogs...`);
       
       // Load each catalog
-      for (const file of localeFiles) {
+      for (const filePath of localeFiles) {
         try {
-          const content = await this.storage.readFile(LOCALES_WORKSPACE_ID, file.name);
+          const content = await this.storage.readTextFile(LOCALES_WORKSPACE_ID, filePath);
           const jsonData = JSON.parse(content);
           
           // Extract locale code from filename (e.g., 'en.json' -> 'en')
-          const locale = file.name.replace('.json', '');
+          const filename = filePath.split('/').pop() || filePath;
+          const locale = filename.replace('.json', '');
           
           // Convert po2json format to our catalog format
           const catalog: TranslationCatalog = {
@@ -169,7 +185,7 @@ class TranslationLoader implements I18nLoader {
           catalogs[locale] = catalog;
           
         } catch (error) {
-          console.error(`Failed to load ${file.name}:`, error);
+          console.error(`Failed to load ${filePath}:`, error);
           // Continue with other files
         }
       }
