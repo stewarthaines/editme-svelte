@@ -1,0 +1,32 @@
+/*
+  App-specific Styles
+  
+  Overrides and additions specific to the EDITME.html application
+*/
+
+/* Ensure the app container fills the viewport */
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Override body to ensure no scrollbars */
+body {
+  overflow: hidden;
+}
+
+/* Ensure proper height inheritance */
+html {
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}

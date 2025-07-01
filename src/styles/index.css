@@ -17,3 +17,6 @@
 
 /* 4. Global Styles - Base element resets */
 @import './global.css';
+
+/* 5. App-specific Styles */
+@import './app.css';
