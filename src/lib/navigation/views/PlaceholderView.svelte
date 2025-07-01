@@ -94,57 +94,57 @@
         <span class="large-icon">{icon}</span>
       </div>
 
-      <h3>{t('Coming Soon')}</h3>
+      <h3>{$t('Coming Soon')}</h3>
       <p class="placeholder-description">
-        {t('The {title} interface will be implemented in Phase 3 of the EDITME development. This will include full content management capabilities.', { title: title.toLowerCase() })}
+        {$t('The {title} interface will be implemented in Phase 3 of the EDITME development. This will include full content management capabilities.', { title: title.toLowerCase() })}
       </p>
 
       <div class="feature-preview">
-        <h4>{t('Planned Features')}:</h4>
+        <h4>{$t('Planned Features')}:</h4>
         <ul class="feature-list">
           {#if viewType === 'manifest'}
-            <li>📋 {t('File listing and management')}</li>
-            <li>🔍 {t('Search and filter files')}</li>
-            <li>📁 {t('Add/remove manifest items')}</li>
-            <li>👁️ {t('Preview file contents')}</li>
+            <li>📋 {$t('File listing and management')}</li>
+            <li>🔍 {$t('Search and filter files')}</li>
+            <li>📁 {$t('Add/remove manifest items')}</li>
+            <li>👁️ {$t('Preview file contents')}</li>
           {:else if viewType === 'navigation'}
-            <li>📖 {t('Table of contents editing')}</li>
-            <li>🔗 {t('Navigation link management')}</li>
-            <li>📝 {t('TOC structure editing')}</li>
-            <li>🎯 {t('Auto-generation from spine')}</li>
+            <li>📖 {$t('Table of contents editing')}</li>
+            <li>🔗 {$t('Navigation link management')}</li>
+            <li>📝 {$t('TOC structure editing')}</li>
+            <li>🎯 {$t('Auto-generation from spine')}</li>
           {:else if viewType === 'spine'}
-            <li>📚 {t('Chapter ordering interface')}</li>
-            <li>🔄 {t('Drag-and-drop reordering')}</li>
-            <li>📄 {t('Spine item management')}</li>
-            <li>🔗 {t('Link to source files')}</li>
+            <li>📚 {$t('Chapter ordering interface')}</li>
+            <li>🔄 {$t('Drag-and-drop reordering')}</li>
+            <li>📄 {$t('Spine item management')}</li>
+            <li>🔗 {$t('Link to source files')}</li>
           {:else if viewType === 'settings'}
-            <li>⚙️ {t('Application preferences')}</li>
-            <li>🎨 {t('Theme and UI settings')}</li>
-            <li>💾 {t('Export/import settings')}</li>
-            <li>🔧 {t('Advanced configurations')}</li>
+            <li>⚙️ {$t('Application preferences')}</li>
+            <li>🎨 {$t('Theme and UI settings')}</li>
+            <li>💾 {$t('Export/import settings')}</li>
+            <li>🔧 {$t('Advanced configurations')}</li>
           {:else}
-            <li>🚀 {t('Enhanced functionality')}</li>
-            <li>📊 {t('Improved user interface')}</li>
-            <li>🔄 {t('Seamless integration')}</li>
-            <li>💡 {t('New capabilities')}</li>
+            <li>🚀 {$t('Enhanced functionality')}</li>
+            <li>📊 {$t('Improved user interface')}</li>
+            <li>🔄 {$t('Seamless integration')}</li>
+            <li>💡 {$t('New capabilities')}</li>
           {/if}
         </ul>
       </div>
 
       <div class="demo-actions">
-        <h4>{t('Navigation Demo')}:</h4>
+        <h4>{$t('Navigation Demo')}:</h4>
         <div class="action-buttons">
           <button class="btn btn-primary" on:click={() => handleAction('demo_action_1')}>
-            {t('Demo Action 1')}
+            {$t('Demo Action 1')}
           </button>
           <button class="btn btn-secondary" on:click={() => handleAction('demo_action_2')}>
-            {t('Demo Action 2')}
+            {$t('Demo Action 2')}
           </button>
           <button
             class="btn btn-secondary"
             on:click={() => navigationStore.navigateTo('workspace')}
           >
-            {t('Back to Workspace')}
+            {$t('Back to Workspace')}
           </button>
         </div>
       </div>
@@ -153,7 +153,7 @@
         <div class="last-action">
           <span class="action-icon">✨</span>
           <span
-            >{t('Last action')}: {viewData.lastAction} {t('at')} {new Date(
+            >{$t('Last action')}: {viewData.lastAction} {$t('at')} {new Date(
               viewData.actionTime
             ).toLocaleTimeString()}</span
           >

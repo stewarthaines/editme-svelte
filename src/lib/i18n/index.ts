@@ -36,15 +36,15 @@ const englishFallback: TranslationCatalog = {
     'Metadata': 'Metadata',
     'Manifest': 'Manifest',
     'Navigation': 'Navigation',
-    'Spine': 'Spine'
+    'Spine Items': 'Spine Items'
   },
   headers: {}
 };
 
 /**
- * Translation function
+ * Non-reactive translation function (for non-component usage)
  */
-export const t: TranslationFunction = (key: string, params: Record<string, any> = {}) => {
+export const translate: TranslationFunction = (key: string, params: Record<string, any> = {}) => {
   const state = get(i18nState);
   
   // Get translation from current locale catalog
@@ -70,6 +70,38 @@ export const t: TranslationFunction = (key: string, params: Record<string, any> 
   
   return translation;
 };
+
+/**
+ * Reactive translation store for Svelte components
+ * Usage: {$t('key')} or {$t('key', { param: value })}
+ */
+export const t = derived(
+  i18nState,
+  ($state): TranslationFunction => (key: string, params: Record<string, any> = {}) => {
+    // Get translation from current locale catalog
+    const catalog = $state.catalogs[$state.currentLocale];
+    let translation = catalog?.messages[key];
+    
+    // Fallback to English if not found
+    if (!translation && $state.currentLocale !== 'en') {
+      translation = $state.catalogs.en?.messages[key] || englishFallback.messages[key];
+    }
+    
+    // Ultimate fallback to key itself
+    if (!translation) {
+      translation = key;
+    }
+    
+    // Simple parameter interpolation
+    if (Object.keys(params).length > 0) {
+      for (const [param, value] of Object.entries(params)) {
+        translation = translation.replace(new RegExp(`\\{${param}\\}`, 'g'), String(value));
+      }
+    }
+    
+    return translation;
+  }
+);
 
 /**
  * Initialize the i18n system
@@ -192,3 +224,6 @@ export function _resetI18nForTesting() {
     loading: false
   });
 }
+
+// Export i18nState for Storybook and testing
+export { i18nState };

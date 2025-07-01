@@ -82,30 +82,30 @@
 
 <div class="workspace-view">
   <header class="view-header">
-    <h2>{t('Workspace Management')}</h2>
-    <p>{t('Select and manage EPUB workspaces')}</p>
+    <h2>{$t('Workspace Management')}</h2>
+    <p>{$t('Select and manage EPUB workspaces')}</p>
   </header>
 
   <main class="view-content">
     <section class="workspace-section">
-      <h3>{t('Current Workspace')}</h3>
+      <h3>{$t('Current Workspace')}</h3>
       {#if viewData.selectedWorkspace}
         <div class="current-workspace">
           <span class="workspace-icon">📁</span>
           <span class="workspace-name">{viewData.selectedWorkspace}</span>
-          <button on:click={() => selectWorkspace('')} class="btn btn-secondary">{t('Close')}</button>
+          <button on:click={() => selectWorkspace('')} class="btn btn-secondary">{$t('Close')}</button>
         </div>
       {:else}
         <div class="no-workspace">
           <span class="icon">📂</span>
-          <p>{t('No workspace selected')}</p>
-          <button class="btn btn-primary">{t('Create New Workspace')}</button>
+          <p>{$t('No workspace selected')}</p>
+          <button class="btn btn-primary">{$t('Create New Workspace')}</button>
         </div>
       {/if}
     </section>
 
     <section class="recent-section">
-      <h3>{t('Recent Workspaces')}</h3>
+      <h3>{$t('Recent Workspaces')}</h3>
       {#if viewData.recentWorkspaces.length > 0}
         <ul class="recent-list">
           {#each viewData.recentWorkspaces as workspaceId}
@@ -113,13 +113,13 @@
               <button on:click={() => selectWorkspace(workspaceId)} class="recent-workspace">
                 <span class="workspace-icon">📁</span>
                 <span class="workspace-name">{workspaceId}</span>
-                <span class="workspace-date">{t('Last opened')}: {t('Recently')}</span>
+                <span class="workspace-date">{$t('Last opened')}: {$t('Recently')}</span>
               </button>
             </li>
           {/each}
         </ul>
       {:else}
-        <p class="no-recent">{t('No recent workspaces')}</p>
+        <p class="no-recent">{$t('No recent workspaces')}</p>
       {/if}
     </section>
 
@@ -127,15 +127,15 @@
       <div class="action-buttons">
         <button class="btn btn-primary">
           <span class="btn-icon">➕</span>
-          {t('Create Workspace')}
+          {$t('Create Workspace')}
         </button>
         <button class="btn btn-secondary">
           <span class="btn-icon">📁</span>
-          {t('Open Existing')}
+          {$t('Open Existing')}
         </button>
         <button class="btn btn-secondary">
           <span class="btn-icon">📥</span>
-          {t('Import EPUB')}
+          {$t('Import EPUB')}
         </button>
       </div>
     </section>
@@ -143,7 +143,7 @@
     {#if hasUnsavedChanges}
       <div class="unsaved-indicator">
         <span class="indicator-icon">⚠️</span>
-        <span>{t('You have unsaved changes')}</span>
+        <span>{$t('You have unsaved changes')}</span>
       </div>
     {/if}
   </main>

@@ -32,7 +32,7 @@
       on:click={toggleSidebar}
       aria-expanded={isExpanded}
       aria-controls="sidebar-content"
-      aria-label={t('Toggle sidebar')}
+      aria-label={$t('Toggle sidebar')}
     >
       {isExpanded ? '◀️' : '▶️'}
     </button>
@@ -42,16 +42,16 @@
     {/if}
   </div>
 
-  <nav class="sidebar-nav" aria-label={t('Main navigation')}>
+  <nav class="sidebar-nav" aria-label={$t('Main navigation')}>
     {#each SIDEBAR_SECTIONS as section}
       <button
         class="sidebar-section"
         class:active={activeSection === section.id}
         on:click={() => setSidebarSection(section.id)}
         aria-current={activeSection === section.id ? 'page' : undefined}
-        title={t(section.label)}
+        title={$t(section.label)}
       >
-        <span class="section-label">{t(section.label)}</span>
+        <span class="section-label">{$t(section.label)}</span>
       </button>
     {/each}
   </nav>

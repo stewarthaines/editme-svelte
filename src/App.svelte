@@ -13,43 +13,43 @@
 <LayoutManager>
   <svelte:fragment slot="sidebar-workspace">
     <div class="placeholder-content">
-      <h3>{t('Workspace')}</h3>
-      <p>{t('Workspace selector placeholder')}</p>
+      <h3>{$t('Workspace')}</h3>
+      <p>{$t('Workspace selector placeholder')}</p>
     </div>
   </svelte:fragment>
 
   <svelte:fragment slot="sidebar-metadata">
     <div class="placeholder-content">
-      <h3>{t('Metadata')}</h3>
-      <p>{t('Metadata editor placeholder')}</p>
+      <h3>{$t('Metadata')}</h3>
+      <p>{$t('Metadata editor placeholder')}</p>
     </div>
   </svelte:fragment>
 
   <svelte:fragment slot="sidebar-manifest">
     <div class="placeholder-content">
-      <h3>{t('Manifest')}</h3>
-      <p>{t('File manifest placeholder')}</p>
+      <h3>{$t('Manifest')}</h3>
+      <p>{$t('File manifest placeholder')}</p>
     </div>
   </svelte:fragment>
 
   <svelte:fragment slot="sidebar-nav">
     <div class="placeholder-content">
-      <h3>{t('Navigation')}</h3>
-      <p>{t('TOC editor placeholder')}</p>
+      <h3>{$t('Navigation')}</h3>
+      <p>{$t('TOC editor placeholder')}</p>
     </div>
   </svelte:fragment>
 
   <svelte:fragment slot="sidebar-spine">
     <div class="placeholder-content">
-      <h3>{t('Spine Items')}</h3>
-      <p>{t('Chapter ordering placeholder')}</p>
+      <h3>{$t('Spine Items')}</h3>
+      <p>{$t('Chapter ordering placeholder')}</p>
     </div>
   </svelte:fragment>
 
   <svelte:fragment slot="sidebar-settings">
     <div class="placeholder-content">
-      <h3>{t('Settings')}</h3>
-      <p>{t('App settings placeholder')}</p>
+      <h3>{$t('Settings')}</h3>
+      <p>{$t('App settings placeholder')}</p>
     </div>
   </svelte:fragment>
 
@@ -62,44 +62,44 @@
     {:else if currentView === 'manifest'}
       <PlaceholderView 
         viewType="manifest" 
-        title={t('File Manifest')} 
-        description={t('Manage EPUB files and resources')}
+        title={$t('File Manifest')} 
+        description={$t('Manage EPUB files and resources')}
         icon="📋" 
       />
     {:else if currentView === 'navigation'}
       <PlaceholderView 
         viewType="navigation" 
-        title={t('Table of Contents')} 
-        description={t('Edit navigation structure and TOC')}
+        title={$t('Table of Contents')} 
+        description={$t('Edit navigation structure and TOC')}
         icon="📖" 
       />
     {:else if currentView === 'spine'}
       <PlaceholderView 
         viewType="spine" 
-        title={t('Spine Items')} 
-        description={t('Manage chapter ordering and spine structure')}
+        title={$t('Spine Items')} 
+        description={$t('Manage chapter ordering and spine structure')}
         icon="📚" 
       />
     {:else if currentView === 'settings'}
       <PlaceholderView 
         viewType="settings" 
-        title={t('Application Settings')} 
-        description={t('Configure preferences and options')}
+        title={$t('Application Settings')} 
+        description={$t('Configure preferences and options')}
         icon="⚙️" 
       />
     {:else}
       <div class="placeholder-content">
-        <h3>{t('Unknown View')}</h3>
-        <p>{t('View type')}: {currentView}</p>
+        <h3>{$t('Unknown View')}</h3>
+        <p>{$t('View type')}: {currentView}</p>
       </div>
     {/if}
   </svelte:fragment>
 
   <svelte:fragment slot="right-content">
     <div class="placeholder-content">
-      <h3>{t('Preview Pane')}</h3>
-      <p>{t('XHTML preview will go here (Phase 4)')}</p>
-      <p class="current-view-info">{t('Current view')}: <strong>{currentView}</strong></p>
+      <h3>{$t('Preview Pane')}</h3>
+      <p>{$t('XHTML preview will go here (Phase 4)')}</p>
+      <p class="current-view-info">{$t('Current view')}: <strong>{currentView}</strong></p>
     </div>
   </svelte:fragment>
 </LayoutManager>
