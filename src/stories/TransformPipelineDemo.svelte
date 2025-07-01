@@ -212,7 +212,13 @@
         <h4>3. Final XHTML Document</h4>
         <div class="result-content">
           {#if finalXHTML}
-            <pre>{finalXHTML}</pre>
+            <!-- <pre>{finalXHTML}</pre> -->
+            <iframe
+              title="preview"
+              srcdoc={finalXHTML}
+              style="box-sizing: border-box; width: 100%; height: 100%;"
+              frameborder="0"
+            ></iframe>
           {:else}
             <div class="placeholder">Final XHTML document will appear here</div>
           {/if}

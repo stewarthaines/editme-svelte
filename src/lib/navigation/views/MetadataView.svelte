@@ -11,7 +11,7 @@
     identifier: '',
     hasUnsavedChanges: false,
   };
-  
+
   let guardId: string;
 
   // ViewComponent interface implementation
@@ -19,7 +19,7 @@
     if (data) {
       viewData = { ...viewData, ...data };
     }
-    
+
     // Restore saved data
     const saved = navigationStore.getViewData<MetadataViewData>('metadata');
     if (saved) {
@@ -51,7 +51,7 @@
   onMount(() => {
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
-    
+
     // Call onViewEnter
     onViewEnter();
   });
@@ -61,7 +61,7 @@
     if (guardId) {
       navigationStore.removeNavigationGuard(guardId);
     }
-    
+
     // Call onViewLeave
     onViewLeave();
   });
@@ -77,7 +77,7 @@
     console.log('Saving metadata:', viewData);
     viewData.hasUnsavedChanges = false;
     navigationStore.setViewData('metadata', viewData);
-    
+
     // Navigate to next logical step
     navigationStore.navigateTo('manifest');
   }
@@ -109,7 +109,7 @@
     <form class="metadata-form" on:submit|preventDefault={handleSave}>
       <div class="form-section">
         <h3>Basic Information</h3>
-        
+
         <div class="form-group">
           <label for="title">Title *</label>
           <input
@@ -136,11 +136,7 @@
 
         <div class="form-group">
           <label for="language">Language</label>
-          <select
-            id="language"
-            bind:value={viewData.language}
-            on:change={handleInputChange}
-          >
+          <select id="language" bind:value={viewData.language} on:change={handleInputChange}>
             <option value="en">English</option>
             <option value="es">Spanish</option>
             <option value="fr">French</option>
@@ -173,25 +169,16 @@
         <h3>Publication Details</h3>
         <div class="placeholder-fields">
           <p class="placeholder-text">
-            Additional metadata fields (publisher, date, description, etc.) will be implemented in Phase 3.
+            Additional metadata fields (publisher, date, description, etc.) will be implemented in
+            Phase 3.
           </p>
         </div>
       </div>
 
       <div class="form-actions">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          on:click={handleReset}
-        >
-          Reset
-        </button>
-        
-        <button
-          type="submit"
-          class="btn btn-primary"
-          disabled={!isValid}
-        >
+        <button type="button" class="btn btn-secondary" on:click={handleReset}> Reset </button>
+
+        <button type="submit" class="btn btn-primary" disabled={!isValid}>
           <span class="btn-icon">💾</span>
           Save & Continue
         </button>
@@ -343,7 +330,6 @@
 
   .btn-primary {
     background-color: var(--color-accent);
-    color: white;
   }
 
   .btn-primary:hover:not(:disabled) {

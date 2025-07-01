@@ -1,6 +1,6 @@
 <!--
   ExtensionUploader Component
-  
+
   Provides drag & drop file upload interface with validation feedback,
   name detection, and support for both single files and EPUB imports.
 -->
@@ -41,7 +41,7 @@
   function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragOver = false;
-    
+
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       handleFiles(files);
@@ -71,7 +71,7 @@
   function handleJavaScriptFile(file: File) {
     // Validate file (using mock validation for demo)
     validationResult = validateFile(file);
-    
+
     if (!validationResult.isValid) {
       return;
     }
@@ -118,27 +118,28 @@
     if (!file.name.endsWith('.js')) {
       return {
         isValid: false,
-        error: 'Only JavaScript files (.js) are allowed'
+        error: 'Only JavaScript files (.js) are allowed',
       };
     }
 
     if (file.size === 0) {
       return {
         isValid: false,
-        error: 'JavaScript file cannot be empty'
+        error: 'JavaScript file cannot be empty',
       };
     }
 
-    if (file.size > 50 * 1024 * 1024) { // 50MB limit
+    if (file.size > 50 * 1024 * 1024) {
+      // 50MB limit
       return {
         isValid: false,
-        error: 'File too large (max 50MB)'
+        error: 'File too large (max 50MB)',
       };
     }
 
     return {
       isValid: true,
-      fileType: 'javascript'
+      fileType: 'javascript',
     };
   }
 
@@ -147,10 +148,10 @@
     let name = filename;
     if (name.endsWith('.js')) name = name.slice(0, -3);
     if (name.endsWith('.min')) name = name.slice(0, -4);
-    
+
     // Remove version numbers
     name = name.replace(/[-@](?:v?\d+[\.\-]\d+|\d+[\.\-]\d+)(?:[\.\-]\w+)*$/i, '');
-    
+
     // Normalize
     return name
       .toLowerCase()
@@ -164,7 +165,7 @@
     const sampleContent = `/*! ${extensionName} demo */\nfunction ${extensionName}() { return 'demo'; }`;
     const blob = new Blob([sampleContent], { type: 'text/javascript' });
     const file = new File([blob], `${extensionName}.min.js`, { type: 'text/javascript' });
-    
+
     dispatch('filesUploaded', { files: [file] });
   }
 
@@ -176,9 +177,9 @@
 
 <div class="extension-uploader">
   <h3>Extension Import</h3>
-  
+
   <!-- Upload Zone -->
-  <div 
+  <div
     class="upload-zone"
     class:drag-over={isDragOver}
     class:has-error={validationResult && !validationResult.isValid}
@@ -188,7 +189,7 @@
     role="button"
     tabindex="0"
     on:click={() => uploadInput?.click()}
-    on:keydown={(e) => e.key === 'Enter' && uploadInput?.click()}
+    on:keydown={e => e.key === 'Enter' && uploadInput?.click()}
   >
     <div class="upload-content">
       {#if state.uploadProgress}
@@ -198,21 +199,16 @@
             <span class="status">{state.uploadProgress.status}</span>
           </div>
           <div class="progress-bar">
-            <div 
-              class="progress-fill" 
-              style="width: {state.uploadProgress.progress}%"
-            ></div>
+            <div class="progress-fill" style="width: {state.uploadProgress.progress}%"></div>
           </div>
         </div>
       {:else}
         <div class="upload-icon">📁</div>
         <p class="upload-text">
-          Drag & drop JavaScript files here<br>
+          Drag & drop JavaScript files here<br />
           or click to browse
         </p>
-        <p class="upload-hint">
-          Supported: .js files up to 50MB
-        </p>
+        <p class="upload-hint">Supported: .js files up to 50MB</p>
       {/if}
     </div>
   </div>
@@ -250,12 +246,8 @@
         />
       </div>
       <div class="confirmation-actions">
-        <button class="btn btn-primary" on:click={confirmImport}>
-          Import Extension
-        </button>
-        <button class="btn btn-secondary" on:click={cancelImport}>
-          Cancel
-        </button>
+        <button class="btn btn-primary" on:click={confirmImport}> Import Extension </button>
+        <button class="btn btn-secondary" on:click={cancelImport}> Cancel </button>
       </div>
     </div>
   {/if}
@@ -263,16 +255,12 @@
   <!-- Quick Actions for Demo -->
   <div class="quick-actions">
     <h4>Quick Demo Actions</h4>
-    
+
     <div class="action-group">
       <h5>Upload Sample Extensions</h5>
       <div class="quick-buttons">
-        <button class="btn btn-small" on:click={() => quickUpload('lodash')}>
-          Lodash
-        </button>
-        <button class="btn btn-small" on:click={() => quickUpload('d3')}>
-          D3.js
-        </button>
+        <button class="btn btn-small" on:click={() => quickUpload('lodash')}> Lodash </button>
+        <button class="btn btn-small" on:click={() => quickUpload('d3')}> D3.js </button>
         <button class="btn btn-small" on:click={() => quickUpload('highlight')}>
           Highlight.js
         </button>
@@ -282,22 +270,13 @@
     <div class="action-group">
       <h5>Import Sample EPUBs</h5>
       <div class="epub-buttons">
-        <button 
-          class="btn btn-small"
-          on:click={() => importSampleEPUB('MARKDOWN_BOOK')}
-        >
+        <button class="btn btn-small" on:click={() => importSampleEPUB('MARKDOWN_BOOK')}>
           Markdown Book
         </button>
-        <button 
-          class="btn btn-small"
-          on:click={() => importSampleEPUB('MUSIC_BOOK')}
-        >
+        <button class="btn btn-small" on:click={() => importSampleEPUB('MUSIC_BOOK')}>
           Music Book
         </button>
-        <button 
-          class="btn btn-small"
-          on:click={() => importSampleEPUB('DATA_VIZ_BOOK')}
-        >
+        <button class="btn btn-small" on:click={() => importSampleEPUB('DATA_VIZ_BOOK')}>
           Data Viz Book
         </button>
       </div>
@@ -512,7 +491,6 @@
   .btn-primary {
     background: var(--color-accent);
     border-color: var(--color-accent);
-    color: white;
   }
 
   .btn-primary:hover {

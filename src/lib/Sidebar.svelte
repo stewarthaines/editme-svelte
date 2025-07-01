@@ -10,7 +10,7 @@
     { id: 'workspace', icon: '🏠', label: 'Workspace' },
     { id: 'metadata', icon: '📄', label: 'Metadata' },
     { id: 'manifest', icon: '📋', label: 'Manifest' },
-    { id: 'nav', icon: '📖', label: 'Navigation' },
+    { id: 'navigation', icon: '📖', label: 'Navigation' },
     { id: 'spine', icon: '📖', label: 'Spine Items' },
     { id: 'settings', icon: '⚙️', label: 'Settings' },
   ] as const;
@@ -50,10 +50,7 @@
         aria-current={activeSection === section.id ? 'page' : undefined}
         title={section.label}
       >
-        <span class="section-icon">{section.icon}</span>
-        {#if isExpanded}
-          <span class="section-label">{section.label}</span>
-        {/if}
+        <span class="section-label">{section.label}</span>
       </button>
     {/each}
   </nav>
@@ -66,8 +63,8 @@
         <slot name="sidebar-metadata" />
       {:else if activeSection === 'manifest'}
         <slot name="sidebar-manifest" />
-      {:else if activeSection === 'nav'}
-        <slot name="sidebar-nav" />
+      {:else if activeSection === 'navigation'}
+        <slot name="sidebar-navigation" />
       {:else if activeSection === 'spine'}
         <slot name="sidebar-spine" />
       {:else if activeSection === 'settings'}
@@ -83,7 +80,7 @@
     --sidebar-collapsed-width: 48px;
 
     inline-size: 100%; /* Using logical properties */
-    background: var(--color-bg-secondary); /* Using design tokens */
+    background: var(--color-sidebar-bg); /* Use semantic sidebar background */
     border-inline-end: 1px solid var(--color-border-default); /* Using logical properties and tokens */
     display: flex;
     flex-direction: column;
@@ -98,8 +95,8 @@
   .sidebar-header {
     display: flex;
     align-items: center;
-    padding-block: var(--space-3); /* Using logical properties and spacing tokens */
-    padding-inline: var(--space-3);
+    padding-block: var(--space-2); /* Tighter spacing */
+    padding-inline: var(--space-2);
     border-block-end: 1px solid var(--color-border-default); /* Using logical properties and tokens */
     background: var(--color-bg-primary); /* Using design tokens */
     flex-shrink: 0;
@@ -134,64 +131,71 @@
   }
 
   .sidebar-title {
-    margin-block: 0; /* Using logical properties */
-    margin-inline: 0 0 0 var(--space-3); /* Using logical properties and spacing tokens */
-    font-size: var(--text-lg); /* Using typography tokens */
-    font-weight: var(--font-semibold);
+    margin: 0; /* Simple reset */
+    margin-inline-start: var(--space-2);
+    font-size: var(--text-base); /* Smaller, like Craigslist */
+    font-weight: var(--font-normal);
     color: var(--color-text-primary); /* Using design tokens */
   }
 
   .sidebar-nav {
-    padding-block: var(--space-2) 0; /* Using logical properties and spacing tokens */
+    padding-block: var(--space-1) 0; /* Minimal spacing */
     padding-inline: 0;
     flex-shrink: 0;
   }
 
   .sidebar-section {
     inline-size: 100%; /* Using logical properties */
-    background: none;
+    background: transparent;
     border: none;
     display: flex;
     align-items: center;
-    padding-block: var(--space-3); /* Using logical properties and spacing tokens */
-    padding-inline: var(--space-3);
+    padding-block: var(--space-1-5); /* Tighter spacing like Craigslist */
+    padding-inline: var(--space-2);
     cursor: pointer;
-    transition: background-color var(--duration-fast) ease; /* Using motion tokens */
+    transition: background-color 0.1s ease; /* Faster transition */
     text-align: start; /* Using logical properties */
-    color: var(--color-text-secondary); /* Using design tokens */
-    min-block-size: var(--touch-target-min); /* Using accessibility tokens */
+    color: var(--color-text-link); /* Blue link color */
+    min-block-size: 32px; /* Smaller height */
+    font-size: var(--text-base);
+    outline: none;
   }
 
   .sidebar-section:hover {
-    background: var(--color-interactive-secondary-hover); /* Using design tokens */
-    color: var(--color-text-primary);
+    text-decoration: underline; /* Craigslist style hover */
+  }
+
+  .sidebar-section:hover:not(.active) {
+    background: var(--color-sidebar-item-hover); /* Use semantic token */
   }
 
   .sidebar-section:focus-visible {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus); /* Using accessibility tokens */
-    outline-offset: calc(-1 * var(--focus-ring-offset));
+    outline: 2px solid var(--color-border-focus); /* Use semantic focus color */
+    outline-offset: -2px;
+    background: var(--color-sidebar-item-hover); /* Use semantic token */
+  }
+
+  .sidebar-section:focus-visible.active {
+    background: var(--color-sidebar-item-active); /* Keep active background on focus */
   }
 
   .sidebar-section.active {
-    background: var(--color-bg-accent); /* Using design tokens */
-    color: var(--color-text-accent);
-    border-inline-end: 3px solid var(--color-border-accent); /* Using logical properties and tokens */
+    background: var(--color-sidebar-item-active); /* Use semantic token */
+    color: var(--color-text-primary);
+    font-weight: var(--font-normal);
+  }
+
+  .sidebar-section.active .section-label {
+    text-decoration: none; /* Remove underline for active state */
   }
 
   .section-icon {
-    font-size: var(--text-lg); /* Using typography tokens */
-    inline-size: 24px; /* Using logical properties */
-    block-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    display: none; /* Hide icons for Craigslist style */
   }
 
   .section-label {
-    margin-inline-start: var(--space-3); /* Using logical properties and spacing tokens */
-    font-size: var(--text-sm); /* Using typography tokens */
-    font-weight: var(--font-medium);
+    font-size: var(--text-base); /* Using typography tokens */
+    font-weight: var(--font-normal);
   }
 
   .sidebar-content {
@@ -234,18 +238,18 @@
     .sidebar {
       border-inline-end: 2px solid var(--color-forced-border);
     }
-    
+
     .sidebar-header {
       border-block-end: 2px solid var(--color-forced-border);
     }
-    
+
     .sidebar-section.active {
       border-inline-end: 4px solid var(--color-forced-active);
     }
   }
 
   /* RTL support - icons that need direction flipping */
-  [dir="rtl"] .sidebar-toggle {
+  [dir='rtl'] .sidebar-toggle {
     transform: scaleX(-1);
   }
 </style>

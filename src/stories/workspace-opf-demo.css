@@ -120,7 +120,6 @@
 
 .btn-primary {
   background: #007acc;
-  color: white;
 }
 
 .btn-primary:hover:not(:disabled) {

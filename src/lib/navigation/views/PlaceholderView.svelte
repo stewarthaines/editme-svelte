@@ -16,7 +16,7 @@
     if (data) {
       viewData = { ...viewData, ...data };
     }
-    
+
     // Restore saved data
     const saved = navigationStore.getViewData(viewType as any);
     if (saved) {
@@ -46,7 +46,7 @@
   onMount(() => {
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
-    
+
     // Call onViewEnter
     onViewEnter();
   });
@@ -56,7 +56,7 @@
     if (guardId) {
       navigationStore.removeNavigationGuard(guardId);
     }
-    
+
     // Call onViewLeave
     onViewLeave();
   });
@@ -79,7 +79,7 @@
         <p>{description}</p>
       </div>
     </div>
-    
+
     {#if comingSoon}
       <div class="coming-soon-badge">
         <span class="badge-text">Phase 3</span>
@@ -92,7 +92,7 @@
       <div class="placeholder-icon">
         <span class="large-icon">{icon}</span>
       </div>
-      
+
       <h3>Coming Soon</h3>
       <p class="placeholder-description">
         The {title.toLowerCase()} interface will be implemented in Phase 3 of the EDITME development.
@@ -134,20 +134,14 @@
       <div class="demo-actions">
         <h4>Navigation Demo:</h4>
         <div class="action-buttons">
-          <button 
-            class="btn btn-primary" 
-            on:click={() => handleAction('demo_action_1')}
-          >
+          <button class="btn btn-primary" on:click={() => handleAction('demo_action_1')}>
             Demo Action 1
           </button>
-          <button 
-            class="btn btn-secondary" 
-            on:click={() => handleAction('demo_action_2')}
-          >
+          <button class="btn btn-secondary" on:click={() => handleAction('demo_action_2')}>
             Demo Action 2
           </button>
-          <button 
-            class="btn btn-secondary" 
+          <button
+            class="btn btn-secondary"
             on:click={() => navigationStore.navigateTo('workspace')}
           >
             Back to Workspace
@@ -158,7 +152,11 @@
       {#if viewData.lastAction}
         <div class="last-action">
           <span class="action-icon">✨</span>
-          <span>Last action: {viewData.lastAction} at {new Date(viewData.actionTime).toLocaleTimeString()}</span>
+          <span
+            >Last action: {viewData.lastAction} at {new Date(
+              viewData.actionTime
+            ).toLocaleTimeString()}</span
+          >
         </div>
       {/if}
     </div>
@@ -317,8 +315,8 @@
   }
 
   .btn-primary {
-    background-color: var(--color-accent);
-    color: white;
+    /* background-color: var(--color-accent-dark); */
+    color: var(--color-text-inverse);
   }
 
   .btn-primary:hover {

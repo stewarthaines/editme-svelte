@@ -1,6 +1,6 @@
 <!--
   ExtensionDetails Component
-  
+
   Displays detailed information about a selected extension including
   file list, sizes, types, and available actions.
 -->
@@ -25,18 +25,24 @@
   // Get file type icon
   function getFileTypeIcon(fileType: string): string {
     switch (fileType) {
-      case 'javascript': return '📄';
-      case 'license': return '📜';
-      default: return '📎';
+      case 'javascript':
+        return '📄';
+      case 'license':
+        return '📜';
+      default:
+        return '📎';
     }
   }
 
   // Get file type description
   function getFileTypeDescription(fileType: string): string {
     switch (fileType) {
-      case 'javascript': return 'JavaScript Library';
-      case 'license': return 'License File';
-      default: return 'Unknown File Type';
+      case 'javascript':
+        return 'JavaScript Library';
+      case 'license':
+        return 'License File';
+      default:
+        return 'Unknown File Type';
     }
   }
 
@@ -55,42 +61,49 @@
   // Get category description
   function getCategoryDescription(category: string): string {
     switch (category) {
-      case 'Text Processing': return 'Libraries for processing and rendering text content';
-      case 'Syntax Highlighting': return 'Libraries for highlighting code syntax';
-      case 'Data Visualization': return 'Libraries for creating charts and graphs';
-      case 'Utilities': return 'General-purpose utility libraries';
-      case 'Math': return 'Libraries for rendering mathematical expressions';
-      case 'Music Notation': return 'Libraries for rendering musical notation';
-      default: return 'Miscellaneous JavaScript library';
+      case 'Text Processing':
+        return 'Libraries for processing and rendering text content';
+      case 'Syntax Highlighting':
+        return 'Libraries for highlighting code syntax';
+      case 'Data Visualization':
+        return 'Libraries for creating charts and graphs';
+      case 'Utilities':
+        return 'General-purpose utility libraries';
+      case 'Math':
+        return 'Libraries for rendering mathematical expressions';
+      case 'Music Notation':
+        return 'Libraries for rendering musical notation';
+      default:
+        return 'Miscellaneous JavaScript library';
     }
   }
 
   // Handle extension actions
   function handleDelete() {
     if (!extension) return;
-    
+
     dispatch('extensionAction', {
       action: 'delete',
       extensionName: extension.name,
-      location: extension.location
+      location: extension.location,
     });
   }
 
   function handleExport() {
     if (!extension) return;
-    
+
     // Simulate extension export
     const exportData = {
       name: extension.name,
       files: extension.files,
       totalSize: extension.totalSize,
-      exportedAt: new Date().toISOString()
+      exportedAt: new Date().toISOString(),
     };
-    
+
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json'
+      type: 'application/json',
     });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -103,26 +116,34 @@
 
   function handleCache() {
     if (!extension) return;
-    
+
     dispatch('extensionAction', {
       action: 'cache',
-      extensionName: extension.name
+      extensionName: extension.name,
     });
   }
 
   // Calculate file type distribution
-  $: fileTypeDistribution = extension ? 
-    extension.files.reduce((acc, file) => {
-      acc[file.type] = (acc[file.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>) : {};
+  $: fileTypeDistribution = extension
+    ? extension.files.reduce(
+        (acc, file) => {
+          acc[file.type] = (acc[file.type] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      )
+    : {};
 
   // Calculate size distribution
-  $: sizeDistribution = extension ?
-    extension.files.reduce((acc, file) => {
-      acc[file.type] = (acc[file.type] || 0) + file.size;
-      return acc;
-    }, {} as Record<string, number>) : {};
+  $: sizeDistribution = extension
+    ? extension.files.reduce(
+        (acc, file) => {
+          acc[file.type] = (acc[file.type] || 0) + file.size;
+          return acc;
+        },
+        {} as Record<string, number>
+      )
+    : {};
 </script>
 
 <div class="extension-details">
@@ -135,12 +156,16 @@
           <span class="category-badge">
             {getExtensionCategory(extension)}
           </span>
-          <span class="location-badge" class:workspace={extension.location === 'workspace'} class:cache={extension.location === 'cache'}>
+          <span
+            class="location-badge"
+            class:workspace={extension.location === 'workspace'}
+            class:cache={extension.location === 'cache'}
+          >
             {extension.location}
           </span>
         </div>
       </div>
-      
+
       <div class="extension-summary">
         <div class="summary-item">
           <span class="summary-value">{extension.files.length}</span>
@@ -175,9 +200,7 @@
               </div>
             </div>
             <div class="file-actions">
-              <button class="file-action-btn" title="Download file">
-                ⬇️
-              </button>
+              <button class="file-action-btn" title="Download file"> ⬇️ </button>
             </div>
           </div>
         {/each}
@@ -206,18 +229,12 @@
       <h4>Actions</h4>
       <div class="action-buttons">
         {#if extension.location === 'workspace'}
-          <button class="btn btn-primary" on:click={handleCache}>
-            Cache Extension
-          </button>
+          <button class="btn btn-primary" on:click={handleCache}> Cache Extension </button>
         {/if}
-        
-        <button class="btn btn-secondary" on:click={handleExport}>
-          Export Extension
-        </button>
-        
-        <button class="btn btn-danger" on:click={handleDelete}>
-          Delete Extension
-        </button>
+
+        <button class="btn btn-secondary" on:click={handleExport}> Export Extension </button>
+
+        <button class="btn btn-danger" on:click={handleDelete}> Delete Extension </button>
       </div>
     </div>
 
@@ -253,14 +270,13 @@
         </div>
       </div>
     </div>
-
   {:else}
     <!-- Empty State -->
     <div class="empty-details">
       <div class="empty-icon">📦</div>
       <h3>No Extension Selected</h3>
       <p>Select an extension from the browser to view detailed information.</p>
-      
+
       <div class="selection-tips">
         <h4>What you can see here:</h4>
         <ul>
@@ -554,7 +570,6 @@
   .btn-primary {
     background: var(--color-accent);
     border-color: var(--color-accent);
-    color: white;
   }
 
   .btn-secondary {

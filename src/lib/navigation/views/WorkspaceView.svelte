@@ -8,7 +8,7 @@
     selectedWorkspace: null,
     recentWorkspaces: [],
   };
-  
+
   let guardId: string;
   let hasUnsavedChanges = false;
 
@@ -17,7 +17,7 @@
     if (data) {
       viewData = { ...viewData, ...data };
     }
-    
+
     // Restore saved data
     const saved = navigationStore.getViewData<WorkspaceViewData>('workspace');
     if (saved) {
@@ -49,7 +49,7 @@
   onMount(() => {
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
-    
+
     // Call onViewEnter
     onViewEnter();
   });
@@ -59,7 +59,7 @@
     if (guardId) {
       navigationStore.removeNavigationGuard(guardId);
     }
-    
+
     // Call onViewLeave
     onViewLeave();
   });
@@ -92,12 +92,7 @@
         <div class="current-workspace">
           <span class="workspace-icon">📁</span>
           <span class="workspace-name">{viewData.selectedWorkspace}</span>
-          <button 
-            on:click={() => selectWorkspace('')}
-            class="btn btn-secondary"
-          >
-            Close
-          </button>
+          <button on:click={() => selectWorkspace('')} class="btn btn-secondary"> Close </button>
         </div>
       {:else}
         <div class="no-workspace">
@@ -114,10 +109,7 @@
         <ul class="recent-list">
           {#each viewData.recentWorkspaces as workspaceId}
             <li class="recent-item">
-              <button 
-                on:click={() => selectWorkspace(workspaceId)}
-                class="recent-workspace"
-              >
+              <button on:click={() => selectWorkspace(workspaceId)} class="recent-workspace">
                 <span class="workspace-icon">📁</span>
                 <span class="workspace-name">{workspaceId}</span>
                 <span class="workspace-date">Last opened: Recently</span>
@@ -306,7 +298,6 @@
 
   .btn-primary {
     background-color: var(--color-accent);
-    color: white;
   }
 
   .btn-primary:hover {

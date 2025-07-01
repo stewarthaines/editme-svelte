@@ -4,14 +4,17 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 1rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 .demo-header {
   text-align: center;
   margin-bottom: 2rem;
   padding: 1rem;
-  background: var(--color-bg-secondary, #f8f9fa);
+  background: var(--color-bg-tertiary, #f8f9fa);
   border-radius: 8px;
 }
 
@@ -23,7 +26,6 @@
 
 .demo-header p {
   margin: 0;
-  color: var(--color-text-secondary, #666);
   font-size: 0.9rem;
 }
 
@@ -80,7 +82,6 @@
 
 .btn-primary {
   background: var(--color-accent, #007acc);
-  color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -125,13 +126,12 @@ button:disabled {
   font-size: 1rem;
 }
 
-.upload-section input[type="file"] {
+.upload-section input[type='file'] {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border: 1px solid var(--color-border-default, #e0e0e0);
   border-radius: 4px;
-  background: white;
 }
 
 /* Reset Section */
@@ -290,7 +290,6 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background: white;
   border: 1px solid var(--color-border-default, #e0e0e0);
   border-radius: 4px;
   font-size: 0.85rem;
@@ -305,7 +304,6 @@ button:disabled {
 }
 
 .file-item.epub-file {
-  background: var(--color-primary-bg, #f0f8ff);
   color: var(--color-primary, #0066cc);
 }
 
@@ -347,11 +345,22 @@ button:disabled {
   margin-top: 0.2rem;
 }
 
-.file-type.type-settings { background: #28a745; }
-.file-type.type-text { background: #007bff; }
-.file-type.type-script { background: #ffc107; color: #000; }
-.file-type.type-extension { background: #6f42c1; }
-.file-type.type-other { background: #6c757d; }
+.file-type.type-settings {
+  background: #28a745;
+}
+.file-type.type-text {
+  background: #007bff;
+}
+.file-type.type-script {
+  background: #ffc107;
+  color: #000;
+}
+.file-type.type-extension {
+  background: #6f42c1;
+}
+.file-type.type-other {
+  background: #6c757d;
+}
 
 .file-size {
   font-family: monospace;
@@ -458,22 +467,18 @@ button:disabled {
 }
 
 .log-entry.log-info {
-  background: var(--color-info-bg, #d1ecf1);
   color: var(--color-info, #0c5460);
 }
 
 .log-entry.log-success {
-  background: var(--color-success-bg, #d4edda);
   color: var(--color-success, #155724);
 }
 
 .log-entry.log-error {
-  background: var(--color-danger-bg, #f8d7da);
   color: var(--color-danger, #721c24);
 }
 
 .log-entry.log-action {
-  background: var(--color-warning-bg, #fff3cd);
   color: var(--color-warning, #856404);
 }
 
@@ -493,13 +498,13 @@ button:disabled {
   .demo-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .metadata-grid,
   .stats-grid,
   .analysis-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .button-group {
     flex-direction: column;
   }

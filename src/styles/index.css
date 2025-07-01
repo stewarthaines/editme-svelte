@@ -1,0 +1,19 @@
+/*
+  Main CSS Entry Point
+  
+  This file imports all design system components in the correct order.
+  Import this file in your main application CSS or component.
+*/
+
+/* 1. Design Tokens - Foundation */
+@import './tokens/index.css';
+
+/* 2. Themes - Light/Dark mode support */
+@import './themes/index.css';
+
+/* 3. Utility Classes - Atomic utilities */
+@import './utilities/layout.css';
+@import './utilities/forms.css';
+
+/* 4. Global Styles - Base element resets */
+@import './global.css';

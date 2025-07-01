@@ -1,6 +1,6 @@
 <!--
   ExtensionBrowser Component
-  
+
   Provides tabbed interface for browsing workspace and cached extensions
   with search, filtering, and batch operation capabilities.
 -->
@@ -33,9 +33,8 @@
   $: filteredCachedExtensions = filterAndSortExtensions(cachedExtensions);
 
   // Current extensions based on active tab
-  $: currentExtensions = activeTab === 'workspace' 
-    ? filteredWorkspaceExtensions 
-    : filteredCachedExtensions;
+  $: currentExtensions =
+    activeTab === 'workspace' ? filteredWorkspaceExtensions : filteredCachedExtensions;
 
   function filterAndSortExtensions(extensions: ExtensionInfo[]): ExtensionInfo[] {
     let filtered = extensions;
@@ -43,9 +42,10 @@
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(ext => 
-        ext.name.toLowerCase().includes(query) ||
-        ext.files.some(file => file.filename.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        ext =>
+          ext.name.toLowerCase().includes(query) ||
+          ext.files.some(file => file.filename.toLowerCase().includes(query))
       );
     }
 
@@ -77,7 +77,7 @@
     // Apply sorting
     filtered.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'name':
           comparison = a.name.localeCompare(b.name);
@@ -92,7 +92,7 @@
           comparison = aType.localeCompare(bType);
           break;
       }
-      
+
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
@@ -110,9 +110,9 @@
   }
 
   function handleDeleteExtension(extension: ExtensionInfo) {
-    dispatch('extensionDelete', { 
-      extensionName: extension.name, 
-      location: activeTab 
+    dispatch('extensionDelete', {
+      extensionName: extension.name,
+      location: activeTab,
     });
   }
 
@@ -136,12 +136,12 @@
 
   function handleBatchOperation(operation: string) {
     if (selectedExtensions.size === 0) return;
-    
+
     dispatch('batchOperation', {
       operation,
-      extensions: Array.from(selectedExtensions)
+      extensions: Array.from(selectedExtensions),
     });
-    
+
     clearSelection();
   }
 
@@ -180,13 +180,20 @@
   function getExtensionIcon(extension: ExtensionInfo): string {
     const category = getExtensionCategory(extension);
     switch (category) {
-      case 'Text Processing': return '📝';
-      case 'Syntax Highlighting': return '🎨';
-      case 'Data Visualization': return '📊';
-      case 'Utilities': return '🔧';
-      case 'Math': return '🧮';
-      case 'Music Notation': return '🎵';
-      default: return '📦';
+      case 'Text Processing':
+        return '📝';
+      case 'Syntax Highlighting':
+        return '🎨';
+      case 'Data Visualization':
+        return '📊';
+      case 'Utilities':
+        return '🔧';
+      case 'Math':
+        return '🧮';
+      case 'Music Notation':
+        return '🎵';
+      default:
+        return '📦';
     }
   }
 </script>
@@ -194,20 +201,20 @@
 <div class="extension-browser">
   <div class="browser-header">
     <h3>Extension Browser</h3>
-    
+
     <!-- Tab Navigation -->
     <div class="tab-nav">
-      <button 
+      <button
         class="tab-button"
         class:active={activeTab === 'workspace'}
-        on:click={() => activeTab = 'workspace'}
+        on:click={() => (activeTab = 'workspace')}
       >
         Workspace ({workspaceExtensions.length})
       </button>
-      <button 
+      <button
         class="tab-button"
         class:active={activeTab === 'cache'}
-        on:click={() => activeTab = 'cache'}
+        on:click={() => (activeTab = 'cache')}
       >
         Global Cache ({cachedExtensions.length})
       </button>
@@ -235,18 +242,18 @@
       </select>
 
       <div class="view-controls">
-        <button 
+        <button
           class="view-button"
           class:active={viewMode === 'grid'}
-          on:click={() => viewMode = 'grid'}
+          on:click={() => (viewMode = 'grid')}
           title="Grid view"
         >
           ⊞
         </button>
-        <button 
+        <button
           class="view-button"
           class:active={viewMode === 'list'}
-          on:click={() => viewMode = 'list'}
+          on:click={() => (viewMode = 'list')}
           title="List view"
         >
           ☰
@@ -258,21 +265,21 @@
   <!-- Sort Controls -->
   <div class="sort-controls">
     <span class="sort-label">Sort by:</span>
-    <button 
+    <button
       class="sort-button"
       class:active={sortBy === 'name'}
       on:click={() => handleSort('name')}
     >
       Name {sortBy === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
     </button>
-    <button 
+    <button
       class="sort-button"
       class:active={sortBy === 'size'}
       on:click={() => handleSort('size')}
     >
       Size {sortBy === 'size' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
     </button>
-    <button 
+    <button
       class="sort-button"
       class:active={sortBy === 'type'}
       on:click={() => handleSort('type')}
@@ -288,31 +295,27 @@
         <span class="selection-count">
           {selectedExtensions.size} of {currentExtensions.length} selected
         </span>
-        <button class="btn btn-small" on:click={selectAllExtensions}>
-          Select All
-        </button>
-        <button class="btn btn-small" on:click={clearSelection}>
-          Clear
-        </button>
+        <button class="btn btn-small" on:click={selectAllExtensions}> Select All </button>
+        <button class="btn btn-small" on:click={clearSelection}> Clear </button>
       </div>
 
       {#if selectedExtensions.size > 0}
         <div class="batch-actions">
           {#if activeTab === 'workspace'}
-            <button 
+            <button
               class="btn btn-small btn-primary"
               on:click={() => handleBatchOperation('cache')}
             >
               Cache Selected ({selectedExtensions.size})
             </button>
-            <button 
+            <button
               class="btn btn-small btn-danger"
               on:click={() => handleBatchOperation('delete')}
             >
               Delete Selected
             </button>
           {:else}
-            <button 
+            <button
               class="btn btn-small btn-danger"
               on:click={() => handleBatchOperation('delete')}
             >
@@ -325,7 +328,11 @@
   {/if}
 
   <!-- Extensions Grid/List -->
-  <div class="extension-list" class:grid-view={viewMode === 'grid'} class:list-view={viewMode === 'list'}>
+  <div
+    class="extension-list"
+    class:grid-view={viewMode === 'grid'}
+    class:list-view={viewMode === 'list'}
+  >
     {#if currentExtensions.length === 0}
       <div class="empty-state">
         <div class="empty-icon">📦</div>
@@ -340,16 +347,21 @@
       </div>
     {:else}
       {#each currentExtensions as extension (extension.name)}
-        <div 
+        <div
           class="extension-card"
           class:selected={selectedExtensions.has(extension.name)}
           on:click={() => handleExtensionClick(extension)}
           role="button"
           tabindex="0"
-          on:keydown={(e) => e.key === 'Enter' && handleExtensionClick(extension)}
+          on:keydown={e => e.key === 'Enter' && handleExtensionClick(extension)}
         >
           <!-- Selection checkbox -->
-          <div class="selection-checkbox" on:click|stopPropagation on:keydown={() => {}} role="none">
+          <div
+            class="selection-checkbox"
+            on:click|stopPropagation
+            on:keydown={() => {}}
+            role="none"
+          >
             <input
               type="checkbox"
               checked={selectedExtensions.has(extension.name)}
@@ -394,7 +406,7 @@
           <!-- Extension actions -->
           <div class="extension-actions">
             {#if activeTab === 'cache'}
-              <button 
+              <button
                 class="action-button"
                 on:click|stopPropagation={() => handleImportFromCache(extension)}
                 title="Import to workspace"
@@ -402,7 +414,7 @@
                 ⬇️
               </button>
             {/if}
-            <button 
+            <button
               class="action-button delete-button"
               on:click|stopPropagation={() => handleDeleteExtension(extension)}
               title="Delete extension"
@@ -610,7 +622,7 @@
     top: var(--space-2);
     left: var(--space-2);
   }
-  
+
   .selection-checkbox input {
     cursor: pointer;
   }
@@ -743,7 +755,6 @@
   .btn-primary {
     background: var(--color-accent);
     border-color: var(--color-accent);
-    color: white;
   }
 
   .btn-danger {

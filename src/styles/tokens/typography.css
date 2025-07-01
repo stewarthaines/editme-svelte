@@ -1,6 +1,6 @@
 /*
   Typography Design Tokens
-  
+
   This file defines the typography system including font families, sizes,
   weights, line heights, and letter spacing.
 */
@@ -10,34 +10,34 @@
      FONT FAMILIES
      ============================================ */
 
-  /* Primary font family - system fonts for best performance */
-  --font-sans: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  /* Primary font family - Craigslist-style system fonts */
+  --font-sans: Helvetica, Arial, sans-serif;
 
   /* Monospace font family - for code and technical content */
   --font-mono:
     'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 
-  /* Serif font family - for enhanced readability in content areas */
-  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  /* Serif font family - minimal serif stack */
+  --font-serif: Georgia, 'Times New Roman', Times, serif;
 
   /* ============================================
      FONT SIZES
      Modular scale based on 16px base with 1.25 ratio
      ============================================ */
 
-  --text-xs: 0.75rem; /* 12px */
-  --text-sm: 0.875rem; /* 14px */
-  --text-base: 1rem; /* 16px - base size */
-  --text-lg: 1.125rem; /* 18px */
-  --text-xl: 1.25rem; /* 20px */
-  --text-2xl: 1.5rem; /* 24px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-4xl: 2.25rem; /* 36px */
-  --text-5xl: 3rem; /* 48px */
-  --text-6xl: 3.75rem; /* 60px */
-  --text-7xl: 4.5rem; /* 72px */
-  --text-8xl: 6rem; /* 96px */
-  --text-9xl: 8rem; /* 128px */
+  --text-xs: 0.6875rem; /* 11px */
+  --text-sm: 0.8125rem; /* 13px */
+  --text-base: 0.875rem; /* 14px - base size */
+  --text-lg: 1rem; /* 16px */
+  --text-xl: 1.125rem; /* 18px */
+  --text-2xl: 1.25rem; /* 20px */
+  --text-3xl: 1.5rem; /* 24px */
+  --text-4xl: 1.875rem; /* 30px */
+  --text-5xl: 2.25rem; /* 36px */
+  --text-6xl: 3rem; /* 48px */
+  --text-7xl: 3.75rem; /* 60px */
+  --text-8xl: 4.5rem; /* 72px */
+  --text-9xl: 6rem; /* 96px */
 
   /* ============================================
      FONT WEIGHTS
@@ -59,11 +59,11 @@
      ============================================ */
 
   --leading-none: 1;
-  --leading-tight: 1.25;
-  --leading-snug: 1.375;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
-  --leading-loose: 2;
+  --leading-tight: 1.2;
+  --leading-snug: 1.3;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.5;
+  --leading-loose: 1.6;
 
   /* Specific line heights for different text sizes */
   --leading-xs: 1rem; /* 16px */
@@ -131,18 +131,18 @@
   --button-text-lg: var(--text-base);
   --button-text-md: var(--text-sm);
   --button-text-sm: var(--text-xs);
-  --button-font-weight: var(--font-medium);
+  --button-font-weight: var(--font-normal);
   --button-letter-spacing: var(--tracking-normal);
 
   /* Input typography */
-  --input-text-size: var(--text-sm);
+  --input-text-size: var(--text-base);
   --input-font-weight: var(--font-normal);
   --input-letter-spacing: var(--tracking-normal);
   --input-placeholder-weight: var(--font-normal);
 
   /* Navigation typography */
-  --nav-text-size: var(--text-sm);
-  --nav-font-weight: var(--font-medium);
+  --nav-text-size: var(--text-base);
+  --nav-font-weight: var(--font-normal);
   --nav-letter-spacing: var(--tracking-normal);
 
   /* Sidebar typography */
@@ -173,9 +173,9 @@
   --text-decoration-line-through: line-through;
 
   /* Link styling */
-  --link-text-decoration: none;
+  --link-text-decoration: underline;
   --link-text-decoration-hover: underline;
-  --link-underline-offset: 0.125em;
+  --link-underline-offset: 0.1em;
 
   /* ============================================
      TEXT TRANSFORM

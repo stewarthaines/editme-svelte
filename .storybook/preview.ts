@@ -1,4 +1,8 @@
 import type { Preview } from '@storybook/svelte-vite';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
+
+// Import the design system CSS
+import '../src/styles/index.css';
 
 const preview: Preview = {
   parameters: {
@@ -15,7 +19,27 @@ const preview: Preview = {
       // 'off' - skip a11y checks entirely
       test: 'todo',
     },
+
+    // Set backgrounds to match our theme colors
+    backgrounds: {
+      default: 'light',
+      values: [
+        { name: 'light', value: '#f0f0f0' },
+        { name: 'dark', value: '#222222' },
+      ],
+    },
   },
+
+  decorators: [
+    withThemeByDataAttribute({
+      themes: {
+        light: '',
+        dark: 'dark',
+      },
+      defaultTheme: 'light',
+      attributeName: 'data-theme',
+    }),
+  ],
 };
 
 export default preview;

@@ -1,6 +1,6 @@
 /**
  * Extension Manager Demo Styles
- * 
+ *
  * Demo-specific styling for the Extension Manager Storybook demonstration.
  * Provides consistent theming and responsive design across all components.
  */
@@ -48,7 +48,7 @@
 }
 
 /* Dark theme support */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --demo-bg-primary: #0f172a;
   --demo-bg-secondary: #1e293b;
   --demo-bg-tertiary: #334155;
@@ -165,7 +165,6 @@
 .demo-btn-primary {
   background: var(--demo-primary);
   border-color: var(--demo-primary);
-  color: white;
 }
 
 .demo-btn-primary:hover {
@@ -288,7 +287,8 @@
 }
 
 @keyframes demo-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -377,7 +377,7 @@ textarea:focus {
   .demo-card {
     border-width: 2px;
   }
-  
+
   .demo-btn {
     border-width: 2px;
     font-weight: var(--font-weight-bold);
@@ -391,7 +391,7 @@ textarea:focus {
   .demo-progress-fill {
     transition: none;
   }
-  
+
   .demo-fade-in,
   .demo-slide-in,
   .demo-pulse,
@@ -408,7 +408,7 @@ textarea:focus {
     background: transparent !important;
     color: #000 !important;
   }
-  
+
   .demo-card {
     border: 1px solid #000;
     box-shadow: none;
@@ -490,7 +490,7 @@ textarea:focus {
   z-index: 10;
 }
 
-[data-theme="dark"] .demo-loading::after {
+[data-theme='dark'] .demo-loading::after {
   background: rgba(0, 0, 0, 0.8);
 }
 
