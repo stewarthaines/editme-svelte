@@ -49,7 +49,7 @@ Plain text source → transformText.js → transformDom.js → XHTML → Preview
 - Multi-device preview (iPhone, iPad, Pixel phone variants)
 - Extensible transform scripts loaded from EPUB manifest
 - Accessibility-focused design
-- Internationalized including RTL
+- Reactive internationalization system with 7 languages and RTL support
 
 ## Development Phases
 
@@ -157,6 +157,46 @@ Complete design token system with utilities and themes for consistent styling. K
 ## ZIP Library
 
 Complete browser-native ZIP implementation for EPUB workflows. See `src/lib/zip/API.md` for full documentation.
+
+## Internationalization (i18n) System
+
+Complete reactive internationalization system supporting 7 languages with instant locale switching. Key features:
+
+- **Reactive Translations**: Uses Svelte stores for automatic UI updates when locale changes
+- **Multi-Language Support**: English, German, Arabic, Hebrew, Japanese, Georgian, Chinese Traditional
+- **RTL Layout**: Automatic layout direction switching for Arabic and Hebrew
+- **Storybook Integration**: Locale switcher in Storybook toolbar for testing translations
+- **Gettext Workflow**: Standard .po file workflow for translators
+- **ZIP Compression**: Compressed translation bundles for efficient loading
+
+### Usage Patterns
+
+**In Svelte Components:**
+```svelte
+<script>
+  import { t } from '$lib/i18n';
+</script>
+
+<!-- Reactive translation -->
+<h1>{$t('Welcome')}</h1>
+<p>{$t('Hello {name}', { name: 'User' })}</p>
+```
+
+**Non-Component Usage:**
+```typescript
+import { translate } from '$lib/i18n';
+
+// Non-reactive function for use outside components
+const message = translate('Save');
+```
+
+**RTL Detection:**
+```typescript
+import { documentDirection } from '$lib/i18n';
+// Reactive store: 'ltr' | 'rtl'
+```
+
+**Location**: All i18n code is in `src/lib/i18n/` with API documentation
 
 ## API Documentation Standards
 
@@ -371,3 +411,7 @@ Before considering a component complete:
 - **Interaction Style**
   - When planning under-specified work don't assume complexity but ask the user
   - When you ask the user questions ask them one at a time
+
+## Claude Interaction Memory
+
+- The user usually has Storybook running. If Claude wants a screenshot, ask the user

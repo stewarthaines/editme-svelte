@@ -4,6 +4,20 @@
 
 This project uses Storybook for component development, testing, and documentation. Beyond traditional UI components, we use Storybook to demonstrate and test backend features that don't have their own dedicated UI.
 
+## Global Storybook Features
+
+### Internationalization (i18n) Locale Switcher
+
+The Storybook toolbar includes a 🌍 globe icon for testing internationalization features:
+
+- **7 Languages**: English, German, Arabic, Hebrew, Japanese, Georgian, Chinese Traditional
+- **Instant Switching**: All components update reactively when locale changes
+- **RTL Support**: Automatic layout direction switching for Arabic and Hebrew
+- **Flag Indicators**: Demo translations show country flag prefixes for visual confirmation
+- **Testing**: Use to verify all UI text is properly internationalized
+
+**Usage**: Click the 🌍 globe icon in the toolbar and select any language to see live translation updates throughout all components.
+
 ## Backend Feature Demonstration Pattern
 
 ### When to Use This Pattern

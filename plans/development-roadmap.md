@@ -8,6 +8,7 @@ The core foundation is complete with full implementations:
 - File Storage API, EPUB Packing/Unpacking, Workspace & OPF Manager
 - Blob URL Manager, Layout System, Navigation Router, Theme System
 - SOURCE.zip Management, Transform Pipeline
+- **Internationalization System**: Reactive i18n with 7 languages, RTL support, and Storybook integration
 
 See individual feature specifications in `plans/features/` for implementation details.
 
