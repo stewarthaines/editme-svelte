@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TransformPipeline } from '../transform-pipeline.js';
 import { TransformError } from '../transform-error.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import { MockBlobUrlManager } from './mocks/blob-url-manager.mock.js';
 import { SAMPLE_CHAPTER_METADATA } from './fixtures/create-test-data.js';
 

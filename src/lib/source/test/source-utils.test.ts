@@ -8,7 +8,7 @@ import {
   calculateDirectoryStats,
   sanitizeSourcePath,
 } from '../source-utils.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import {
   createCompleteSourceStructure,
   createFileTypeTestData,
@@ -186,7 +186,7 @@ describe('source-utils', () => {
       const result = validateSettingsJson(invalidJson);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Invalid JSON syntax'));
+      expect(result.errors.some(error => error.includes('Invalid JSON syntax'))).toBe(true);
     });
 
     it('should validate required fields', () => {
@@ -235,15 +235,15 @@ describe('source-utils', () => {
       const result = validateSettingsJson(extraFields);
 
       expect(result.isValid).toBe(true); // Still valid, just warnings
-      expect(result.warnings).toContain(expect.stringContaining('unknown_field'));
-      expect(result.warnings).toContain(expect.stringContaining('another_unknown'));
+      expect(result.warnings.some(warning => warning.includes('unknown_field'))).toBe(true);
+      expect(result.warnings.some(warning => warning.includes('another_unknown'))).toBe(true);
     });
 
     it('should handle empty string', () => {
       const result = validateSettingsJson('');
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Empty settings'));
+      expect(result.errors.some(error => error.includes('Empty settings'))).toBe(true);
     });
 
     it('should handle null values correctly', () => {

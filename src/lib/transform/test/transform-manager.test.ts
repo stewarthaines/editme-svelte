@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TransformManager } from '../transform-manager.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import {
   createCompleteTransformWorkspace,
   createMinimalTransformWorkspace,

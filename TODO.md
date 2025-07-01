@@ -91,3 +91,91 @@ The EPUB editor now has a solid foundation with core functionality complete, inc
   - Filename sanitization minutiae
 
 **Note**: All skipped tests represent edge cases that don't affect core Extension Manager functionality. Re-evaluate these when team has capacity for optimization and edge case refinement.
+
+## Skipped Tests Analysis
+
+### Overview
+Found **29 skipped tests** across **15 test files** throughout the codebase. These fall into several categories requiring different approaches for resolution.
+
+### Settings Manager Tests (Awaiting Implementation)
+**3 entire test suites skipped** - These should be enabled once the Settings Manager is implemented:
+
+- `src/lib/settings/test/settings-manager.test.ts` - `describe.skip('Settings Manager Core')`
+- `src/lib/settings/test/integration.test.ts` - `describe.skip('Settings Manager Integration')`  
+- `src/lib/settings/test/validation.test.ts` - `describe.skip('Settings Validation')`
+
+### Browser API Limitation Tests
+**5 tests skipped** due to happy-dom limitations - May need Storybook testing or different approach:
+
+- `src/lib/workspace/test/dependency-tracker.test.ts`:
+  - `should extract @import dependencies using CSSOM` - CSSOM API not supported
+- `src/lib/navigation/navigation.test.ts`:
+  - `should work with real localStorage` - Integration test requiring real browser APIs
+- `src/lib/stores/theme.test.ts`:
+  - `should detect system dark mode preference` - matchMedia API limitation
+  - `should follow system preference when no saved preference` - matchMedia API limitation
+
+### Integration/Complex Workflow Tests  
+**8 tests skipped** - Complex scenarios requiring full browser environment:
+
+- `src/lib/navigation/navigation.test.ts`:
+  - `should integrate with view components visually` - Visual testing
+  - `should handle view transitions smoothly` - Browser animation testing
+- `src/lib/extensions/test/integration.test.ts`:
+  - `should handle conflict resolution in batch operations` - Complex workflow testing
+  - `should rollback on import failure` - Transaction rollback testing
+  - `should handle partial cache corruption gracefully` - Error recovery testing
+- `src/lib/i18n/test/integration.test.ts`:
+  - `describe.skip('i18n integration workflow')` - Full workflow testing
+  - `should complete full first-run extraction workflow` - Complex integration test
+- `src/lib/i18n/test/loader.test.ts`:
+  - `describe.skip('loadTranslations()')` - Entire section skipped
+  - `describe.skip('extractMessages()')` - Entire section skipped
+
+### Performance/Memory Tests
+**4 tests skipped** - Resource-intensive testing:
+
+- `src/lib/blob-url/test/xhtml-processing.test.ts`:
+  - `should throw capacity error when limit reached during processing` - Memory limit testing
+  - `should check capacity before processing` - Memory limit testing
+- `src/lib/extensions/test/utils.test.ts`:
+  - `should handle very large files` - Performance testing
+  - `should validate MIME types strictly` - MIME validation
+
+### Security/Validation Tests
+**4 tests skipped** - File security and validation:
+
+- `src/lib/extensions/test/utils.test.ts`:
+  - `should sanitize dangerous filenames` - Security testing
+  - `should preserve safe filenames` - Security testing
+  - `should validate file types correctly` - File type validation
+  - `should handle edge cases gracefully` - Edge case testing
+
+### XML/DOM Parsing Tests
+**5 tests skipped** - Complex parsing scenarios:
+
+- `src/lib/epub/opf-utils.test.ts`:
+  - `should parse required metadata fields` - XML/OPF parsing
+  - `should parse optional metadata fields` - XML/OPF parsing
+  - `should parse complete OPF document` - XML/OPF parsing
+- `src/lib/i18n/test/loader.test.ts`:
+  - `should return true when insufficient locale files` - File detection logic
+  - `should return false when version matches and all files present` - File detection logic
+  - `should return true on storage error` - Error handling
+  - `should extract translations from data URL` - Translation extraction
+
+### Optimization Tests
+**3 tests skipped** - Performance optimization features:
+
+- `src/lib/extensions/test/extension-manager.test.ts`:
+  - `should skip caching if extension already cached with same content` - Caching optimization
+- `src/lib/extensions/test/extension-cache.test.ts`:
+  - `should skip caching if extension already cached with same content` - Caching optimization
+- `src/lib/transform/test/transform-manager.test.ts`:
+  - `should detect syntax errors` - JavaScript syntax error detection
+
+### Priority for Re-enabling
+1. **High Priority**: Settings Manager tests (once implementation complete)
+2. **Medium Priority**: Integration/workflow tests (can be moved to Storybook)
+3. **Low Priority**: Browser API limitation tests (may require different testing approach)
+4. **Future**: Performance/security tests (when optimization becomes focus)

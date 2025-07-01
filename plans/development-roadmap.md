@@ -157,4 +157,16 @@ See individual feature specifications in `plans/features/` for implementation de
 - **Sequential Development**: Text Editor (13) → Error Handling (14) → Preview Features (15-16)
 - **Independent Features**: Navigation Editor (17), Storage Monitor (18), Audio Editor (19) can be implemented anytime
 
+## Performance Optimization
+
+### Bundle Size Optimization (Future Priority)
+**Current Status**: Single-file build is 201KB (130KB JS, 73KB CSS)
+- **CSS Design System Optimization**: Current CSS is 73KB (36% of bundle)
+  - Remove unused CSS selectors (build warns about 2 unused selectors)
+  - Optimize design token definitions and utility classes
+  - Consider CSS purging for unused styles
+  - Evaluate if full utility class library is needed
+- **JavaScript Optimization**: Consider code splitting for larger features
+- **Priority**: Low (implement when core features are complete)
+
 This roadmap ensures efficient development with clear priorities and satisfied dependencies.

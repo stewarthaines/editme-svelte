@@ -59,6 +59,6 @@ import './integration.test.js';
  * ✅ Real-world usage patterns
  */
 
-export * from './mocks/file-storage.mock.js';
+export * from '../../test/mocks/file-storage.mock.js';
 export * from './fixtures/create-test-data.js';
 export * from './fixtures/extension-samples.js';

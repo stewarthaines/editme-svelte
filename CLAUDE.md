@@ -172,17 +172,17 @@ Complete reactive internationalization system supporting 7 languages with instan
 ### Usage Patterns
 
 **In Svelte Components:**
+
 ```svelte
 <script>
   import { t } from '$lib/i18n';
 </script>
 
-<!-- Reactive translation -->
-<h1>{$t('Welcome')}</h1>
-<p>{$t('Hello {name}', { name: 'User' })}</p>
+<!-- Reactive translation --><h1>{$t('Welcome')}</h1><p>{$t('Hello {name}', { name: 'User' })}</p>
 ```
 
 **Non-Component Usage:**
+
 ```typescript
 import { translate } from '$lib/i18n';
 
@@ -191,6 +191,7 @@ const message = translate('Save');
 ```
 
 **RTL Detection:**
+
 ```typescript
 import { documentDirection } from '$lib/i18n';
 // Reactive store: 'ltr' | 'rtl'
@@ -415,3 +416,4 @@ Before considering a component complete:
 ## Claude Interaction Memory
 
 - The user usually has Storybook running. If Claude wants a screenshot, ask the user
+- the user is the system architecture expert. instead of searching the whole project try asking the user for guidance

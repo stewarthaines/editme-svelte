@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ExtensionManager } from '../extension-manager.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import {
   TEST_WORKSPACE_IDS,
   SAMPLE_EXTENSIONS,

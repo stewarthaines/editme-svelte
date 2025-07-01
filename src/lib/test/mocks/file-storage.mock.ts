@@ -1,11 +1,27 @@
 /**
- * Mock File Storage API for Extension Manager testing
+ * Shared Mock File Storage API for Testing
  * 
- * Provides controllable simulation of file operations with error injection
- * and state tracking for comprehensive test coverage.
+ * Comprehensive mock implementation of FileStorageAPI used across all feature modules.
+ * Provides controllable simulation of file operations with error injection, state tracking,
+ * and comprehensive test utilities.
+ * 
+ * Based on the most feature-rich implementation from extensions module, this shared mock
+ * eliminates code duplication while providing consistent testing capabilities.
+ * 
+ * Usage:
+ * ```typescript
+ * import { MockFileStorage, createMockFileStorage } from '../../../test/mocks/file-storage.mock.js';
+ * 
+ * // For class-based mocking with full control
+ * const mockStorage = new MockFileStorage();
+ * mockStorage.setFailureMode('read');
+ * 
+ * // For simple function-based mocking
+ * const mockStorage = createMockFileStorage();
+ * ```
  */
 
-import type { FileStorageAPI } from '$lib/storage';
+import type { FileStorageAPI } from '../storage/index.js';
 
 export interface MockFileEntry {
   path: string;
@@ -16,6 +32,16 @@ export interface MockFileEntry {
 
 export type FailureMode = 'read' | 'write' | 'list' | 'delete' | 'exists' | 'stats';
 
+/**
+ * Comprehensive mock implementation of FileStorageAPI
+ * 
+ * Features:
+ * - In-memory file storage simulation
+ * - Controllable error injection for testing failure scenarios
+ * - Operation counting for test verification
+ * - Rich helper methods for test setup and verification
+ * - Full compatibility with FileStorageAPI interface
+ */
 export class MockFileStorage implements Partial<FileStorageAPI> {
   private workspaces = new Map<string, Map<string, MockFileEntry>>();
   private failureMode: FailureMode | null = null;
@@ -25,16 +51,27 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     this.reset();
   }
 
+  /**
+   * Reset mock to initial state
+   * Clears all workspaces, failure modes, and operation counters
+   */
   reset(): void {
     this.workspaces.clear();
     this.failureMode = null;
     this.operationCount = 0;
   }
 
+  /**
+   * Set failure mode for testing error scenarios
+   * @param mode - Type of operation to fail, or null to disable failures
+   */
   setFailureMode(mode: FailureMode | null): void {
     this.failureMode = mode;
   }
 
+  /**
+   * Get total number of operations performed (for test verification)
+   */
   getOperationCount(): number {
     return this.operationCount;
   }
@@ -90,7 +127,7 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
   async readFile(workspaceId: string, path: string): Promise<ArrayBuffer> {
     this.operationCount++;
     if (this.failureMode === 'read') {
-      throw new Error('Failed to read file');
+      throw new Error(`Failed to read file: ${path}`);
     }
 
     const workspace = this.getWorkspace(workspaceId);
@@ -111,6 +148,10 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     return new TextDecoder().decode(buffer);
   }
 
+  async readTextFile(workspaceId: string, path: string): Promise<string> {
+    return this.readFileAsText(workspaceId, path);
+  }
+
   async fileExists(workspaceId: string, path: string): Promise<boolean> {
     this.operationCount++;
     if (this.failureMode === 'exists') {
@@ -119,6 +160,10 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
 
     const workspace = this.workspaces.get(workspaceId);
     return workspace ? workspace.has(path) : false;
+  }
+
+  async workspaceExists(workspaceId: string): Promise<boolean> {
+    return this.workspaces.has(workspaceId);
   }
 
   async listFiles(workspaceId: string, directory?: string): Promise<string[]> {
@@ -156,6 +201,10 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     };
   }
 
+  async getFileStats(workspaceId: string, path: string): Promise<{ size: number; lastModified: Date }> {
+    return this.getFileInfo(workspaceId, path);
+  }
+
   async deleteFile(workspaceId: string, path: string): Promise<void> {
     this.operationCount++;
     if (this.failureMode === 'delete') {
@@ -169,8 +218,31 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     workspace.delete(path);
   }
 
-  // Utility methods for testing
-  addTestFiles(workspaceId: string, files: Record<string, string | ArrayBuffer>): Promise<void> {
+  // System methods for compatibility
+  async init(): Promise<void> {
+    // No-op for mock
+  }
+
+  isInitialized(): boolean {
+    return true;
+  }
+
+  destroy(): void {
+    this.reset();
+  }
+
+  async getQuota(): Promise<{ used: number; available: number }> {
+    return { used: 0, available: 1000000 };
+  }
+
+  // Test utility methods
+  
+  /**
+   * Add multiple files at once for test setup
+   * @param workspaceId - Target workspace
+   * @param files - Map of file paths to content
+   */
+  async addTestFiles(workspaceId: string, files: Record<string, string | ArrayBuffer>): Promise<void> {
     const workspace = this.ensureWorkspace(workspaceId);
     
     for (const [path, content] of Object.entries(files)) {
@@ -185,18 +257,49 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
         lastModified: new Date()
       });
     }
-
-    return Promise.resolve();
   }
 
+  /**
+   * Get all files in a workspace for test verification
+   * @param workspaceId - Target workspace
+   * @returns Map of file paths to mock file entries
+   */
   getWorkspaceFiles(workspaceId: string): Map<string, MockFileEntry> {
     return this.workspaces.get(workspaceId) || new Map();
   }
 
+  /**
+   * Get all files for verification (from original source/transform mocks)
+   * @param workspaceId - Target workspace  
+   * @returns Map of file paths to ArrayBuffer content
+   */
+  getAllFiles(workspaceId: string): Map<string, ArrayBuffer> | undefined {
+    const workspace = this.workspaces.get(workspaceId);
+    if (!workspace) return undefined;
+
+    const result = new Map<string, ArrayBuffer>();
+    for (const [path, entry] of workspace) {
+      if (typeof entry.content === 'string') {
+        result.set(path, new TextEncoder().encode(entry.content).buffer);
+      } else {
+        result.set(path, entry.content);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Check if workspace exists
+   * @param workspaceId - Target workspace
+   */
   hasWorkspace(workspaceId: string): boolean {
     return this.workspaces.has(workspaceId);
   }
 
+  /**
+   * Get total size of all files in workspace
+   * @param workspaceId - Target workspace
+   */
   getWorkspaceSize(workspaceId: string): number {
     const workspace = this.workspaces.get(workspaceId);
     if (!workspace) return 0;
@@ -207,6 +310,17 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     }
     return totalSize;
   }
+
+  /**
+   * Check if workspace has any SOURCE/ files (from source module)
+   * @param workspaceId - Target workspace
+   */
+  async hasSourceFiles(workspaceId: string): Promise<boolean> {
+    const files = await this.listFiles(workspaceId);
+    return files.some(path => path.startsWith('SOURCE/'));
+  }
+
+  // Private helper methods
 
   private getWorkspace(workspaceId: string): Map<string, MockFileEntry> {
     const workspace = this.workspaces.get(workspaceId);
@@ -224,4 +338,15 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     }
     return this.workspaces.get(workspaceId)!;
   }
+}
+
+/**
+ * Factory function for creating fresh mock instances in tests
+ * 
+ * Use this when you need a class-based mock with full control over state and error simulation.
+ * For simple function-based mocks, consider using the pattern in settings/test/test-utils.ts
+ * following TESTING.md modern mock strategy.
+ */
+export function createMockFileStorage(): MockFileStorage {
+  return new MockFileStorage();
 }

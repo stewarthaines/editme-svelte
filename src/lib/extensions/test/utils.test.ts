@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ExtensionManager } from '../extension-manager.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import {
   FILENAME_PATTERNS,
   FILE_VALIDATION_CASES,

@@ -72,11 +72,24 @@ async function extractStrings() {
     try {
       console.log(`💾 Updating ${locale}.po...`);
       
-      // Read existing translations if file exists
+      // Read existing translations and metadata if file exists
       const existingTranslations = {};
+      let existingHeaders = {};
       if (existsSync(poPath)) {
         const existingContent = readFileSync(poPath, 'utf8');
         const lines = existingContent.split('\n');
+        
+        // Parse existing headers
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.startsWith('"') && line.includes(':')) {
+            const match = line.match(/^"([^:]+):\s*([^"]*?)\\?n?"$/);
+            if (match) {
+              existingHeaders[match[1]] = match[2];
+            }
+          }
+          if (line.trim() === '' && i > 0) break; // End of headers
+        }
         
         let currentMsgid = '';
         for (let i = 0; i < lines.length; i++) {
@@ -97,46 +110,60 @@ async function extractStrings() {
         console.log(`📚 Preserved ${Object.keys(existingTranslations).length} existing translations for ${locale}`);
       }
       
-      // Generate new .po file
-      extractor.savePotFile(poPath, {
+      // Check if content has actually changed by comparing message count
+      const currentMessages = extractor.getMessages();
+      const contentChanged = !existsSync(poPath) || 
+                             Object.keys(existingTranslations).length !== currentMessages.length;
+      
+      // Preserve existing dates if content hasn't changed
+      const now = new Date().toISOString();
+      const headers = {
         'Language': locale,
         'MIME-Version': '1.0',
         'Content-Type': 'text/plain; charset=UTF-8',
         'Content-Transfer-Encoding': '8bit',
         'Project-Id-Version': 'EDITME EPUB Editor',
         'Report-Msgid-Bugs-To': '',
-        'POT-Creation-Date': new Date().toISOString(),
-        'PO-Revision-Date': new Date().toISOString(),
-        'Last-Translator': '',
-        'Language-Team': '',
+        'POT-Creation-Date': contentChanged ? now : (existingHeaders['POT-Creation-Date'] || now),
+        'PO-Revision-Date': contentChanged ? now : (existingHeaders['PO-Revision-Date'] || now),
+        'Last-Translator': existingHeaders['Last-Translator'] || '',
+        'Language-Team': existingHeaders['Language-Team'] || '',
         'Plural-Forms': 'nplurals=2; plural=(n != 1);'
-      });
+      };
       
-      // Merge back existing translations
-      if (Object.keys(existingTranslations).length > 0) {
-        let content = readFileSync(poPath, 'utf8');
-        const lines = content.split('\n');
-        const result = [];
+      // Generate new .po file
+      extractor.savePotFile(poPath, headers);
+      
+      // Post-process to clean up the file
+      let content = readFileSync(poPath, 'utf8');
+      const lines = content.split('\n');
+      const result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
         
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          result.push(line);
-          
-          if (line.startsWith('msgid "') && line !== 'msgid ""') {
-            const match = line.match(/^msgid "(.+)"$/);
-            if (match && existingTranslations[match[1]]) {
-              // Look ahead for msgstr line and replace it
-              if (i + 1 < lines.length && lines[i + 1].startsWith('msgstr ""')) {
-                result[result.length] = `msgstr "${existingTranslations[match[1]]}"`;
-                i++; // Skip original empty msgstr
-              }
+        // Clean up header fields by removing trailing \n
+        if (line.startsWith('"') && line.includes(':') && line.endsWith('\\n"')) {
+          line = line.replace(/\\n"$/, '"');
+        }
+        
+        result.push(line);
+        
+        // Merge back existing translations
+        if (line.startsWith('msgid "') && line !== 'msgid ""') {
+          const match = line.match(/^msgid "(.+)"$/);
+          if (match && existingTranslations[match[1]]) {
+            // Look ahead for msgstr line and replace it
+            if (i + 1 < lines.length && lines[i + 1].startsWith('msgstr ""')) {
+              result[result.length] = `msgstr "${existingTranslations[match[1]]}"`;
+              i++; // Skip original empty msgstr
             }
           }
         }
-        
-        // Write back the merged content
-        writeFileSync(poPath, result.join('\n'));
       }
+      
+      // Write back the cleaned and merged content
+      writeFileSync(poPath, result.join('\n'));
       
     } catch (error) {
       console.error(`❌ Error creating ${locale}.po:`, error.message);

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SourceManager } from '../source-manager.js';
-import { MockFileStorage } from './mocks/file-storage.mock.js';
+import { MockFileStorage } from '../../test/mocks/file-storage.mock.js';
 import { createMockZipWriter, createMockZip } from './mocks/zip-library.mock.js';
 import {
   createCompleteSourceStructure,

@@ -46,6 +46,10 @@ describe('i18n runtime system', () => {
     originalNavigator = globalThis.navigator;
     originalDocument = globalThis.document;
 
+    // Reset mock navigator to default English
+    mockNavigator.languages = ['en-US', 'en'];
+    mockNavigator.language = 'en-US';
+
     // Mock globalThis properties
     Object.defineProperty(globalThis, 'localStorage', {
       value: mockLocalStorage,
@@ -102,28 +106,29 @@ describe('i18n runtime system', () => {
   describe('translation function t()', () => {
     beforeEach(async () => {
       // Setup with mock catalogs
+      _resetI18nForTesting();
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
       await initI18n();
     });
 
     it('should translate basic strings', () => {
-      expect(t('Save')).toBe('Save');
-      expect(t('Cancel')).toBe('Cancel');
-      expect(t('Delete')).toBe('Delete');
+      expect(get(t)('Save')).toBe('Save');
+      expect(get(t)('Cancel')).toBe('Cancel');
+      expect(get(t)('Delete')).toBe('Delete');
     });
 
     it('should handle missing translations with fallback', () => {
-      expect(t('Nonexistent key')).toBe('Nonexistent key');
+      expect(get(t)('Nonexistent key')).toBe('Nonexistent key');
     });
 
     it('should interpolate parameters', () => {
-      expect(t('Found {count} items', { count: 5 })).toBe('Found 5 items');
-      expect(t('Found {count} items', { count: 0 })).toBe('Found 0 items');
+      expect(get(t)('Found {count} items', { count: 5 })).toBe('Found 5 items');
+      expect(get(t)('Found {count} items', { count: 0 })).toBe('Found 0 items');
     });
 
     it('should handle multiple parameters', () => {
-      const result = t('Hello {name}, you have {count} messages', {
+      const result = get(t)('Hello {name}, you have {count} messages', {
         name: 'John',
         count: 3,
       });
@@ -133,24 +138,24 @@ describe('i18n runtime system', () => {
     it('should translate to German when locale is set', async () => {
       await setLocale('de');
 
-      expect(t('Save')).toBe('Speichern');
-      expect(t('Cancel')).toBe('Abbrechen');
-      expect(t('Delete')).toBe('Löschen');
+      expect(get(t)('Save')).toBe('Speichern');
+      expect(get(t)('Cancel')).toBe('Abbrechen');
+      expect(get(t)('Delete')).toBe('Löschen');
     });
 
     it('should fall back to English for missing German translations', async () => {
       await setLocale('de');
 
       // This key doesn't exist in German catalog
-      expect(t('Nonexistent key')).toBe('Nonexistent key');
+      expect(get(t)('Nonexistent key')).toBe('Nonexistent key');
     });
 
     it('should translate to Arabic when locale is set', async () => {
       await setLocale('ar');
 
-      expect(t('Save')).toBe('حفظ');
-      expect(t('Cancel')).toBe('إلغاء');
-      expect(t('Delete')).toBe('حذف');
+      expect(get(t)('Save')).toBe('حفظ');
+      expect(get(t)('Cancel')).toBe('إلغاء');
+      expect(get(t)('Delete')).toBe('حذف');
     });
   });
 
@@ -197,7 +202,7 @@ describe('i18n runtime system', () => {
 
       expect(get(isInitialized)).toBe(true);
       expect(get(currentLocale)).toBe('en');
-      expect(t('Save')).toBe('Save'); // Fallback English
+      expect(get(t)('Save')).toBe('Save'); // Fallback English
     });
 
     it('should set document direction for RTL locale', async () => {
@@ -231,18 +236,19 @@ describe('i18n runtime system', () => {
 
   describe('setLocale()', () => {
     beforeEach(async () => {
+      _resetI18nForTesting();
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
       await initI18n();
     });
 
-    it.skip('should switch locale successfully', async () => {
+    it('should switch locale successfully', async () => {
       expect(get(currentLocale)).toBe('en');
 
       await setLocale('de');
 
       expect(get(currentLocale)).toBe('de');
-      expect(t('Save')).toBe('Speichern');
+      expect(get(t)('Save')).toBe('Speichern');
     });
 
     it('should update document direction for RTL locale', async () => {
@@ -263,8 +269,9 @@ describe('i18n runtime system', () => {
       await expect(setLocale('invalid')).rejects.toThrow('Unsupported locale: invalid');
     });
 
-    it.skip('should throw error when not initialized', async () => {
+    it('should throw error when not initialized', async () => {
       // Reset to uninitialized state
+      _resetI18nForTesting();
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue({});
 
@@ -286,12 +293,13 @@ describe('i18n runtime system', () => {
 
   describe('reactive stores', () => {
     beforeEach(async () => {
+      _resetI18nForTesting();
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
       await initI18n();
     });
 
-    it.skip('should update currentLocale store', async () => {
+    it('should update currentLocale store', async () => {
       expect(get(currentLocale)).toBe('en');
 
       await setLocale('de');
@@ -319,6 +327,7 @@ describe('i18n runtime system', () => {
 
   describe('utility functions', () => {
     beforeEach(async () => {
+      _resetI18nForTesting();
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
       await initI18n();
@@ -336,7 +345,7 @@ describe('i18n runtime system', () => {
       );
     });
 
-    it.skip('should return current locale config', () => {
+    it('should return current locale config', () => {
       const config = getCurrentLocaleConfig();
 
       expect(config).toEqual({
