@@ -10,6 +10,9 @@
 import type { FileStorageAPI } from '../storage/index.js';
 import type { ExtensionManager } from '../extensions/index.js';
 
+// Export the implementation
+export { SettingsManager } from './settings-manager.js';
+
 // ============================================================================
 // Type Definitions
 // ============================================================================

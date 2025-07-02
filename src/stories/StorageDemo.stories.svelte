@@ -108,3 +108,10 @@ This demonstrates the complete workspace isolation and file organization used by
 >
   <StorageDemo />
 </Story>
+
+<style>
+  /* Override app.css body overflow: hidden for Storybook scrolling */
+  :global(body) {
+    overflow: auto !important;
+  }
+</style>

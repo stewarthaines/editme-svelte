@@ -5,7 +5,8 @@
  */
 
 import { GettextExtractor, JsExtractors } from 'gettext-extractor';
-import { glob } from 'glob';
+import pkg from 'glob';
+const { glob } = pkg;
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync, writeFileSync, existsSync } from 'fs';

@@ -4,7 +4,7 @@
  * Mock helpers and testing utilities for Settings Manager test suite.
  */
 
-import { vi } from 'vitest';
+import { vi, expect } from 'vitest';
 import type { FileStorageAPI } from '../../storage/index.js';
 import type { ExtensionManager } from '../../extensions/index.js';
 import type { WorkspaceSettings, EPUBSettings } from '../index.js';
@@ -112,8 +112,16 @@ export function expectWorkspaceSettingsSaved(
   expect(mockStorage.writeTextFile).toHaveBeenCalledWith(
     workspaceId,
     '.workspace-metadata.json',
-    expect.stringContaining(JSON.stringify(settings).slice(1, -1)) // Check for partial content
+    expect.stringContaining('"settings":')
   );
+  
+  // Also verify settings are included
+  const calls = mockStorage.writeTextFile.mock.calls;
+  const lastCall = calls[calls.length - 1];
+  if (lastCall && lastCall[2]) {
+    const savedData = JSON.parse(lastCall[2]);
+    expect(savedData.settings).toEqual(settings);
+  }
 }
 
 /**
@@ -177,7 +185,8 @@ export function mockWorkspaceSettingsReturn(
   mockStorage: ReturnType<typeof createMockFileStorage>,
   settings: WorkspaceSettings
 ) {
-  mockStorage.readTextFile.mockResolvedValueOnce(JSON.stringify(settings));
+  const metadata = createWorkspaceMetadata(settings);
+  mockStorage.readTextFile.mockResolvedValueOnce(JSON.stringify(metadata));
 }
 
 /**

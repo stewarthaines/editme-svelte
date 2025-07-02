@@ -8,7 +8,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { ExtensionManager } from '../../lib/extensions/extension-manager.js';
-  import { MockFileStorage } from '../../lib/extensions/test/mocks/file-storage.mock.js';
+  import { FileStorageAPI } from '../../lib/storage/index.js';
   import type { ExtensionInfo } from '../../lib/extensions/types.js';
   
   // Components
@@ -72,7 +72,7 @@
 
   // Extension Manager instance
   let extensionManager: ExtensionManager;
-  let mockStorage: MockFileStorage;
+  let fileStorage: FileStorageAPI;
 
   // Workflow selection
   const workflows = [
@@ -88,10 +88,11 @@
   // Initialize Extension Manager
   onMount(async () => {
     try {
-      mockStorage = new MockFileStorage();
-      extensionManager = new ExtensionManager(mockStorage as any);
+      fileStorage = new FileStorageAPI();
+      await fileStorage.init();
+      extensionManager = new ExtensionManager(fileStorage);
       
-      log('info', 'Extension Manager initialized');
+      log('info', `Extension Manager initialized with ${fileStorage.getBackendType()} backend`);
       
       // Pre-populate cache for demonstration
       await setupDemoEnvironment();
@@ -110,7 +111,7 @@
     log('info', 'Setting up demo environment...');
     
     // Create demo workspace
-    await mockStorage.createWorkspace(state.selectedWorkspace);
+    await fileStorage.createWorkspace();
     
     // Pre-populate cache with popular extensions
     const popularExtensions = getPopularExtensions();
@@ -133,8 +134,8 @@
     
     // Set up conflict scenarios for cache management demo
     if (selectedWorkflowId === 'cache-management') {
-      const conflictCache = createConflictingCache([CONFLICT_SCENARIOS.VERSION_MISMATCH]);
-      await mockStorage.addTestFiles('extensions-cache', conflictCache);
+      // Note: Conflict scenarios would be handled through extension cache directly
+      log('info', 'Cache management scenario setup (conflicts handled via extension cache)');
     }
     
     log('info', 'Demo environment setup complete');
@@ -359,7 +360,19 @@
     
     // Simulate EPUB extraction to workspace
     const workspaceFiles = createWorkspaceFromEPUB(epub);
-    await mockStorage.addTestFiles(state.selectedWorkspace, workspaceFiles);
+    
+    // Write sample files to demonstrate the workflow
+    for (const [filePath, content] of Object.entries(workspaceFiles)) {
+      try {
+        if (typeof content === 'string') {
+          await fileStorage.writeTextFile(state.selectedWorkspace, filePath, content);
+        } else {
+          await fileStorage.writeFile(state.selectedWorkspace, filePath, content);
+        }
+      } catch (error) {
+        log('warning', `Failed to write ${filePath}:`, error);
+      }
+    }
     
     // Auto-scan and cache extensions
     const summary = await extensionManager.scanAndCacheExtensions(state.selectedWorkspace);
@@ -467,10 +480,14 @@
 
 <style>
   .extension-manager-demo {
-    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: auto;
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
     font-family: var(--font-family-sans);
+    display: flex;
+    flex-direction: column;
   }
 
   .demo-header {
@@ -528,7 +545,8 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--space-4);
     padding: var(--space-4);
-    min-height: calc(100vh - 200px);
+    flex: 1;
+    overflow: auto;
   }
 
   .left-panel,
