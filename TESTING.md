@@ -670,6 +670,81 @@ export const Default: Story = {};
 - ✅ Invalid JSON parsing
 - ✅ Missing dependencies
 
+## Interface Consolidation Testing Strategy
+
+When consolidating duplicate type definitions across modules, follow these patterns to maintain test reliability:
+
+### 1. Identify Authoritative Source
+Choose the most comprehensive, specification-compliant interface as the single source of truth:
+
+```typescript
+// ❌ Before: Multiple duplicate definitions
+// workspace/types.ts - Simple interface
+// epub/opf-utils.ts - Comprehensive EPUB-compliant interface
+
+// ✅ After: Single source of truth
+import type { EPUBMetadata, OPFDocument } from '../../epub/opf-utils.js';
+```
+
+### 2. Update Imports Systematically
+Use relative imports in test files for TypeScript compatibility:
+
+```typescript
+// ✅ Update all test files
+import type { OPFDocument } from '../../epub/opf-utils.js';
+
+// ❌ Avoid $lib paths in tests (TypeScript compatibility)
+import type { OPFDocument } from '$lib/epub/opf-utils.js';
+```
+
+### 3. Fix Type Compatibility Issues
+Update mock data and test expectations to match the consolidated interface:
+
+```typescript
+// ❌ Before: Simple string format
+creator: 'Test Author',
+
+// ✅ After: EPUB Dublin Core specification compliance
+creator: ['Test Author'], // Array format per EPUB spec
+```
+
+### 4. Verify Test Coverage
+Ensure all tests pass with the unified interface:
+
+```typescript
+// Update test expectations
+expect(metadata.creator).toEqual(['Test Author']); // Array format
+expect(xml).toContain('<dc:creator>Test Author</dc:creator>'); // Generated XML
+```
+
+### 5. Benefits of Interface Consolidation
+- **Single Source of Truth**: Eliminates duplicate interface definitions
+- **Specification Compliance**: Ensures adherence to standards (EPUB, Dublin Core)
+- **Reduced Maintenance**: Changes only need to be made in one location
+- **Type Safety**: Prevents interface drift between modules
+
+### 6. Factory Functions for Test Isolation
+Use factory functions instead of shared constants to prevent test pollution:
+
+```typescript
+// ✅ Good - each test gets fresh data
+export function createTestOPF(): MockOPFDocument { 
+  return {
+    manifest: [],
+    spine: [],
+    metadata: {
+      title: 'Test EPUB',
+      creator: ['Test Author'],
+      language: 'en',
+      identifier: 'test-123'
+    }
+  };
+}
+
+// ❌ Avoid - shared mutable state
+export const TEST_OPF = { manifest: [], spine: [] }; // Tests can mutate this
+```
+
 ## Modern Development Best Practices (2024)
 
 ### Test-Driven Development with Behavior Focus

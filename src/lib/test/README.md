@@ -42,6 +42,47 @@ mockStorage.setFailureMode('read');
 const mockStorage = createMockFileStorage();
 ```
 
+### `mocks/workspace-manager.mock.ts`
+
+Comprehensive mock implementation of `WorkspaceManager` used across spine and EPUB testing modules.
+
+**Features:**
+- In-memory OPF document simulation with EPUB specification compliance
+- EPUB metadata management with Dublin Core support (creator[], contributor[], etc.)
+- Spine/manifest operations with atomic transaction support
+- Source file association tracking by naming convention
+- Comprehensive validation and error injection capabilities
+- Rich helper methods for workspace setup and verification
+
+**Usage:**
+```typescript
+// Import from shared location
+import { MockWorkspaceManager, createMockWorkspaceManager } from '../../test/mocks/workspace-manager.mock.js';
+
+// For class-based mocking with full control
+const mockWorkspace = new MockWorkspaceManager();
+mockWorkspace.setWorkspaceOPF('workspace-123', {
+  manifest: [...],
+  spine: [...], 
+  metadata: { 
+    title: 'Test EPUB',
+    creator: ['Author Name'], // EPUB-compliant array format
+    language: 'en',
+    identifier: 'test-123'
+  }
+});
+
+// For simple function-based mocking
+const mockWorkspace = createMockWorkspaceManager();
+```
+
+**Key Features:**
+- **EPUB Compliance**: Uses specification-compliant interfaces from `epub/opf-utils.ts`
+- **Transaction Support**: Atomic operations with rollback capabilities
+- **Error Injection**: Controllable failure modes for testing error scenarios
+- **File Association**: Tracks SOURCE/text/{id}.txt file associations
+- **Validation Helpers**: Built-in validation state checking for spine consistency
+
 ## When to Use Shared vs Module-Specific Mocks
 
 ### ✅ Use Shared Mocks When:
