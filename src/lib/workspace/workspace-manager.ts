@@ -14,6 +14,7 @@ import type {
   EPUBMetadata,
   OPFDocument,
   ManifestItem,
+  SpineItem,
   ValidationResult,
   WorkspacePreview,
   WorkspaceConfig,
@@ -387,6 +388,154 @@ export class WorkspaceManager {
       throw new WorkspaceError(
         `Failed to update spine order: ${error instanceof Error ? error.message : 'Unknown error'}`,
         'SPINE_UPDATE_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Add a spine item to the workspace
+   */
+  async addSpineItem(workspaceId: string, item: SpineItem, insertIndex?: number): Promise<void> {
+    try {
+      const opf = await this.getWorkspaceOPF(workspaceId);
+
+      // Validate that referenced manifest item exists
+      if (!opf.manifest.some(m => m.id === item.idref)) {
+        throw new ValidationError(
+          `Referenced manifest item not found: ${item.idref}`,
+          [`Missing manifest item: ${item.idref}`],
+          workspaceId
+        );
+      }
+
+      // Check for duplicate spine items
+      if (opf.spine.some(s => s.idref === item.idref)) {
+        throw new ValidationError(
+          `Spine item with idref '${item.idref}' already exists`,
+          [`Duplicate spine item: ${item.idref}`],
+          workspaceId
+        );
+      }
+
+      const targetIndex = insertIndex ?? opf.spine.length;
+      opf.spine.splice(targetIndex, 0, {
+        idref: item.idref,
+        linear: item.linear ?? true,
+        properties: item.properties,
+      });
+
+      // Update modification date
+      opf.metadata.modifiedDate = new Date().toISOString();
+
+      // Save updated OPF
+      await this.updateWorkspaceOPF(workspaceId, opf);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw error;
+      }
+      throw new WorkspaceError(
+        `Failed to add spine item: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'SPINE_UPDATE_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Remove a spine item from the workspace
+   */
+  async removeSpineItem(workspaceId: string, idref: string): Promise<void> {
+    try {
+      const opf = await this.getWorkspaceOPF(workspaceId);
+
+      const index = opf.spine.findIndex(item => item.idref === idref);
+      if (index === -1) {
+        throw new ValidationError(
+          `Spine item with idref '${idref}' not found`,
+          [`Missing spine item: ${idref}`],
+          workspaceId
+        );
+      }
+
+      opf.spine.splice(index, 1);
+
+      // Update modification date
+      opf.metadata.modifiedDate = new Date().toISOString();
+
+      // Save updated OPF
+      await this.updateWorkspaceOPF(workspaceId, opf);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw error;
+      }
+      throw new WorkspaceError(
+        `Failed to remove spine item: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'SPINE_UPDATE_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Check if a file exists in the workspace
+   */
+  async fileExists(workspaceId: string, path: string): Promise<boolean> {
+    try {
+      return await this.storage.fileExists(workspaceId, path);
+    } catch (error) {
+      throw new WorkspaceError(
+        `Failed to check file existence: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'FILE_ACCESS_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Write a text file to the workspace
+   */
+  async writeTextFile(workspaceId: string, path: string, content: string): Promise<void> {
+    try {
+      await this.storage.writeTextFile(workspaceId, path, content);
+      // Invalidate cache since workspace contents changed
+      await this.invalidateCache(workspaceId);
+    } catch (error) {
+      throw new WorkspaceError(
+        `Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'FILE_WRITE_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Read a text file from the workspace
+   */
+  async readTextFile(workspaceId: string, path: string): Promise<string> {
+    try {
+      return await this.storage.readTextFile(workspaceId, path);
+    } catch (error) {
+      throw new WorkspaceError(
+        `Failed to read file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'FILE_READ_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
+   * Delete a file from the workspace
+   */
+  async deleteFile(workspaceId: string, path: string): Promise<void> {
+    try {
+      await this.storage.deleteFile(workspaceId, path);
+      // Invalidate cache since workspace contents changed
+      await this.invalidateCache(workspaceId);
+    } catch (error) {
+      throw new WorkspaceError(
+        `Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'FILE_DELETE_ERROR',
         workspaceId
       );
     }
