@@ -131,7 +131,7 @@ function isValidSidebarSection(value: string): value is SidebarSection {
     'workspace',
     'metadata',
     'manifest',
-    'nav',
+    'navigation',
     'spine',
     'settings',
   ];

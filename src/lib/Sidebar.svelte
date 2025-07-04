@@ -140,7 +140,6 @@
 
     inline-size: 100%; /* Using logical properties */
     background: var(--color-sidebar-bg); /* Use semantic sidebar background */
-    border-inline-end: 1px solid var(--color-border-default); /* Using logical properties and tokens */
     display: flex;
     flex-direction: column;
     overflow-x: visible; /* Allow active items to extend past border */
@@ -252,17 +251,21 @@
     z-index: 1; /* Ensure focus ring appears above */
   }
 
-  .sidebar-section.active {
-    background: var(--color-bg-primary); /* White background like main content */
-    color: var(--color-text-primary);
-    font-weight: var(--font-normal);
-    border-top: 1px solid var(--color-border-default);
-    border-bottom: 1px solid var(--color-border-default);
-    margin-inline-end: -1px; /* Extend past the sidebar border */
+  /* High specificity for Craigslist-style visual connection */
+  :global(.sidebar .sidebar-section.active) {
+    background: var(--color-bg-primary) !important; /* White background like main content */
+    color: var(--color-text-primary) !important;
+    font-weight: var(--font-normal) !important;
+    border-top: 1px solid var(--color-border-default) !important;
+    border-bottom: 1px solid var(--color-border-default) !important;
+    border-right: 1px solid var(--color-bg-primary) !important; /* Hide the right border to connect */
+    margin-inline-end: -1px !important; /* Extend past the sidebar border */
+    position: relative !important;
+    z-index: 1 !important; /* Ensure it appears above the sidebar border */
   }
 
-  .sidebar-section.active .section-label {
-    text-decoration: none; /* Remove underline for active state */
+  :global(.sidebar .sidebar-section.active .section-label) {
+    text-decoration: none !important; /* Remove underline for active state */
   }
 
   .spine-section-header {

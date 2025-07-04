@@ -2,222 +2,231 @@
 
 ## Overview & Objectives
 
-The Spine Item UI provides comprehensive management of EPUB reading order through two coordinated interfaces that replace the current placeholder content in the application. This design leverages the fully-implemented SpineItemManager API to deliver a seamless chapter management experience.
+The Spine Item UI provides comprehensive management of EPUB reading order through a dedicated sidebar interface that replaces the current placeholder content. This design leverages the fully-implemented SpineItemManager API to deliver a seamless chapter management experience.
 
 ### High-Level Description
 
-The Spine Item UI consists of two interconnected components:
+The Spine Item UI consists of a single, complete interface:
 
-1. **Sidebar Spine Panel**: Compact chapter list integrated into the left sidebar, providing quick access to spine navigation and basic reordering capabilities
-2. **Main Spine View**: Detailed management interface in the main content area, offering full CRUD operations, validation feedback, and advanced spine management features
+1. **Sidebar Spine Panel**: Complete chapter management interface integrated into the left sidebar, providing all spine operations including navigation, reordering, creation, and validation
+2. **Main View**: Shows the currently selected spine item's content/editor (separate design document)
 
 ### Core Functionality
 
-The UI provides access to all SpineItemManager capabilities:
-- **Visual Spine Listing**: Display spine items with clear indication of reading order
-- **Drag-and-Drop Reordering**: Intuitive reordering with visual feedback and touch support
-- **Chapter CRUD Operations**: Create, read, update, and delete chapters with proper validation
-- **Source File Association**: Visual indication of SOURCE/text/{id}.txt file presence and management
-- **Real-Time Validation**: Live feedback on spine consistency and structural errors
-- **Workspace Integration**: Seamless coordination with workspace state and other views
+The sidebar provides access to all SpineItemManager capabilities:
+
+- **Visual Spine Listing**: Display spine items with chapter IDs in reading order
+- **Drag-and-Drop Reordering**: Intuitive reordering with drag handles (expanded sidebar only)
+- **Chapter Creation**: Append new chapters with auto-generated IDs
+- **Chapter Selection**: Click to select for main view editing
+- **Real-Time Validation**: Compact error indicators for validation issues
+- **Workspace Integration**: Seamless coordination with workspace state and main view
 
 ### Current Implementation Status
 
 **Completed:**
+
 - ✅ SpineItemManager API with comprehensive functionality
 - ✅ Sidebar infrastructure with spine slot (`slot="sidebar-spine"`)
 - ✅ Main view infrastructure with spine placeholder
 - ✅ Layout system with responsive design support
 
 **To Be Implemented:**
+
 - 🔲 Sidebar spine item list component
-- 🔲 Main spine management view component
-- 🔲 Drag-and-drop interaction system
-- 🔲 Chapter creation/editing forms
-- 🔲 Validation feedback UI
-- 🔲 Source file status indicators
+- 🔲 Drag-and-drop interaction system with handles
+- 🔲 Chapter creation (append button)
+- 🔲 Minimal validation feedback UI
+- 🔲 Chapter selection for main view integration
 
 ## Key Design Questions
 
-### 1. Interface Distribution & Responsibility
+### 1. Interface Architecture ✅ **RESOLVED**
 
-**Primary Question:** How should functionality be distributed between the sidebar and main view?
+**Decision:** Sidebar is the complete spine management interface. Main view shows the currently selected spine item's content/editor.
 
-**Options to Consider:**
-- **Option A**: Sidebar for navigation/overview, main view for detailed management
-- **Option B**: Parallel interfaces with different levels of detail
-- **Option C**: Context-dependent functionality based on user intent
+**Rationale:** Clear separation of concerns - sidebar handles structural spine operations, main view handles individual item content editing.
 
-**Specific Questions:**
-- Should the sidebar show read-only overview while main view handles editing?
-- Can users perform basic operations (reorder, rename) directly in the sidebar?
-- How should actions in one interface update the other in real-time?
-- Should both interfaces support drag-and-drop, or only the main view?
+**Implementation:**
+- Sidebar: All spine operations (create, reorder, select, validate)
+- Main view: Single item content editing (separate design document)
+- Real-time coordination between interfaces
 
-### 2. Drag-and-Drop Interaction Design
+### 2. Drag-and-Drop Interaction Design ✅ **RESOLVED**
 
-**Primary Question:** How should drag-and-drop reordering work across different contexts and devices?
+**Decision:** Dedicated drag handles when sidebar is expanded, no reordering when collapsed.
 
-**Desktop Considerations:**
-- Visual feedback during drag (ghost elements, drop zones, insertion indicators)
-- Multi-select support for moving multiple chapters at once
-- Keyboard accessibility for drag operations (arrow keys, cut/paste)
+**Implementation:**
+- **Expanded Sidebar**: Drag handles visible, full reordering capability
+- **Collapsed Sidebar**: Navigation only, no reordering
+- **Touch Support**: Drag handles work on both desktop and mobile
+- **No Multi-select**: Single item drag operations only
+- **Move Button Support**: Up/Down buttons for keyboard accessibility
 
-**Mobile/Touch Considerations:**
-- Long-press to initiate drag vs dedicated drag handles
-- Touch-friendly drop zones and visual feedback
-- Alternative interaction patterns for devices without precise pointing
+### 3. Information Architecture & Display ✅ **RESOLVED**
 
-**Cross-Interface Questions:**
-- Can users drag from sidebar to main view or vice versa?
-- How to handle drag operations between collapsed/expanded sidebar states?
-- Should drag operations be atomic or allow for cancellation?
+**Decision:** Minimal information display focused on essential spine management.
 
-### 3. Information Architecture & Display
+**Display Elements:**
+- **Primary Label**: Chapter ID only (chapter1, chapter2, etc.)
+- **Drag Handle**: When sidebar expanded
+- **Validation Status**: ⚠️ icon only when errors exist (no indicator for valid items)
+- **No Source File Status**: Not displayed
+- **No Linear/Non-linear Status**: Not displayed
+- **No Advanced Properties**: Deferred to main view design
 
-**Primary Question:** What information should be displayed and how should it be organized?
+### 4. Visual Design & Status Indicators ✅ **RESOLVED**
 
-**Chapter Identification:**
-- Show chapter ID (chapter1, chapter2) vs title vs filename?
-- How to handle long titles in compact sidebar display?
-- Should there be primary/secondary information hierarchy?
+**Decision:** Minimal status indicators with focus on validation errors only.
 
-**Source File Status:**
-- How to indicate presence/absence of SOURCE/text/{id}.txt files?
-- Visual distinction between chapters with/without source files?
-- Should missing source files be treated as warnings or informational?
-
-**Spine Properties:**
-- Display linear/non-linear status visually or textually?
-- How to show EPUB properties (page-spread-left, etc.) if present?
-- Should advanced properties be hidden in sidebar, shown in main view?
-
-### 4. Visual Design & Status Indicators
-
-**Primary Question:** How should different states and properties be communicated visually?
-
-**Status Indicators Needed:**
-- ✅ Chapter has source file / ❌ Missing source file
-- 📖 Linear reading order / 📄 Non-linear (reference material)
-- ⚠️ Validation errors / ✓ Valid spine item
-- 🏗️ Currently being edited / 👁️ Read-only view
-
-**Visual Hierarchy:**
-- How to maintain readability in compact sidebar view?
-- Should status use icons, colors, typography, or combinations?
-- How to ensure accessibility with color-blind users and high contrast modes?
+**Status Indicators:**
+- **Validation Errors**: ⚠️ icon when errors exist
+- **Valid Items**: No indicator (clean list)
+- **No Source File Status**: Not displayed
+- **No Linear/Non-linear Status**: Not displayed
+- **No Hover Tooltips**: No additional information on hover
 
 **Interaction States:**
-- Hover effects for interactive elements
-- Focus styles for keyboard navigation
-- Selection states for multi-select operations
-- Drag feedback (ghost elements, insertion lines)
+- **Selection**: Visual highlight for currently selected item
+- **Hover**: Standard interactive element feedback
+- **Focus**: Accessibility-compliant focus styles
+- **Drag Feedback**: Visual feedback during drag operations
 
-### 5. Error Handling & Validation Feedback
+### 5. Error Handling & Validation Feedback ✅ **RESOLVED**
 
-**Primary Question:** How should validation errors and operation failures be communicated?
+**Decision:** Minimal, non-intrusive error indication.
 
-**Validation Error Display:**
-- Inline indicators on problematic spine items?
-- Centralized validation panel showing all issues?
-- Toast notifications for real-time validation updates?
+**Error Display:**
+- **Single Indicator**: ⚠️ icon for any validation error
+- **No Error Details**: No hover tooltips or detailed messages
+- **No Summary**: No overall validation status display
+- **No Recovery Actions**: No undo/redo or auto-fix in sidebar
 
-**Error Types to Handle:**
-- Missing manifest items referenced by spine
-- Duplicate spine items
-- Orphaned manifest items not in spine
-- File system errors (missing XHTML or source files)
-- Network/storage operation failures
+**Error Types Handled:**
+- All validation errors use the same ⚠️ indicator
+- Error details available through main view or other interfaces
+- Focus on visual indication rather than detailed feedback
 
-**Recovery Actions:**
-- Undo/redo for accidental operations
-- Auto-fix suggestions for common validation errors
-- Batch operations for resolving multiple issues
+### 6. Responsive Design & Accessibility ✅ **RESOLVED**
 
-### 6. Responsive Design & Accessibility
+**Decision:** Progressive enhancement based on sidebar state with dual interaction approach for accessibility.
 
-**Primary Question:** How should the interface adapt to different screen sizes and accessibility needs?
+**Responsive Design:**
+- **Expanded Sidebar**: Full functionality with drag handles
+- **Collapsed Sidebar**: Navigation only, no reordering
+- **Touch Targets**: Minimum 44px for all interactive elements
+- **Mobile Optimized**: Drag handles work on touch devices
 
-**Responsive Considerations:**
-- Sidebar collapse behavior on mobile devices
-- Touch-friendly interaction targets (minimum 44px)
-- Alternative layouts for very narrow screens
-- Scroll behavior for long chapter lists
+**Accessibility - Dual Interaction Approach:**
+- **Mouse/Touch Users**: Drag handles for intuitive reordering
+- **Keyboard Users**: Move Up/Down buttons appear on selected item only
+- **Screen Reader Support**: Proper ARIA labels and position announcements
+- **Button States**: Move buttons disabled when at first/last position
+- **Focus Management**: Proper focus handling after move operations
+- **Clean UI**: No accessibility clutter - buttons only visible when needed
 
-**Accessibility Requirements:**
-- Screen reader support for drag-and-drop operations
-- Keyboard navigation for all interactive elements
-- High contrast mode compatibility
-- Focus management during modal operations
-- ARIA labels for status indicators and actions
+**Accessibility Implementation:**
+- **Move Button Labels**: "Move [Chapter ID] up" / "Move [Chapter ID] down"
+- **Position Announcements**: "[Chapter ID] moved to position X of Y"
+- **Button Visibility**: Only on selected item, maintains clean design
+- **High Contrast**: Design system compatibility for all interactive elements
 
-### 7. Integration with Other Views
+### 7. Integration with Other Views ✅ **RESOLVED**
 
-**Primary Question:** How should spine management coordinate with other application features?
+**Decision:** Simple selection-based coordination with main view.
 
-**Cross-View Synchronization:**
-- Should spine changes immediately update Navigation (TOC) view?
-- How to handle conflicts between spine order and navigation structure?
-- Should preview pane update in real-time during reordering?
+**Main View Integration:**
+- **Selection**: Click spine item to open in main view for editing
+- **Creation**: New chapters automatically selected for editing
+- **Real-time Updates**: Spine changes immediately reflected in main view
 
-**Workspace State Management:**
-- How to handle unsaved changes during spine operations?
-- Should spine operations be immediately persistent or batched?
-- How to coordinate with workspace validation and error states?
+**Workspace Coordination:**
+- **Immediate Operations**: Spine operations are immediately persistent
+- **Validation**: Real-time validation with ⚠️ indicators
+- **State Management**: Seamless workspace state coordination
 
-**User Workflow Integration:**
-- Should creating a new chapter automatically open it for editing?
-- How to transition between spine management and content editing?
-- Should spine view show content preview or focus purely on structure?
+## Final Design Specification
 
-## Preliminary Design Direction
+### Sidebar Interface Components
 
-Based on the application's current architecture and user needs, I propose the following initial direction (subject to your feedback):
+**Spine Item List:**
+- Drag handle (expanded sidebar only)
+- Chapter ID as primary label
+- Validation error indicator (⚠️ when errors exist)
+- Click to select for main view editing
+- Visual selection highlight for current item
+- **Move buttons** (Up/Down) appear on selected item only
+- **Accessibility**: ARIA labels and keyboard navigation support
 
-### Two-Tier Interface Model
+**Append Button:**
+- "Append Item" button at bottom of list
+- Auto-generates sequential chapter ID
+- Immediately selects new chapter for main view editing
 
-**Sidebar Panel (Navigation-Focused):**
-- Compact list showing chapter order and basic status
-- Simple drag-and-drop reordering
-- Click to navigate/select chapters
-- Basic context menu for common actions
-- Visual indicators for source files and validation status
+**Responsive States:**
+- **Expanded**: Full management capabilities with drag handles
+- **Collapsed**: Navigation only, no reordering
 
-**Main View (Management-Focused):**
-- Detailed spine management with full CRUD operations
-- Comprehensive validation feedback and error resolution
-- Advanced reordering with multi-select support
-- Chapter creation/editing forms integrated into the interface
-- Source file management and preview capabilities
+### Interaction Model
 
-### Mobile-First Interaction Design
+**Primary Interactions:**
+- **Drag Handles**: Mouse/touch reordering (expanded sidebar)
+- **Move Buttons**: Keyboard accessible reordering (selected item only)
+- **Click Selection**: Item selection for main view editing
+- **Append Button**: New chapter creation
 
-- Touch-friendly drag handles in both interfaces
-- Long-press context menus for secondary actions
-- Responsive layout that gracefully handles sidebar collapse
-- Alternative interaction patterns for accessibility
+**Design Constraints:**
+- **No Context Menus**: All operations through direct interaction
+- **No Global Keyboard Shortcuts**: Interaction through focused elements only
+- **No Hover Tooltips**: Clean, minimal feedback
+- **No Additional Status**: Focus on essential validation only
 
-### Real-Time Validation Integration
-
-- Live validation feedback using SpineItemManager.validateSpineOrder()
-- Non-intrusive error indicators with detailed explanations on hover/focus
-- Suggested fixes for common validation errors
-- Batch resolution tools for multiple issues
+**Accessibility Features:**
+- **Dual Approach**: Drag handles + move buttons for comprehensive access
+- **Contextual Buttons**: Move buttons appear only on selected items
+- **Screen Reader Support**: Proper announcements and ARIA labels
+- **Focus Management**: Logical tab order and focus handling
 
 ---
 
-## Next Steps
+## Implementation Requirements
 
-**I need your input on these key decisions:**
+### Component Structure
 
-1. **Interface Responsibility**: Should sidebar be read-only navigation while main view handles editing, or should both support editing with different levels of detail?
+**SpineSidebar.svelte:**
+- Spine item list with drag handles
+- Append button for new chapters
+- Selection state management
+- Validation error display
 
-2. **Drag-and-Drop Scope**: Should both interfaces support drag-and-drop, or focus it in the main view for better mobile experience?
+**SpineItem.svelte:**
+- Individual spine item component
+- Drag handle integration
+- ID display and selection handling
+- Error indicator when needed
+- **Conditional Move Buttons**: Up/Down buttons when item is selected
+- **Accessibility**: Proper ARIA labels and keyboard navigation
+- **Button State Management**: Disabled states for first/last items
 
-3. **Information Priority**: What's the most important information to show in the compact sidebar view - titles, IDs, or status indicators?
+### Integration Points
 
-4. **Error Handling Approach**: Preference for inline validation feedback vs centralized error panel vs a combination?
+**SpineItemManager API:**
+- Use existing methods for all operations
+- Real-time validation integration
+- Workspace state coordination
 
-5. **Mobile Strategy**: Should we prioritize touch-first design or desktop-first with mobile adaptations?
+**Main View Coordination:**
+- Selection event handling
+- New chapter creation workflow
+- State synchronization
 
-Please share your thoughts on these questions, and I'll develop the detailed design specifications and component requirements based on your preferences.
+### Next Steps
+
+1. Implement SpineSidebar component structure
+2. Add drag-and-drop functionality with accessibility support
+3. Implement conditional move buttons for selected items
+4. Add proper ARIA labels and screen reader announcements
+5. Integrate with SpineItemManager API
+6. Add validation error display
+7. Implement main view selection coordination
+8. Test keyboard navigation and screen reader compatibility
