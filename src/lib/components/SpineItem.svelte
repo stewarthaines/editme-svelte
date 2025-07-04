@@ -1,0 +1,265 @@
+<script lang="ts">
+  import type { SpineItemWithSource } from '../spine/types';
+
+  // Props
+  export let item: SpineItemWithSource;
+  export const index: number = 0; // External reference only
+  export let isSelected = false;
+  export let isExpanded = true;
+  export let compact = false;
+  export let dragHandleProps = {};
+  export let isFirstItem = false;
+  export let isLastItem = false;
+
+  // Event handlers
+  export let onSelect: () => void;
+  export let onMoveUp: () => Promise<void>;
+  export let onMoveDown: () => Promise<void>;
+
+  function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onSelect();
+    }
+  }
+
+  // Focus management for move buttons
+  async function handleMoveUpKeyboard(event: KeyboardEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      await onMoveUp(); // Wait for operation to complete
+      // Focus restoration happens immediately after Promise resolves
+      const newUpButton = document.querySelector(`[aria-label="Move ${item.id} up"]`) as HTMLButtonElement;
+      if (newUpButton) {
+        newUpButton.focus();
+      }
+    }
+  }
+
+  async function handleMoveDownKeyboard(event: KeyboardEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      await onMoveDown(); // Wait for operation to complete
+      // Focus restoration with fallback logic
+      const newDownButton = document.querySelector(`[aria-label="Move ${item.id} down"]`) as HTMLButtonElement;
+      if (newDownButton && !newDownButton.disabled) {
+        newDownButton.focus();
+      } else {
+        // Fallback: focus the move up button if down button is disabled (item is now last)
+        const newUpButton = document.querySelector(`[aria-label="Move ${item.id} up"]`) as HTMLButtonElement;
+        if (newUpButton) {
+          newUpButton.focus();
+        }
+      }
+    }
+  }
+
+  // Determine if we should show move buttons (only when selected and not compact)
+  $: showMoveButtons = isSelected && !compact;
+
+  // Generate compact label for collapsed sidebar
+  function generateCompactLabel(itemId: string): string {
+    // Handle numbered patterns like "chapter1", "chapter-1", "chapter_1"
+    const numberedMatch = itemId.match(/^(\w+)[\-_]?(\d+)$/i);
+    if (numberedMatch) {
+      const [, prefix, number] = numberedMatch;
+      return prefix.charAt(0).toUpperCase() + number;
+    }
+
+    // Handle multiple words separated by spaces, hyphens, or underscores
+    const words = itemId.split(/[\s\-_]+/).filter(word => word.length > 0);
+    if (words.length > 1) {
+      return words.map(word => word.charAt(0).toUpperCase()).join('');
+    }
+
+    // Single word - take first 2-3 characters
+    const singleWord = itemId.trim();
+    if (singleWord.length <= 3) {
+      return singleWord.toUpperCase();
+    } else if (singleWord.length <= 6) {
+      return singleWord.slice(0, 3);
+    } else {
+      return singleWord.slice(0, 2);
+    }
+  }
+
+  $: displayLabel = compact ? generateCompactLabel(item.id) : item.id;
+</script>
+
+<div
+  class="spine-item"
+  class:compact
+  class:selected={isSelected}
+  class:has-error={item.hasSourceFile === false || !item.linear}
+  on:click={onSelect}
+  on:keydown={handleKeyDown}
+  role="button"
+  tabindex="0"
+  aria-pressed={isSelected}
+  aria-label={`${item.id}${!item.hasSourceFile ? ', has validation error' : ''}`}
+>
+  {#if !compact && isExpanded}
+    <div 
+      class="drag-handle"
+      {...dragHandleProps}
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M2 5h12v1H2zm0 5h12v1H2z"/>
+      </svg>
+    </div>
+  {/if}
+
+  <span class="chapter-id">{displayLabel}</span>
+
+  {#if !compact && (!item.hasSourceFile || !item.linear)}
+    <span class="error-indicator" aria-label="Validation error">⚠️</span>
+  {/if}
+
+  {#if showMoveButtons}
+    <div class="move-buttons" aria-label="Reorder controls">
+      <button
+        class="move-button"
+        on:click|stopPropagation={onMoveUp}
+        on:keydown|stopPropagation={handleMoveUpKeyboard}
+        disabled={isFirstItem}
+        aria-label={`Move ${item.id} up`}
+        title={`Move ${item.id} up`}
+      >
+        ↑
+      </button>
+      <button
+        class="move-button"
+        on:click|stopPropagation={onMoveDown}
+        on:keydown|stopPropagation={handleMoveDownKeyboard}
+        disabled={isLastItem}
+        aria-label={`Move ${item.id} down`}
+        title={`Move ${item.id} down`}
+      >
+        ↓
+      </button>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .spine-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding-block: var(--space-1); /* More compact */
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-xs); /* Smaller radius */
+    cursor: pointer;
+    transition: background-color var(--duration-fast) ease;
+    min-block-size: 32px; /* Smaller minimum height */
+    position: relative;
+  }
+
+  .spine-item:hover {
+    background: var(--color-interactive-secondary-hover);
+  }
+
+  .spine-item:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .spine-item.selected {
+    background: var(--color-interactive-secondary-active);
+  }
+
+  .spine-item.compact {
+    padding-block: 2px; /* Ultra compact */
+    padding-inline: var(--space-1);
+    justify-content: center;
+    min-block-size: 24px; /* Even smaller for collapsed state */
+  }
+
+  .spine-item.compact .chapter-id {
+    font-size: var(--text-xs);
+    text-align: center;
+    font-weight: var(--font-medium);
+  }
+
+  .drag-handle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 20px;
+    block-size: 20px;
+    color: var(--color-text-tertiary);
+    cursor: grab;
+  }
+
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
+  .chapter-id {
+    flex: 1;
+    font-size: var(--text-sm); /* Smaller text for compact look */
+    color: var(--color-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .error-indicator {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    color: var(--color-status-warning);
+  }
+
+  .move-buttons {
+    display: flex;
+    gap: var(--space-1);
+    margin-inline-start: auto;
+  }
+
+  .move-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 28px;
+    block-size: 28px;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    transition: all var(--duration-fast) ease;
+  }
+
+  .move-button:hover:not(:disabled) {
+    background: var(--color-interactive-secondary-hover);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
+
+  .move-button:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .move-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--color-text-tertiary);
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .spine-item.selected {
+      border: 2px solid var(--color-forced-active);
+    }
+
+    .error-indicator {
+      font-weight: bold;
+    }
+  }
+
+</style>

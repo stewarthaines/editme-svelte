@@ -56,8 +56,8 @@
     {/each}
   </nav>
 
-  {#if isExpanded}
-    <div class="sidebar-content" id="sidebar-content">
+  <div class="sidebar-content" class:collapsed={!isExpanded} id="sidebar-content">
+    {#if isExpanded}
       {#if activeSection === 'workspace'}
         <slot name="sidebar-workspace" />
       {:else if activeSection === 'metadata'}
@@ -71,8 +71,13 @@
       {:else if activeSection === 'settings'}
         <slot name="sidebar-settings" />
       {/if}
-    </div>
-  {/if}
+    {:else}
+      <!-- Show only spine content when collapsed -->
+      {#if activeSection === 'spine'}
+        <slot name="sidebar-spine" />
+      {/if}
+    {/if}
+  </div>
 </aside>
 
 <style>
@@ -96,12 +101,12 @@
   .sidebar-header {
     display: flex;
     align-items: center;
-    padding-block: var(--space-2); /* Tighter spacing */
+    padding-block: var(--space-1); /* More compact */
     padding-inline: var(--space-2);
     border-block-end: 1px solid var(--color-border-default); /* Using logical properties and tokens */
     background: var(--color-bg-primary); /* Using design tokens */
     flex-shrink: 0;
-    min-block-size: 60px; /* Using logical properties */
+    min-block-size: 40px; /* Smaller header */
   }
 
   .sidebar-toggle {
@@ -134,13 +139,13 @@
   .sidebar-title {
     margin: 0; /* Simple reset */
     margin-inline-start: var(--space-2);
-    font-size: var(--text-base); /* Smaller, like Craigslist */
+    font-size: var(--text-sm); /* Even smaller for compact look */
     font-weight: var(--font-normal);
-    color: var(--color-text-primary); /* Using design tokens */
+    color: var(--color-text-secondary); /* Subdued like Craigslist */
   }
 
   .sidebar-nav {
-    padding-block: var(--space-1) 0; /* Minimal spacing */
+    padding-block: 0; /* No extra padding for ultra-compact */
     padding-inline: 0;
     flex-shrink: 0;
   }
@@ -151,14 +156,14 @@
     border: none;
     display: flex;
     align-items: center;
-    padding-block: var(--space-1-5); /* Tighter spacing like Craigslist */
+    padding-block: var(--space-1); /* Even tighter spacing */
     padding-inline: var(--space-2);
     cursor: pointer;
     transition: background-color 0.1s ease; /* Faster transition */
     text-align: start; /* Using logical properties */
     color: var(--color-text-link); /* Blue link color */
-    min-block-size: 32px; /* Smaller height */
-    font-size: var(--text-base);
+    min-block-size: 28px; /* Smaller height for compact look */
+    font-size: var(--text-sm); /* Smaller font */
     outline: none;
   }
 
@@ -202,9 +207,14 @@
   .sidebar-content {
     flex: 1;
     overflow-y: auto;
-    padding-block: var(--space-4); /* Using logical properties and spacing tokens */
-    padding-inline: var(--space-4);
+    padding-block: var(--space-2); /* More compact padding */
+    padding-inline: var(--space-2); /* Less horizontal padding */
     background: var(--color-bg-primary); /* Using design tokens */
+  }
+
+  .sidebar-content.collapsed {
+    padding-block: var(--space-1);
+    padding-inline: var(--space-1);
   }
 
   /* Scrollbar styling using design tokens */
