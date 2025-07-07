@@ -5,7 +5,7 @@
  * and SOURCE/ directory management.
  */
 
-import type { FileStorageAPI } from '$lib/storage';
+import type { FileStorageAPI } from '../storage';
 import type { 
   SourceFileType, 
   SourceStats, 

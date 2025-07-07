@@ -5,8 +5,8 @@
  * for EPUB workspace management.
  */
 
-import { ZipWriter, Zip } from '$lib/zip';
-import type { FileStorageAPI } from '$lib/storage';
+import { ZipWriter, Zip } from '../zip';
+import type { FileStorageAPI } from '../storage';
 import {
   classifySourceFile,
   validateSourcePath,

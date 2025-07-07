@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { EPUBUnpacker } from '$lib/epub/EPUBUnpacker';
-  import { FileStorageAPI } from '$lib/storage';
+  import { EPUBUnpacker } from '../lib/epub/EPUBUnpacker';
+  import { FileStorageAPI } from '../lib/storage';
   import { mockEPUBScenarios } from './epub-mock-data';
   import './_templates/backend-feature-demo.css';
 

@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '../../i18n';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
@@ -378,14 +378,15 @@
   }
 
   .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-surface);
-    border-left-color: var(--color-error);
+    background-color: var(--color-error-bg);
+    border-left-color: var(--color-error-600);
   }
 
   .remove-button:focus {
     outline: none;
-    background-color: var(--color-error-surface);
-    box-shadow: inset 0 0 0 2px var(--color-error);
+    background-color: var(--color-error-bg);
+    border-left-color: var(--color-error-600);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring), inset 0 0 0 1px var(--color-error-600);
   }
 
   .remove-button:disabled {

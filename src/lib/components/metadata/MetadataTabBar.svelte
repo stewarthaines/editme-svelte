@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '../../i18n';
   import MetadataTab from './MetadataTab.svelte';
 
   const dispatch = createEventDispatcher();

@@ -7,9 +7,9 @@ This is a Svelte-based EPUB editor that runs in modern browsers, replacing a pre
 ## Project Structure
 
 - `plans/` - Project documentation and planning
-  - `overview.md` - Complete project specification
+  - `overview.md` - Initial project specification
   - `features.md` - Feature breakdown and development phases
-  - `screens/` - UI mockup screenshots
+  - `screens/` - UI screenshots from the previous VueJS version
 - `src/` - Svelte application source code
 - `static/` - Static assets (inlined by Vite build)
 
@@ -27,6 +27,7 @@ This is a Svelte-based EPUB editor that runs in modern browsers, replacing a pre
 - **XML/HTML Parsing**: Use `DOMParser` and `querySelector` instead of regular expressions for robust parsing
 - **CSS & Styling**: Use the comprehensive design system in `src/styles/` - see `plans/features/css_design_system.md` for full documentation
 - **SOURCE.zip Handling**: Use existing ZIP library (`src/lib/zip/`) for SOURCE.zip creation/extraction
+- **Import Paths**: Use relative imports (`../`, `../../`) instead of absolute paths (`$lib/`) for consistency and explicit dependency tracking
 - Browser-native APIs preferred over regex for structured data handling
 
 ### Storage Strategy
@@ -96,7 +97,7 @@ mimetype
 META-INF/content.opf
 OEBPS/ (standard EPUB content)
 ├── SOURCE.zip (editor source files - extracted to SOURCE/ during editing)
-└── EDITME.html (editor app)
+└── EDITME.html (editor app - to be extracted by the user to edit the EPUB file)
 ```
 
 **Note**: The `SOURCE.zip` file contains all editor-specific files (settings, plain text sources, transform scripts, extensions) and is extracted to a `SOURCE/` directory in the workspace during editing.
@@ -411,7 +412,7 @@ Before considering a component complete:
 
 - **Interaction Style**
   - When planning under-specified work don't assume complexity but ask the user
-  - When you ask the user questions ask them one at a time
+  - **IMPORTANT:** Ask the user one question at a time, not a list of questions
 
 ## Claude Interaction Memory
 

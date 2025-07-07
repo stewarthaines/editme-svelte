@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '../../../i18n';
 
   const dispatch = createEventDispatcher();
 
@@ -15,11 +15,11 @@
   // Check if field needs attention (required but empty)
   $: needsAttention = required && (!value || value.trim() === '');
 
-  const handleInput = (event) => {
+  const handleInput = event => {
     dispatch('change', { value: event.target.value });
   };
 
-  const handleBlur = (event) => {
+  const handleBlur = event => {
     dispatch('blur', { value: event.target.value });
   };
 
@@ -31,13 +31,16 @@
 <div class="metadata-field">
   {#if label}
     <label for={id} class="field-label" class:needs-attention={needsAttention}>
-      {label}
-      {#if required}
-        <span class="required" aria-label={$t('Required field')}>*</span>
+      {#if error}
+        <span id="{id}-error" class="field-error" role="alert">
+          {error}
+        </span>
+      {:else}
+        {label}
       {/if}
     </label>
   {/if}
-  
+
   <input
     {id}
     type="text"
@@ -54,12 +57,6 @@
     aria-describedby={error ? `${id}-error` : undefined}
     aria-invalid={!!error}
   />
-
-  {#if error}
-    <div id="{id}-error" class="field-error" role="alert">
-      {error}
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -76,7 +73,7 @@
   }
 
   .field-label.needs-attention {
-    color: #228B22; /* Green color for required unfilled fields */
+    color: #228b22; /* Green color for required unfilled fields */
   }
 
   .required {
@@ -117,11 +114,11 @@
   }
 
   .field-input.needs-attention {
-    border-color: #228B22; /* Green border for required unfilled fields */
+    border-color: #228b22; /* Green border for required unfilled fields */
   }
 
   .field-input.needs-attention:focus {
-    border-color: #228B22;
+    border-color: #228b22;
     box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.2);
   }
 

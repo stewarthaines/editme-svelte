@@ -1,11 +1,10 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { t } from '$lib/i18n';
 
   const dispatch = createEventDispatcher();
 
   export let value = '';
-  export let options = [];
+  export let options: Array<{value: string, label: string}> = [];
   export let required = false;
   export let disabled = false;
   export let error = '';
@@ -16,12 +15,14 @@
   // Check if field needs attention (required but empty)
   $: needsAttention = required && (!value || value.trim() === '');
 
-  const handleChange = (event) => {
-    dispatch('change', { value: event.target.value });
+  const handleChange = (event: Event) => {
+    const target = event.target as HTMLSelectElement;
+    dispatch('change', { value: target.value });
   };
 
-  const handleBlur = (event) => {
-    dispatch('blur', { value: event.target.value });
+  const handleBlur = (event: Event) => {
+    const target = event.target as HTMLSelectElement;
+    dispatch('blur', { value: target.value });
   };
 
   const handleFocus = () => {
@@ -32,13 +33,16 @@
 <div class="metadata-field">
   {#if label}
     <label for={id} class="field-label" class:needs-attention={needsAttention}>
-      {label}
-      {#if required}
-        <span class="required" aria-label={$t('Required field')}>*</span>
+      {#if error}
+        <div id="{id}-error" class="field-error" role="alert">
+          {error}
+        </div>
+      {:else}
+        {label}
       {/if}
     </label>
   {/if}
-  
+
   <select
     {id}
     {value}
@@ -62,12 +66,6 @@
       </option>
     {/each}
   </select>
-
-  {#if error}
-    <div id="{id}-error" class="field-error" role="alert">
-      {error}
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -84,13 +82,9 @@
   }
 
   .field-label.needs-attention {
-    color: #228B22; /* Green color for required unfilled fields */
+    color: #228b22; /* Green color for required unfilled fields */
   }
 
-  .required {
-    color: var(--color-error);
-    margin-inline-start: 0.25rem;
-  }
 
   .field-select {
     width: 100%;
@@ -126,11 +120,11 @@
   }
 
   .field-select.needs-attention {
-    border-color: #228B22; /* Green border for required unfilled fields */
+    border-color: #228b22; /* Green border for required unfilled fields */
   }
 
   .field-select.needs-attention:focus {
-    border-color: #228B22;
+    border-color: #228b22;
     box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.2);
   }
 

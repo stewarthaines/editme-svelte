@@ -1,7 +1,7 @@
 /**
  * Mock EPUB data for demo scenarios
  */
-import { ZipWriter } from '$lib/zip';
+import { ZipWriter } from '../lib/zip';
 
 // Valid EPUB 3.0 files
 const validMimetype = 'application/epub+zip';

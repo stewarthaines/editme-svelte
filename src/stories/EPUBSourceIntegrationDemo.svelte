@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { FileStorageAPI } from '$lib/storage';
-  import { SourceManager } from '$lib/source';
-  import { DEFAULT_SOURCE_SETTINGS } from '$lib/source';
-  import { EPUBPackager, EPUBUnpacker } from '$lib/epub';
-  import { OPFUtils } from '$lib/epub';
-  import type { EPUBMetadata } from '$lib/epub';
+  import { FileStorageAPI } from '../lib/storage';
+  import { SourceManager } from '../lib/source';
+  import { DEFAULT_SOURCE_SETTINGS } from '../lib/source';
+  import { EPUBPackager, EPUBUnpacker } from '../lib/epub';
+  import { OPFUtils } from '../lib/epub';
+  import type { EPUBMetadata } from '../lib/epub';
   import './epub-source-integration-demo.css';
 
   interface LogEntry {

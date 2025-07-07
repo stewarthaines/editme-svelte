@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { EPUBPackager } from '$lib/epub';
-  import type { PackageResult, PackageProgress } from '$lib/epub';
+  import { EPUBPackager } from '../lib/epub';
+  import type { PackageResult, PackageProgress } from '../lib/epub';
   import { BASIC_EPUB_WORKSPACE, MockFileStorageAPI } from './epub-packaging-mock-data';
 
   export let showProgress = true;
