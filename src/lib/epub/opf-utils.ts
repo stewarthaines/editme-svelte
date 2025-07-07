@@ -30,6 +30,13 @@ export interface EPUBMetadata {
   // EPUB-specific metadata
   modifiedDate?: string;
   epubVersion?: string;
+
+  // EPUB 3 accessibility metadata
+  accessMode?: string[];
+  accessModeSufficient?: string[];
+  accessibilityFeature?: string[];
+  accessibilityHazard?: string[];
+  accessibilitySummary?: string;
 }
 
 export interface ContainerInfo {

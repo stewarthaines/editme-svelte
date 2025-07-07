@@ -34,10 +34,10 @@ import type {
   EPUBMetadata,
 } from '../../epub/opf-utils.js';
 
-export interface MockOPFDocument extends OPFDocument {
+export interface MockOPFDocument extends Omit<OPFDocument, 'metadata'> {
   manifest: ManifestItem[];
   spine: SpineItem[];
-  metadata: EPUBMetadata;
+  metadata: EPUBMetadata | undefined;
 }
 
 export type WorkspaceFailureMode = 
@@ -119,7 +119,7 @@ export class MockWorkspaceManager implements Partial<WorkspaceManager> {
 
   // Core WorkspaceManager methods
 
-  async getWorkspaceOPF(workspaceId: string): Promise<OPFDocument> {
+  async getWorkspaceOPF(workspaceId: string): Promise<MockOPFDocument> {
     this.operationCount++;
     if (this.failureMode === 'opf-read') {
       throw new Error('Failed to read OPF document');
@@ -285,6 +285,9 @@ export class MockWorkspaceManager implements Partial<WorkspaceManager> {
     if (this.failureMode === 'file-write') {
       throw new Error(`Failed to write file: ${path}`);
     }
+    if (this.failureMode === 'opf-write' && path.includes('content.opf')) {
+      throw new Error(`Failed to write OPF file: ${path}`);
+    }
 
     const workspace = this.ensureWorkspace(workspaceId);
     const existingContent = workspace.get(path);
@@ -369,7 +372,7 @@ export class MockWorkspaceManager implements Partial<WorkspaceManager> {
     const fullOPF: MockOPFDocument = {
       manifest: opf.manifest || [],
       spine: opf.spine || [],
-      metadata: opf.metadata || {
+      metadata: 'metadata' in opf ? opf.metadata : {
         title: 'Test EPUB',
         language: 'en',
         identifier: `urn:uuid:${crypto.randomUUID()}`,
