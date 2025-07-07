@@ -8,8 +8,8 @@ Manages the EPUB spine (reading order) with drag-and-drop reordering, item opera
 
 - List of spine items with reorder capability
 - Rename, delete, append operations
-- Drag-and-drop reordering
-- Association of spine item with its plain text source file in SOURCE/text
+- Drag-and-drop reordering (that works with keyboard navigation)
+- Association of spine item with its plain text source file in `SOURCE/text`
 - Source plain text file always created with new spine item
 
 ## Dependencies
@@ -195,7 +195,7 @@ interface SpineItemWithSource {
 ```typescript
 const createSourceFile = async (spineItem: SpineItemWithSource): Promise<void> => {
   const sourceFileName = spineItem.id + '.txt';
-  const sourcePath = `SOURCE/text/${sourceFileName}`;  // Changed to SOURCE/text/
+  const sourcePath = `SOURCE/text/${sourceFileName}`; // Changed to SOURCE/text/
 
   // Create default content based on spine item title
   const defaultContent = `# ${getDisplayTitle(spineItem)}\n\nContent goes here...\n`;

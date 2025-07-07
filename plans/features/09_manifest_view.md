@@ -2,15 +2,16 @@
 
 ## Overview
 
-Provides a table-based interface for viewing and managing all EPUB manifest items with content preview capabilities and item creation/editing functionality.
+Provides a table-based interface for viewing and managing all EPUB manifest items with content preview capabilities and item creation/editing/download functionality.
 
 ## Requirements
 
 - Table display of all manifest items
 - Row selection and content preview
 - Support for text, image, audio, video preview
-- Add/Create manifest item buttons
+- Add/Create manifest item buttons (either as named text file or load from file)
 - content.opf display as text item
+- Download selected item
 
 ## Dependencies
 
@@ -18,10 +19,11 @@ Provides a table-based interface for viewing and managing all EPUB manifest item
 
 ## Technical Approach
 
-- Data table with sortable columns
+- Table with manifest item attribute columns, in manifest order
 - Preview pane with content-type specific rendering
 - Modal dialogs for item creation/editing
 - File upload handling for new resources
+- If Advanced Mode enabled for the workspace (see @plans/features/22_settings_manager.md) then the unpacked `SOURCE/` contents are displayed below the main manifest items, otherwise just the `SOURCE.zip` which can't be deleted.
 
 ## API Design
 
@@ -72,10 +74,10 @@ interface ManifestItemExtended extends ManifestItem {
     <table class="manifest-table">
       <thead>
         <tr>
-          <th on:click={() => sort('id')}>ID</th>
-          <th on:click={() => sort('href')}>File Path</th>
-          <th on:click={() => sort('mediaType')}>Media Type</th>
-          <th on:click={() => sort('size')}>Size</th>
+          <th>ID</th>
+          <th>File Path</th>
+          <th>Media Type</th>
+          <th>Size</th>
           <th>Properties</th>
           <th>Actions</th>
         </tr>
@@ -224,26 +226,9 @@ const handleFileUpload = async (files: FileList) => {
 </Modal>
 ```
 
-## Sorting and Filtering
+## Filtering
 
 ```typescript
-const sortItems = (
-  items: ManifestItem[],
-  column: keyof ManifestItem,
-  direction: 'asc' | 'desc'
-) => {
-  return [...items].sort((a, b) => {
-    const aVal = a[column] || '';
-    const bVal = b[column] || '';
-
-    if (direction === 'asc') {
-      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-    } else {
-      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-    }
-  });
-};
-
 const filterItems = (items: ManifestItem[], filterText: string) => {
   if (!filterText) return items;
 
