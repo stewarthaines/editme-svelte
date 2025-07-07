@@ -49,6 +49,7 @@
   --color-border-warning: var(--color-warning-600);
   --color-border-error: var(--color-error-600);
   --color-border-focus: var(--color-primary-400);
+  --color-border-hover: var(--color-neutral-600);
 
   /* ============================================
      INTERACTIVE COLORS - Dark Theme
@@ -106,6 +107,28 @@
   --color-status-warning: var(--color-warning-400);
   --color-status-error: var(--color-error-400);
   --color-status-info: var(--color-primary-400);
+
+  /* ============================================
+     ACCESSIBILITY COLORS - Dark Theme Overrides
+     Dark theme versions of focus indicators and WCAG compliant colors
+     ============================================ */
+
+  /* Focus indicators - optimized for dark backgrounds */
+  --color-focus: var(--color-primary-400);
+  --color-focus-ring: var(--color-primary-300);
+
+  /* Error and validation colors (WCAG AA compliant on dark) */
+  --color-error-text: #fca5a5; /* 4.5:1 contrast on dark */
+  --color-error-bg: var(--color-error-950);
+  --color-success-text: #86efac; /* 4.5:1 contrast on dark */
+  --color-success-bg: var(--color-success-950);
+  --color-warning-text: #fcd34d; /* 4.5:1 contrast on dark */
+  --color-warning-bg: var(--color-warning-950);
+
+  /* Disabled state colors */
+  --color-surface-disabled: var(--color-neutral-800);
+  --color-text-disabled: var(--color-neutral-500);
+  --color-surface-hover: var(--color-neutral-700);
 
   /* ============================================
      SHADOWS - Dark Theme

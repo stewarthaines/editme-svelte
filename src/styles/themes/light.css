@@ -52,6 +52,7 @@
   --color-border-warning: var(--color-warning-300);
   --color-border-error: var(--color-error-300);
   --color-border-focus: var(--color-primary-500);
+  --color-border-hover: var(--color-neutral-300);
 
   /* ============================================
      INTERACTIVE COLORS - Light Theme (Default)
@@ -109,6 +110,28 @@
   --color-status-warning: var(--color-warning-600);
   --color-status-error: var(--color-error-600);
   --color-status-info: var(--color-primary-600);
+
+  /* ============================================
+     ACCESSIBILITY COLORS - Light Theme (Explicit)
+     Explicit light theme versions for consistency
+     ============================================ */
+
+  /* Focus indicators - optimized for light backgrounds */
+  --color-focus: var(--color-primary-600);
+  --color-focus-ring: var(--color-primary-500);
+
+  /* Error and validation colors (WCAG AA compliant on light) */
+  --color-error-text: #dc2626; /* 4.5:1 contrast on white */
+  --color-error-bg: #fef2f2;
+  --color-success-text: #166534; /* 4.5:1 contrast on white */
+  --color-success-bg: #f0fdf4;
+  --color-warning-text: #92400e; /* 4.5:1 contrast on white */
+  --color-warning-bg: #fffbeb;
+
+  /* Disabled state colors */
+  --color-surface-disabled: var(--color-neutral-100);
+  --color-text-disabled: var(--color-neutral-400);
+  --color-surface-hover: var(--color-neutral-50);
 
   /* ============================================
      SHADOWS - Light Theme (Default)
