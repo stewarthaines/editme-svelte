@@ -243,7 +243,7 @@ export class EPUBPackager {
 
   generateFilename(metadata: EPUBMetadata): string {
     const title = this.sanitizeFilename(metadata.title || 'Untitled');
-    const author = metadata.author ? this.sanitizeFilename(metadata.author) : null;
+    const author = metadata.creator?.[0] ? this.sanitizeFilename(metadata.creator[0]) : null;
     const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     const parts = [title];
