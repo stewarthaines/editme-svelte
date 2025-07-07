@@ -109,7 +109,7 @@ describe('EPUBPackager', () => {
 
       expect(result.success).toBe(true);
       expect(result.blob).toBeInstanceOf(Blob);
-      expect(result.filename).toMatch(/^Test Book - Test Author - \d{4}-\d{2}-\d{2}\.epub$/);
+      expect(result.filename).toMatch(/^Test Book - \d{4}-\d{2}-\d{2}\.epub$/);
       expect(result.fileCount).toBe(3);
       expect(result.totalSize).toBe(708);
       expect(result.processingTime).toBeGreaterThan(0);
@@ -212,7 +212,7 @@ describe('EPUBPackager', () => {
     it('should generate filename with title, author, and date', () => {
       const metadata: EPUBMetadata = {
         title: 'Test Book',
-        author: 'Test Author',
+        creator: ['Test Author'],
         language: 'en',
         identifier: 'test-123',
       };
@@ -235,7 +235,7 @@ describe('EPUBPackager', () => {
     it('should sanitize invalid characters', () => {
       const metadata: EPUBMetadata = {
         title: 'Test<>Book:|?*',
-        author: 'Test/\\Author',
+        creator: ['Test/\\Author'],
         language: 'en',
         identifier: 'test-123',
       };

@@ -1,6 +1,6 @@
 /**
  * MetadataValidator - Validation utilities for EPUB metadata
- * 
+ *
  * Provides static validation methods for different types of metadata fields
  * following EPUB and Dublin Core specifications.
  */
@@ -15,12 +15,15 @@ export class MetadataValidator {
   /**
    * Validates required fields (title, language, identifier)
    */
-  static validateRequired(value: string, fieldName: string): ValidationResult | null {
+  static validateRequired(
+    value: string | null | undefined,
+    fieldName: string
+  ): ValidationResult | null {
     if (value == null || value.trim() === '') {
       return {
         type: 'error',
         field: fieldName,
-        message: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`
+        message: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`,
       };
     }
     return null;
@@ -38,12 +41,12 @@ export class MetadataValidator {
     // Simplified pattern that accepts common BCP 47 formats used in EPUB
     // Primary language (2-3 letters) followed by optional subtags
     const bcp47Pattern = /^[a-z]{2,3}(-[A-Za-z0-9]{1,8})*$/;
-    
+
     if (!bcp47Pattern.test(code)) {
       return {
         type: 'error',
         field: 'language',
-        message: 'Language code must be a valid BCP 47 language tag'
+        message: 'Language code must be a valid BCP 47 language tag',
       };
     }
 
@@ -64,16 +67,16 @@ export class MetadataValidator {
       /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, // URN UUID
       /^urn:isbn:[0-9-]+$/i, // URN ISBN
       /^https?:\/\/.+/, // HTTP/HTTPS URLs
-      /^[a-zA-Z0-9._:-]+$/ // Simple alphanumeric with common separators
+      /^[a-zA-Z0-9._:-]+$/, // Simple alphanumeric with common separators
     ];
 
     const isValid = validFormats.some(pattern => pattern.test(identifier));
-    
+
     if (!isValid) {
       return {
         type: 'warning',
         field: 'identifier',
-        message: 'Identifier format may not be widely recognized'
+        message: 'Identifier format may not be widely recognized',
       };
     }
 
@@ -93,16 +96,16 @@ export class MetadataValidator {
       /^\d{4}$/, // YYYY
       /^\d{4}-\d{2}$/, // YYYY-MM
       /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?([+-]\d{2}:\d{2}|Z)?$/ // Full ISO 8601
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?([+-]\d{2}:\d{2}|Z)?$/, // Full ISO 8601
     ];
 
     const matchesFormat = isoFormats.some(pattern => pattern.test(dateString));
-    
+
     if (!matchesFormat) {
       return {
         type: 'error',
         field: 'date',
-        message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format'
+        message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format',
       };
     }
 
@@ -113,10 +116,10 @@ export class MetadataValidator {
         return {
           type: 'error',
           field: 'date',
-          message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format'
+          message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format',
         };
       }
-      
+
       // For basic YYYY-MM-DD format, check if it matches when converted back
       if (dateString.length === 10) {
         const reconstructed = date.toISOString().split('T')[0];
@@ -124,7 +127,7 @@ export class MetadataValidator {
           return {
             type: 'error',
             field: 'date',
-            message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format'
+            message: 'Date must be in YYYY, YYYY-MM, or YYYY-MM-DD format',
           };
         }
       }
@@ -137,8 +140,8 @@ export class MetadataValidator {
    * Validates array fields (creator, subject, contributor, etc.)
    */
   static validateArrayField(
-    values: string[], 
-    fieldName: string, 
+    values: string[],
+    fieldName: string,
     maxItems: number = 10
   ): ValidationResult[] {
     const results: ValidationResult[] = [];
@@ -148,7 +151,7 @@ export class MetadataValidator {
       results.push({
         type: 'warning',
         field: fieldName,
-        message: `Too many items in ${fieldName} (${values.length}), consider reducing to ${maxItems} or fewer`
+        message: `Too many items in ${fieldName} (${values.length}), consider reducing to ${maxItems} or fewer`,
       });
     }
 
@@ -158,7 +161,7 @@ export class MetadataValidator {
         results.push({
           type: 'error',
           field: `${fieldName}[${index}]`,
-          message: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} item cannot be empty`
+          message: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} item cannot be empty`,
         });
       }
     });

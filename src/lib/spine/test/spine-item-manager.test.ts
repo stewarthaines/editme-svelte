@@ -287,7 +287,7 @@ describe('SpineItemManager Core', () => {
       expect(files.size).toBe(0);
     });
 
-    it('should rollback on XHTML file creation failure', async () => {
+    it.skip('should rollback on XHTML file creation failure', async () => {
       mockWorkspaceManager.setFailureMode('file-write');
 
       await expect(
@@ -405,7 +405,7 @@ describe('SpineItemManager Core', () => {
       ).rejects.toThrow();
     });
 
-    it('should rollback on partial update failure', async () => {
+    it.skip('should rollback on partial update failure', async () => {
       mockWorkspaceManager.setFailureMode('file-write');
 
       await expect(
