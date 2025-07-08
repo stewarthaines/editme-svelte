@@ -75,7 +75,7 @@
     </div>
   </svelte:fragment>
 
-  <svelte:fragment slot="sidebar-nav">
+  <svelte:fragment slot="sidebar-navigation">
     <div class="demo-content">
       <h3>📖 Navigation</h3>
       <nav class="toc">
@@ -274,7 +274,7 @@
     </div>
   </svelte:fragment>
 
-  <svelte:fragment slot="sidebar-nav">
+  <svelte:fragment slot="sidebar-navigation">
     <div class="demo-content">
       <h3>📖 Navigation</h3>
       <p>Create and edit table of contents</p>

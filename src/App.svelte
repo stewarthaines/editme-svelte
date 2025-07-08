@@ -34,7 +34,7 @@
           // Default behavior - create own manager
           currentWorkspaceManager = new WorkspaceManager();
           await currentWorkspaceManager.init();
-          
+
           // Get the first available workspace
           const workspaces = await currentWorkspaceManager.listWorkspacesWithMetadata();
           if (workspaces.length > 0) {
@@ -45,7 +45,7 @@
           currentWorkspaceManager = workspaceManager;
           currentWorkspaceId = initialWorkspaceId;
         }
-        
+
         initialized = true;
       } catch (error) {
         console.error('Failed to initialize workspace manager:', error);
@@ -56,10 +56,23 @@
     const handleSelectSpineItem = (event: Event) => {
       const customEvent = event as CustomEvent<{ itemId: string }>;
       selectedSpineItemId = customEvent.detail.itemId;
+
+      // Automatically navigate to spine view when a spine item is selected
+      navigationStore.navigateTo('spine');
+    };
+
+    // Listen for spine item clear events
+    const handleClearSpineSelection = () => {
+      selectedSpineItemId = null;
     };
 
     window.addEventListener('select-spine-item', handleSelectSpineItem);
-    return () => window.removeEventListener('select-spine-item', handleSelectSpineItem);
+    window.addEventListener('clear-spine-selection', handleClearSpineSelection);
+
+    return () => {
+      window.removeEventListener('select-spine-item', handleSelectSpineItem);
+      window.removeEventListener('clear-spine-selection', handleClearSpineSelection);
+    };
   });
 </script>
 
@@ -86,40 +99,40 @@
     {:else if currentView === 'metadata'}
       <MetadataView />
     {:else if currentView === 'manifest'}
-      <PlaceholderView 
-        viewType="manifest" 
-        title={$t('File Manifest')} 
+      <PlaceholderView
+        viewType="manifest"
+        title={$t('File Manifest')}
         description={$t('Manage EPUB files and resources')}
-        icon="📋" 
+        icon="📋"
       />
     {:else if currentView === 'navigation'}
-      <PlaceholderView 
-        viewType="navigation" 
-        title={$t('Table of Contents')} 
+      <PlaceholderView
+        viewType="navigation"
+        title={$t('Table of Contents')}
         description={$t('Edit navigation structure and TOC')}
-        icon="📖" 
+        icon="📖"
       />
     {:else if currentView === 'spine'}
       {#if initialized && currentWorkspaceId && currentWorkspaceManager}
-        <SpineView 
+        <SpineView
           workspaceId={currentWorkspaceId}
           workspaceManager={currentWorkspaceManager}
           selectedItemId={selectedSpineItemId}
         />
       {:else}
-        <PlaceholderView 
-          viewType="spine" 
-          title={$t('Spine Items')} 
+        <PlaceholderView
+          viewType="spine"
+          title={$t('Spine Items')}
           description={$t('Loading workspace...')}
-          icon="📚" 
+          icon="📚"
         />
       {/if}
     {:else if currentView === 'settings'}
-      <PlaceholderView 
-        viewType="settings" 
-        title={$t('Application Settings')} 
+      <PlaceholderView
+        viewType="settings"
+        title={$t('Application Settings')}
         description={$t('Configure preferences and options')}
-        icon="⚙️" 
+        icon="⚙️"
       />
     {:else}
       <div class="placeholder-content">

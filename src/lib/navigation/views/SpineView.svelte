@@ -148,29 +148,29 @@
           <h3>{$t('Item Information')}</h3>
           <div class="metadata-grid">
             <div class="metadata-item">
-              <label>{$t('ID')}</label>
+              <div>{$t('ID')}</div>
               <span class="mono">{selectedItem.id}</span>
             </div>
             <div class="metadata-item">
-              <label>{$t('Title')}</label>
+              <div>{$t('Title')}</div>
               <span>{selectedItem.idref || $t('Untitled')}</span>
             </div>
             <div class="metadata-item">
-              <label>{$t('Linear')}</label>
+              <div>{$t('Linear')}</div>
               <span class={selectedItem.linear ? 'status-success' : 'status-warning'}>
                 {selectedItem.linear ? $t('Yes') : $t('No')}
               </span>
             </div>
             <div class="metadata-item">
-              <label>{$t('XHTML Path')}</label>
+              <div>{$t('XHTML Path')}</div>
               <span class="mono">{selectedItem.href}</span>
             </div>
             <div class="metadata-item">
-              <label>{$t('Source Path')}</label>
+              <div>{$t('Source Path')}</div>
               <span class="mono">SOURCE/text/{selectedItem.id}.txt</span>
             </div>
             <div class="metadata-item">
-              <label>{$t('Source Status')}</label>
+              <div>{$t('Source Status')}</div>
               <span class={selectedItem.hasSourceFile ? 'status-success' : 'status-error'}>
                 {selectedItem.hasSourceFile ? $t('Available') : $t('Missing')}
               </span>
@@ -345,7 +345,7 @@
     gap: var(--space-1);
   }
 
-  .metadata-item label {
+  .metadata-item div {
     font-size: var(--text-xs);
     font-weight: var(--font-medium);
     color: var(--color-text-secondary);

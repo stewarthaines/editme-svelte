@@ -117,7 +117,7 @@
       <slot name="sidebar-workspace" />
       <slot name="sidebar-metadata" />
       <slot name="sidebar-manifest" />
-      <slot name="sidebar-nav" />
+      <slot name="sidebar-navigation" />
       <slot name="sidebar-settings" />
     </div>
   </div>

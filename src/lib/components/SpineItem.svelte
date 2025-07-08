@@ -153,6 +153,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
     padding-block: var(--space-2);
     padding-inline-start: var(--space-2);
     padding-inline-end: var(--space-2); /* Add right padding for non-selected items */

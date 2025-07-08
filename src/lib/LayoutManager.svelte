@@ -25,8 +25,8 @@
       <slot name="sidebar-manifest" />
     </svelte:fragment>
 
-    <svelte:fragment slot="sidebar-nav">
-      <slot name="sidebar-nav" />
+    <svelte:fragment slot="sidebar-navigation">
+      <slot name="sidebar-navigation" />
     </svelte:fragment>
 
     <svelte:fragment slot="sidebar-spine">

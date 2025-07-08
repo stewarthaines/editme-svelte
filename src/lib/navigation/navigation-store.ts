@@ -120,9 +120,23 @@ function createNavigationStore(): NavigationStore {
 
       // Listen for layout store changes
       layoutStore.subscribe(({ sidebar }) => {
-        if (sidebar.activeSection !== savedCurrentView) {
-          // Layout store changed, update navigation
-          this.navigateTo(sidebar.activeSection as ViewType, { replaceHistory: true });
+        // Get the actual current state instead of using savedCurrentView
+        let currentView: ViewType | null = null;
+        const unsubscribe = this.subscribe(state => {
+          currentView = state.currentView;
+        });
+        unsubscribe(); // Immediately unsubscribe after getting current value
+        
+        if (sidebar.activeSection !== currentView) {
+          // Firefox-specific fix: Add microtask delay to handle async timing issues
+          if (navigator.userAgent.includes('Firefox')) {
+            queueMicrotask(() => {
+              this.navigateTo(sidebar.activeSection as ViewType, { replaceHistory: true });
+            });
+          } else {
+            // Layout store changed, update navigation
+            this.navigateTo(sidebar.activeSection as ViewType, { replaceHistory: true });
+          }
         }
       });
     },
@@ -152,6 +166,13 @@ function createNavigationStore(): NavigationStore {
             update(state => ({ ...state, isTransitioning: false }));
             return false;
           }
+        }
+
+        // Clear spine item selection when navigating away from spine view
+        if (currentState.currentView === 'spine' && view !== 'spine') {
+          console.log('[NavigationStore] Clearing spine selection - navigating from spine to', view);
+          const clearEvent = new CustomEvent('clear-spine-selection');
+          window.dispatchEvent(clearEvent);
         }
 
         // Perform navigation
