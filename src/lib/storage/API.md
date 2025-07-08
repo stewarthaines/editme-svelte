@@ -275,6 +275,29 @@ Helper method for reading text files. Automatically decodes ArrayBuffer to strin
 const opfContent = await storage.readTextFile('workspace-id', 'OEBPS/content.opf');
 ```
 
+#### getFileInfo()
+
+```typescript
+getFileInfo(workspaceId: string, path: string): Promise<{ size: number; lastModified: Date }>
+```
+
+**Input:**
+
+- `workspaceId: string` - Source workspace
+- `path: string` - File path within workspace
+
+**Output:** `Promise<{ size: number; lastModified: Date }>` - File metadata
+
+**Side Effects:** None (read-only)
+
+**Usage:**
+
+```typescript
+const fileInfo = await storage.getFileInfo('workspace-id', 'OEBPS/content.opf');
+console.log(`File size: ${fileInfo.size} bytes`);
+console.log(`Last modified: ${fileInfo.lastModified.toISOString()}`);
+```
+
 ## StorageBackendFactory
 
 ### Static Methods

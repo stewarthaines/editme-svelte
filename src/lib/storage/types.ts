@@ -44,6 +44,7 @@ export interface StorageBackend {
   readFile(workspaceId: string, path: string): Promise<ArrayBuffer>;
   deleteFile(workspaceId: string, path: string): Promise<void>;
   listFiles(workspaceId: string, path?: string): Promise<string[]>;
+  getFileInfo(workspaceId: string, path: string): Promise<{ size: number; lastModified: Date }>;
 
   // Storage info
   getQuota(): Promise<StorageQuota>;
@@ -136,6 +137,7 @@ export enum WorkerMessageType {
   READ_FILE = 'readFile',
   DELETE_FILE = 'deleteFile',
   LIST_FILES = 'listFiles',
+  GET_FILE_INFO = 'getFileInfo',
   GET_QUOTA = 'getQuota',
 }
 

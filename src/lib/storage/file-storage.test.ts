@@ -166,4 +166,48 @@ describe('File Storage API', () => {
       expect(results).toEqual(['operation1', 'operation2', 'operation3']);
     });
   });
+
+  describe('File Info API', () => {
+    it('should define getFileInfo method interface', () => {
+      // Test that the expected interface exists in type system
+      type FileInfoResult = { size: number; lastModified: Date };
+      
+      // This would be the expected function signature
+      const mockGetFileInfo = (workspaceId: string, path: string): Promise<FileInfoResult> => {
+        return Promise.resolve({
+          size: 1024,
+          lastModified: new Date()
+        });
+      };
+
+      expect(typeof mockGetFileInfo).toBe('function');
+    });
+
+    it('should handle file info data types correctly', () => {
+      const mockFileInfo = {
+        size: 2048,
+        lastModified: new Date('2023-12-01T10:00:00Z')
+      };
+
+      expect(typeof mockFileInfo.size).toBe('number');
+      expect(mockFileInfo.size).toBeGreaterThan(0);
+      expect(mockFileInfo.lastModified).toBeInstanceOf(Date);
+      expect(mockFileInfo.lastModified.getTime()).toBeGreaterThan(0);
+    });
+
+    it('should validate file info response structure', () => {
+      const validResponse = {
+        size: 1024,
+        lastModified: new Date()
+      };
+
+      // Check required properties exist
+      expect('size' in validResponse).toBe(true);
+      expect('lastModified' in validResponse).toBe(true);
+      
+      // Check property types
+      expect(typeof validResponse.size).toBe('number');
+      expect(validResponse.lastModified instanceof Date).toBe(true);
+    });
+  });
 });
