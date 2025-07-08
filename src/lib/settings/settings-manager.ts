@@ -15,7 +15,7 @@ import type {
   EPUBSettings,
   SettingsValidation,
   TransformOption,
-  ISettingsManager
+  SettingsManager
 } from './index.js';
 import { themeStore } from '../stores/theme.js';
 import { setLocale } from '../i18n/index.js';
@@ -33,7 +33,7 @@ interface TransformCache {
   timestamp: number;
 }
 
-export class SettingsManager implements ISettingsManager {
+export class DefaultSettingsManager implements SettingsManager {
   private fileStorage: FileStorageAPI;
   private extensionManager: ExtensionManager;
   private transformCache: TransformCache | null = null;

@@ -29,7 +29,8 @@ import {
   simulateFileReadError,
 } from './test-utils.js';
 
-import { SettingsManager } from '../settings-manager.js';
+import { DefaultSettingsManager } from '../settings-manager.js';
+import type { SettingsManager } from '../index.js';
 
 describe('Settings Manager Core', () => {
   let settingsManager: SettingsManager;
@@ -42,7 +43,7 @@ describe('Settings Manager Core', () => {
     mockExtensionManager = createMockExtensionManager();
     mockLocalStorage = setupLocalStorageMock();
 
-    settingsManager = new SettingsManager(mockFileStorage as any, mockExtensionManager as any);
+    settingsManager = new DefaultSettingsManager(mockFileStorage as any, mockExtensionManager as any);
 
     resetAllMocks(mockFileStorage, mockExtensionManager, mockLocalStorage);
   });

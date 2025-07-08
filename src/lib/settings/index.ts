@@ -10,8 +10,8 @@
 import type { FileStorageAPI } from '../storage/index.js';
 import type { ExtensionManager } from '../extensions/index.js';
 
-// Export the implementation
-export { SettingsManager } from './settings-manager.js';
+// Export the implementation class
+export { DefaultSettingsManager } from './settings-manager.js';
 
 // ============================================================================
 // Type Definitions
@@ -60,7 +60,7 @@ export interface TransformOption {
 // Settings Manager Interface
 // ============================================================================
 
-export interface ISettingsManager {
+export interface SettingsManager {
 
   // Global Settings (localStorage)
   loadGlobalSettings(): GlobalSettings;
@@ -97,6 +97,7 @@ export interface ISettingsManager {
   validateWorkspaceSettings(settings: Partial<WorkspaceSettings>): SettingsValidation;
   validateEPUBSettings(settings: Partial<EPUBSettings>): SettingsValidation;
 }
+
 
 // ============================================================================
 // Method Signatures

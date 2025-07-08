@@ -15,18 +15,18 @@ import {
   createMockExtensionManager
 } from './test-utils.js';
 
-import { SettingsManager } from '../settings-manager.js';
-import type { SettingsManager as ISettingsManager } from '../index.js';
+import { DefaultSettingsManager } from '../settings-manager.js';
+import type { SettingsManager } from '../index.js';
 
 describe('Settings Validation', () => {
-  let settingsManager: ISettingsManager;
+  let settingsManager: SettingsManager;
   let mockFileStorage: ReturnType<typeof createMockFileStorage>;
   let mockExtensionManager: ReturnType<typeof createMockExtensionManager>;
 
   beforeEach(() => {
     mockFileStorage = createMockFileStorage();
     mockExtensionManager = createMockExtensionManager();
-    settingsManager = new SettingsManager(mockFileStorage as any, mockExtensionManager as any);
+    settingsManager = new DefaultSettingsManager(mockFileStorage as any, mockExtensionManager as any);
   });
 
   describe('validateGlobalSettings', () => {

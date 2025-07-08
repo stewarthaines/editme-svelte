@@ -10,7 +10,7 @@ import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 import { SETTINGS_FIXTURES } from './fixtures.js';
 import { createTempWorkspace, cleanupTempWorkspace, createMockFileStorage, createMockExtensionManager } from './test-utils.js';
 import type { SettingsManager } from '../index.js';
-import { SettingsManager as SettingsManagerImpl } from '../settings-manager.js';
+import { DefaultSettingsManager } from '../settings-manager.js';
 
 describe.skip('Settings Manager Integration', () => {
   // These tests will be enabled when the actual SettingsManager is implemented
@@ -26,7 +26,7 @@ describe.skip('Settings Manager Integration', () => {
     mockFileStorage = createMockFileStorage();
     mockExtensionManager = createMockExtensionManager();
     
-    settingsManager = new SettingsManagerImpl(mockFileStorage as any, mockExtensionManager as any);
+    settingsManager = new DefaultSettingsManager(mockFileStorage as any, mockExtensionManager as any);
   });
   
   afterEach(async () => {
