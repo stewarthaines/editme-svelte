@@ -42,3 +42,4 @@ static/translations.zip
 
 # TypeScript build artifacts
 *.tsbuildinfo
+vite.config.d.ts
