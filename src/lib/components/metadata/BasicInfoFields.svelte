@@ -1,14 +1,17 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
+  import type { EPUBMetadata } from '../../epub';
+  import type { ValidationResult } from '../../metadata/MetadataValidator';
+  import { MetadataUtils, type ArrayMetadataFields } from '../../epub/opf-utils';
 
   const dispatch = createEventDispatcher();
 
-  export let metadata = {};
-  export let validationErrors = [];
+  export let metadata: EPUBMetadata = { title: '', language: '', identifier: '' };
+  export let validationErrors: ValidationResult[] = [];
   export let saving = false;
 
   // Language options - simplified for now
@@ -23,56 +26,56 @@
     { value: 'zh', label: '中文' },
     { value: 'ar', label: 'العربية' },
     { value: 'he', label: 'עברית' },
-    { value: 'ka', label: 'ქართული' }
+    { value: 'ka', label: 'ქართული' },
   ];
 
   // Rendition options
   const layoutOptions = [
     { value: 'reflowable', label: $t('Reflowable') },
-    { value: 'pre-paginated', label: $t('Pre-paginated') }
+    { value: 'pre-paginated', label: $t('Pre-paginated') },
   ];
 
   const progressionOptions = [
     { value: 'default', label: $t('Default') },
     { value: 'ltr', label: $t('Left to Right') },
-    { value: 'rtl', label: $t('Right to Left') }
+    { value: 'rtl', label: $t('Right to Left') },
   ];
 
   const orientationOptions = [
     { value: 'auto', label: $t('Auto') },
     { value: 'landscape', label: $t('Landscape') },
-    { value: 'portrait', label: $t('Portrait') }
+    { value: 'portrait', label: $t('Portrait') },
   ];
 
   const spreadOptions = [
     { value: 'auto', label: $t('Auto') },
     { value: 'none', label: $t('None') },
-    { value: 'both', label: $t('Both') }
+    { value: 'both', label: $t('Both') },
   ];
 
-  const getFieldError = (fieldName) => {
+  const getFieldError = (fieldName: string) => {
     const error = validationErrors.find(err => err.field === fieldName);
     return error ? error.message : '';
   };
 
-  const handleFieldChange = (field, value) => {
+  const handleFieldChange = (field: string, value: any[]) => {
     dispatch('fieldChange', { field, value });
   };
 
-  const handleFieldSave = (field, value) => {
+  const handleFieldSave = (field: string, value: string[] | undefined) => {
     dispatch('fieldSave', { field, value });
   };
 
-  const handleArrayAdd = (field) => {
+  const handleArrayAdd = (field: ArrayMetadataFields) => {
     dispatch('arrayAdd', { field });
   };
 
-  const handleArrayRemove = (field, index) => {
+  const handleArrayRemove = (field: ArrayMetadataFields, index: number) => {
     dispatch('arrayRemove', { field, index });
   };
 
-  const updateArrayItem = (field, index, value) => {
-    const currentArray = metadata[field] || [];
+  const updateArrayItem = (field: ArrayMetadataFields, index: number, value: string) => {
+    const currentArray = MetadataUtils.getArrayField(metadata, field);
     const newArray = [...currentArray];
     newArray[index] = value;
     handleFieldChange(field, newArray);
@@ -88,29 +91,29 @@
     <div class="column" tabindex="-1">
       <fieldset class="field-group" tabindex="-1">
         <legend class="group-title" tabindex="-1">{$t('Essential Information')}</legend>
-    
-    <TextMetadataField
-      id="title"
-      label={$t('Title')}
-      value={metadata.title || ''}
-      placeholder={$t('Enter book title')}
-      required={true}
-      error={getFieldError('title')}
-      on:change={(e) => handleFieldChange('title', e.detail.value)}
-      on:blur={(e) => handleFieldSave('title', e.detail.value)}
-    />
 
-    <SelectMetadataField
-      id="language"
-      label={$t('Language')}
-      value={metadata.language || ''}
-      options={languageOptions}
-      placeholder={$t('Select language')}
-      required={true}
-      error={getFieldError('language')}
-      on:change={(e) => handleFieldChange('language', e.detail.value)}
-      on:blur={(e) => handleFieldSave('language', e.detail.value)}
-    />
+        <TextMetadataField
+          id="title"
+          label={$t('Title')}
+          value={metadata.title || ''}
+          placeholder={$t('Enter book title')}
+          required={true}
+          error={getFieldError('title')}
+          on:change={e => handleFieldChange('title', e.detail.value)}
+          on:blur={e => handleFieldSave('title', e.detail.value)}
+        />
+
+        <SelectMetadataField
+          id="language"
+          label={$t('Language')}
+          value={metadata.language || ''}
+          options={languageOptions}
+          placeholder={$t('Select language')}
+          required={true}
+          error={getFieldError('language')}
+          on:change={e => handleFieldChange('language', e.detail.value)}
+          on:blur={e => handleFieldSave('language', e.detail.value)}
+        />
 
         <div class="identifier-field">
           <TextMetadataField
@@ -120,8 +123,8 @@
             placeholder={$t('Enter a unique identifier')}
             required={true}
             error={getFieldError('identifier')}
-            on:change={(e) => handleFieldChange('identifier', e.detail.value)}
-            on:blur={(e) => handleFieldSave('identifier', e.detail.value)}
+            on:change={e => handleFieldChange('identifier', e.detail.value)}
+            on:blur={e => handleFieldSave('identifier', e.detail.value)}
           />
           <button
             type="button"
@@ -136,38 +139,38 @@
 
       <fieldset class="field-group">
         <legend class="group-title" tabindex="-1">{$t('Authors')}</legend>
-    
-    <div class="array-field">
-      {#each (metadata.creator || []) as author, index}
-        <div class="array-item">
-          <TextMetadataField
-            id="creator-{index}"
-            value={author}
-            placeholder={$t('Author name')}
-            error={getFieldError(`creator[${index}]`)}
-            on:change={(e) => updateArrayItem('creator', index, e.detail.value)}
-            on:blur={() => handleFieldSave('creator', metadata.creator)}
-          />
+
+        <div class="array-field">
+          {#each metadata.creator || [] as author, index}
+            <div class="array-item">
+              <TextMetadataField
+                id="creator-{index}"
+                value={author}
+                placeholder={$t('Author name')}
+                error={getFieldError(`creator[${index}]`)}
+                on:change={e => updateArrayItem('creator', index, e.detail.value)}
+                on:blur={() => handleFieldSave('creator', metadata.creator)}
+              />
+              <button
+                type="button"
+                class="remove-button"
+                on:click={() => handleArrayRemove('creator', index)}
+                disabled={saving}
+                aria-label={$t('Remove author')}
+              >
+                ×
+              </button>
+            </div>
+          {/each}
+
           <button
             type="button"
-            class="remove-button"
-            on:click={() => handleArrayRemove('creator', index)}
+            class="add-button"
+            on:click={() => handleArrayAdd('creator')}
             disabled={saving}
-            aria-label={$t('Remove author')}
           >
-            ×
+            {$t('Add Author')}
           </button>
-        </div>
-      {/each}
-      
-      <button
-        type="button"
-        class="add-button"
-        on:click={() => handleArrayAdd('creator')}
-        disabled={saving}
-      >
-        {$t('Add Author')}
-      </button>
         </div>
       </fieldset>
     </div>
@@ -175,30 +178,30 @@
     <div class="column">
       <fieldset class="field-group">
         <legend class="group-title" tabindex="-1">{$t('Description')}</legend>
-        
+
         <TextareaMetadataField
           id="description"
-          label={$t('Description')}
+          label={undefined}
           value={metadata.description || ''}
           placeholder={$t('Enter book description')}
           error={getFieldError('description')}
           rows={3}
-          on:change={(e) => handleFieldChange('description', e.detail.value)}
-          on:blur={(e) => handleFieldSave('description', e.detail.value)}
+          on:change={e => handleFieldChange('description', e.detail.value)}
+          on:blur={e => handleFieldSave('description', e.detail.value)}
         />
       </fieldset>
 
       <fieldset class="field-group">
         <legend class="group-title" tabindex="-1">{$t('Rendition Properties')}</legend>
-    
+
         <SelectMetadataField
           id="renditionLayout"
           label={$t('Layout')}
           value={metadata.renditionLayout || 'reflowable'}
           options={layoutOptions}
           error={getFieldError('renditionLayout')}
-          on:change={(e) => handleFieldChange('renditionLayout', e.detail.value)}
-          on:blur={(e) => handleFieldSave('renditionLayout', e.detail.value)}
+          on:change={e => handleFieldChange('renditionLayout', e.detail.value)}
+          on:blur={e => handleFieldSave('renditionLayout', e.detail.value)}
         />
 
         <SelectMetadataField
@@ -207,8 +210,8 @@
           value={metadata.pageProgressionDirection || 'default'}
           options={progressionOptions}
           error={getFieldError('pageProgressionDirection')}
-          on:change={(e) => handleFieldChange('pageProgressionDirection', e.detail.value)}
-          on:blur={(e) => handleFieldSave('pageProgressionDirection', e.detail.value)}
+          on:change={e => handleFieldChange('pageProgressionDirection', e.detail.value)}
+          on:blur={e => handleFieldSave('pageProgressionDirection', e.detail.value)}
         />
 
         <SelectMetadataField
@@ -217,8 +220,8 @@
           value={metadata.renditionOrientation || 'auto'}
           options={orientationOptions}
           error={getFieldError('renditionOrientation')}
-          on:change={(e) => handleFieldChange('renditionOrientation', e.detail.value)}
-          on:blur={(e) => handleFieldSave('renditionOrientation', e.detail.value)}
+          on:change={e => handleFieldChange('renditionOrientation', e.detail.value)}
+          on:blur={e => handleFieldSave('renditionOrientation', e.detail.value)}
         />
 
         <SelectMetadataField
@@ -227,8 +230,8 @@
           value={metadata.renditionSpread || 'auto'}
           options={spreadOptions}
           error={getFieldError('renditionSpread')}
-          on:change={(e) => handleFieldChange('renditionSpread', e.detail.value)}
-          on:blur={(e) => handleFieldSave('renditionSpread', e.detail.value)}
+          on:change={e => handleFieldChange('renditionSpread', e.detail.value)}
+          on:blur={e => handleFieldSave('renditionSpread', e.detail.value)}
         />
       </fieldset>
     </div>
@@ -272,8 +275,6 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text-primary);
-    padding: 0 0.75rem;
-    margin-block-end: 1rem;
   }
 
   .identifier-field {
@@ -308,7 +309,7 @@
   .generate-button:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .generate-button:disabled {
@@ -355,14 +356,16 @@
   }
 
   .array-item :global(.field-input.needs-attention:focus) {
-    box-shadow: inset 0 0 0 2px #228B22;
+    box-shadow: inset 0 0 0 2px #228b22;
   }
 
   .remove-button {
     width: 2.5rem;
-    height: calc(1rem * 1.5 + 0.75rem * 2 + 2px); /* Match input total height: line-height + padding + border */
+    height: calc(
+      1rem * 1.5 + 0.75rem * 2 - 1px
+    ); /* Match input total height: line-height + padding + border */
     border: none;
-    border-left: 1px solid var(--color-border-default);
+    border-inline-start: 1px solid var(--color-border-default);
     border-radius: 0;
     background-color: var(--color-bg-secondary);
     color: var(--color-error);
@@ -379,14 +382,16 @@
 
   .remove-button:hover:not(:disabled) {
     background-color: var(--color-error-bg);
-    border-left-color: var(--color-error-600);
+    border-inline-start-color: var(--color-error-600);
   }
 
   .remove-button:focus {
     outline: none;
     background-color: var(--color-error-bg);
-    border-left-color: var(--color-error-600);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring), inset 0 0 0 1px var(--color-error-600);
+    border-inline-start-color: var(--color-error-600);
+    box-shadow:
+      inset 0 0 0 2px var(--color-focus-ring),
+      inset 0 0 0 1px var(--color-error-600);
   }
 
   .remove-button:disabled {
@@ -414,7 +419,7 @@
   .add-button:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
     border-style: solid;
   }
 

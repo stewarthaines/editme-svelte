@@ -124,7 +124,7 @@
     <p>{$t('View and manage spine item content')}</p>
   </header>
 
-  <main class="view-content">
+  <div class="view-content">
     {#if isLoading}
       <div class="loading-state">
         <div class="spinner"></div>
@@ -219,7 +219,7 @@
         </section>
       </div>
     {/if}
-  </main>
+  </div>
 </div>
 
 <style>

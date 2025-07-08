@@ -1,48 +1,76 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import { t } from '../../i18n';
   import MetadataTabBar from './MetadataTabBar.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
   import AdvancedFields from './AdvancedFields.svelte';
+  import type { MetadataManagerImpl } from '../../metadata/MetadataManager';
+  import type { ValidationResult } from '../../metadata/MetadataValidator';
+  import type { EPUBMetadata } from '../../epub';
 
   export let workspaceId = '';
-  export let metadataManager = null;
+  export let metadataManager: MetadataManagerImpl | null = null;
 
-  let metadata = {};
-  let validationErrors = [];
+  let metadata: EPUBMetadata = { title: '', language: '', identifier: '' };
+  let validationErrors: ValidationResult[] = [];
   let activeTab = 'basic';
   let saving = false;
   let loading = true;
-  let error = null;
+  let error: string | null = null;
 
   // Tab definitions with labels
   $: tabs = [
     { id: 'basic', label: $t('Basic Info') },
     { id: 'advanced', label: $t('Advanced') },
     { id: 'publication', label: $t('Publication Details') },
-    { id: 'accessibility', label: $t('Accessibility') }
+    { id: 'accessibility', label: $t('Accessibility') },
   ];
 
-  const getTabFields = (tabId) => {
+  const getTabFields = (tabId: string) => {
     switch (tabId) {
       case 'basic':
         return ['title', 'language', 'identifier', 'creator'];
       case 'advanced':
-        return ['publisher', 'date', 'description', 'subject', 'rights', 'source', 'relation', 'coverage', 'type', 'format', 'contributor'];
+        return [
+          'publisher',
+          'date',
+          'description',
+          'subject',
+          'rights',
+          'source',
+          'relation',
+          'coverage',
+          'type',
+          'format',
+          'contributor',
+        ];
       case 'publication':
-        return ['series', 'seriesPosition', 'epubVersion', 'uniqueIdentifierScheme', 'primaryCreatorFileAs', 'creatorRoles'];
+        return [
+          'series',
+          'seriesPosition',
+          'epubVersion',
+          'uniqueIdentifierScheme',
+          'primaryCreatorFileAs',
+          'creatorRoles',
+        ];
       case 'accessibility':
-        return ['accessMode', 'accessModeSufficient', 'accessibilityFeature', 'accessibilityHazard', 'accessibilitySummary', 'accessibilityCertification', 'accessibilityCertifier'];
+        return [
+          'accessMode',
+          'accessModeSufficient',
+          'accessibilityFeature',
+          'accessibilityHazard',
+          'accessibilitySummary',
+          'accessibilityCertification',
+          'accessibilityCertifier',
+        ];
       default:
         return [];
     }
   };
 
-  const validateCurrentTab = (tabId, metadata) => {
+  const validateCurrentTab = (tabId: string, metadata: EPUBMetadata) => {
     const tabFields = getTabFields(tabId);
-    return validationErrors.filter(error => 
-      tabFields.includes(error.field)
-    );
+    return validationErrors.filter(error => tabFields.includes(error.field));
   };
 
   const loadMetadata = async () => {
@@ -61,21 +89,21 @@
     }
   };
 
-  const handleFieldChange = (event) => {
+  const handleFieldChange = (event: { detail: any }) => {
     const { field, value } = event.detail;
-    
+
     // Update local state immediately for UI responsiveness
     metadata = { ...metadata, [field]: value };
-    
+
     // Update validation errors
     if (metadataManager) {
       validationErrors = metadataManager.validateMetadata(metadata);
     }
   };
 
-  const handleFieldSave = async (event) => {
+  const handleFieldSave = async (event: { detail: any }) => {
     const { field, value } = event.detail;
-    
+
     if (!metadataManager || !workspaceId) return;
 
     try {
@@ -83,19 +111,19 @@
       await metadataManager.updateField(workspaceId, field, value);
     } catch (err) {
       console.error(`Failed to save field ${field}:`, err);
-      // Show error indicator - in a real implementation, you might want to 
+      // Show error indicator - in a real implementation, you might want to
       // show a toast notification or update the field with an error state
     }
   };
 
-  const handleArrayAdd = async (event) => {
+  const handleArrayAdd = async (event: { detail: { field: any } }) => {
     const { field } = event.detail;
-    
+
     if (!metadataManager || !workspaceId) return;
 
     try {
       saving = true;
-      
+
       if (field === 'creator') {
         await metadataManager.addCreator(workspaceId);
       } else if (field === 'subject') {
@@ -103,7 +131,7 @@
       } else if (field === 'contributor') {
         await metadataManager.addContributor(workspaceId);
       }
-      
+
       // Refresh metadata from manager
       metadata = await metadataManager.loadMetadata(workspaceId);
       validationErrors = metadataManager.validateMetadata(metadata);
@@ -114,14 +142,14 @@
     }
   };
 
-  const handleArrayRemove = async (event) => {
+  const handleArrayRemove = async (event: { detail: { field: any; index: any } }) => {
     const { field, index } = event.detail;
-    
+
     if (!metadataManager || !workspaceId) return;
 
     try {
       saving = true;
-      
+
       if (field === 'creator') {
         await metadataManager.removeCreator(workspaceId, index);
       } else if (field === 'subject') {
@@ -129,7 +157,7 @@
       } else if (field === 'contributor') {
         await metadataManager.removeContributor(workspaceId, index);
       }
-      
+
       // Refresh metadata from manager
       metadata = await metadataManager.loadMetadata(workspaceId);
       validationErrors = metadataManager.validateMetadata(metadata);
@@ -148,9 +176,9 @@
     await handleFieldSave({ detail: { field: 'identifier', value: newIdentifier } });
   };
 
-  const handleTabSwitch = async (event) => {
+  const handleTabSwitch = async (event: { detail: { tabId: any } }) => {
     const newTabId = event.detail.tabId;
-    
+
     // Check for errors in current tab
     const currentTabErrors = validateCurrentTab(activeTab, metadata);
     if (currentTabErrors.length > 0) {
@@ -158,7 +186,7 @@
       alert($t('Please fix errors before switching tabs'));
       return;
     }
-    
+
     // Switch tab
     activeTab = newTabId;
   };
@@ -172,15 +200,10 @@
 
 <div class="metadata-editor">
   <div class="pane-header" tabindex="-1">
-    <MetadataTabBar
-      {activeTab}
-      {validationErrors}
-      {tabs}
-      on:tabClick={handleTabSwitch}
-    />
+    <MetadataTabBar {activeTab} {validationErrors} {tabs} on:tabClick={handleTabSwitch} />
   </div>
 
-  <div class="pane-content">
+  <div class="pane-content" tabindex="-1">
     {#if loading}
       <div class="loading-state">
         <p>{$t('Loading metadata...')}</p>
@@ -188,17 +211,13 @@
     {:else if error}
       <div class="error-state">
         <p class="error-message">{error}</p>
-        <button 
-          type="button" 
-          class="retry-button"
-          on:click={loadMetadata}
-        >
+        <button type="button" class="retry-button" on:click={loadMetadata}>
           {$t('Retry')}
         </button>
       </div>
     {:else}
-      <div 
-        class="tab-panel" 
+      <div
+        class="tab-panel"
         id="metadata-panel-{activeTab}"
         aria-labelledby="metadata-tab-{activeTab}"
         tabindex="-1"
@@ -227,12 +246,20 @@
         {:else if activeTab === 'publication'}
           <div class="placeholder-panel">
             <p>{$t('Coming Soon')}</p>
-            <p class="placeholder-description">{$t('Publication Details')} - {$t('Series information, EPUB version, and publication-specific metadata')}</p>
+            <p class="placeholder-description">
+              {$t('Publication Details')} - {$t(
+                'Series information, EPUB version, and publication-specific metadata'
+              )}
+            </p>
           </div>
         {:else if activeTab === 'accessibility'}
           <div class="placeholder-panel">
             <p>{$t('Coming Soon')}</p>
-            <p class="placeholder-description">{$t('Accessibility')} - {$t('Accessibility features, hazards, and certification information')}</p>
+            <p class="placeholder-description">
+              {$t('Accessibility')} - {$t(
+                'Accessibility features, hazards, and certification information'
+              )}
+            </p>
           </div>
         {/if}
       </div>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
 
@@ -16,7 +16,7 @@
     }
   };
 
-  const handleKeydown = (event) => {
+  const handleKeydown = (event: KeyboardEvent) => {
     if ((event.key === 'Enter' || event.key === ' ') && !disabled) {
       event.preventDefault();
       dispatch('click', { tabId: id });
@@ -36,12 +36,9 @@
   id="metadata-tab-{id}"
 >
   <span class="tab-label">{label}</span>
-  
+
   {#if errorCount > 0}
-    <span 
-      class="error-indicator" 
-      aria-label={$t('validation.errorsCount', { count: errorCount })}
-    >
+    <span class="error-indicator" aria-label={$t('validation.errorsCount', { count: errorCount })}>
       !
     </span>
   {/if}
@@ -71,7 +68,7 @@
 
   .metadata-tab:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
     border-radius: var(--radius-sm);
   }
 
@@ -113,7 +110,7 @@
   }
 
   /* RTL support */
-  :global([dir="rtl"]) .metadata-tab {
+  :global([dir='rtl']) .metadata-tab {
     flex-direction: row-reverse;
   }
 </style>

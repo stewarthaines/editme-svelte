@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import MetadataEditor from '../../lib/components/metadata/MetadataEditor.svelte';
   import { WorkspaceManager } from '../../lib/workspace/index.js';
-  import { MetadataManagerImpl } from '../../lib/metadata/MetadataManager.ts';
+  import { MetadataManagerImpl } from '../../lib/metadata/MetadataManager';
 
   // State management following the established pattern
   let workspaceManager: WorkspaceManager;
@@ -17,14 +17,15 @@
     language: 'en',
     identifier: 'urn:uuid:12345678-1234-5678-9012-123456789012',
     creator: ['Mark Twain'],
-    description: 'A classic American novel about a young boy growing up along the Mississippi River. This story follows the mischievous adventures of Tom Sawyer in the fictional town of St. Petersburg, Missouri.',
+    description:
+      'A classic American novel about a young boy growing up along the Mississippi River. This story follows the mischievous adventures of Tom Sawyer in the fictional town of St. Petersburg, Missouri.',
     publisher: 'American Publishing Company',
     date: '1876-06-01',
     rights: 'Public Domain',
     subject: ['Fiction', 'Adventure', 'American Literature', 'Coming of Age'],
     contributor: ['Samuel Clemens (Editor)'],
     type: 'fiction',
-    source: 'Original 1876 edition'
+    source: 'Original 1876 edition',
   };
 
   // Real backend initialization following the established pattern
@@ -60,7 +61,7 @@
 
   // Expose reset for Storybook play functions
   if (typeof window !== 'undefined') {
-    (window as Record<string, unknown>).resetMetadataDemo = initializeDemo;
+    (window as unknown as Record<string, unknown>).resetMetadataDemo = initializeDemo;
   }
 </script>
 
@@ -80,10 +81,7 @@
   {:else}
     <!-- Metadata Editor with real backend -->
     <div class="metadata-editor-container">
-      <MetadataEditor 
-        {workspaceId} 
-        {metadataManager} 
-      />
+      <MetadataEditor {workspaceId} {metadataManager} />
     </div>
   {/if}
 </div>
@@ -96,55 +94,6 @@
     background-color: #f9fafb;
   }
 
-  .demo-header {
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    background-color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .demo-header h2 {
-    margin: 0;
-    color: #1f2937;
-  }
-
-  .demo-status {
-    text-align: right;
-  }
-
-  .demo-status h4 {
-    margin: 0 0 0.5rem 0;
-    color: #374151;
-    font-size: 0.875rem;
-  }
-
-  .demo-status p {
-    margin: 0.25rem 0;
-    font-size: 0.75rem;
-    color: #059669;
-  }
-
-  .demo-status button {
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  .demo-status button:hover:not(:disabled) {
-    background-color: #2563eb;
-  }
-
-  .demo-status button:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-  }
 
   .demo-loading,
   .demo-error {

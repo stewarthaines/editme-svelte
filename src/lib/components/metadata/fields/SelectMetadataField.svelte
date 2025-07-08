@@ -4,7 +4,7 @@
   const dispatch = createEventDispatcher();
 
   export let value = '';
-  export let options: Array<{value: string, label: string}> = [];
+  export let options: Array<{ value: string; label: string }> = [];
   export let required = false;
   export let disabled = false;
   export let error = '';
@@ -85,7 +85,6 @@
     color: #228b22; /* Green color for required unfilled fields */
   }
 
-
   .field-select {
     width: 100%;
     padding: 0.75rem;
@@ -101,7 +100,7 @@
   .field-select:focus {
     outline: none;
     border-color: var(--color-focus);
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .field-select:disabled {

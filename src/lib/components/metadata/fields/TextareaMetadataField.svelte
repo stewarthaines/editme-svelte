@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../../i18n';
 
@@ -16,12 +16,12 @@
   // Check if field needs attention (required but empty)
   $: needsAttention = required && (!value || value.trim() === '');
 
-  const handleInput = (event) => {
-    dispatch('change', { value: event.target.value });
+  const handleInput = (event: Event) => {
+    dispatch('change', { value: (event.target as HTMLTextAreaElement).value });
   };
 
-  const handleBlur = (event) => {
-    dispatch('blur', { value: event.target.value });
+  const handleBlur = (event: FocusEvent) => {
+    dispatch('blur', { value: (event.target as HTMLTextAreaElement).value });
   };
 
   const handleFocus = () => {
@@ -38,7 +38,7 @@
       {/if}
     </label>
   {/if}
-  
+
   <textarea
     {id}
     {value}
@@ -77,7 +77,7 @@
   }
 
   .field-label.needs-attention {
-    color: #228B22; /* Green color for required unfilled fields */
+    color: #228b22; /* Green color for required unfilled fields */
   }
 
   .required {
@@ -104,7 +104,7 @@
   .field-textarea:focus {
     outline: none;
     border-color: var(--color-focus);
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .field-textarea:disabled {
@@ -124,11 +124,11 @@
   }
 
   .field-textarea.needs-attention {
-    border-color: #228B22; /* Green border for required unfilled fields */
+    border-color: #228b22; /* Green border for required unfilled fields */
   }
 
   .field-textarea.needs-attention:focus {
-    border-color: #228B22;
+    border-color: #228b22;
     box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.2);
   }
 

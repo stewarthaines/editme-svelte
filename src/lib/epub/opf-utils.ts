@@ -31,6 +31,12 @@ export interface EPUBMetadata {
   modifiedDate?: string;
   epubVersion?: string;
 
+  // EPUB 3 rendition metadata
+  renditionLayout?: string;
+  pageProgressionDirection?: string;
+  renditionOrientation?: string;
+  renditionSpread?: string;
+
   // EPUB 3 accessibility metadata
   accessMode?: string[];
   accessModeSufficient?: string[];
@@ -38,6 +44,54 @@ export interface EPUBMetadata {
   accessibilityHazard?: string[];
   accessibilitySummary?: string;
 }
+
+// Type mapping for strict field access
+export interface MetadataFieldTypes {
+  // Array fields
+  creator: string[];
+  contributor: string[];
+  subject: string[];
+  accessMode: string[];
+  accessModeSufficient: string[];
+  accessibilityFeature: string[];
+  accessibilityHazard: string[];
+  
+  // Required string fields
+  title: string;
+  language: string;
+  identifier: string;
+  
+  // Optional string fields
+  publisher: string;
+  date: string;
+  description: string;
+  rights: string;
+  source: string;
+  relation: string;
+  coverage: string;
+  type: string;
+  format: string;
+  modifiedDate: string;
+  epubVersion: string;
+  renditionLayout: string;
+  pageProgressionDirection: string;
+  renditionOrientation: string;
+  renditionSpread: string;
+  accessibilitySummary: string;
+}
+
+// Extract field type categories
+export type ArrayMetadataFields = {
+  [K in keyof MetadataFieldTypes]: MetadataFieldTypes[K] extends string[] ? K : never;
+}[keyof MetadataFieldTypes];
+
+export type StringMetadataFields = {
+  [K in keyof MetadataFieldTypes]: MetadataFieldTypes[K] extends string ? K : never;
+}[keyof MetadataFieldTypes];
+
+export type RequiredMetadataFields = 'title' | 'language' | 'identifier';
+
+export type OptionalMetadataFields = Exclude<StringMetadataFields, RequiredMetadataFields>;
 
 export interface ContainerInfo {
   rootfilePath?: string;
@@ -520,5 +574,85 @@ export class OPFUtils {
     });
 
     return errors;
+  }
+}
+
+// Type-safe helper functions for metadata field access
+export class MetadataUtils {
+  /**
+   * Safely get an array field from metadata
+   */
+  static getArrayField<T extends ArrayMetadataFields>(
+    metadata: EPUBMetadata,
+    field: T
+  ): string[] {
+    const value = metadata[field];
+    return Array.isArray(value) ? value : [];
+  }
+
+  /**
+   * Safely get a string field from metadata
+   */
+  static getStringField<T extends StringMetadataFields>(
+    metadata: EPUBMetadata,
+    field: T
+  ): string | undefined {
+    const value = metadata[field];
+    return typeof value === 'string' ? value : undefined;
+  }
+
+  /**
+   * Safely get a required string field from metadata
+   */
+  static getRequiredStringField<T extends RequiredMetadataFields>(
+    metadata: EPUBMetadata,
+    field: T
+  ): string {
+    const value = metadata[field];
+    return typeof value === 'string' ? value : '';
+  }
+
+  /**
+   * Type guard to check if a field is an array field
+   */
+  static isArrayField(field: string): field is ArrayMetadataFields {
+    return ['creator', 'contributor', 'subject', 'accessMode', 'accessModeSufficient', 'accessibilityFeature', 'accessibilityHazard'].includes(field);
+  }
+
+  /**
+   * Type guard to check if a field is a string field
+   */
+  static isStringField(field: string): field is StringMetadataFields {
+    return ['title', 'language', 'identifier', 'publisher', 'date', 'description', 'rights', 'source', 'relation', 'coverage', 'type', 'format', 'modifiedDate', 'epubVersion', 'renditionLayout', 'pageProgressionDirection', 'renditionOrientation', 'renditionSpread', 'accessibilitySummary'].includes(field);
+  }
+
+  /**
+   * Safely update an array field in metadata
+   */
+  static updateArrayField<T extends ArrayMetadataFields>(
+    metadata: EPUBMetadata,
+    field: T,
+    updater: (current: string[]) => string[]
+  ): EPUBMetadata {
+    const currentArray = MetadataUtils.getArrayField(metadata, field);
+    const newArray = updater(currentArray);
+    return {
+      ...metadata,
+      [field]: newArray
+    };
+  }
+
+  /**
+   * Safely update a string field in metadata
+   */
+  static updateStringField<T extends StringMetadataFields>(
+    metadata: EPUBMetadata,
+    field: T,
+    value: string | undefined
+  ): EPUBMetadata {
+    return {
+      ...metadata,
+      [field]: value
+    };
   }
 }

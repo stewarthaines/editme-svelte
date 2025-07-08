@@ -43,7 +43,7 @@
 
   export async function canLeave(): Promise<boolean> {
     if (viewData.hasUnsavedChanges) {
-      return window.confirm(t('You have unsaved metadata changes. Continue?'));
+      return window.confirm($t('You have unsaved metadata changes. Continue?'));
     }
     return true;
   }
@@ -84,7 +84,7 @@
   }
 
   function handleReset() {
-    if (window.confirm(t('Reset all metadata to defaults?'))) {
+    if (window.confirm($t('Reset all metadata to defaults?'))) {
       viewData = {
         title: '',
         author: '',
@@ -106,7 +106,7 @@
     <p>{$t('Configure basic information about your EPUB publication')}</p>
   </header>
 
-  <main class="view-content">
+  <div class="view-content">
     <form class="metadata-form" on:submit|preventDefault={handleSave}>
       <div class="form-section">
         <h3>{$t('Basic Information')}</h3>
@@ -191,7 +191,7 @@
         </div>
       {/if}
     </form>
-  </main>
+  </div>
 </div>
 
 <style>

@@ -41,7 +41,7 @@
 
   export async function canLeave(): Promise<boolean> {
     if (hasUnsavedChanges) {
-      return window.confirm(t('You have unsaved workspace changes. Continue?'));
+      return window.confirm($t('You have unsaved workspace changes. Continue?'));
     }
     return true;
   }
@@ -86,7 +86,7 @@
     <p>{$t('Select and manage EPUB workspaces')}</p>
   </header>
 
-  <main class="view-content">
+  <div class="view-content">
     <section class="workspace-section">
       <h3>{$t('Current Workspace')}</h3>
       {#if viewData.selectedWorkspace}
@@ -146,7 +146,7 @@
         <span>{$t('You have unsaved changes')}</span>
       </div>
     {/if}
-  </main>
+  </div>
 </div>
 
 <style>
