@@ -298,7 +298,7 @@ export class BlobURLManager {
       const blobURL = await this.createBlobURL(href);
       element.setAttribute(attr, blobURL);
     } catch (error) {
-      this.handleMissingAsset(element, href, error);
+      this.handleMissingAsset(element, href, error as Error);
     }
   }
 
