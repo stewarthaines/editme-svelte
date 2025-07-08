@@ -22,7 +22,7 @@
  */
 
 import { vi } from 'vitest';
-import type { FileStorageAPI } from '../storage/index.js';
+import type { FileStorageAPI, BackendType } from '../../storage/index.js';
 
 export interface MockFileEntry {
   path: string;
@@ -138,7 +138,7 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     }
 
     if (typeof entry.content === 'string') {
-      return new TextEncoder().encode(entry.content).buffer;
+      return new TextEncoder().encode(entry.content).buffer as ArrayBuffer;
     }
     return entry.content;
   }
@@ -239,7 +239,7 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     return { used: 0, available: 1000000 };
   }
 
-  getBackendType(): string {
+  getBackendType(): BackendType {
     return 'indexeddb';
   }
 
@@ -307,7 +307,7 @@ export class MockFileStorage implements Partial<FileStorageAPI> {
     const result = new Map<string, ArrayBuffer>();
     for (const [path, entry] of workspace) {
       if (typeof entry.content === 'string') {
-        result.set(path, new TextEncoder().encode(entry.content).buffer);
+        result.set(path, new TextEncoder().encode(entry.content).buffer as ArrayBuffer);
       } else {
         result.set(path, entry.content);
       }

@@ -118,7 +118,7 @@ describe.skip('i18n integration workflow', () => {
     
     expect(get(isInitialized)).toBe(true);
     expect(get(currentLocale)).toBe('en');
-    expect(t('Save')).toBe('Save');
+    expect(get(t)('Save')).toBe('Save');
   });
 
   it('should handle version-based cache invalidation', async () => {
@@ -173,14 +173,14 @@ describe.skip('i18n integration workflow', () => {
     // Test English (initial)
     expect(get(currentLocale)).toBe('en');
     expect(get(documentDirection)).toBe('ltr');
-    expect(t('Save')).toBe('Save');
+    expect(get(t)('Save')).toBe('Save');
     
     // Switch to German
     await setLocale('de');
     
     expect(get(currentLocale)).toBe('de');
     expect(get(documentDirection)).toBe('ltr');
-    expect(t('Save')).toBe('Speichern');
+    expect(get(t)('Save')).toBe('Speichern');
     expect(mockLocalStorage.getItem('editme-locale')).toBe('de');
     
     // Switch to Arabic (RTL)
@@ -188,7 +188,7 @@ describe.skip('i18n integration workflow', () => {
     
     expect(get(currentLocale)).toBe('ar');
     expect(get(documentDirection)).toBe('rtl');
-    expect(t('Save')).toBe('حفظ');
+    expect(get(t)('Save')).toBe('حفظ');
     expect(globalThis.document?.documentElement.dir).toBe('rtl');
   });
 
@@ -226,7 +226,7 @@ describe.skip('i18n integration workflow', () => {
     
     expect(get(isInitialized)).toBe(true);
     expect(get(currentLocale)).toBe('en');
-    expect(t('Save')).toBe('Save'); // From fallback catalog
+    expect(get(t)('Save')).toBe('Save'); // From fallback catalog
   });
 
   it('should persist and restore locale preference', async () => {
@@ -282,11 +282,11 @@ describe.skip('i18n integration workflow', () => {
     expect(get(isInitialized)).toBe(true);
     
     // Should work with English
-    expect(t('Save')).toBe('Save');
+    expect(get(t)('Save')).toBe('Save');
     
     // Should work with German
     await setLocale('de');
-    expect(t('Save')).toBe('Speichern');
+    expect(get(t)('Save')).toBe('Speichern');
   });
 
   it('should handle interpolation across different locales', async () => {
@@ -312,12 +312,12 @@ describe.skip('i18n integration workflow', () => {
     await initI18n();
     
     // Test English interpolation
-    expect(t('Found {count} items', { count: 3 })).toBe('Found 3 items');
-    expect(t('Hello {name}', { name: 'World' })).toBe('Hello World');
+    expect(get(t)('Found {count} items', { count: 3 })).toBe('Found 3 items');
+    expect(get(t)('Hello {name}', { name: 'World' })).toBe('Hello World');
     
     // Test German interpolation
     await setLocale('de');
-    expect(t('Found {count} items', { count: 3 })).toBe('3 Elemente gefunden');
-    expect(t('Hello {name}', { name: 'Welt' })).toBe('Hallo Welt');
+    expect(get(t)('Found {count} items', { count: 3 })).toBe('3 Elemente gefunden');
+    expect(get(t)('Hello {name}', { name: 'Welt' })).toBe('Hallo Welt');
   });
 });

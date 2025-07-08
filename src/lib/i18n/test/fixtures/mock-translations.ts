@@ -100,7 +100,7 @@ export function createMockGzipData(): ArrayBuffer {
   // Create simple mock compressed data (not real gzip, but sufficient for testing)
   const mockData = createMockTranslationArchive();
   const encoder = new TextEncoder();
-  return encoder.encode(mockData).buffer;
+  return encoder.encode(mockData).buffer as ArrayBuffer;
 }
 
 /**

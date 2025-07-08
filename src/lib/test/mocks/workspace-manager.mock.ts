@@ -55,7 +55,7 @@ export type WorkspaceFailureMode =
  * - Rich helper methods for test setup and verification
  * - Full compatibility with WorkspaceManager interface
  */
-export class MockWorkspaceManager implements Partial<WorkspaceManager> {
+export class MockWorkspaceManager implements Partial<any> {
   private workspaceOPFs = new Map<string, MockOPFDocument>();
   private workspaceFiles = new Map<string, Map<string, string | ArrayBuffer>>();
   private failureMode: WorkspaceFailureMode | null = null;
@@ -119,7 +119,7 @@ export class MockWorkspaceManager implements Partial<WorkspaceManager> {
 
   // Core WorkspaceManager methods
 
-  async getWorkspaceOPF(workspaceId: string): Promise<MockOPFDocument> {
+  async getWorkspaceOPF(workspaceId: string): Promise<MockOPFDocument | any> {
     this.operationCount++;
     if (this.failureMode === 'opf-read') {
       throw new Error('Failed to read OPF document');
@@ -149,7 +149,7 @@ export class MockWorkspaceManager implements Partial<WorkspaceManager> {
     return opf;
   }
 
-  async addManifestItem(workspaceId: string, item: ManifestItem): Promise<void> {
+  async addManifestItem(workspaceId: string, item: any): Promise<void> {
     this.operationCount++;
     if (this.failureMode === 'manifest-add') {
       throw new Error('Failed to add manifest item');
