@@ -1,14 +1,11 @@
 /**
  * Settings Manager Public API
- * 
+ *
  * Unified interface for managing application settings across three storage tiers:
  * - Global Settings (localStorage): User preferences that persist across workspaces
  * - Workspace Settings (.workspace-metadata.json): Workspace-specific configuration
  * - EPUB Settings (SOURCE/settings.json): Book-specific settings that travel with EPUB
  */
-
-import type { FileStorageAPI } from '../storage/index.js';
-import type { ExtensionManager } from '../extensions/index.js';
 
 // Export the implementation class
 export { DefaultSettingsManager } from './settings-manager.js';
@@ -19,41 +16,41 @@ export { DefaultSettingsManager } from './settings-manager.js';
 
 export interface GlobalSettings {
   theme: 'light' | 'dark' | 'system';
-  locale: string;              // e.g., 'en', 'de', 'ar', 'he', 'ja', 'ka', 'zh-hant'
-  editor_font_size: number;    // Font size in pixels (8-32)
+  locale: string; // e.g., 'en', 'de', 'ar', 'he', 'ja', 'ka', 'zh-hant'
+  editor_font_size: number; // Font size in pixels (8-32)
 }
 
 export interface WorkspaceSettings {
-  bust_cache: boolean;         // Enable draft mode for cache busting
-  draft_id: number;            // Current draft version number
+  bust_cache: boolean; // Enable draft mode for cache busting
+  draft_id: number; // Current draft version number
   editor?: {
-    preview_delay_ms: number;  // Delay before preview updates (100-2000)
-    advanced_mode: boolean;    // Show advanced features and JSON preview
+    preview_delay_ms: number; // Delay before preview updates (100-2000)
+    advanced_mode: boolean; // Show advanced features and JSON preview
   };
 }
 
 export interface EPUBSettings {
-  text_transform: string;      // Path to text transform script
-  dom_transforms: string[];    // Array of DOM transform script paths
-  spine_basename: string;      // Base name for new spine items
+  text_transform: string; // Path to text transform script
+  dom_transforms: string[]; // Array of DOM transform script paths
+  spine_basename: string; // Base name for new spine items
   cover?: {
-    template: string;          // Cover template name
-    background_color: string;  // Hex color for background
-    text_color: string;        // Hex color for text
-    font_family: string;       // Font family name
+    template: string; // Cover template name
+    background_color: string; // Hex color for background
+    text_color: string; // Hex color for text
+    font_family: string; // Font family name
   };
 }
 
 export interface SettingsValidation {
-  isValid: boolean;            // Overall validation status
-  errors: string[];            // Critical errors preventing save
-  warnings: string[];          // Non-critical issues
+  isValid: boolean; // Overall validation status
+  errors: string[]; // Critical errors preventing save
+  warnings: string[]; // Non-critical issues
 }
 
 export interface TransformOption {
-  path: string;                // Full path to script file
-  extensionName: string;       // Parent extension name
-  fileName: string;            // Script filename
+  path: string; // Full path to script file
+  extensionName: string; // Parent extension name
+  fileName: string; // Script filename
 }
 
 // ============================================================================
@@ -61,7 +58,6 @@ export interface TransformOption {
 // ============================================================================
 
 export interface SettingsManager {
-
   // Global Settings (localStorage)
   loadGlobalSettings(): GlobalSettings;
   saveGlobalSettings(settings: GlobalSettings): void;
@@ -97,7 +93,6 @@ export interface SettingsManager {
   validateWorkspaceSettings(settings: Partial<WorkspaceSettings>): SettingsValidation;
   validateEPUBSettings(settings: Partial<EPUBSettings>): SettingsValidation;
 }
-
 
 // ============================================================================
 // Method Signatures
@@ -210,28 +205,28 @@ export interface SettingsManager {
 
 /**
  * Basic Usage
- * 
+ *
  * ```typescript
  * import { SettingsManager } from '$lib/settings';
  * import { FileStorageAPI } from '$lib/storage';
  * import { ExtensionManager } from '$lib/extensions';
- * 
+ *
  * // Initialize
  * const fileStorage = new FileStorageAPI();
  * await fileStorage.init();
  * const extensionManager = new ExtensionManager(fileStorage);
  * const settingsManager = new SettingsManager(fileStorage, extensionManager);
- * 
+ *
  * // Global settings
  * const globalSettings = settingsManager.loadGlobalSettings();
  * globalSettings.theme = 'dark';
  * settingsManager.saveGlobalSettings(globalSettings);
- * 
+ *
  * // Workspace settings
  * const workspaceSettings = await settingsManager.loadWorkspaceSettings('workspace-123');
  * workspaceSettings.bust_cache = true;
  * await settingsManager.saveWorkspaceSettings('workspace-123', workspaceSettings);
- * 
+ *
  * // EPUB settings
  * const epubSettings = await settingsManager.loadEPUBSettings('workspace-123');
  * epubSettings.spine_basename = 'section';
@@ -241,7 +236,7 @@ export interface SettingsManager {
 
 /**
  * Draft Mode Workflow
- * 
+ *
  * ```typescript
  * // During EPUB packaging
  * const workspaceSettings = await settingsManager.loadWorkspaceSettings('workspace-123');
@@ -250,7 +245,7 @@ export interface SettingsManager {
  *   const draftTitle = settingsManager.generateDraftTitle('My Book', newDraftId);
  *   // Use draftTitle for EPUB metadata and filename
  * }
- * 
+ *
  * // During EPUB import
  * const importedTitle = 'My Book 5';
  * const draftInfo = settingsManager.extractDraftInfo(importedTitle);
@@ -262,12 +257,12 @@ export interface SettingsManager {
 
 /**
  * Transform Discovery
- * 
+ *
  * ```typescript
  * // Get available transforms for UI dropdown
  * const transforms = await settingsManager.getAvailableTransforms('workspace-123');
  * // Returns: [{ path: 'SOURCE/scripts/transform.js', extensionName: 'built-in', fileName: 'transform.js' }, ...]
- * 
+ *
  * // Validate selected transforms
  * const epubSettings = await settingsManager.loadEPUBSettings('workspace-123');
  * const resolved = await settingsManager.resolveTransformScripts('workspace-123', epubSettings);
@@ -279,7 +274,7 @@ export interface SettingsManager {
 
 /**
  * Validation Example
- * 
+ *
  * ```typescript
  * // Validate before saving
  * const validation = settingsManager.validateEPUBSettings({
@@ -287,7 +282,7 @@ export interface SettingsManager {
  *   spine_basename: 'chapter',
  *   cover: { template: 'minimal', background_color: '#ffffff' }
  * });
- * 
+ *
  * if (validation.isValid) {
  *   await settingsManager.saveEPUBSettings('workspace-123', settings);
  * } else {

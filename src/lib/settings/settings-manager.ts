@@ -1,6 +1,6 @@
 /**
  * Settings Manager Implementation
- * 
+ *
  * Manages application settings across three storage tiers:
  * - Global Settings (localStorage)
  * - Workspace Settings (.workspace-metadata.json)
@@ -15,7 +15,7 @@ import type {
   EPUBSettings,
   SettingsValidation,
   TransformOption,
-  SettingsManager
+  SettingsManager,
 } from './index.js';
 import { themeStore } from '../stores/theme.js';
 import { setLocale } from '../i18n/index.js';
@@ -60,7 +60,7 @@ export class DefaultSettingsManager implements SettingsManager {
       }
 
       const parsed = JSON.parse(stored);
-      
+
       // Validate parsed data has expected shape
       if (typeof parsed !== 'object' || !parsed) {
         return this.getDefaultGlobalSettings();
@@ -71,9 +71,11 @@ export class DefaultSettingsManager implements SettingsManager {
       return {
         theme: this.isValidTheme(parsed.theme) ? parsed.theme : defaults.theme,
         locale: this.isValidLocale(parsed.locale) ? parsed.locale : defaults.locale,
-        editor_font_size: this.isValidFontSize(parsed.editor_font_size) ? parsed.editor_font_size : defaults.editor_font_size
+        editor_font_size: this.isValidFontSize(parsed.editor_font_size)
+          ? parsed.editor_font_size
+          : defaults.editor_font_size,
       };
-    } catch (error) {
+    } catch {
       // Return defaults on any error (corrupted data, access denied, etc.)
       return this.getDefaultGlobalSettings();
     }
@@ -114,7 +116,7 @@ export class DefaultSettingsManager implements SettingsManager {
     return {
       theme: 'system',
       locale: 'en',
-      editor_font_size: 14
+      editor_font_size: 14,
     };
   }
 
@@ -126,63 +128,62 @@ export class DefaultSettingsManager implements SettingsManager {
     try {
       const content = await this.fileStorage.readTextFile(workspaceId, '.workspace-metadata.json');
       const metadata = JSON.parse(content);
-      
+
       if (!metadata || typeof metadata !== 'object') {
         return this.getDefaultWorkspaceSettings();
       }
 
       // Extract settings from metadata structure
       const settings = metadata.settings || {};
-      
+
       // Merge with defaults
       const defaults = this.getDefaultWorkspaceSettings();
       return {
-        bust_cache: typeof settings.bust_cache === 'boolean' ? settings.bust_cache : defaults.bust_cache,
+        bust_cache:
+          typeof settings.bust_cache === 'boolean' ? settings.bust_cache : defaults.bust_cache,
         draft_id: this.isValidDraftId(settings.draft_id) ? settings.draft_id : defaults.draft_id,
-        editor: settings.editor ? {
-          preview_delay_ms: this.isValidPreviewDelay(settings.editor.preview_delay_ms) 
-            ? settings.editor.preview_delay_ms 
-            : defaults.editor!.preview_delay_ms,
-          advanced_mode: typeof settings.editor.advanced_mode === 'boolean' 
-            ? settings.editor.advanced_mode 
-            : defaults.editor!.advanced_mode
-        } : defaults.editor
+        editor: settings.editor
+          ? {
+              preview_delay_ms: this.isValidPreviewDelay(settings.editor.preview_delay_ms)
+                ? settings.editor.preview_delay_ms
+                : defaults.editor!.preview_delay_ms,
+              advanced_mode:
+                typeof settings.editor.advanced_mode === 'boolean'
+                  ? settings.editor.advanced_mode
+                  : defaults.editor!.advanced_mode,
+            }
+          : defaults.editor,
       };
-    } catch (error) {
+    } catch {
       // Return defaults on any error (file not found, corrupted JSON, etc.)
       return this.getDefaultWorkspaceSettings();
     }
   }
 
   async saveWorkspaceSettings(workspaceId: string, settings: WorkspaceSettings): Promise<void> {
+    // Read existing metadata or create new
+    let metadata: any = {};
     try {
-      // Read existing metadata or create new
-      let metadata: any = {};
-      try {
-        const content = await this.fileStorage.readTextFile(workspaceId, '.workspace-metadata.json');
-        metadata = JSON.parse(content);
-      } catch {
-        // File doesn't exist or is corrupted, start fresh
-        metadata = {
-          version: '1.0',
-          created: new Date().toISOString()
-        };
-      }
-
-      // Update metadata with new settings
-      metadata.lastModified = new Date().toISOString();
-      metadata.settings = settings;
-
-      // Write back to file
-      await this.fileStorage.writeTextFile(
-        workspaceId,
-        '.workspace-metadata.json',
-        JSON.stringify(metadata, null, 2)
-      );
-    } catch (error) {
-      // Re-throw write errors so caller can handle
-      throw error;
+      const content = await this.fileStorage.readTextFile(workspaceId, '.workspace-metadata.json');
+      metadata = JSON.parse(content);
+    } catch {
+      // File doesn't exist or is corrupted, start fresh
+      metadata = {
+        version: '1.0',
+        created: new Date().toISOString(),
+      };
     }
+
+    // Update metadata with new settings
+    metadata.lastModified = new Date().toISOString();
+    metadata.settings = settings;
+
+    // Write back to file
+    await this.fileStorage.writeTextFile(
+      workspaceId,
+      '.workspace-metadata.json',
+      JSON.stringify(metadata, null, 2)
+    );
   }
 
   getDefaultWorkspaceSettings(): WorkspaceSettings {
@@ -191,8 +192,8 @@ export class DefaultSettingsManager implements SettingsManager {
       draft_id: 0,
       editor: {
         preview_delay_ms: 500,
-        advanced_mode: false
-      }
+        advanced_mode: false,
+      },
     };
   }
 
@@ -204,7 +205,7 @@ export class DefaultSettingsManager implements SettingsManager {
     try {
       const content = await this.fileStorage.readTextFile(workspaceId, 'SOURCE/settings.json');
       const settings = JSON.parse(content);
-      
+
       if (!settings || typeof settings !== 'object') {
         return this.getDefaultEPUBSettings();
       }
@@ -212,17 +213,27 @@ export class DefaultSettingsManager implements SettingsManager {
       // Merge with defaults
       const defaults = this.getDefaultEPUBSettings();
       return {
-        text_transform: typeof settings.text_transform === 'string' ? settings.text_transform : defaults.text_transform,
-        dom_transforms: Array.isArray(settings.dom_transforms) ? settings.dom_transforms : defaults.dom_transforms,
-        spine_basename: typeof settings.spine_basename === 'string' ? settings.spine_basename : defaults.spine_basename,
-        cover: settings.cover ? {
-          template: settings.cover.template || defaults.cover!.template,
-          background_color: settings.cover.background_color || defaults.cover!.background_color,
-          text_color: settings.cover.text_color || defaults.cover!.text_color,
-          font_family: settings.cover.font_family || defaults.cover!.font_family
-        } : defaults.cover
+        text_transform:
+          typeof settings.text_transform === 'string'
+            ? settings.text_transform
+            : defaults.text_transform,
+        dom_transforms: Array.isArray(settings.dom_transforms)
+          ? settings.dom_transforms
+          : defaults.dom_transforms,
+        spine_basename:
+          typeof settings.spine_basename === 'string'
+            ? settings.spine_basename
+            : defaults.spine_basename,
+        cover: settings.cover
+          ? {
+              template: settings.cover.template || defaults.cover!.template,
+              background_color: settings.cover.background_color || defaults.cover!.background_color,
+              text_color: settings.cover.text_color || defaults.cover!.text_color,
+              font_family: settings.cover.font_family || defaults.cover!.font_family,
+            }
+          : defaults.cover,
       };
-    } catch (error) {
+    } catch {
       // Return defaults on any error
       return this.getDefaultEPUBSettings();
     }
@@ -245,8 +256,8 @@ export class DefaultSettingsManager implements SettingsManager {
         template: 'minimal',
         background_color: '#ffffff',
         text_color: '#000000',
-        font_family: 'serif'
-      }
+        font_family: 'serif',
+      },
     };
   }
 
@@ -257,10 +268,10 @@ export class DefaultSettingsManager implements SettingsManager {
   async incrementDraftId(workspaceId: string): Promise<number> {
     const settings = await this.loadWorkspaceSettings(workspaceId);
     const newDraftId = (settings.draft_id || 0) + 1;
-    
+
     settings.draft_id = newDraftId;
     await this.saveWorkspaceSettings(workspaceId, settings);
-    
+
     return newDraftId;
   }
 
@@ -270,16 +281,16 @@ export class DefaultSettingsManager implements SettingsManager {
 
   extractDraftInfo(title: string): { baseTitle: string; draftId: number | null } {
     const match = title.match(/^(.+)\s+(\d+)$/);
-    
+
     if (match) {
       const baseTitle = match[1];
       const draftId = parseInt(match[2], 10);
-      
+
       if (!isNaN(draftId)) {
         return { baseTitle, draftId };
       }
     }
-    
+
     return { baseTitle: title, draftId: null };
   }
 
@@ -289,9 +300,11 @@ export class DefaultSettingsManager implements SettingsManager {
 
   async getAvailableTransforms(workspaceId: string): Promise<TransformOption[]> {
     // Check cache first
-    if (this.transformCache && 
-        this.transformCache.workspaceId === workspaceId &&
-        Date.now() - this.transformCache.timestamp < this.CACHE_TTL) {
+    if (
+      this.transformCache &&
+      this.transformCache.workspaceId === workspaceId &&
+      Date.now() - this.transformCache.timestamp < this.CACHE_TTL
+    ) {
       return this.transformCache.transforms;
     }
 
@@ -305,11 +318,11 @@ export class DefaultSettingsManager implements SettingsManager {
           transforms.push({
             path: `SOURCE/scripts/${file}`,
             extensionName: 'built-in',
-            fileName: file
+            fileName: file,
           });
         }
       }
-    } catch (error) {
+    } catch {
       // Directory might not exist, continue
     }
 
@@ -322,12 +335,12 @@ export class DefaultSettingsManager implements SettingsManager {
             transforms.push({
               path: `SOURCE/extensions/${extension.name}/${file.filename}`,
               extensionName: extension.name,
-              fileName: file.filename
+              fileName: file.filename,
             });
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Extension discovery failed, continue with what we have
     }
 
@@ -335,7 +348,7 @@ export class DefaultSettingsManager implements SettingsManager {
     this.transformCache = {
       workspaceId,
       transforms,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     return transforms;
@@ -350,7 +363,7 @@ export class DefaultSettingsManager implements SettingsManager {
   }> {
     const result = {
       textTransform: null as string | null,
-      domTransforms: [] as string[]
+      domTransforms: [] as string[],
     };
 
     try {
@@ -375,7 +388,7 @@ export class DefaultSettingsManager implements SettingsManager {
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Return empty result on any error
     }
 
@@ -395,7 +408,7 @@ export class DefaultSettingsManager implements SettingsManager {
       return {
         isValid: true,
         errors,
-        warnings
+        warnings,
       };
     }
 
@@ -420,7 +433,7 @@ export class DefaultSettingsManager implements SettingsManager {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -433,7 +446,7 @@ export class DefaultSettingsManager implements SettingsManager {
       return {
         isValid: true,
         errors,
-        warnings
+        warnings,
       };
     }
 
@@ -462,7 +475,10 @@ export class DefaultSettingsManager implements SettingsManager {
         }
       }
 
-      if ('advanced_mode' in settings.editor && typeof settings.editor.advanced_mode !== 'boolean') {
+      if (
+        'advanced_mode' in settings.editor &&
+        typeof settings.editor.advanced_mode !== 'boolean'
+      ) {
         errors.push('Advanced mode must be a boolean');
       }
     }
@@ -470,7 +486,7 @@ export class DefaultSettingsManager implements SettingsManager {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -483,7 +499,7 @@ export class DefaultSettingsManager implements SettingsManager {
       return {
         isValid: true,
         errors,
-        warnings
+        warnings,
       };
     }
 
@@ -523,7 +539,10 @@ export class DefaultSettingsManager implements SettingsManager {
         errors.push('Cover template cannot be empty');
       }
 
-      if ('background_color' in settings.cover && !this.isValidHexColor(settings.cover.background_color)) {
+      if (
+        'background_color' in settings.cover &&
+        !this.isValidHexColor(settings.cover.background_color)
+      ) {
         errors.push('Background color must be a valid hex color (#RRGGBB)');
       }
 
@@ -539,7 +558,7 @@ export class DefaultSettingsManager implements SettingsManager {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
