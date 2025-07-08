@@ -4,7 +4,10 @@
  * Type definitions for workspace management, OPF operations, and error handling.
  */
 
-import type { EPUBMetadata } from '../epub/opf-utils.js';
+import type { EPUBMetadata, ManifestItem } from '../epub/opf-utils.js';
+
+// Re-export ManifestItem for convenience
+export type { ManifestItem };
 
 // Core workspace types
 export interface WorkspaceInfo {
@@ -68,7 +71,7 @@ export interface WorkspaceConfig {
 // Validation types
 export interface ValidationResult {
   isValid: boolean;
-  errors: ValidationError[];
+  errors: ValidationIssue[];
   warnings: ValidationWarning[];
   summary: {
     totalFiles: number;
@@ -78,7 +81,7 @@ export interface ValidationResult {
   };
 }
 
-export interface ValidationError {
+export interface ValidationIssue {
   code: string;
   message: string;
   file?: string;

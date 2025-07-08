@@ -5,7 +5,7 @@
  * to convert plain text sources into XHTML spine items.
  */
 
-import type { FileStorageAPI } from '../storage/file-storage.js';
+import type { FileStorageAPI } from '../storage/index.js';
 import { TransformManager } from './transform-manager.js';
 import { TransformExecutor, type TransformContext } from './transform-executor.js';
 import { TransformError } from './transform-error.js';

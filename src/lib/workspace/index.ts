@@ -10,22 +10,26 @@ export { WorkspaceManager } from './workspace-manager.js';
 export { WorkspaceMetadataCache } from './workspace-cache.js';
 export { ManifestDependencyTracker } from './dependency-tracker.js';
 
-// Type definitions
+// Type definitions from workspace types
 export type {
   WorkspaceInfo,
-  EPUBMetadata,
-  OPFDocument,
-  ManifestItem,
-  SpineItem,
-  GuideItem,
   WorkspacePreview,
   WorkspaceConfig,
   ValidationResult,
-  ValidationError,
+  ValidationIssue,
   ValidationWarning,
   WorkspaceCacheEntry,
   WorkspaceCache,
+  ManifestItem, // Re-exported from epub
 } from './types.js';
+
+// Type definitions from EPUB utilities
+export type {
+  EPUBMetadata,
+  OPFDocument,
+  SpineItem,
+  GuideItem,
+} from '../epub/opf-utils.js';
 
 // Error classes
 export { WorkspaceError, ValidationError, CacheError, DEFAULT_WORKSPACE_CONFIG } from './types.js';

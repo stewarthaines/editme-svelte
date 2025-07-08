@@ -49,7 +49,6 @@
       class="sidebar-toggle"
       on:click={toggleSidebar}
       aria-expanded={isExpanded}
-      aria-controls="sidebar-content"
       aria-label={$t('Toggle sidebar')}
     >
       {isExpanded ? '◀️' : '▶️'}
@@ -111,6 +110,15 @@
     <!-- Always visible spine items -->
     <div class="spine-items-container">
       <slot name="sidebar-spine" />
+    </div>
+    
+    <!-- Content slots for different sections -->
+    <div class="section-content">
+      <slot name="sidebar-workspace" />
+      <slot name="sidebar-metadata" />
+      <slot name="sidebar-manifest" />
+      <slot name="sidebar-nav" />
+      <slot name="sidebar-settings" />
     </div>
   </div>
 
@@ -338,9 +346,6 @@
     /* Remove overflow - let parent handle scrolling */
   }
 
-  .section-icon {
-    display: none; /* Hide icons for Craigslist style */
-  }
 
   .section-label {
     font-size: var(--text-base); /* Using typography tokens */
@@ -402,7 +407,7 @@
   }
 
   /* RTL support - icons that need direction flipping */
-  [dir='rtl'] .sidebar-toggle {
+  :global([dir='rtl']) .sidebar-toggle {
     transform: scaleX(-1);
   }
 </style>

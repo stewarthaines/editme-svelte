@@ -2,6 +2,7 @@
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import Sidebar from './Sidebar.svelte';
   import { layoutStore } from './stores/layout';
+  import { t } from './i18n';
 
   // Subscribe to layout store
   $: ({ sidebar } = $layoutStore);
@@ -37,7 +38,7 @@
     </svelte:fragment>
   </Sidebar>
 
-  <main class="main-content">
+  <main class="main-content" title={$t('Main View')}>
     <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
       <Pane defaultSize={50} minSize={25}>
         <div class="pane-container">
