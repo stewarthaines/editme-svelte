@@ -216,7 +216,7 @@ export class SpineItemManager {
         const xhtmlContent = await this.workspaceManager.readTextFile(workspaceId, oldXhtmlPath);
         await this.workspaceManager.writeTextFile(workspaceId, newXhtmlPath, xhtmlContent);
         await this.workspaceManager.deleteFile(workspaceId, oldXhtmlPath);
-      } catch (error) {
+      } catch {
         // File might not exist, continue
       }
 
@@ -225,7 +225,7 @@ export class SpineItemManager {
         const sourceContent = await this.workspaceManager.readTextFile(workspaceId, oldSourcePath);
         await this.workspaceManager.writeTextFile(workspaceId, newSourcePath, sourceContent);
         await this.workspaceManager.deleteFile(workspaceId, oldSourcePath);
-      } catch (error) {
+      } catch {
         // Source file might not exist, continue
       }
 
@@ -317,7 +317,7 @@ export class SpineItemManager {
       const xhtmlPath = `OEBPS/${manifestItem.href}`;
       try {
         await this.workspaceManager.deleteFile(workspaceId, xhtmlPath);
-      } catch (error) {
+      } catch {
         // File might not exist, continue
       }
     }
@@ -327,7 +327,7 @@ export class SpineItemManager {
       const sourcePath = `SOURCE/text/${chapterId}.txt`;
       try {
         await this.workspaceManager.deleteFile(workspaceId, sourcePath);
-      } catch (error) {
+      } catch {
         // File might not exist, continue
       }
     }
@@ -522,7 +522,7 @@ export class SpineItemManager {
     const uniqueIdrefs = new Set(spineIdrefs);
     if (uniqueIdrefs.size !== spineIdrefs.length) {
       const duplicates = spineIdrefs.filter((idref, index) => spineIdrefs.indexOf(idref) !== index);
-      for (const duplicate of [...new Set(duplicates)]) {
+      for (const duplicate of new Set(duplicates)) {
         errors.push({
           code: 'DUPLICATE_SPINE_ITEM',
           message: `Duplicate spine item: ${duplicate}`,
