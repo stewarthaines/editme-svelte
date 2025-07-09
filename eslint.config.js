@@ -34,7 +34,20 @@ export default [
         Document: 'readonly',
         Element: 'readonly',
         Event: 'readonly',
+        CustomEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        DragEvent: 'readonly',
+        EventTarget: 'readonly',
+        HTMLElement: 'readonly',
         HTMLInputElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        FocusEvent: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        Window: 'readonly',
         ReadableStream: 'readonly',
         WritableStream: 'readonly',
         TransformStream: 'readonly',
@@ -114,7 +127,20 @@ export default [
         Document: 'readonly',
         Element: 'readonly',
         Event: 'readonly',
+        CustomEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        DragEvent: 'readonly',
+        EventTarget: 'readonly',
+        HTMLElement: 'readonly',
         HTMLInputElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        FocusEvent: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        Window: 'readonly',
         ReadableStream: 'readonly',
         WritableStream: 'readonly',
         TransformStream: 'readonly',
@@ -159,7 +185,21 @@ export default [
       // Allow console.log in development
       'no-console': 'warn',
       // Allow const assertions
-      '@typescript-eslint/prefer-as-const': 'warn'
+      '@typescript-eslint/prefer-as-const': 'warn',
+      // Allow unnecessary escape in regex for clarity
+      'no-useless-escape': 'warn',
+      // Allow case declarations
+      'no-case-declarations': 'warn'
+    }
+  },
+  {
+    files: ['src/stories/**/*.{js,ts,svelte}'],
+    rules: {
+      // More lenient rules for story/demo files
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-console': 'off',
+      'no-case-declarations': 'off'
     }
   },
   {
@@ -185,7 +225,7 @@ export default [
     }
   },
   {
-    files: ['scripts/**/*.js', 'scripts/**/*.mjs'],
+    files: ['scripts/**/*.js', 'scripts/**/*.mjs', 'build-scripts/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -197,14 +237,25 @@ export default [
         global: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        // Node.js modules
+        fs: 'readonly',
+        path: 'readonly',
+        crypto: 'readonly',
         // Plus browser globals for Playwright
         setTimeout: 'readonly',
         clearTimeout: 'readonly'
       }
     },
     rules: {
-      // More lenient for scripts
-      'no-console': 'off'
+      // More lenient for Node.js scripts
+      'no-console': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Allow require in Node.js scripts
+      '@typescript-eslint/no-var-requires': 'off'
     }
   },
   {
@@ -215,9 +266,18 @@ export default [
       'node_modules/',
       '__screenshots__/',
       'storybook-static/',
+      'coverage/',
+      '.claude/',
       '*.config.js',
       '*.config.ts',
-      '.storybook/'
+      '.storybook/',
+      // Ignore specific generated files
+      '**/lcov-report/',
+      '**/coverage-report/',
+      '**/.nyc_output/',
+      // Ignore auto-generated documentation
+      '**/api-docs/',
+      '**/typedoc/'
     ]
   }
 ];

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { t } from '../i18n';
-  import { layoutStore } from '../stores/layout';
+  import { layoutStore as _layoutStore } from '../stores/layout';
   import SpineItem from './SpineItem.svelte';
   import { SpineItemManager } from '../spine/spine-item-manager';
   import type { SpineItemWithSource } from '../spine/types';

@@ -183,7 +183,7 @@ export function extractAssetReferences(xhtmlContent: string): string[] {
 
     // Remove duplicates
     return [...new Set(references)];
-  } catch (_error) {
+  } catch {
     // Return empty array if parsing fails
     return [];
   }

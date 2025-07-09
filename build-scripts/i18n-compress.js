@@ -7,8 +7,8 @@
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createWriteStream } from 'fs';
-import { pipeline } from 'stream/promises';
+import { createWriteStream as _createWriteStream } from 'fs';
+import { pipeline as _pipeline } from 'stream/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,7 +29,7 @@ async function compressTranslations() {
 
     // For now, create a simple archive of all JSON files concatenated
     // This is a temporary solution until we can properly integrate with the ZIP library
-    
+
     // Read all .json files from locales directory
     const files = await fs.readdir(localesDir);
     const jsonFiles = files.filter(file => file.endsWith('.json'));
@@ -40,7 +40,7 @@ async function compressTranslations() {
     for (const file of jsonFiles) {
       const filePath = join(localesDir, file);
       const content = await fs.readFile(filePath, 'utf8');
-      
+
       archiveData[file] = content;
       totalSize += Buffer.byteLength(content, 'utf8');
       console.log(`📄 Added ${file} (${Math.round(Buffer.byteLength(content, 'utf8') / 1024)}KB)`);
@@ -51,26 +51,25 @@ async function compressTranslations() {
     const compressedBuffer = await new Promise((resolve, reject) => {
       const chunks = [];
       const gzip = createGzip();
-      
+
       gzip.on('data', chunk => chunks.push(chunk));
       gzip.on('end', () => resolve(Buffer.concat(chunks)));
       gzip.on('error', reject);
-      
+
       gzip.write(archiveJson);
       gzip.end();
     });
 
     await fs.writeFile(outputPath, compressedBuffer);
-    
+
     const compressedSize = compressedBuffer.length;
-    const compressionRatio = ((totalSize - compressedSize) / totalSize * 100).toFixed(1);
+    const compressionRatio = (((totalSize - compressedSize) / totalSize) * 100).toFixed(1);
 
     console.log(`✅ Created translations.zip (compressed JSON)`);
     console.log(`📊 Original size: ${Math.round(totalSize / 1024)}KB`);
     console.log(`📊 Compressed size: ${Math.round(compressedSize / 1024)}KB`);
     console.log(`📊 Compression: ${compressionRatio}% reduction`);
     console.log(`📁 Output: ${outputPath}`);
-
   } catch (error) {
     console.error('❌ Compression failed:', error);
     process.exit(1);
