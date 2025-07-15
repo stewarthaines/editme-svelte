@@ -1,10 +1,10 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { userEvent, within } from 'storybook/test';
+  // Standard testing library imports will be done inside play functions
   import ThemeToggle from '../lib/ThemeToggle.svelte';
 
   const { Story } = defineMeta({
-    title: 'UI/Theme System',
+    title: 'Components/UI/Theme System',
     component: ThemeToggle,
     parameters: {
       layout: 'padded',

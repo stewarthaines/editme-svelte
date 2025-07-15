@@ -3,7 +3,7 @@
   import WorkspaceDebugTest from './components/WorkspaceDebugTest.svelte';
 
   const { Story } = defineMeta({
-    title: 'Debug/Workspace Creation',
+    title: 'Components/Debug/Workspace Creation',
     component: WorkspaceDebugTest,
     parameters: {
       layout: 'fullscreen',

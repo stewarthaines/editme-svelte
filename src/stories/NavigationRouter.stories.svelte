@@ -1,10 +1,10 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { userEvent, within } from 'storybook/test';
+  // Standard testing library imports will be done inside play functions
   import App from '../App.svelte';
 
   const { Story } = defineMeta({
-    title: 'Navigation/Router System',
+    title: 'Application/Router System',
     component: App,
     parameters: {
       layout: 'fullscreen',
