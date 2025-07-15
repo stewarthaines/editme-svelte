@@ -5,7 +5,7 @@
   import { t } from './i18n';
 
   // Props
-  export let hasWorkspace = false;
+  export let hasWorkspace: boolean = false;
 
   // Subscribe to layout store
   $: ({ sidebar } = $layoutStore);

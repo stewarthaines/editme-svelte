@@ -21,6 +21,9 @@
 
 <Story
   name="Default Layout"
+  args={{
+    hasWorkspace: true,
+  }}
   parameters={{
     docs: {
       description: {
@@ -165,6 +168,9 @@
 
 <Story
   name="Collapsed Sidebar"
+  args={{
+    hasWorkspace: true,
+  }}
   parameters={{
     docs: {
       description: {
@@ -227,6 +233,9 @@
 
 <Story
   name="Section Navigation"
+  args={{
+    hasWorkspace: true,
+  }}
   parameters={{
     docs: {
       description: {
@@ -306,6 +315,51 @@
     <div class="preview-demo">
       <h3>Preview</h3>
       <p>Preview content is independent of sidebar state.</p>
+    </div>
+  </svelte:fragment>
+</Story>
+
+<Story
+  name="No Workspace State"
+  args={{
+    hasWorkspace: false,
+  }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          'Layout when no workspace is available. Only Workspace and Settings sections are enabled, content sections are disabled.',
+      },
+    },
+  }}
+>
+  <svelte:fragment slot="sidebar-workspace">
+    <div class="demo-content">
+      <h3>📁 Workspace</h3>
+      <p>No workspace selected</p>
+      <p><em>Create or load a workspace to get started</em></p>
+    </div>
+  </svelte:fragment>
+
+  <svelte:fragment slot="sidebar-settings">
+    <div class="demo-content">
+      <h3>⚙️ Settings</h3>
+      <p>Application preferences are always available</p>
+    </div>
+  </svelte:fragment>
+
+  <svelte:fragment slot="left-content">
+    <div class="no-workspace-demo">
+      <h3>No Workspace Selected</h3>
+      <p>Content sections (Metadata, Manifest, Navigation) are disabled when no workspace is available.</p>
+      <p>This ensures proper workflow where users must create or load a workspace first.</p>
+    </div>
+  </svelte:fragment>
+
+  <svelte:fragment slot="right-content">
+    <div class="preview-demo">
+      <h3>Preview</h3>
+      <p>Preview is not available without an active workspace.</p>
     </div>
   </svelte:fragment>
 </Story>
@@ -505,5 +559,16 @@
   .preview-content li {
     margin-bottom: 0.5rem;
     color: #2c3e50;
+  }
+
+  .no-workspace-demo {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+  }
+
+  .no-workspace-demo h3 {
+    color: #495057;
+    margin-bottom: 1rem;
   }
 </style>
