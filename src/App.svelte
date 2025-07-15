@@ -3,7 +3,7 @@
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
-  import MetadataView from './lib/navigation/views/MetadataView.svelte';
+  import MetadataEditor from './lib/components/metadata/MetadataEditor.svelte';
   import PlaceholderView from './lib/navigation/views/PlaceholderView.svelte';
   import SpineView from './lib/navigation/views/SpineView.svelte';
   import SpineSidebar from './lib/components/SpineSidebar.svelte';
@@ -17,6 +17,8 @@
   // Optional props for dependency injection (used by stories)
   export let workspaceManager: WorkspaceManager | null = null;
   export let initialWorkspaceId: string | null = null;
+  export let manifestManager: ManifestManagerImpl | null = null;
+  export let metadataManager: any | null = null;
 
   // Subscribe to navigation state
   $: currentView = $navigationStore.currentView;
@@ -27,7 +29,8 @@
   let currentWorkspaceId: string | null = null;
   let selectedSpineItemId: string | null = null;
   let initialized = false;
-  let manifestManager: ManifestManagerImpl | null = null;
+  let currentManifestManager: ManifestManagerImpl | null = null;
+  let currentMetadataManager: any | null = null;
 
   // Initialize workspace manager
   onMount(() => {
@@ -51,7 +54,23 @@
         }
 
         // Create manifest manager
-        manifestManager = new ManifestManagerImpl(currentWorkspaceManager);
+        if (manifestManager) {
+          // Use provided manifest manager (from stories)
+          currentManifestManager = manifestManager;
+        } else {
+          // Create default manifest manager
+          currentManifestManager = new ManifestManagerImpl(currentWorkspaceManager);
+        }
+
+        // Create metadata manager
+        if (metadataManager) {
+          // Use provided metadata manager (from stories)
+          currentMetadataManager = metadataManager;
+        } else {
+          // For now, don't create a default metadata manager in non-story mode
+          // This will be implemented when the real MetadataManagerImpl is ready
+          currentMetadataManager = null;
+        }
         
         initialized = true;
       } catch (error) {
@@ -104,12 +123,24 @@
     {#if currentView === 'workspace'}
       <WorkspaceView />
     {:else if currentView === 'metadata'}
-      <MetadataView />
+      {#if initialized && currentWorkspaceId && currentMetadataManager}
+        <MetadataEditor
+          workspaceId={currentWorkspaceId}
+          metadataManager={currentMetadataManager}
+        />
+      {:else}
+        <PlaceholderView
+          viewType="metadata"
+          title={$t('EPUB Metadata')}
+          description={$t('Configure publication metadata and details')}
+          icon="📝"
+        />
+      {/if}
     {:else if currentView === 'manifest'}
-      {#if initialized && currentWorkspaceId && manifestManager}
+      {#if initialized && currentWorkspaceId && currentManifestManager}
         <ManifestContainer
           workspaceId={currentWorkspaceId}
-          manifestManager={manifestManager}
+          manifestManager={currentManifestManager}
           advancedMode={true}
         />
       {:else}
@@ -158,12 +189,12 @@
   </svelte:fragment>
 
   <svelte:fragment slot="right-content">
-    {#if currentView === 'manifest' && initialized && currentWorkspaceId && manifestManager}
+    {#if currentView === 'manifest' && initialized && currentWorkspaceId && currentManifestManager}
       <ManifestPreview
         selectedItem={null}
         selectedItemType={null}
         workspaceId={currentWorkspaceId}
-        manifestManager={manifestManager}
+        manifestManager={currentManifestManager}
       />
     {:else}
       <div class="placeholder-content">

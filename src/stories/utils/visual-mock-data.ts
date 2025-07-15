@@ -293,3 +293,419 @@ export function createVisualMockWorkspaceManager(scenario: VisualScenario = 'wit
     },
   };
 }
+
+/**
+ * Create a mock manifest manager for visual stories
+ * This provides all the IManifestManager methods expected by ManifestContainer
+ */
+export function createVisualMockManifestManager(scenario: VisualScenario = 'withContent') {
+  const mockData = getVisualScenario(scenario);
+
+  // Convert our mock data to manifest items format
+  const manifestItems = mockData.manifestItems.map(item => ({
+    id: item.id,
+    href: item.href,
+    mediaType: item.mediaType,
+    size: Math.floor(Math.random() * 50000) + 1000,
+    modified: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+    properties: item.id === 'cover-image' ? ['cover-image'] : undefined,
+    isInSpine: mockData.spineItems.some(s => s.id === item.id),
+    spineIndex: mockData.spineItems.findIndex(s => s.id === item.id),
+  }));
+
+  return {
+    // Core data operations
+    async loadManifest(workspaceId: string) {
+      return Promise.resolve(manifestItems);
+    },
+
+    async getManifestItem(workspaceId: string, itemId: string) {
+      const item = manifestItems.find(i => i.id === itemId);
+      if (!item) throw new Error(`Item ${itemId} not found`);
+      return Promise.resolve(item);
+    },
+
+    async updateManifestItem(workspaceId: string, itemId: string, updates: any) {
+      return Promise.resolve();
+    },
+
+    async deleteManifestItem(workspaceId: string, itemId: string) {
+      return Promise.resolve();
+    },
+
+    // Content operations
+    async getItemContent(workspaceId: string, itemId: string) {
+      if (itemId.includes('chapter')) {
+        return Promise.resolve(`<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Chapter Content</title>
+</head>
+<body>
+  <h1>Sample Chapter</h1>
+  <p>This is sample content for demonstration purposes.</p>
+</body>
+</html>`);
+      }
+      return Promise.resolve('Sample content');
+    },
+
+    async setItemContent(workspaceId: string, itemId: string, content: any) {
+      return Promise.resolve();
+    },
+
+    async getContentPreview(workspaceId: string, itemId: string) {
+      return Promise.resolve({
+        type: 'text',
+        content: 'Sample preview content',
+        metadata: { size: 1234, lastModified: new Date() }
+      });
+    },
+
+    // Item creation operations
+    async createTextItem(workspaceId: string, itemData: any) {
+      return Promise.resolve({
+        id: itemData.id || 'new-item',
+        href: itemData.fileName || 'new-file.txt',
+        mediaType: itemData.mediaType || 'text/plain',
+        size: 0,
+        modified: new Date(),
+      });
+    },
+
+    async createFileItem(workspaceId: string, file: File) {
+      return Promise.resolve({
+        id: file.name.replace(/\./g, '-'),
+        href: file.name,
+        mediaType: file.type || 'application/octet-stream',
+        size: file.size,
+        modified: new Date(),
+      });
+    },
+
+    async importFileItem(workspaceId: string, filePath: string, content: ArrayBuffer) {
+      return Promise.resolve({
+        id: filePath.replace(/\./g, '-'),
+        href: filePath,
+        mediaType: 'application/octet-stream',
+        size: content.byteLength,
+        modified: new Date(),
+      });
+    },
+
+    // Manifest structure operations
+    async reorderManifestItems(workspaceId: string, itemIds: string[]) {
+      return Promise.resolve();
+    },
+
+    async getManifestOrder(workspaceId: string) {
+      return Promise.resolve(manifestItems.map(i => i.id));
+    },
+
+    async validateManifest(workspaceId: string) {
+      // Return some mock validation errors for items that have warnings in UI
+      return Promise.resolve([
+        {
+          severity: 'warning',
+          message: 'Missing source file',
+          itemId: 'titlepage',
+          type: 'missing-source'
+        },
+        {
+          severity: 'warning', 
+          message: 'Non-linear item in spine',
+          itemId: 'appendix',
+          type: 'spine-validation'
+        }
+      ]);
+    },
+
+    // Advanced mode operations
+    async listSourceItems(workspaceId: string) {
+      return Promise.resolve([
+        {
+          path: 'SOURCE/text/chapter-001.txt',
+          type: 'text',
+          size: 1234,
+          modified: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        },
+        {
+          path: 'SOURCE/text/chapter-002.txt',
+          type: 'text',
+          size: 2345,
+          modified: new Date(Date.now() - 1 * 60 * 60 * 1000),
+        }
+      ]);
+    },
+
+    async getSourceItemContent(workspaceId: string, sourcePath: string) {
+      return Promise.resolve('# Sample Source Content\n\nThis is plain text content that would be transformed to XHTML.');
+    },
+
+    async isAdvancedModeEnabled(workspaceId: string) {
+      return Promise.resolve(true);
+    },
+
+    // Utility operations
+    generateItemId(fileName: string) {
+      return fileName.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '-');
+    },
+
+    detectMediaType(fileName: string, content?: ArrayBuffer) {
+      if (fileName.endsWith('.xhtml') || fileName.endsWith('.html')) return 'application/xhtml+xml';
+      if (fileName.endsWith('.css')) return 'text/css';
+      if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) return 'image/jpeg';
+      if (fileName.endsWith('.png')) return 'image/png';
+      if (fileName.endsWith('.mp3')) return 'audio/mpeg';
+      if (fileName.endsWith('.mp4')) return 'video/mp4';
+      return 'application/octet-stream';
+    },
+
+    getMediaTypeCategories() {
+      return {
+        text: ['application/xhtml+xml', 'text/html', 'text/css', 'text/plain'],
+        image: ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'],
+        audio: ['audio/mpeg', 'audio/ogg', 'audio/wav'],
+        video: ['video/mp4', 'video/ogg', 'video/webm'],
+        binary: ['application/octet-stream', 'application/pdf']
+      };
+    },
+
+    // Cache management
+    clearCache(workspaceId?: string) {
+      // Mock implementation - do nothing
+    },
+
+    async preloadManifest(workspaceId: string) {
+      return Promise.resolve();
+    },
+
+    clearContentCache(workspaceId: string, itemId?: string) {
+      // Mock implementation - do nothing
+    },
+  };
+}
+
+/**
+ * Create a mock metadata manager for visual stories
+ * This provides all the MetadataManager methods expected by MetadataEditor
+ */
+export function createVisualMockMetadataManager(scenario: VisualScenario = 'withContent') {
+  const mockData = getVisualScenario(scenario);
+
+  // Rich metadata based on scenario
+  const getMetadata = () => {
+    if (scenario === 'empty') {
+      return {
+        title: '',
+        language: 'en',
+        identifier: '',
+        creator: [],
+        description: '',
+        publisher: '',
+        date: '',
+        rights: '',
+        subject: [],
+        contributor: [],
+        type: '',
+        source: '',
+        relation: '',
+        coverage: '',
+        format: ''
+      };
+    }
+
+    // Rich metadata for withContent and largeBook scenarios
+    return {
+      title: mockData.metadata.title,
+      language: mockData.metadata.language,
+      identifier: mockData.metadata.identifier,
+      creator: [mockData.metadata.author, 'Co-Author Name'],
+      description: mockData.metadata.description,
+      publisher: 'Digital Publishing House',
+      date: mockData.metadata.publishedDate,
+      rights: 'Copyright © 2024 Digital Publishing House. All rights reserved.',
+      subject: [
+        'Technology',
+        'Digital Transformation', 
+        'Fiction',
+        'Contemporary Literature',
+        'Human-Computer Interaction'
+      ],
+      contributor: ['Jane Editor (Editor)', 'Bob Illustrator (Illustrator)'],
+      type: 'fiction',
+      source: 'Original digital manuscript',
+      relation: 'Part of the Digital Chronicles series',
+      coverage: 'Global, 21st century',
+      format: 'EPUB 3.0'
+    };
+  };
+
+  const metadata = getMetadata();
+
+  return {
+    // Core metadata operations
+    async loadMetadata(workspaceId: string) {
+      return Promise.resolve(metadata);
+    },
+
+    async getMetadata(workspaceId: string) {
+      return Promise.resolve(metadata);
+    },
+
+    async updateMetadata(workspaceId: string, updates: any) {
+      // Mock update - merge changes
+      Object.assign(metadata, updates);
+      return Promise.resolve();
+    },
+
+    validateMetadata(metadata: any) {
+      const errors = [];
+      
+      // Mock validation errors for demonstration
+      if (!metadata.title?.trim()) {
+        errors.push({
+          field: 'title',
+          severity: 'error' as const,
+          message: 'Title is required',
+          code: 'REQUIRED_FIELD'
+        });
+      }
+
+      if (!metadata.identifier?.trim()) {
+        errors.push({
+          field: 'identifier',
+          severity: 'error' as const,
+          message: 'Identifier is required',
+          code: 'REQUIRED_FIELD'
+        });
+      }
+
+      if (metadata.language && !metadata.language.match(/^[a-z]{2}(-[A-Z]{2})?$/)) {
+        errors.push({
+          field: 'language',
+          severity: 'warning' as const,
+          message: 'Language should follow BCP 47 format (e.g., en, en-US)',
+          code: 'INVALID_FORMAT'
+        });
+      }
+
+      return errors;
+    },
+
+    // Array field operations
+    async addArrayItem(workspaceId: string, field: string, value: string) {
+      if (Array.isArray(metadata[field])) {
+        metadata[field].push(value);
+      }
+      return Promise.resolve();
+    },
+
+    async removeArrayItem(workspaceId: string, field: string, index: number) {
+      if (Array.isArray(metadata[field]) && index >= 0 && index < metadata[field].length) {
+        metadata[field].splice(index, 1);
+      }
+      return Promise.resolve();
+    },
+
+    async updateArrayItem(workspaceId: string, field: string, index: number, value: string) {
+      if (Array.isArray(metadata[field]) && index >= 0 && index < metadata[field].length) {
+        metadata[field][index] = value;
+      }
+      return Promise.resolve();
+    },
+
+    // Utility operations
+    async getLanguageOptions() {
+      return Promise.resolve([
+        { code: 'en', name: 'English' },
+        { code: 'en-US', name: 'English (United States)' },
+        { code: 'en-GB', name: 'English (United Kingdom)' },
+        { code: 'es', name: 'Spanish' },
+        { code: 'es-ES', name: 'Spanish (Spain)' },
+        { code: 'es-MX', name: 'Spanish (Mexico)' },
+        { code: 'fr', name: 'French' },
+        { code: 'fr-FR', name: 'French (France)' },
+        { code: 'fr-CA', name: 'French (Canada)' },
+        { code: 'de', name: 'German' },
+        { code: 'de-DE', name: 'German (Germany)' },
+        { code: 'de-AT', name: 'German (Austria)' },
+        { code: 'it', name: 'Italian' },
+        { code: 'pt', name: 'Portuguese' },
+        { code: 'pt-BR', name: 'Portuguese (Brazil)' },
+        { code: 'pt-PT', name: 'Portuguese (Portugal)' },
+        { code: 'zh', name: 'Chinese' },
+        { code: 'zh-CN', name: 'Chinese (Simplified)' },
+        { code: 'zh-TW', name: 'Chinese (Traditional)' },
+        { code: 'ja', name: 'Japanese' },
+        { code: 'ko', name: 'Korean' },
+        { code: 'ar', name: 'Arabic' },
+        { code: 'he', name: 'Hebrew' }
+      ]);
+    },
+
+    async generateIdentifier() {
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      return Promise.resolve(`urn:uuid:${uuid}`);
+    },
+
+    async getMetadataHistory(workspaceId: string) {
+      return Promise.resolve([
+        {
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+          field: 'title',
+          oldValue: 'The Digital Chronicles (Draft)',
+          newValue: metadata.title,
+          action: 'update'
+        },
+        {
+          timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
+          field: 'description',
+          oldValue: '',
+          newValue: metadata.description,
+          action: 'update'
+        }
+      ]);
+    },
+
+    // Export/import operations
+    async exportMetadata(workspaceId: string, format: 'json' | 'xml' = 'json') {
+      if (format === 'xml') {
+        return Promise.resolve(`<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <dc:title>${metadata.title}</dc:title>
+  <dc:creator>${Array.isArray(metadata.creator) ? metadata.creator.join(', ') : metadata.creator}</dc:creator>
+  <dc:language>${metadata.language}</dc:language>
+  <dc:identifier>${metadata.identifier}</dc:identifier>
+  <dc:description>${metadata.description}</dc:description>
+  <dc:publisher>${metadata.publisher}</dc:publisher>
+  <dc:date>${metadata.date}</dc:date>
+  <dc:rights>${metadata.rights}</dc:rights>
+</metadata>`);
+      }
+      return Promise.resolve(JSON.stringify(metadata, null, 2));
+    },
+
+    async importMetadata(workspaceId: string, data: string, format: 'json' | 'xml' = 'json') {
+      if (format === 'json') {
+        const imported = JSON.parse(data);
+        Object.assign(metadata, imported);
+      }
+      return Promise.resolve();
+    },
+
+    // Cache and performance
+    clearCache(workspaceId?: string) {
+      // Mock implementation - do nothing
+    },
+
+    async preloadMetadata(workspaceId: string) {
+      return Promise.resolve();
+    }
+  };
+}
