@@ -77,7 +77,7 @@
   }
 
   .field-label.needs-attention {
-    color: #228b22; /* Green color for required unfilled fields */
+    color: var(--color-success-600); /* Green color for required unfilled fields */
   }
 
   .required {
@@ -124,11 +124,11 @@
   }
 
   .field-textarea.needs-attention {
-    border-color: #228b22; /* Green border for required unfilled fields */
+    border-color: var(--color-success-600); /* Green border for required unfilled fields */
   }
 
   .field-textarea.needs-attention:focus {
-    border-color: #228b22;
+    border-color: var(--color-success-600);
     box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.2);
   }
 

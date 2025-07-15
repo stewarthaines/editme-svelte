@@ -4,6 +4,9 @@
   import { layoutStore } from './stores/layout';
   import { t } from './i18n';
 
+  // Props
+  export let hasWorkspace = false;
+
   // Subscribe to layout store
   $: ({ sidebar } = $layoutStore);
 
@@ -15,7 +18,7 @@
 </script>
 
 <div class="app-layout" style="grid-template-columns: {sidebarWidth} 1fr">
-  <Sidebar isExpanded={sidebar.isExpanded} activeSection={sidebar.activeSection}>
+  <Sidebar isExpanded={sidebar.isExpanded} activeSection={sidebar.activeSection} {hasWorkspace}>
     <svelte:fragment slot="sidebar-workspace">
       <slot name="sidebar-workspace" />
     </svelte:fragment>

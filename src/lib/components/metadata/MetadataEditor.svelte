@@ -283,7 +283,7 @@
   .pane-content {
     flex: 1;
     overflow-y: auto;
-    background-color: var(--color-background);
+    background-color: var(--color-bg-primary);
   }
 
   .tab-panel {

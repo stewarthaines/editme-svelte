@@ -12,31 +12,57 @@
   const dispatch = createEventDispatcher<{
     workspaceOpened: { workspaceId: string };
     navigationRequested: { view: string; workspaceId?: string };
+    workspaceChanged: { workspaceId: string | null };
   }>();
 
-  // Initialize WorkspaceManager
-  const workspaceManager = new WorkspaceManager();
+  // Props for dependency injection
+  export let workspaceManager: WorkspaceManager | null = null;
+  export let onWorkspaceChange: ((workspaceId: string | null) => void) | null = null;
+  export let currentWorkspaceId: string | null = null;
+
+  // Initialize WorkspaceManager - use provided instance or create new one
+  const localWorkspaceManager = workspaceManager || new WorkspaceManager();
 
   // Component state
   let workspaces: WorkspaceInfo[] = [];
-  let currentWorkspaceId: string | null = null;
   let currentWorkspace: WorkspaceInfo | null = null;
   let loading = true;
   let error: string | null = null;
   let hasUnsavedChanges = false;
   let guardId: string;
 
-  // Load current workspace from localStorage
-  const loadCurrentWorkspace = () => {
-    const stored = localStorage.getItem('currentWorkspace');
-    if (stored && workspaces.find(w => w.id === stored)) {
-      currentWorkspaceId = stored;
-      currentWorkspace = workspaces.find(w => w.id === stored) || null;
+  // Reactive: Update currentWorkspace when prop changes
+  $: {
+    if (currentWorkspaceId && workspaces.length > 0) {
+      currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId) || null;
     } else {
-      currentWorkspaceId = null;
+      currentWorkspace = null;
+    }
+  }
+
+  // Helper to update workspace selection and notify parent
+  const setCurrentWorkspace = (workspaceId: string | null) => {
+    if (workspaceId) {
+      currentWorkspace = workspaces.find(w => w.id === workspaceId) || null;
+      localStorage.setItem('currentWorkspace', workspaceId);
+    } else {
       currentWorkspace = null;
       localStorage.removeItem('currentWorkspace');
     }
+    
+    // Notify parent component about workspace change
+    if (onWorkspaceChange) {
+      onWorkspaceChange(workspaceId);
+    }
+    
+    // Dispatch event for backward compatibility
+    dispatch('workspaceChanged', { workspaceId });
+  };
+
+  // Load current workspace from props (reactive statement handles the sync)
+  const loadCurrentWorkspace = () => {
+    // Reactive statement now handles workspace sync
+    // This function remains for compatibility but doesn't need to do anything
   };
 
   // Load workspaces from WorkspaceManager
@@ -44,7 +70,7 @@
     try {
       loading = true;
       error = null;
-      workspaces = await workspaceManager.listWorkspacesWithMetadata();
+      workspaces = await localWorkspaceManager.listWorkspacesWithMetadata();
       loadCurrentWorkspace();
     } catch (err) {
       console.error('Failed to load workspaces:', err);
@@ -68,15 +94,13 @@
     try {
       loading = true;
       const metadata = createMinimalEPUBMetadata();
-      const workspaceId = await workspaceManager.createEPUBWorkspace(metadata);
+      const workspaceId = await localWorkspaceManager.createEPUBWorkspace(metadata);
 
       // Refresh workspace list
       await loadWorkspaces();
 
       // Set as current workspace
-      currentWorkspaceId = workspaceId;
-      currentWorkspace = workspaces.find(w => w.id === workspaceId) || null;
-      localStorage.setItem('currentWorkspace', workspaceId);
+      setCurrentWorkspace(workspaceId);
 
       // Navigate to metadata view
       dispatch('navigationRequested', {
@@ -139,9 +163,7 @@
 
     try {
       // Set as current workspace
-      currentWorkspaceId = workspaceId;
-      currentWorkspace = workspaces.find(w => w.id === workspaceId) || null;
-      localStorage.setItem('currentWorkspace', workspaceId);
+      setCurrentWorkspace(workspaceId);
 
       // Navigate to workspace (metadata view)
       dispatch('navigationRequested', {
@@ -177,13 +199,11 @@
 
     try {
       loading = true;
-      await workspaceManager.deleteWorkspace(workspaceId);
+      await localWorkspaceManager.deleteWorkspace(workspaceId);
 
       // If this was the current workspace, clear it
       if (currentWorkspaceId === workspaceId) {
-        currentWorkspaceId = null;
-        currentWorkspace = null;
-        localStorage.removeItem('currentWorkspace');
+        setCurrentWorkspace(null);
       }
 
       // Refresh workspace list
@@ -215,9 +235,7 @@
       if (!confirmed) return;
     }
 
-    currentWorkspaceId = null;
-    currentWorkspace = null;
-    localStorage.removeItem('currentWorkspace');
+    setCurrentWorkspace(null);
     hasUnsavedChanges = false;
   };
 
@@ -248,7 +266,7 @@
 
   export function setViewData(data: any): void {
     if (data.currentWorkspaceId) {
-      currentWorkspaceId = data.currentWorkspaceId;
+      setCurrentWorkspace(data.currentWorkspaceId);
     }
     if (data.hasUnsavedChanges !== undefined) {
       hasUnsavedChanges = data.hasUnsavedChanges;
@@ -258,7 +276,7 @@
   // Component lifecycle
   onMount(async () => {
     // Initialize workspace manager
-    await workspaceManager.init();
+    await localWorkspaceManager.init();
 
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
@@ -329,7 +347,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: var(--color-background);
+    background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
   }
 

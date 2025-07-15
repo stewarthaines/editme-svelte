@@ -11,7 +11,9 @@
   import ManifestPreview from './lib/components/manifest/ManifestPreview.svelte';
   import { WorkspaceManager } from './lib/workspace';
   import { ManifestManagerImpl } from './lib/manifest/manifest-manager';
+  import { MetadataManagerImpl } from './lib/metadata/MetadataManager';
   import { layoutStore } from './lib/stores/layout';
+  import { themeStore } from './lib/stores/theme';
   import { t } from './lib/i18n';
 
   // Optional props for dependency injection (used by stories)
@@ -23,6 +25,9 @@
   // Subscribe to navigation state
   $: currentView = $navigationStore.currentView;
   $: isExpanded = $layoutStore.sidebar.isExpanded;
+  
+  // Subscribe to theme state
+  $: themeState = $themeStore;
 
   // Spine management state
   let currentWorkspaceManager: WorkspaceManager;
@@ -67,9 +72,8 @@
           // Use provided metadata manager (from stories)
           currentMetadataManager = metadataManager;
         } else {
-          // For now, don't create a default metadata manager in non-story mode
-          // This will be implemented when the real MetadataManagerImpl is ready
-          currentMetadataManager = null;
+          // Create default metadata manager with real backend
+          currentMetadataManager = new MetadataManagerImpl(currentWorkspaceManager);
         }
         
         initialized = true;
@@ -102,7 +106,7 @@
   });
 </script>
 
-<LayoutManager>
+<LayoutManager hasWorkspace={!!currentWorkspaceId}>
   <svelte:fragment slot="sidebar-spine">
     {#if initialized && currentWorkspaceId && currentWorkspaceManager}
       <SpineSidebar
@@ -121,7 +125,13 @@
   <svelte:fragment slot="left-content">
     <!-- Main content area - switches based on current view -->
     {#if currentView === 'workspace'}
-      <WorkspaceView />
+      <WorkspaceView 
+        workspaceManager={currentWorkspaceManager}
+        currentWorkspaceId={currentWorkspaceId}
+        onWorkspaceChange={(workspaceId) => {
+          currentWorkspaceId = workspaceId;
+        }}
+      />
     {:else if currentView === 'metadata'}
       {#if initialized && currentWorkspaceId && currentMetadataManager}
         <MetadataEditor
@@ -209,7 +219,7 @@
 <style>
   .placeholder-content {
     padding: 1rem;
-    color: #666;
+    color: var(--color-text-secondary);
   }
 
   .placeholder-content h3 {
@@ -227,7 +237,7 @@
   .current-view-info {
     margin-top: 1rem !important;
     padding: 0.5rem;
-    background: #f0f0f0;
+    background: var(--color-bg-secondary);
     border-radius: 4px;
     font-size: 0.75rem !important;
   }

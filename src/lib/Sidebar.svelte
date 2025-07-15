@@ -5,6 +5,7 @@
   // Props
   export let isExpanded = true;
   export let activeSection: SidebarSection = 'workspace';
+  export let hasWorkspace = false;
 
   // Main navigation sections (clickable)
   const MAIN_SECTIONS: Array<{
@@ -26,7 +27,16 @@
   }
 
   function setSidebarSection(section: SidebarSection) {
+    // Only allow navigation if workspace exists or it's workspace/settings section
+    if (!hasWorkspace && section !== 'workspace' && section !== 'settings') {
+      return;
+    }
     layoutStore.setSidebarSection(section);
+  }
+
+  function isSectionDisabled(sectionId: string): boolean {
+    // Disable content-related sections when no workspace exists
+    return !hasWorkspace && sectionId !== 'workspace' && sectionId !== 'settings';
   }
 
   function handleAppendItem() {
@@ -65,6 +75,8 @@
         <button
           class="sidebar-section"
           class:active={activeSection === section.id}
+          class:disabled={isSectionDisabled(section.id)}
+          disabled={isSectionDisabled(section.id)}
           on:click={() => setSidebarSection(section.id)}
           aria-current={activeSection === section.id ? 'page' : undefined}
           title={$t(section.label)}
@@ -81,10 +93,12 @@
 
       <!-- Spine Items section header (non-clickable) -->
       {#if isExpanded}
-        <div class="spine-section-header">
+        <div class="spine-section-header" class:disabled={!hasWorkspace}>
           <span class="section-label">{$t('Spine Items')}</span>
           <button
             class="append-button-nav"
+            class:disabled={!hasWorkspace}
+            disabled={!hasWorkspace}
             on:click={handleAppendItem}
             aria-label={$t('Append Item')}
             title={$t('Append Item')}
@@ -93,10 +107,12 @@
           </button>
         </div>
       {:else}
-        <div class="spine-section-header compact">
+        <div class="spine-section-header compact" class:disabled={!hasWorkspace}>
           <span class="section-label">{generateCompactLabel($t('Spine Items'))}</span>
           <button
             class="append-button-nav compact"
+            class:disabled={!hasWorkspace}
+            disabled={!hasWorkspace}
             on:click={handleAppendItem}
             aria-label={$t('Append Item')}
             title={$t('Append Item')}
@@ -408,5 +424,41 @@
   /* RTL support - icons that need direction flipping */
   :global([dir='rtl']) .sidebar-toggle {
     transform: scaleX(-1);
+  }
+
+  /* Disabled state styling */
+  .sidebar-section:disabled,
+  .sidebar-section.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--color-text-disabled, var(--color-text-tertiary));
+  }
+
+  .sidebar-section:disabled:hover,
+  .sidebar-section.disabled:hover {
+    text-decoration: none;
+    background: transparent;
+  }
+
+  .spine-section-header.disabled {
+    opacity: 0.5;
+  }
+
+  .spine-section-header.disabled .section-label {
+    color: var(--color-text-disabled, var(--color-text-tertiary));
+  }
+
+  .append-button-nav:disabled,
+  .append-button-nav.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--color-bg-primary);
+    color: var(--color-text-disabled, var(--color-text-tertiary));
+  }
+
+  .append-button-nav:disabled:hover,
+  .append-button-nav.disabled:hover {
+    background: var(--color-bg-primary);
+    color: var(--color-text-disabled, var(--color-text-tertiary));
   }
 </style>

@@ -305,7 +305,7 @@
   }
 
   .array-item :global(.field-input.needs-attention:focus) {
-    box-shadow: inset 0 0 0 2px #228b22;
+    box-shadow: inset 0 0 0 2px var(--color-success-600);
   }
 
   .remove-button {
