@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, getContext } from 'svelte';
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
@@ -13,21 +13,27 @@
   import { ManifestManagerImpl } from './lib/manifest/manifest-manager';
   import { MetadataManagerImpl } from './lib/metadata/MetadataManager';
   import { layoutStore } from './lib/stores/layout';
-  import { themeStore } from './lib/stores/theme';
   import { t } from './lib/i18n';
+  import {
+    WORKSPACE_MANAGER_CONTEXT,
+    MANIFEST_MANAGER_CONTEXT,
+    METADATA_MANAGER_CONTEXT,
+    WORKSPACE_ID_CONTEXT,
+    type WorkspaceManagerContext,
+    type ManifestManagerContext,
+    type MetadataManagerContext,
+    type WorkspaceIdContext
+  } from './lib/contexts';
 
-  // Optional props for dependency injection (used by stories)
-  export let workspaceManager: WorkspaceManager | null = null;
-  export let initialWorkspaceId: string | null = null;
-  export let manifestManager: ManifestManagerImpl | null = null;
-  export let metadataManager: any | null = null;
+  // Get dependencies from context (stories) or create real ones (production)
+  const contextWorkspaceManager: WorkspaceManagerContext = getContext(WORKSPACE_MANAGER_CONTEXT);
+  const contextManifestManager: ManifestManagerContext = getContext(MANIFEST_MANAGER_CONTEXT);
+  const contextMetadataManager: MetadataManagerContext = getContext(METADATA_MANAGER_CONTEXT);
+  const contextWorkspaceId: WorkspaceIdContext = getContext(WORKSPACE_ID_CONTEXT);
 
   // Subscribe to navigation state
   $: currentView = $navigationStore.currentView;
   $: isExpanded = $layoutStore.sidebar.isExpanded;
-  
-  // Subscribe to theme state
-  $: themeState = $themeStore;
 
   // Spine management state
   let currentWorkspaceManager: WorkspaceManager;
@@ -35,45 +41,36 @@
   let selectedSpineItemId: string | null = null;
   let initialized = false;
   let currentManifestManager: ManifestManagerImpl | null = null;
-  let currentMetadataManager: any | null = null;
+  let currentMetadataManager: MetadataManagerImpl | null = null;
 
   // Initialize workspace manager
   onMount(() => {
     // Async initialization
     (async () => {
       try {
-        if (!workspaceManager) {
-          // Default behavior - create own manager
-          currentWorkspaceManager = new WorkspaceManager();
-          await currentWorkspaceManager.init();
+        if (contextWorkspaceManager) {
+          // Use context-provided managers (from stories)
+          currentWorkspaceManager = contextWorkspaceManager;
+          currentWorkspaceId = contextWorkspaceId || null;
+          currentManifestManager = contextManifestManager || null;
+          currentMetadataManager = contextMetadataManager || null;
+        } else {
+          // Production: create and initialize real managers
+          const tempWorkspaceManager = new WorkspaceManager();
+          await tempWorkspaceManager.init();
 
           // Get the first available workspace
-          const workspaces = await currentWorkspaceManager.listWorkspacesWithMetadata();
+          const workspaces = await tempWorkspaceManager.listWorkspacesWithMetadata();
           if (workspaces.length > 0) {
             currentWorkspaceId = workspaces[0].id;
           }
-        } else {
-          // Use provided manager and workspace ID
-          currentWorkspaceManager = workspaceManager;
-          currentWorkspaceId = initialWorkspaceId;
-        }
 
-        // Create manifest manager
-        if (manifestManager) {
-          // Use provided manifest manager (from stories)
-          currentManifestManager = manifestManager;
-        } else {
-          // Create default manifest manager
-          currentManifestManager = new ManifestManagerImpl(currentWorkspaceManager);
-        }
-
-        // Create metadata manager
-        if (metadataManager) {
-          // Use provided metadata manager (from stories)
-          currentMetadataManager = metadataManager;
-        } else {
-          // Create default metadata manager with real backend
-          currentMetadataManager = new MetadataManagerImpl(currentWorkspaceManager);
+          // Create real manifest and metadata managers
+          currentManifestManager = new ManifestManagerImpl(tempWorkspaceManager);
+          currentMetadataManager = new MetadataManagerImpl(tempWorkspaceManager);
+          
+          // Set manager only after full initialization
+          currentWorkspaceManager = tempWorkspaceManager;
         }
         
         initialized = true;

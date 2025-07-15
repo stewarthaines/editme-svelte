@@ -1,17 +1,11 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   // Standard testing library imports will be done inside play functions
-  import App from '../App.svelte';
-  import { 
-    createVisualMockWorkspaceManager, 
-    createVisualMockManifestManager, 
-    createVisualMockMetadataManager,
-    VISUAL_SCENARIOS 
-  } from './utils/visual-mock-data';
+  import AppStoryProvider from './AppStoryProvider.svelte';
 
   const { Story } = defineMeta({
     title: 'Application/App (Visual)',
-    component: App,
+    component: AppStoryProvider,
     parameters: {
       layout: 'fullscreen',
       docs: {
@@ -27,12 +21,7 @@
 
 <Story
   name="With Sample Content"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('withContent'),
-    manifestManager: createVisualMockManifestManager('withContent'),
-    metadataManager: createVisualMockMetadataManager('withContent'),
-    initialWorkspaceId: 'demo-workspace',
-  }}
+  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -45,12 +34,7 @@
 
 <Story
   name="Empty Project"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('empty'),
-    manifestManager: createVisualMockManifestManager('empty'),
-    metadataManager: createVisualMockMetadataManager('empty'),
-    initialWorkspaceId: 'empty-workspace',
-  }}
+  args={{ scenario: 'empty' }}
   parameters={{
     docs: {
       description: {
@@ -62,12 +46,7 @@
 
 <Story
   name="Large Book"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('largeBook'),
-    manifestManager: createVisualMockManifestManager('largeBook'),
-    metadataManager: createVisualMockMetadataManager('largeBook'),
-    initialWorkspaceId: 'large-book',
-  }}
+  args={{ scenario: 'largeBook' }}
   parameters={{
     docs: {
       description: {
@@ -80,12 +59,7 @@
 
 <Story
   name="Section Navigation Demo"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('withContent'),
-    manifestManager: createVisualMockManifestManager('withContent'),
-    metadataManager: createVisualMockMetadataManager('withContent'),
-    initialWorkspaceId: 'demo-workspace',
-  }}
+  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -127,12 +101,7 @@
 
 <Story
   name="Spine Item Selection"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('withContent'),
-    manifestManager: createVisualMockManifestManager('withContent'),
-    metadataManager: createVisualMockMetadataManager('withContent'),
-    initialWorkspaceId: 'demo-workspace',
-  }}
+  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -177,12 +146,7 @@
 
 <Story
   name="Firefox Debug Test"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('withContent'),
-    manifestManager: createVisualMockManifestManager('withContent'),
-    metadataManager: createVisualMockMetadataManager('withContent'),
-    initialWorkspaceId: 'demo-workspace',
-  }}
+  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -248,12 +212,7 @@
 
 <Story
   name="Navigation Spine Selection Clear Test"
-  args={{
-    workspaceManager: createVisualMockWorkspaceManager('withContent'),
-    manifestManager: createVisualMockManifestManager('withContent'),
-    metadataManager: createVisualMockMetadataManager('withContent'),
-    initialWorkspaceId: 'demo-workspace',
-  }}
+  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {

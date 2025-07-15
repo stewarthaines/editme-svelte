@@ -16,12 +16,9 @@
   }>();
 
   // Props for dependency injection
-  export let workspaceManager: WorkspaceManager | null = null;
+  export let workspaceManager: WorkspaceManager;
   export let onWorkspaceChange: ((workspaceId: string | null) => void) | null = null;
   export let currentWorkspaceId: string | null = null;
-
-  // Initialize WorkspaceManager - use provided instance or create new one
-  const localWorkspaceManager = workspaceManager || new WorkspaceManager();
 
   // Component state
   let workspaces: WorkspaceInfo[] = [];
@@ -49,12 +46,12 @@
       currentWorkspace = null;
       localStorage.removeItem('currentWorkspace');
     }
-    
+
     // Notify parent component about workspace change
     if (onWorkspaceChange) {
       onWorkspaceChange(workspaceId);
     }
-    
+
     // Dispatch event for backward compatibility
     dispatch('workspaceChanged', { workspaceId });
   };
@@ -65,12 +62,19 @@
     // This function remains for compatibility but doesn't need to do anything
   };
 
+  // Reactive: load workspaces when manager becomes available
+  $: if (workspaceManager) {
+    loadWorkspaces();
+  }
+
   // Load workspaces from WorkspaceManager
   const loadWorkspaces = async () => {
+    if (!workspaceManager) return; // Guard against undefined
+    
     try {
       loading = true;
       error = null;
-      workspaces = await localWorkspaceManager.listWorkspacesWithMetadata();
+      workspaces = await workspaceManager.listWorkspacesWithMetadata();
       loadCurrentWorkspace();
     } catch (err) {
       console.error('Failed to load workspaces:', err);
@@ -94,7 +98,7 @@
     try {
       loading = true;
       const metadata = createMinimalEPUBMetadata();
-      const workspaceId = await localWorkspaceManager.createEPUBWorkspace(metadata);
+      const workspaceId = await workspaceManager.createEPUBWorkspace(metadata);
 
       // Refresh workspace list
       await loadWorkspaces();
@@ -199,7 +203,7 @@
 
     try {
       loading = true;
-      await localWorkspaceManager.deleteWorkspace(workspaceId);
+      await workspaceManager.deleteWorkspace(workspaceId);
 
       // If this was the current workspace, clear it
       if (currentWorkspaceId === workspaceId) {
@@ -249,8 +253,10 @@
 
   // ViewComponent interface implementation
   export function onViewEnter(data?: any): void {
-    // Load workspaces when entering view
-    loadWorkspaces();
+    // Load workspaces when entering view (safe to call anytime)
+    if (workspaceManager) {
+      loadWorkspaces();
+    }
   }
 
   export function onViewLeave(): void {
@@ -275,14 +281,8 @@
 
   // Component lifecycle
   onMount(async () => {
-    // Initialize workspace manager
-    await localWorkspaceManager.init();
-
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
-
-    // Call onViewEnter
-    onViewEnter();
   });
 
   onDestroy(() => {
@@ -422,20 +422,8 @@
 
   /* Mobile adjustments */
   @media (max-width: 768px) {
-    .view-header {
-      padding: var(--space-4);
-    }
-
     .view-content {
       padding: var(--space-4);
-    }
-
-    .view-title {
-      font-size: var(--text-xl);
-    }
-
-    .view-description {
-      font-size: var(--text-sm);
     }
   }
 </style>
