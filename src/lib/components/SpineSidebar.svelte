@@ -23,10 +23,9 @@
   // Reactive state - use prop instead of store
   $: sidebarExpanded = isExpanded;
 
-  // Initialize spine manager
+  // Initialize spine manager and reactive loading
   onMount(() => {
     spineManager = new SpineItemManager(workspaceManager);
-    loadSpineItems();
 
     // Listen for append item events from Sidebar
     const handleAppendEvent = () => {
@@ -39,6 +38,11 @@
       window.removeEventListener('append-spine-item', handleAppendEvent);
     };
   });
+
+  // Reactive: Load spine items when workspaceId changes
+  $: if (workspaceId && spineManager) {
+    loadSpineItems();
+  }
 
   // Load spine items
   async function loadSpineItems() {

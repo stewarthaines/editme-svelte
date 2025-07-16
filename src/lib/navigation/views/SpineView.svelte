@@ -20,7 +20,7 @@
   let guardId: string;
 
   // ViewComponent interface implementation
-  export function onViewEnter(data?: any): void {
+  export function onViewEnter(_data?: any): void {
     // Initialize spine manager
     spineManager = new SpineItemManager(workspaceManager);
 
@@ -103,9 +103,17 @@
     onViewLeave();
   });
 
-  // React to prop changes
-  $: if (selectedItemId && spineManager) {
-    loadSelectedItem();
+  // React to prop changes - reload when workspace or selected item changes
+  $: if (workspaceId && spineManager) {
+    // Clear selection when workspace changes, then load if item is selected
+    if (selectedItemId) {
+      loadSelectedItem();
+    } else {
+      // Clear previous workspace data
+      selectedItem = null;
+      sourceContent = '';
+      error = null;
+    }
   }
 
   // Format file size for display

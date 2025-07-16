@@ -146,17 +146,63 @@ export class WorkspaceManager {
   }
 
   /**
-   * Delete a workspace
+   * Delete a workspace with comprehensive cleanup
    */
   async deleteWorkspace(workspaceId: string): Promise<void> {
     try {
-      await this.storage.deleteWorkspace(workspaceId);
+      // Step 1: Invalidate cache first to prevent issues if storage deletion fails
       await this.invalidateCache(workspaceId);
+      
+      // Step 2: Attempt storage deletion
+      await this.storage.deleteWorkspace(workspaceId);
+      
+      // Step 3: Verify deletion completed successfully
+      const remainingWorkspaces = await this.storage.listWorkspaces();
+      if (remainingWorkspaces.includes(workspaceId)) {
+        throw new Error(`Workspace still exists after deletion attempt`);
+      }
+      
     } catch (error) {
       throw new WorkspaceError(
         `Failed to delete workspace: ${error instanceof Error ? error.message : 'Unknown error'}`,
         'WORKSPACE_DELETE_ERROR',
         workspaceId
+      );
+    }
+  }
+
+  /**
+   * Clean up orphaned and corrupted workspaces
+   * This method identifies and removes workspaces that cannot be properly loaded
+   */
+  async cleanupOrphanedWorkspaces(): Promise<{ cleaned: string[]; errors: string[] }> {
+    const cleaned: string[] = [];
+    const errors: string[] = [];
+    
+    try {
+      const allWorkspaceIds = await this.storage.listWorkspaces();
+      
+      for (const workspaceId of allWorkspaceIds) {
+        try {
+          // Attempt to parse workspace metadata
+          await this.parseWorkspaceMetadata(workspaceId);
+          // If successful, workspace is valid - skip cleanup
+        } catch (error) {
+          // Workspace is corrupted or orphaned - attempt cleanup
+          try {
+            await this.deleteWorkspace(workspaceId);
+            cleaned.push(workspaceId);
+          } catch (cleanupError) {
+            errors.push(`Failed to clean ${workspaceId}: ${cleanupError instanceof Error ? cleanupError.message : 'Unknown error'}`);
+          }
+        }
+      }
+      
+      return { cleaned, errors };
+    } catch (error) {
+      throw new WorkspaceError(
+        `Failed to cleanup orphaned workspaces: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'CLEANUP_ERROR'
       );
     }
   }

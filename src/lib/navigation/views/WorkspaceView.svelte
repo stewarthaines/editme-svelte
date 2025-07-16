@@ -224,6 +224,59 @@
     }
   };
 
+  // Handle cleanup of orphaned workspaces
+  const handleCleanupOrphaned = async () => {
+    const errorWorkspaces = workspaces.filter(w => w.hasError).length;
+    
+    if (errorWorkspaces === 0) {
+      alert($t('No corrupted workspaces found to clean up.'));
+      return;
+    }
+
+    const confirmed = confirm(
+      $t('Clean up {count} corrupted workspace(s)? This will permanently delete workspaces that cannot be loaded properly.', {
+        count: errorWorkspaces,
+      })
+    );
+
+    if (!confirmed) return;
+
+    try {
+      loading = true;
+      const result = await workspaceManager.cleanupOrphanedWorkspaces();
+      
+      // Show results
+      if (result.cleaned.length > 0) {
+        alert(
+          $t('Successfully cleaned up {count} corrupted workspace(s).', {
+            count: result.cleaned.length,
+          })
+        );
+      }
+      
+      if (result.errors.length > 0) {
+        console.error('Cleanup errors:', result.errors);
+        alert(
+          $t('Some workspaces could not be cleaned: {errors}', {
+            errors: result.errors.join(', '),
+          })
+        );
+      }
+
+      // Refresh workspace list
+      await loadWorkspaces();
+    } catch (err) {
+      console.error('Failed to cleanup orphaned workspaces:', err);
+      alert(
+        $t('Failed to cleanup workspaces: {error}', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+        })
+      );
+    } finally {
+      loading = false;
+    }
+  };
+
   // Handle current workspace actions
   const handleSwitchWorkspace = () => {
     // Just scroll to workspace list for now
@@ -323,6 +376,21 @@
       </div>
     {/if}
 
+    <!-- Cleanup Banner (show when there are error workspaces) -->
+    {#if workspaces.some(w => w.hasError)}
+      <div class="cleanup-banner">
+        <span class="cleanup-icon" aria-hidden="true">🧹</span>
+        <span class="cleanup-text">
+          {$t('{count} corrupted workspace(s) detected', {
+            count: workspaces.filter(w => w.hasError).length,
+          })}
+        </span>
+        <button type="button" class="cleanup-button" on:click={handleCleanupOrphaned}>
+          {$t('Clean Up')}
+        </button>
+      </div>
+    {/if}
+
     <!-- Workspace List -->
     <WorkspaceList
       {workspaces}
@@ -398,6 +466,51 @@
   }
 
   .retry-button:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
+  }
+
+  .cleanup-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    margin-block-end: var(--space-6);
+    background-color: var(--color-warning-surface);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-md);
+  }
+
+  .cleanup-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .cleanup-text {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .cleanup-button {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-warning);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    min-height: 44px; /* Accessibility: min touch target */
+  }
+
+  .cleanup-button:hover {
+    background-color: var(--color-warning);
+    color: var(--color-surface);
+  }
+
+  .cleanup-button:focus-visible {
     outline: none;
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }

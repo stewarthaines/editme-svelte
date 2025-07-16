@@ -322,11 +322,8 @@ export class MetadataManagerImpl implements IMetadataManager {
     const opfDocument = await this.workspaceManager.getWorkspaceOPF(workspaceId);
     opfDocument.metadata = metadata;
 
-    // Trigger a file write operation to test error propagation
-    // The workspace manager mock will fail on file operations when in failure mode
-    if (this.workspaceManager.writeTextFile) {
-      await this.workspaceManager.writeTextFile(workspaceId, 'META-INF/content.opf', 'dummy');
-    }
+    // Properly persist the updated OPF document and invalidate workspace cache
+    await this.workspaceManager.updateWorkspaceOPF(workspaceId, opfDocument);
   }
 }
 
