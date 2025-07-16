@@ -302,3 +302,4 @@ import { documentDirection } from '$lib/i18n';
 - The user is the system architecture expert. Instead of searching the whole project, try asking the user for guidance
 - **CRITICAL**: The user expects zero TypeScript errors in the codebase at all times
 - The user will run the npm dev server, so the agent never needs to
+- When writing api docs only document methods specified. do not invent features that haven't been requests.
