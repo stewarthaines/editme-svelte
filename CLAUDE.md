@@ -301,3 +301,4 @@ import { documentDirection } from '$lib/i18n';
 - The user usually has Storybook running. If Claude wants a screenshot, ask the user
 - The user is the system architecture expert. Instead of searching the whole project, try asking the user for guidance
 - **CRITICAL**: The user expects zero TypeScript errors in the codebase at all times
+- The user will run the npm dev server, so the agent never needs to
