@@ -6,7 +6,7 @@ import type { I18nLoader, TranslationCatalog } from './types.js';
 import { FileStorageAPI } from '../storage/index.js';
 
 // Version tracking for cache invalidation
-const I18N_VERSION = '1.0.0'; // Update when translation format changes
+const I18N_VERSION = '1.0.2'; // Update when translation format changes
 const VERSION_KEY = 'editme-i18n-version';
 const LOCALES_WORKSPACE_ID = 'locales';
 
@@ -59,26 +59,72 @@ class TranslationLoader implements I18nLoader {
     try {
       console.log('📦 Extracting translations from embedded data...');
 
-      // Get embedded translation data URL from global variable
-      const translationsDataUrl = (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
-      if (!translationsDataUrl) {
-        throw new Error(
-          'Translation data URL not found. Ensure the app was built with i18n:build.'
-        );
-      }
+      // Try to get embedded translation data URL from global variable
+      let translationsDataUrl = (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+      let response: Response;
 
-      // Fetch from data URL
-      const response = await fetch(translationsDataUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch translation data: ${response.status}`);
+      if (!translationsDataUrl) {
+        // Development fallback: try to fetch from static directory
+        console.log('⚠️ No embedded translation data found, trying static file fallback...');
+        console.log('This usually means you need to rebuild the single file with: npm run build');
+        try {
+          response = await fetch('/translations.zip');
+          if (!response.ok) {
+            throw new Error(`Failed to fetch translations.zip: ${response.status}`);
+          }
+        } catch (error) {
+          throw new Error(
+            'Translation data not found. For single file builds, please run "npm run build" to generate a new build with embedded translations.'
+          );
+        }
+      } else {
+        // Production: fetch from embedded data URL
+        console.log('✅ Found embedded translation data, extracting...');
+        response = await fetch(translationsDataUrl);
+        // Clean up memory after reading the data URL
+        delete (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+        if (!response.ok) {
+          throw new Error(`Failed to fetch translation data: ${response.status}`);
+        }
       }
 
       // Decompress the gzipped JSON
+      console.log('📥 Fetched compressed data, size:', response.headers.get('content-length') || 'unknown');
       const compressedData = await response.arrayBuffer();
-      const decompressedData = await this.decompressGzip(compressedData);
-      const archiveData = JSON.parse(decompressedData);
+      console.log('📦 Compressed buffer size:', compressedData.byteLength, 'bytes');
+      
+      // Debug: Check first few bytes to verify it's gzip format
+      const firstBytes = new Uint8Array(compressedData, 0, Math.min(10, compressedData.byteLength));
+      const hexString = Array.from(firstBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+      console.log('🔍 First 10 bytes (hex):', hexString);
+      console.log('🔍 Looks like gzip?', firstBytes[0] === 0x1f && firstBytes[1] === 0x8b);
+      
+      let decompressedData: string;
+      try {
+        decompressedData = await this.decompressGzip(compressedData);
+        console.log('✅ Decompressed data size:', decompressedData.length, 'characters');
+      } catch (error) {
+        console.error('❌ Decompression failed:', error);
+        throw new Error(`Failed to decompress translation data: ${error.message}`);
+      }
+      
+      let archiveData: Record<string, string>;
+      try {
+        archiveData = JSON.parse(decompressedData);
+        console.log('✅ Parsed JSON archive with', Object.keys(archiveData).length, 'files');
+      } catch (error) {
+        console.error('❌ JSON parsing failed:', error);
+        console.error('First 200 chars of decompressed data:', decompressedData.substring(0, 200));
+        throw new Error(`Failed to parse translation archive: ${error.message}`);
+      }
 
       console.log(`📄 Found ${Object.keys(archiveData).length} translation files`);
+
+      // Initialize storage if needed
+      if (!this.storage.isInitialized()) {
+        console.log('🔧 Initializing storage manager...');
+        await this.storage.init();
+      }
 
       // Ensure workspace exists
       await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
@@ -104,41 +150,72 @@ class TranslationLoader implements I18nLoader {
    * Decompress gzipped data in browser
    */
   private async decompressGzip(compressedData: ArrayBuffer): Promise<string> {
+    console.log('🔧 Starting decompression...');
+    
     // Use browser's DecompressionStream if available
     if ('DecompressionStream' in globalThis) {
-      const stream = new DecompressionStream('gzip');
-      const writer = stream.writable.getWriter();
-      const reader = stream.readable.getReader();
+      console.log('✅ DecompressionStream available');
+      try {
+        // Create the decompression stream
+        const stream = new DecompressionStream('gzip');
+        
+        // Convert the compressed data to a stream and pipe it through the decompressor
+        const compressedStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(new Uint8Array(compressedData));
+            controller.close();
+          }
+        });
 
-      // Write compressed data
-      await writer.write(new Uint8Array(compressedData));
-      await writer.close();
+        console.log('📝 Piping data through decompression stream...');
+        
+        // Pipe the compressed stream through the decompressor
+        const decompressedStream = compressedStream.pipeThrough(stream);
+        const reader = decompressedStream.getReader();
 
-      // Read decompressed data
-      const chunks: Uint8Array[] = [];
-      let done = false;
+        console.log('📖 Reading decompressed chunks...');
+        // Read decompressed data
+        const chunks: Uint8Array[] = [];
+        let done = false;
 
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-        done = readerDone;
-        if (value) {
-          chunks.push(value);
+        try {
+          while (!done) {
+            const { value, done: readerDone } = await reader.read();
+            done = readerDone;
+            if (value) {
+              chunks.push(value);
+              console.log(`📦 Read chunk of ${value.length} bytes`);
+            }
+          }
+        } catch (readError) {
+          console.error('❌ Stream read failed:', readError);
+          throw readError;
+        } finally {
+          reader.releaseLock();
         }
+
+        console.log(`🔀 Combining ${chunks.length} chunks...`);
+        // Combine chunks and decode to string
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+
+        console.log(`📝 Decoding ${totalLength} bytes to text...`);
+        const result = new TextDecoder().decode(combined);
+        console.log('✅ Decompression complete');
+        return result;
+      } catch (error) {
+        console.error('❌ DecompressionStream failed:', error);
+        throw error;
       }
-
-      // Combine chunks and decode to string
-      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-      const combined = new Uint8Array(totalLength);
-      let offset = 0;
-
-      for (const chunk of chunks) {
-        combined.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      return new TextDecoder().decode(combined);
     } else {
       // Fallback: assume it's already decompressed or use a different approach
+      console.error('❌ DecompressionStream not available');
       throw new Error('DecompressionStream not available and no fallback implemented');
     }
   }
@@ -157,7 +234,9 @@ class TranslationLoader implements I18nLoader {
 
       // List all JSON files in locales workspace
       const filePaths = await this.storage.listFiles(LOCALES_WORKSPACE_ID);
+      console.log(`🔍 Debug: Found ${filePaths.length} total files in locales workspace:`, filePaths);
       const localeFiles = filePaths.filter(path => path.endsWith('.json'));
+      console.log(`🔍 Debug: Filtered to ${localeFiles.length} JSON files:`, localeFiles);
 
       console.log(`📚 Loading ${localeFiles.length} translation catalogs...`);
 
@@ -186,6 +265,19 @@ class TranslationLoader implements I18nLoader {
       }
 
       console.log(`✅ Loaded ${Object.keys(catalogs).length} translation catalogs`);
+      
+      // Debug: check sample content in English catalog
+      if (catalogs.en) {
+        const sampleKeys = Object.keys(catalogs.en.messages).filter(k => k.startsWith('sample.'));
+        console.log(`🔍 Debug: English catalog has ${Object.keys(catalogs.en.messages).length} total keys, ${sampleKeys.length} sample keys`);
+        if (sampleKeys.length > 0) {
+          console.log(`🔍 Sample keys found: ${sampleKeys.slice(0, 3).join(', ')}...`);
+          console.log(`🔍 Sample title: "${catalogs.en.messages['sample.book.title'] || 'MISSING'}"`);
+        } else {
+          console.log('❌ No sample keys found in English catalog!');
+        }
+      }
+      
       return catalogs;
     } catch (error) {
       console.error('❌ Failed to load translations from storage:', error);
