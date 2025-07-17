@@ -16,22 +16,38 @@ The Workspace & OPF Manager provides high-level workspace management with integr
 ### Constructor
 
 ```typescript
-constructor(config?: Partial<WorkspaceConfig>)
+constructor(
+  config?: Partial<WorkspaceConfig>,
+  contentGenerator?: SampleContentGenerator,
+  transformExecutor?: TransformExecutor
+)
 ```
 
 **Input:**
 
 - `config?: Partial<WorkspaceConfig>` - Optional configuration overrides
+- `contentGenerator?: SampleContentGenerator` - Optional content generator for localized workspace creation (defaults to new instance with unified i18n service)
+- `transformExecutor?: TransformExecutor` - Optional transform executor for text/DOM transformations (defaults to new instance)
 
-**Side Effects:** Initializes File Storage API and cache system
+**Side Effects:** Initializes File Storage API, cache system, and dependency injection for content generation
 
 **Usage:**
 
 ```typescript
+// Basic usage with default dependencies
 const workspaceManager = new WorkspaceManager({
   cache: { ttl: 12 * 60 * 60 * 1000 }, // 12 hour cache
   validation: { strict: true },
 });
+
+// Advanced usage with custom dependencies (for testing or customization)
+const customContentGenerator = new SampleContentGenerator(customI18nService);
+const customTransformExecutor = new TransformExecutor();
+const workspaceManager = new WorkspaceManager(
+  { validation: { strict: true } },
+  customContentGenerator,
+  customTransformExecutor
+);
 ```
 
 ### listWorkspacesWithMetadata()
@@ -76,6 +92,56 @@ const workspaceId = await workspaceManager.createEPUBWorkspace({
   identifier: 'isbn:9781234567890',
 });
 ```
+
+### createLocalizedEPUBWorkspace()
+
+```typescript
+createLocalizedEPUBWorkspace(
+  metadata: Partial<EPUBMetadata> = {}, 
+  locale = 'en'
+): Promise<string>
+```
+
+**Input:**
+
+- `metadata?: Partial<EPUBMetadata>` - Optional EPUB metadata (defaults to localized sample metadata)
+- `locale?: string` - Target locale for sample content generation (defaults to 'en')
+
+**Output:** `Promise<string>` - Generated workspace ID (UUID)
+
+**Side Effects:** Creates workspace with localized sample content, installs transform scripts, creates SOURCE directory structure
+
+**Usage:**
+
+```typescript
+// Create workspace with English sample content
+const workspaceId = await workspaceManager.createLocalizedEPUBWorkspace({
+  title: 'My Localized Book',
+  author: 'Jane Smith',
+});
+
+// Create workspace with German sample content
+const workspaceId = await workspaceManager.createLocalizedEPUBWorkspace({
+  title: 'Mein Lokalisiertes Buch',
+  author: 'Jane Smith',
+  language: 'de',
+}, 'de');
+
+// Create workspace with Arabic sample content (RTL support)
+const workspaceId = await workspaceManager.createLocalizedEPUBWorkspace({
+  title: 'كتابي المترجم',
+  author: 'Jane Smith',
+  language: 'ar',
+}, 'ar');
+```
+
+**Features:**
+
+- **Localized Content**: Generates sample chapters, prologue, and appendix in the target locale
+- **Universal Assets**: Installs CSS with RTL support and transform scripts
+- **SOURCE Directory**: Creates SOURCE/text/, SOURCE/scripts/, and SOURCE/settings.json
+- **Transform Pipeline**: Installs transformText.js and transformDom.js for content processing
+- **Locale Detection**: Automatically detects RTL languages and applies appropriate styling
 
 ### switchWorkspace()
 

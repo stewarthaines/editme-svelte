@@ -6,5 +6,6 @@ You may not modify, decompile or reverse-engineer this software.
 You may redistribute this software provided this license agreement and copyright notice are included in all copies.
 The software is provided "as is" without warranty of any kind.
 The author is not liable for any damages arising from its use.
+Endangered Language Exception: This software can be used to create an EPUB file in which the majority of content is in an endangered language for any purpose without obtaining a seperate commercial license.
 
 (c) 2025 Stewart Haines

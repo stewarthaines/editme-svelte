@@ -10,6 +10,46 @@ Public interface for the Translation Content System - generates localized sample
 constructor(i18nSystem: I18nSystem)
 ```
 
+**Input:**
+
+- `i18nSystem: I18nSystem` - Internationalization system providing translation and locale services
+
+**Side Effects:** Initializes internal i18n system reference for localized content generation
+
+**Usage:**
+
+```typescript
+import { i18nService } from '$lib/i18n';
+import { SampleContentGenerator } from '$lib/content';
+
+// Standard usage with unified i18n service
+const contentGenerator = new SampleContentGenerator(i18nService);
+
+// Usage with custom i18n implementation (for testing)
+const mockI18n = {
+  translate: (key: string, params?: Record<string, any>) => key,
+  getCurrentLocale: () => 'en',
+  getAvailableLocales: () => [],
+  hasTranslation: (locale: string, key: string) => true,
+  isLocaleSupported: (locale: string) => true,
+  isRTL: (locale: string) => false,
+};
+const testGenerator = new SampleContentGenerator(mockI18n);
+```
+
+**I18nSystem Interface:**
+
+```typescript
+interface I18nSystem {
+  translate: (key: string, params?: Record<string, any>) => string;
+  getCurrentLocale: () => string;
+  getAvailableLocales: () => any[];
+  hasTranslation: (locale: string, key: string) => boolean;
+  isLocaleSupported: (locale: string) => boolean;
+  isRTL: (locale: string) => boolean;
+}
+```
+
 ## Core Content Generation
 
 ### generateLocalizedContent()

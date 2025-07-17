@@ -32,7 +32,7 @@ async function translateText(text, targetLang) {
     if (data.responseStatus === 200 && data.responseData?.translatedText) {
       const translated = data.responseData.translatedText;
       console.log(`    ✅ Result: "${translated}"`);
-      return translated;
+      return '🤖 ' + translated;
     } else {
       throw new Error(
         `API returned status ${data.responseStatus}: ${data.responseDetails || 'Unknown error'}`
@@ -48,11 +48,11 @@ async function translateText(text, targetLang) {
 // Language mappings for MyMemory API
 const LANGUAGE_MAPPINGS = {
   de: 'de', // German
-  ar: 'ar', // Arabic
-  he: 'he', // Hebrew
-  ja: 'ja', // Japanese
-  ka: 'ka', // Georgian (may fallback to prefix)
-  'zh-Hant': 'zh-TW', // Traditional Chinese (Taiwan)
+  // ar: 'ar', // Arabic
+  // he: 'he', // Hebrew
+  // ja: 'ja', // Japanese
+  // ka: 'ka', // Georgian (may fallback to prefix)
+  // 'zh-Hant': 'zh-TW', // Traditional Chinese (Taiwan)
 };
 
 // Language display names

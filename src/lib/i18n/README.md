@@ -154,6 +154,101 @@ export class ValidationManager {
 }
 ```
 
+## Unified i18n Service
+
+### Service-Based Access
+
+For non-component usage (such as in service classes or utilities), a unified i18n service is available that provides all i18n functionality through a single object:
+
+```typescript
+import { i18nService } from '$lib/i18n';
+
+// Service object with all i18n methods
+const {
+  translate,
+  getCurrentLocale,
+  getAvailableLocales,
+  hasTranslation,
+  isLocaleSupported,
+  isRTL,
+} = i18nService;
+
+// Use in service classes
+class SampleContentGenerator {
+  constructor() {
+    this.i18n = i18nService;
+  }
+
+  generateContent(locale: string) {
+    if (!this.i18n.isLocaleSupported(locale)) {
+      throw new Error(`Unsupported locale: ${locale}`);
+    }
+
+    const isRightToLeft = this.i18n.isRTL(locale);
+    const title = this.i18n.translate('sample.book.title');
+    
+    return { title, isRTL: isRightToLeft };
+  }
+}
+```
+
+### Service Methods
+
+#### `translate(key: string, params?: Record<string, any>): string`
+- Non-reactive translation function
+- Same as standalone `translate` function
+- Supports parameter interpolation
+
+#### `getCurrentLocale(): string`
+- Returns current locale code
+- Non-reactive version of `currentLocale` store
+
+#### `getAvailableLocales(): LocaleConfig[]`
+- Returns array of available locale configurations
+- Includes locale code, name, and language direction
+
+#### `hasTranslation(locale: string, key: string): boolean`
+- Checks if a translation exists for specific locale and key
+- Returns `false` if locale or key not found
+
+#### `isLocaleSupported(locale: string): boolean`
+- Checks if locale is supported by the application
+- Returns `true` for all 7 configured languages
+
+#### `isRTL(locale: string): boolean`
+- Checks if locale uses right-to-left text direction
+- Returns `true` for Arabic and Hebrew
+
+### Usage in Dependency Injection
+
+The unified service is designed for dependency injection patterns:
+
+```typescript
+// Constructor injection
+class WorkspaceManager {
+  constructor(
+    config?: WorkspaceConfig,
+    contentGenerator?: SampleContentGenerator
+  ) {
+    this.contentGenerator = contentGenerator || new SampleContentGenerator(i18nService);
+  }
+}
+
+// Service method usage
+class TranslationValidator {
+  constructor(private i18n = i18nService) {}
+
+  validateTranslations(locale: string, keys: string[]): ValidationResult {
+    if (!this.i18n.isLocaleSupported(locale)) {
+      return { valid: false, error: 'Unsupported locale' };
+    }
+
+    const missing = keys.filter(key => !this.i18n.hasTranslation(locale, key));
+    return { valid: missing.length === 0, missing };
+  }
+}
+```
+
 ## RTL Layout Support
 
 ### Automatic Direction Detection
