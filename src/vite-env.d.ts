@@ -15,6 +15,6 @@ declare module '*.ts?raw' {
 // Global types for internationalization
 declare global {
   interface Window {
-    __EDITME_TRANSLATIONS_ZIP__?: string;
+    __EDITME_I18N_BUNDLE__?: string;
   }
 }

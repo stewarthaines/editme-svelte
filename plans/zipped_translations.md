@@ -2,11 +2,11 @@
 
 ## Problem Statement
 
-The current i18n loader assumes translations.zip is served from `/translations.zip`, but EDITME is a single-file application embedded in EPUBs. The translation data needs to be inlined into the HTML file as a data URL.
+The current i18n loader assumes i18n-bundle.gz is served from `/i18n-bundle.gz`, but EDITME is a single-file application embedded in EPUBs. The translation data needs to be inlined into the HTML file as a data URL.
 
 ## Current Implementation Issues
 
-1. **Wrong fetch approach**: `fetch('/translations.zip')` won't work in embedded context
+1. **Wrong fetch approach**: `fetch('/i18n-bundle.gz')` won't work in embedded context
 2. **Missing data URL integration**: Translations need to be embedded in build output
 3. **No fallback strategy**: Should work without network access
 4. **Untested**: No unit test coverage for complex loader logic
@@ -17,7 +17,7 @@ The current i18n loader assumes translations.zip is served from `/translations.z
 
 **Update Vite config** to:
 
-- Generate `translations.zip` during build
+- Generate `i18n-bundle.gz` during build
 - Convert ZIP to base64 data URL
 - Inject data URL into HTML template as global variable
 - Ensure single-file app includes all translation data
@@ -34,8 +34,8 @@ npm run build       # Vite build with data URL injection
 **Data URL access**:
 
 ```typescript
-// Instead of fetch('/translations.zip')
-const translationsDataUrl = (window as any).__EDITME_TRANSLATIONS_ZIP__;
+// Instead of fetch('/i18n-bundle.gz')
+const translationsDataUrl = (window as any).__EDITME_I18N_BUNDLE__;
 const response = await fetch(translationsDataUrl);
 ```
 
@@ -69,7 +69,7 @@ OPFS/IndexedDB:
 ### Phase 1: Fix Data URL Loading
 
 1. **Update loader.ts**:
-   - Replace `fetch('/translations.zip')` with data URL access
+   - Replace `fetch('/i18n-bundle.gz')` with data URL access
    - Add proper error handling for missing data URL
    - Maintain existing storage integration
 
@@ -122,7 +122,7 @@ src/lib/i18n/
 
 ```typescript
 // Injected by Vite build
-window.__EDITME_TRANSLATIONS_ZIP__ = 'data:application/gzip;base64,H4sI...';
+window.__EDITME_I18N_BUNDLE__ = 'data:application/gzip;base64,H4sI...';
 ```
 
 ### Vite Plugin Configuration
@@ -135,11 +135,11 @@ export default defineConfig({
     {
       name: 'embed-translations',
       transformIndexHtml(html) {
-        const translationsZip = fs.readFileSync('static/translations.zip');
+        const translationsZip = fs.readFileSync('static/i18n-bundle.gz');
         const dataUrl = `data:application/gzip;base64,${translationsZip.toString('base64')}`;
         return html.replace(
           '</head>',
-          `<script>window.__EDITME_TRANSLATIONS_ZIP__ = '${dataUrl}';</script></head>`
+          `<script>window.__EDITME_I18N_BUNDLE__ = '${dataUrl}';</script></head>`
         );
       },
     },

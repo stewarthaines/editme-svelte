@@ -168,6 +168,43 @@ describe('WorkspaceManager', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(mockWorkspaceInfo);
     });
+
+    it('should exclude reserved workspace IDs (like locales)', async () => {
+      // Create regular user workspaces
+      await createValidWorkspace('user-workspace-1');
+      await createValidWorkspace('user-workspace-2');
+      
+      // Create reserved system workspace (locales)
+      await createValidWorkspace('locales');
+
+      // Mock parsing to return valid workspace info for all workspaces
+      const userWorkspace1 = { ...mockWorkspaceInfo, id: 'user-workspace-1', title: 'User Book 1' };
+      const userWorkspace2 = { ...mockWorkspaceInfo, id: 'user-workspace-2', title: 'User Book 2' };
+      const localesWorkspace = { ...mockWorkspaceInfo, id: 'locales', title: 'i18n Locales' };
+
+      vi.spyOn(workspaceManager as any, 'parseWorkspaceMetadata')
+        .mockImplementation((id: unknown) => {
+          const workspaceId = id as string;
+          switch (workspaceId) {
+            case 'user-workspace-1':
+              return Promise.resolve(userWorkspace1);
+            case 'user-workspace-2':
+              return Promise.resolve(userWorkspace2);
+            case 'locales':
+              return Promise.resolve(localesWorkspace);
+            default:
+              return Promise.reject(new Error('Unknown workspace'));
+          }
+        });
+
+      const result = await workspaceManager.listWorkspacesWithMetadata();
+
+      // Should only return user workspaces, not the 'locales' workspace
+      expect(result).toHaveLength(2);
+      expect(result.some(ws => ws.id === 'user-workspace-1')).toBe(true);
+      expect(result.some(ws => ws.id === 'user-workspace-2')).toBe(true);
+      expect(result.some(ws => ws.id === 'locales')).toBe(false);
+    });
   });
 
   describe('createEPUBWorkspace', () => {

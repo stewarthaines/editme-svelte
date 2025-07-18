@@ -20,7 +20,7 @@ export default defineConfig({
       name: 'embed-translations',
       async transformIndexHtml(html) {
         try {
-          const translationsPath = path.join(dirname, 'static', 'translations.zip');
+          const translationsPath = path.join(dirname, 'static', 'i18n-bundle.gz');
           const translationsZip = await fs.readFile(translationsPath);
           const dataUrl = `data:application/gzip;base64,${translationsZip.toString('base64')}`;
           
@@ -28,7 +28,7 @@ export default defineConfig({
           
           return html.replace(
             '</head>',
-            `<script>window.__EDITME_TRANSLATIONS_ZIP__ = '${dataUrl}';</script></head>`
+            `<script>window.__EDITME_I18N_BUNDLE__ = '${dataUrl}';</script></head>`
           );
         } catch (error) {
           console.warn('⚠️ Translation file not found, app will use English fallback only');

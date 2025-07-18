@@ -9,6 +9,11 @@ import type { EPUBMetadata, ManifestItem } from '../epub/opf-utils.js';
 // Re-export ManifestItem for convenience
 export type { ManifestItem };
 
+// Reserved workspace IDs that should be excluded from user workspace lists
+export const RESERVED_WORKSPACE_IDS = new Set([
+  'locales', // Used internally by the i18n system
+]);
+
 // Core workspace types
 export interface WorkspaceInfo {
   id: string;

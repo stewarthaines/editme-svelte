@@ -27,7 +27,7 @@ import type {
   WorkspaceCacheEntry,
 } from './types.js';
 import type { EPUBMetadata, OPFDocument, ManifestItem, SpineItem } from '../epub/opf-utils.js';
-import { WorkspaceError, ValidationError, DEFAULT_WORKSPACE_CONFIG } from './types.js';
+import { WorkspaceError, ValidationError, DEFAULT_WORKSPACE_CONFIG, RESERVED_WORKSPACE_IDS } from './types.js';
 
 
 export class WorkspaceManager {
@@ -62,10 +62,13 @@ export class WorkspaceManager {
 
   /**
    * List all workspaces with metadata, sorted by last modified date
+   * Excludes reserved workspace IDs used internally by the system
    */
   async listWorkspacesWithMetadata(): Promise<WorkspaceInfo[]> {
     try {
-      const workspaceIds = await this.storage.listWorkspaces();
+      const allWorkspaceIds = await this.storage.listWorkspaces();
+      // Filter out reserved workspace IDs (e.g., 'locales' used by i18n system)
+      const workspaceIds = allWorkspaceIds.filter(id => !RESERVED_WORKSPACE_IDS.has(id));
       const workspaceInfos: WorkspaceInfo[] = [];
 
       for (const workspaceId of workspaceIds) {
@@ -402,6 +405,7 @@ ${chapterLinks}
   /**
    * Clean up orphaned and corrupted workspaces
    * This method identifies and removes workspaces that cannot be properly loaded
+   * Excludes reserved workspace IDs used internally by the system
    */
   async cleanupOrphanedWorkspaces(): Promise<{ cleaned: string[]; errors: string[] }> {
     const cleaned: string[] = [];
@@ -409,8 +413,10 @@ ${chapterLinks}
 
     try {
       const allWorkspaceIds = await this.storage.listWorkspaces();
+      // Filter out reserved workspace IDs to avoid cleaning system workspaces
+      const workspaceIds = allWorkspaceIds.filter(id => !RESERVED_WORKSPACE_IDS.has(id));
 
-      for (const workspaceId of allWorkspaceIds) {
+      for (const workspaceId of workspaceIds) {
         try {
           // Attempt to parse workspace metadata
           await this.parseWorkspaceMetadata(workspaceId);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Compress .json translation files into a ZIP archive for EPUB embedding
+ * Compress .json translation files into a gzip bundle for EPUB embedding
  */
 
 import { promises as fs } from 'fs';
@@ -21,7 +21,7 @@ async function compressTranslations() {
   console.log('📦 Compressing translation files...');
 
   const localesDir = join(projectRoot, 'src', 'lib', 'i18n', 'locales');
-  const outputPath = join(projectRoot, 'static', 'translations.zip');
+  const outputPath = join(projectRoot, 'static', 'i18n-bundle.gz');
 
   try {
     // Ensure static directory exists
@@ -65,7 +65,7 @@ async function compressTranslations() {
     const compressedSize = compressedBuffer.length;
     const compressionRatio = (((totalSize - compressedSize) / totalSize) * 100).toFixed(1);
 
-    console.log(`✅ Created translations.zip (compressed JSON)`);
+    console.log(`✅ Created i18n-bundle.gz (compressed JSON)`);
     console.log(`📊 Original size: ${Math.round(totalSize / 1024)}KB`);
     console.log(`📊 Compressed size: ${Math.round(compressedSize / 1024)}KB`);
     console.log(`📊 Compression: ${compressionRatio}% reduction`);

@@ -198,7 +198,7 @@ describe('TranslationLoader', () => {
     // This functionality is tested in browser environment via Storybook
     it.skip('should extract translations from data URL', async () => {
       const mockDataUrl = createMockDataUrl();
-      (globalThis as any).__EDITME_TRANSLATIONS_ZIP__ = mockDataUrl;
+      (globalThis as any).__EDITME_I18N_BUNDLE__ = mockDataUrl;
 
       // Create proper mock JSON data that will be returned after decompression
       const mockArchiveData = createMockTranslationArchive();
@@ -218,14 +218,14 @@ describe('TranslationLoader', () => {
     });
 
     it('should throw error when data URL missing', async () => {
-      delete (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+      delete (globalThis as any).__EDITME_I18N_BUNDLE__;
 
       await expect(loader.extractTranslations()).rejects.toThrow('Translation data URL not found');
     });
 
     it('should throw error when fetch fails', async () => {
       const mockDataUrl = createMockDataUrl();
-      (globalThis as any).__EDITME_TRANSLATIONS_ZIP__ = mockDataUrl;
+      (globalThis as any).__EDITME_I18N_BUNDLE__ = mockDataUrl;
 
       const mockResponse = {
         ok: false,
@@ -242,7 +242,7 @@ describe('TranslationLoader', () => {
       delete (globalThis as any).DecompressionStream;
 
       const mockDataUrl = createMockDataUrl();
-      (globalThis as any).__EDITME_TRANSLATIONS_ZIP__ = mockDataUrl;
+      (globalThis as any).__EDITME_I18N_BUNDLE__ = mockDataUrl;
 
       const mockResponse = {
         ok: true,

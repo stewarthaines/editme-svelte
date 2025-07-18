@@ -60,7 +60,7 @@ class TranslationLoader implements I18nLoader {
       console.log('📦 Extracting translations from embedded data...');
 
       // Try to get embedded translation data URL from global variable
-      let translationsDataUrl = (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+      let translationsDataUrl = (globalThis as any).__EDITME_I18N_BUNDLE__;
       let response: Response;
 
       if (!translationsDataUrl) {
@@ -68,9 +68,9 @@ class TranslationLoader implements I18nLoader {
         console.log('⚠️ No embedded translation data found, trying static file fallback...');
         console.log('This usually means you need to rebuild the single file with: npm run build');
         try {
-          response = await fetch('/translations.zip');
+          response = await fetch('/i18n-bundle.gz');
           if (!response.ok) {
-            throw new Error(`Failed to fetch translations.zip: ${response.status}`);
+            throw new Error(`Failed to fetch i18n-bundle.gz: ${response.status}`);
           }
         } catch (error) {
           throw new Error(
@@ -82,7 +82,7 @@ class TranslationLoader implements I18nLoader {
         console.log('✅ Found embedded translation data, extracting...');
         response = await fetch(translationsDataUrl);
         // Clean up memory after reading the data URL
-        delete (globalThis as any).__EDITME_TRANSLATIONS_ZIP__;
+        delete (globalThis as any).__EDITME_I18N_BUNDLE__;
         if (!response.ok) {
           throw new Error(`Failed to fetch translation data: ${response.status}`);
         }

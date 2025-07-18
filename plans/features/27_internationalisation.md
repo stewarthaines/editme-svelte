@@ -224,7 +224,7 @@ locales/
 build-scripts/
 ├── i18n-extract.js   # Extract t() calls from Svelte files
 ├── i18n-convert.js   # Convert .po to .json files
-└── i18n-compress.js  # Create translations.zip
+└── i18n-compress.js  # Create i18n-bundle.gz
 
 src/lib/i18n/
 ├── index.ts     # Main translation runtime
@@ -236,7 +236,7 @@ src/lib/i18n/
 
 **Runtime Loading Strategy**:
 
-- **ZIP approach**: All translations compressed at build time (`translations.zip`)
+- **ZIP approach**: All translations compressed at build time (`i18n-bundle.gz`)
 - **First-run extraction**: Extract all locales to storage with 'locales' workspace ID
 - **Version-based updates**: Re-extract when app version changes
 - **English fallback**: Bundled English for immediate availability
