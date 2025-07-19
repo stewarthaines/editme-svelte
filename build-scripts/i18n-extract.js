@@ -4,11 +4,13 @@
  * Extract translatable strings from Svelte files using gettext-extractor
  */
 
-import { GettextExtractor, JsExtractors } from 'gettext-extractor';
+import gettextExtractor from 'gettext-extractor';
 import { glob } from 'glob';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+
+const { GettextExtractor, JsExtractors } = gettextExtractor;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,47 +32,107 @@ async function extractStrings() {
     cwd: projectRoot,
     ignore: ['**/*.test.*', '**/test/**', '**/__tests__/**'],
   });
-  const allFiles = [...svelteFiles, ...tsFiles];
 
-  console.log(`📁 Found ${allFiles.length} files to scan`);
+  console.log(`📁 Found ${svelteFiles.length} Svelte files and ${tsFiles.length} TypeScript files to scan`);
 
-  // Extract from each file
-  for (const file of allFiles) {
+  // Configure extraction options
+  const extractorOptions = {
+    arguments: {
+      text: 0,
+      context: 1,
+    },
+  };
+
+  // Extract from TypeScript files using JavaScript parser
+  const jsParser = extractor
+    .createJsParser([
+      JsExtractors.callExpression('t', extractorOptions),
+      JsExtractors.callExpression('$t', extractorOptions),
+      JsExtractors.callExpression('_', extractorOptions),
+      JsExtractors.callExpression('translate', extractorOptions),
+    ]);
+  
+  for (const file of tsFiles) {
     const fullPath = join(projectRoot, file);
-
-    extractor
-      .createJsParser([
-        // Basic translation calls: t('text')
-        JsExtractors.callExpression('t', {
-          arguments: {
-            text: 0,
-            context: 1,
-          },
-        }),
-        // Reactive store syntax: $t('text')
-        JsExtractors.callExpression('$t', {
-          arguments: {
-            text: 0,
-            context: 1,
-          },
-        }),
-        // Alternative underscore syntax: _('text')
-        JsExtractors.callExpression('_', {
-          arguments: {
-            text: 0,
-            context: 1,
-          },
-        }),
-        // Direct translate function calls: translate('text')
-        JsExtractors.callExpression('translate', {
-          arguments: {
-            text: 0,
-            context: 1,
-          },
-        }),
-      ])
-      .parseFile(fullPath);
+    jsParser.parseFile(fullPath);
   }
+
+  // Extract from Svelte files using custom regex approach
+  for (const file of svelteFiles) {
+    const fullPath = join(projectRoot, file);
+    const content = readFileSync(fullPath, 'utf8');
+    
+    // Use regex to find translation patterns in Svelte templates
+    const patterns = [
+      // Match {$t('text')} patterns (template expressions)
+      /\{\s*\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      // Match {t('text')} patterns (template expressions)
+      /\{\s*t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      // Match $t('text') patterns in attributes (but not import statements)
+      /(?:=\s*|\{\s*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      // Match t('text') patterns in attributes (but not import statements)
+      /(?:=\s*|\{\s*)t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      // Match {_('text')} patterns
+      /\{\s*_\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      // Match {translate('text')} patterns
+      /\{\s*translate\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+    ];
+    
+    // Function to filter out non-translatable strings
+    const isTranslatable = (text) => {
+      // Skip empty strings
+      if (!text || text.trim() === '') return false;
+      
+      // Skip package names and module paths
+      if (text.includes('@') && text.includes('/')) return false;
+      if (text.startsWith('@')) return false;
+      
+      // Skip file extensions and paths
+      if (text.includes('.') && (text.endsWith('.js') || text.endsWith('.ts') || text.endsWith('.json') || text.endsWith('.css'))) return false;
+      
+      // Skip single characters that aren't words
+      if (text.length === 1 && !/[a-zA-Z]/.test(text)) return false;
+      
+      // Skip URLs and paths
+      if (text.startsWith('http') || text.startsWith('//') || text.startsWith('./') || text.startsWith('../')) return false;
+      
+      // Skip technical strings
+      if (text.includes('\\n') && text.trim() === '\\n') return false;
+      if (text === '/' || text === '.' || text === '..') return false;
+      
+      // Skip HTML tag names
+      if (/^[a-z]+$/.test(text) && text.length <= 5 && ['div', 'span', 'p', 'a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'form', 'input', 'label', 'button', 'select', 'option', 'textarea'].includes(text)) return false;
+      
+      return true;
+    };
+
+    patterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const text = match[2]; // The captured text content
+        
+        // Filter out non-translatable strings
+        if (isTranslatable(text)) {
+          // Add the message to the extractor with proper reference format
+          const lineNumber = content.substring(0, match.index).split('\n').length;
+          extractor.addMessage({
+            text: text,
+            references: [`${join(projectRoot, file)}:${lineNumber}`]
+          });
+        }
+      }
+    });
+  }
+  
+  console.log(`✅ Processed ${tsFiles.length} TypeScript files and ${svelteFiles.length} Svelte files`);
+
+  // Use the single extractor that processed all files
+  const allMessages = extractor.getMessages();
+  
+  console.log(`📝 Extracted ${allMessages.length} strings from all files`);
+
+  // Use the main extractor directly
+  const combinedExtractor = extractor;
 
   // Create/update .po files for each locale
   for (const locale of locales) {
@@ -98,6 +160,9 @@ async function extractStrings() {
           if (line.trim() === '' && i > 0) break; // End of headers
         }
 
+        // Function to normalize quotes for consistent comparison
+        const normalizeQuotes = (text) => text.replace(/\\"/g, '"');
+
         let currentMsgid = '';
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
@@ -109,7 +174,9 @@ async function extractStrings() {
           } else if (line.startsWith('msgstr "') && currentMsgid) {
             const match = line.match(/^msgstr "(.+)"$/);
             if (match && match[1] !== '') {
-              existingTranslations[currentMsgid] = match[1];
+              // Store translations with normalized keys for consistent lookup
+              const normalizedKey = normalizeQuotes(currentMsgid);
+              existingTranslations[normalizedKey] = match[1];
             }
             currentMsgid = '';
           }
@@ -119,10 +186,19 @@ async function extractStrings() {
         );
       }
 
-      // Check if content has actually changed by comparing message count
-      const currentMessages = extractor.getMessages();
-      const contentChanged =
-        !existsSync(poPath) || Object.keys(existingTranslations).length !== currentMessages.length;
+      // Check if content has actually changed by comparing actual message content
+      const currentMessages = combinedExtractor.getMessages();
+      const normalizeQuotes = (text) => text.replace(/\\"/g, '"');
+      
+      let contentChanged = !existsSync(poPath);
+      if (!contentChanged) {
+        // Compare actual message content, not just counts
+        const existingMsgids = new Set(Object.keys(existingTranslations));
+        const currentMsgids = new Set(currentMessages.map(m => normalizeQuotes(m.text)));
+        
+        contentChanged = existingMsgids.size !== currentMsgids.size || 
+                        ![...existingMsgids].every(id => currentMsgids.has(id));
+      }
 
       // Preserve existing dates if content hasn't changed
       const now = new Date().toISOString();
@@ -141,7 +217,7 @@ async function extractStrings() {
       };
 
       // Generate new .po file
-      extractor.savePotFile(poPath, headers);
+      combinedExtractor.savePotFile(poPath, headers);
 
       // Post-process to clean up the file
       let content = readFileSync(poPath, 'utf8');
@@ -151,21 +227,20 @@ async function extractStrings() {
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
 
-        // Clean up header fields by removing trailing \n
-        if (line.startsWith('"') && line.includes(':') && line.endsWith('\\n"')) {
-          line = line.replace(/\\n"$/, '"');
-        }
-
         result.push(line);
 
         // Merge back existing translations
         if (line.startsWith('msgid "') && line !== 'msgid ""') {
           const match = line.match(/^msgid "(.+)"$/);
-          if (match && existingTranslations[match[1]]) {
-            // Look ahead for msgstr line and replace it
-            if (i + 1 < lines.length && lines[i + 1].startsWith('msgstr ""')) {
-              result[result.length] = `msgstr "${existingTranslations[match[1]]}"`;
-              i++; // Skip original empty msgstr
+          if (match) {
+            // Normalize the key for lookup
+            const normalizedKey = match[1].replace(/\\"/g, '"');
+            if (existingTranslations[normalizedKey]) {
+              // Look ahead for msgstr line and replace it
+              if (i + 1 < lines.length && lines[i + 1].startsWith('msgstr ""')) {
+                result[result.length] = `msgstr "${existingTranslations[normalizedKey]}"`;
+                i++; // Skip original empty msgstr
+              }
             }
           }
         }
@@ -179,7 +254,7 @@ async function extractStrings() {
     }
   }
 
-  const messageCount = extractor.getMessages().length;
+  const messageCount = combinedExtractor.getMessages().length;
   console.log(`✅ Extracted ${messageCount} translatable strings`);
   console.log(`📝 Updated ${locales.length} .po files`);
 }
