@@ -37,9 +37,9 @@ export default defineConfig({
       name: 'embed-translations',
       async transformIndexHtml(html) {
         try {
-          const translationsPath = path.join(dirname, 'static', 'i18n-bundle.gz');
+          const translationsPath = path.join(dirname, 'static', 'i18n-bundle.zip');
           const translationsZip = await fs.readFile(translationsPath);
-          const dataUrl = `data:application/gzip;base64,${translationsZip.toString('base64')}`;
+          const dataUrl = `data:application/zip;base64,${translationsZip.toString('base64')}`;
 
           console.log(`📦 Embedded ${Math.round(translationsZip.length / 1024)}KB translation data`);
 
@@ -58,7 +58,7 @@ export default defineConfig({
     visualizer({
       filename: 'dist/stats.html',
       template: 'treemap',
-      open: true,
+      open: false,
       gzipSize: true,
       brotliSize: true
     }),

@@ -121,10 +121,8 @@ export async function initI18n(): Promise<void> {
   try {
     const loader = createI18nLoader();
 
-    // Check if we need to extract translations
-    if (await loader.needsUpdate()) {
-      await loader.extractTranslations();
-    }
+    // Always extract translations from ZIP bundle
+    await loader.extractTranslations();
 
     // Load translation catalogs
     const catalogs = await loader.loadTranslations();
