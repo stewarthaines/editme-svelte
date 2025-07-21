@@ -38,7 +38,7 @@ coverage
 
 # i18n build artifacts
 src/lib/i18n/locales/*.json
-static/i18n-bundle.gz
+static/i18n-bundle.zip
 
 # TypeScript build artifacts
 *.tsbuildinfo

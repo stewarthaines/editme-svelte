@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import ManifestTable from './ManifestTable.svelte';
-  import ManifestPreview from './ManifestPreview.svelte';
   import ManifestItemEditor from './ManifestItemEditor.svelte';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
   import type { IManifestManager } from '../../manifest/manifest-manager';
@@ -10,6 +9,11 @@
   export let workspaceId = '';
   export let manifestManager: IManifestManager | null = null;
   export let advancedMode = false;
+
+  // Create event dispatcher for item selection
+  const dispatch = createEventDispatcher<{
+    itemSelect: { item: ManifestItem | SourceItem; type: 'manifest' | 'source' };
+  }>();
 
   let manifestItems: ManifestItem[] = [];
   let sourceItems: SourceItem[] = [];
@@ -53,6 +57,12 @@
   }) => {
     selectedItem = event.detail.item;
     selectedItemType = event.detail.type;
+    
+    // Dispatch the selection event to parent component
+    dispatch('itemSelect', {
+      item: event.detail.item,
+      type: event.detail.type
+    });
   };
 
   const handleItemCreate = (event: { detail: { mode: 'create-text' | 'create-file' } }) => {

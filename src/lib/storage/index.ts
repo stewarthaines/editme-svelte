@@ -317,7 +317,8 @@ export class OPFSSyncBackend implements StorageBackend {
     if (!result.success) {
       throw new Error(result.error?.message || 'Failed to list workspaces');
     }
-    return result.data?.workspaces || [];
+    // Fix: Access result.workspaces directly, not result.data.workspaces
+    return (result as any).workspaces || [];
   }
 
   async writeFile(workspaceId: string, path: string, content: ArrayBuffer): Promise<void> {
@@ -332,7 +333,28 @@ export class OPFSSyncBackend implements StorageBackend {
     if (!result.success) {
       throw new Error(result.error?.message || 'Failed to read file');
     }
-    return result.data?.content || new ArrayBuffer(0);
+    
+    // Fix: Access result.content directly, not result.data.content
+    const content = (result as any).content;
+    
+    // Validate ArrayBuffer is not detached/empty
+    if (!content || !(content instanceof ArrayBuffer)) {
+      console.warn(`⚠️ Invalid ArrayBuffer received for ${path}: ${typeof content}, length: ${content?.byteLength || 'undefined'}`);
+      return new ArrayBuffer(0);
+    }
+    
+    // Check for detached ArrayBuffer
+    try {
+      // Accessing byteLength will throw if the ArrayBuffer is detached
+      const size = content.byteLength;
+      if (size === 0) {
+        console.warn(`⚠️ Empty ArrayBuffer received for ${path}`);
+      }
+      return content;
+    } catch (error) {
+      console.warn(`⚠️ Detached ArrayBuffer received for ${path}:`, error);
+      return new ArrayBuffer(0);
+    }
   }
 
   async deleteFile(workspaceId: string, path: string): Promise<void> {
@@ -347,7 +369,8 @@ export class OPFSSyncBackend implements StorageBackend {
     if (!result.success) {
       throw new Error(result.error?.message || 'Failed to list files');
     }
-    return result.data?.files || [];
+    // Fix: Access result.files directly, not result.data.files
+    return (result as any).files || [];
   }
 
   async getFileInfo(

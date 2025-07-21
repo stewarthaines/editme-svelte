@@ -15,6 +15,7 @@
   import { SpineItemManager } from './lib/spine/spine-item-manager';
   import { layoutStore } from './lib/stores/layout';
   import { t } from './lib/i18n';
+  import type { ManifestItem, SourceItem } from './lib/manifest/types';
   import {
     WORKSPACE_MANAGER_CONTEXT,
     MANIFEST_MANAGER_CONTEXT,
@@ -44,6 +45,16 @@
   let currentManifestManager: ManifestManagerImpl | null = null;
   let currentMetadataManager: MetadataManagerImpl | null = null;
   let currentSpineManager: SpineItemManager | null = null;
+
+  // Manifest preview state
+  let selectedManifestItem: ManifestItem | SourceItem | null = null;
+  let selectedManifestItemType: 'manifest' | 'source' | null = null;
+
+  // Handler for manifest item selection
+  const handleManifestItemSelect = (event: CustomEvent<{ item: ManifestItem | SourceItem; type: 'manifest' | 'source' }>) => {
+    selectedManifestItem = event.detail.item;
+    selectedManifestItemType = event.detail.type;
+  };
 
   // Initialize workspace manager
   onMount(() => {
@@ -96,6 +107,7 @@
     const handleClearSpineSelection = () => {
       selectedSpineItemId = null;
     };
+
 
     window.addEventListener('select-spine-item', handleSelectSpineItem);
     window.addEventListener('clear-spine-selection', handleClearSpineSelection);
@@ -152,6 +164,7 @@
           workspaceId={currentWorkspaceId}
           manifestManager={currentManifestManager}
           advancedMode={true}
+          on:itemSelect={handleManifestItemSelect}
         />
       {:else}
         <PlaceholderView
@@ -202,8 +215,8 @@
   <svelte:fragment slot="right-content">
     {#if currentView === 'manifest' && initialized && currentWorkspaceId && currentManifestManager}
       <ManifestPreview
-        selectedItem={null}
-        selectedItemType={null}
+        selectedItem={selectedManifestItem}
+        selectedItemType={selectedManifestItemType}
         workspaceId={currentWorkspaceId}
         manifestManager={currentManifestManager}
       />

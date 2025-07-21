@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { SettingsManager } from '../lib/settings/settings-manager.js';
+  import { DefaultSettingsManager } from '../lib/settings/settings-manager.js';
   import { FileStorageAPI } from '../lib/storage/index.js';
   import { ExtensionManager } from '../lib/extensions/index.js';
   import type {
@@ -20,7 +20,7 @@
   }
 
   // Core instances
-  let settingsManager: SettingsManager;
+  let settingsManager: DefaultSettingsManager;
   let fileStorage: FileStorageAPI;
   let extensionManager: ExtensionManager;
 
@@ -68,7 +68,7 @@
       addLog('success', 'Extension manager initialized');
 
       // Initialize settings manager
-      settingsManager = new SettingsManager(fileStorage, extensionManager);
+      settingsManager = new DefaultSettingsManager(fileStorage, extensionManager);
       addLog('success', 'Settings manager initialized');
 
       // Load initial settings

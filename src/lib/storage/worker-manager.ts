@@ -42,7 +42,17 @@ export class OPFSWorkerManager {
   }
 
   private handleWorkerMessage(event: MessageEvent): void {
-    const { result, id } = event.data as WorkerResponse;
+    const { result, id, type } = event.data as WorkerResponse;
+
+    // Debug logging for readFile operations to track intermittent issues
+    if (type === 'readFile' && result) {
+      const content = (result as any).content;
+      if (content instanceof ArrayBuffer) {
+        console.log(`🔍 Worker readFile response: success=${result.success}, content size=${content.byteLength} bytes`);
+      } else {
+        console.warn(`⚠️ Worker readFile response: success=${result.success}, content type=${typeof content}, value=${content}`);
+      }
+    }
 
     if (this.pendingMessages.has(id)) {
       const { resolve } = this.pendingMessages.get(id)!;
