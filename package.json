@@ -50,6 +50,7 @@
     "eslint": "^9.29.0",
     "eslint-plugin-svelte": "^3.9.3",
     "gettext-extractor": "^3.8.0",
+    "gettext-parser": "^8.0.0",
     "happy-dom": "^18.0.1",
     "jest-image-snapshot": "^6.5.1",
     "playwright": "^1.52.0",

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Extract translatable strings from Svelte files using gettext-extractor
+ * Extract translatable strings from Svelte files using proper gettext workflow
  */
 
 import gettextExtractor from 'gettext-extractor';
+import gettextParser from 'gettext-parser';
 import { glob } from 'glob';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -18,10 +19,89 @@ const projectRoot = join(__dirname, '..');
 
 const locales = ['en', 'de', 'ka', 'ar', 'he', 'zh-Hant', 'ja'];
 
+/**
+ * Create a .po data structure from .pot template for a specific locale
+ */
+function initializePoFromPot(potData, locale) {
+  const poData = {
+    headers: {
+      ...potData.headers,
+      Language: locale,
+      'PO-Revision-Date': new Date().toISOString(),
+      'Last-Translator': '',
+      'Language-Team': '',
+    },
+    translations: {
+      '': {
+        '': potData.translations[''][''],
+      },
+    },
+  };
+
+  // Copy all messages from .pot with empty translations
+  for (const [msgid, entry] of Object.entries(potData.translations[''])) {
+    if (msgid !== '') {
+      poData.translations[''][msgid] = {
+        ...entry,
+        msgstr: [''], // Empty translation
+      };
+    }
+  }
+
+  return poData;
+}
+
+/**
+ * Merge existing .po file with updated .pot template
+ */
+function mergePoWithPot(existingPo, potData, locale) {
+  const now = new Date().toISOString();
+
+  // Preserve existing translations
+  const existingTranslations = new Map();
+  for (const [msgid, entry] of Object.entries(existingPo.translations[''] || {})) {
+    if (msgid !== '' && entry.msgstr && entry.msgstr[0]) {
+      existingTranslations.set(msgid, entry.msgstr[0]);
+    }
+  }
+
+  // Create merged data structure
+  const mergedPo = {
+    headers: {
+      ...potData.headers,
+      Language: locale,
+      'PO-Revision-Date':
+        existingTranslations.size > 0 ? now : existingPo.headers['PO-Revision-Date'] || now,
+      'Last-Translator': existingPo.headers['Last-Translator'] || '',
+      'Language-Team': existingPo.headers['Language-Team'] || '',
+    },
+    translations: {
+      '': {
+        '': potData.translations[''][''],
+      },
+    },
+  };
+
+  // Merge translations from .pot with existing translations
+  for (const [msgid, entry] of Object.entries(potData.translations[''])) {
+    if (msgid !== '') {
+      mergedPo.translations[''][msgid] = {
+        ...entry,
+        msgstr: [existingTranslations.get(msgid) || ''],
+      };
+    }
+  }
+
+  return mergedPo;
+}
+
 async function extractStrings() {
   console.log('🔍 Extracting translatable strings...');
 
   const extractor = new GettextExtractor();
+  
+  // Store translator comments separately since gettext-extractor doesn't preserve custom fields
+  const extractedCommentsMap = new Map(); // text -> comment
 
   // Find all Svelte and TypeScript files, excluding test files
   const svelteFiles = await glob('src/**/*.svelte', {
@@ -33,7 +113,9 @@ async function extractStrings() {
     ignore: ['**/*.test.*', '**/test/**', '**/__tests__/**'],
   });
 
-  console.log(`📁 Found ${svelteFiles.length} Svelte files and ${tsFiles.length} TypeScript files to scan`);
+  console.log(
+    `📁 Found ${svelteFiles.length} Svelte files and ${tsFiles.length} TypeScript files to scan`
+  );
 
   // Configure extraction options
   const extractorOptions = {
@@ -44,14 +126,13 @@ async function extractStrings() {
   };
 
   // Extract from TypeScript files using JavaScript parser
-  const jsParser = extractor
-    .createJsParser([
-      JsExtractors.callExpression('t', extractorOptions),
-      JsExtractors.callExpression('$t', extractorOptions),
-      JsExtractors.callExpression('_', extractorOptions),
-      JsExtractors.callExpression('translate', extractorOptions),
-    ]);
-  
+  const jsParser = extractor.createJsParser([
+    JsExtractors.callExpression('t', extractorOptions),
+    JsExtractors.callExpression('$t', extractorOptions),
+    JsExtractors.callExpression('_', extractorOptions),
+    JsExtractors.callExpression('translate', extractorOptions),
+  ]);
+
   for (const file of tsFiles) {
     const fullPath = join(projectRoot, file);
     jsParser.parseFile(fullPath);
@@ -61,7 +142,56 @@ async function extractStrings() {
   for (const file of svelteFiles) {
     const fullPath = join(projectRoot, file);
     const content = readFileSync(fullPath, 'utf8');
-    
+
+    // Parse translator comments from both HTML and JavaScript comments
+    const extractTranslatorComments = (content) => {
+      const comments = new Map(); // line number -> comment text
+      
+      // HTML-style comments: <!-- i18n: comment -->
+      const htmlCommentPattern = /<!--\s*i18n:\s*(.+?)\s*-->/gi;
+      
+      // JavaScript-style comments: // i18n: comment or /* i18n: comment */
+      const jsLineCommentPattern = /\/\/\s*i18n:\s*(.+?)$/gmi;
+      const jsBlockCommentPattern = /\/\*\s*i18n:\s*(.+?)\s*\*\//gi;
+      
+      // Extract HTML comments
+      let match;
+      while ((match = htmlCommentPattern.exec(content)) !== null) {
+        const commentText = match[1].trim();
+        const lineNumber = content.substring(0, match.index).split('\n').length;
+        comments.set(lineNumber, commentText);
+      }
+      
+      // Extract JavaScript line comments
+      while ((match = jsLineCommentPattern.exec(content)) !== null) {
+        const commentText = match[1].trim();
+        const lineNumber = content.substring(0, match.index).split('\n').length;
+        comments.set(lineNumber, commentText);
+      }
+      
+      // Extract JavaScript block comments
+      while ((match = jsBlockCommentPattern.exec(content)) !== null) {
+        const commentText = match[1].trim();
+        const lineNumber = content.substring(0, match.index).split('\n').length;
+        comments.set(lineNumber, commentText);
+      }
+      
+      return comments;
+    };
+
+    const translatorComments = extractTranslatorComments(content);
+
+    // Find the closest translator comment for a given line
+    const findClosestComment = (lineNumber) => {
+      // Look for comments within 3 lines before the translation
+      for (let i = lineNumber - 1; i >= Math.max(1, lineNumber - 3); i--) {
+        if (translatorComments.has(i)) {
+          return translatorComments.get(i);
+        }
+      }
+      return null;
+    };
+
     // Use regex to find translation patterns in Svelte templates
     const patterns = [
       // Match {$t('text')} patterns (template expressions)
@@ -77,32 +207,76 @@ async function extractStrings() {
       // Match {translate('text')} patterns
       /\{\s*translate\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
     ];
-    
+
     // Function to filter out non-translatable strings
-    const isTranslatable = (text) => {
+    const isTranslatable = text => {
       // Skip empty strings
       if (!text || text.trim() === '') return false;
-      
+
       // Skip package names and module paths
       if (text.includes('@') && text.includes('/')) return false;
       if (text.startsWith('@')) return false;
-      
+
       // Skip file extensions and paths
-      if (text.includes('.') && (text.endsWith('.js') || text.endsWith('.ts') || text.endsWith('.json') || text.endsWith('.css'))) return false;
-      
+      if (
+        text.includes('.') &&
+        (text.endsWith('.js') ||
+          text.endsWith('.ts') ||
+          text.endsWith('.json') ||
+          text.endsWith('.css'))
+      )
+        return false;
+
       // Skip single characters that aren't words
       if (text.length === 1 && !/[a-zA-Z]/.test(text)) return false;
-      
+
       // Skip URLs and paths
-      if (text.startsWith('http') || text.startsWith('//') || text.startsWith('./') || text.startsWith('../')) return false;
-      
+      if (
+        text.startsWith('http') ||
+        text.startsWith('//') ||
+        text.startsWith('./') ||
+        text.startsWith('../')
+      )
+        return false;
+
       // Skip technical strings
       if (text.includes('\\n') && text.trim() === '\\n') return false;
       if (text === '/' || text === '.' || text === '..') return false;
-      
+
       // Skip HTML tag names
-      if (/^[a-z]+$/.test(text) && text.length <= 5 && ['div', 'span', 'p', 'a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'form', 'input', 'label', 'button', 'select', 'option', 'textarea'].includes(text)) return false;
-      
+      if (
+        /^[a-z]+$/.test(text) &&
+        text.length <= 5 &&
+        [
+          'div',
+          'span',
+          'p',
+          'a',
+          'img',
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'ul',
+          'ol',
+          'li',
+          'table',
+          'tr',
+          'td',
+          'th',
+          'form',
+          'input',
+          'label',
+          'button',
+          'select',
+          'option',
+          'textarea',
+        ].includes(text)
+      )
+        return false;
+
       return true;
     };
 
@@ -110,153 +284,141 @@ async function extractStrings() {
       let match;
       while ((match = pattern.exec(content)) !== null) {
         const text = match[2]; // The captured text content
-        
+
         // Filter out non-translatable strings
         if (isTranslatable(text)) {
           // Add the message to the extractor with proper reference format
           const lineNumber = content.substring(0, match.index).split('\n').length;
-          extractor.addMessage({
+          const translatorComment = findClosestComment(lineNumber);
+          
+          const messageData = {
             text: text,
-            references: [`${join(projectRoot, file)}:${lineNumber}`]
-          });
+            references: [`${file}:${lineNumber}`],
+          };
+          
+          // Store translator comment separately
+          if (translatorComment) {
+            extractedCommentsMap.set(text, translatorComment);
+          }
+          
+          extractor.addMessage(messageData);
         }
       }
     });
   }
-  
-  console.log(`✅ Processed ${tsFiles.length} TypeScript files and ${svelteFiles.length} Svelte files`);
 
-  // Use the single extractor that processed all files
+  console.log(
+    `✅ Processed ${tsFiles.length} TypeScript files and ${svelteFiles.length} Svelte files`
+  );
+
   const allMessages = extractor.getMessages();
-  
-  console.log(`📝 Extracted ${allMessages.length} strings from all files`);
+  console.log(`📝 Extracted ${allMessages.length} translatable strings`);
+  if (extractedCommentsMap.size > 0) {
+    console.log(`💬 Found ${extractedCommentsMap.size} translator comments`);
+  }
 
-  // Use the main extractor directly
-  const combinedExtractor = extractor;
+  // Post-process messages to convert absolute paths to relative paths
+  for (const message of allMessages) {
+    if (message.references) {
+      message.references = message.references.map(ref => {
+        // Convert absolute path to relative path
+        if (ref.startsWith(projectRoot)) {
+          return ref.substring(projectRoot.length + 1); // +1 to remove leading slash
+        }
+        return ref;
+      });
+    }
+  }
 
-  // Create/update .po files for each locale
+  // Create .pot data structure using gettext-parser format
+  const now = new Date().toISOString();
+  const potData = {
+    headers: {
+      'MIME-Version': '1.0',
+      'Content-Type': 'text/plain; charset=UTF-8',
+      'Content-Transfer-Encoding': '8bit',
+      'Project-Id-Version': 'EDITME EPUB Editor',
+      'Report-Msgid-Bugs-To': '',
+      'POT-Creation-Date': now,
+      'PO-Revision-Date': now,
+      Language: '',
+      'Language-Team': '',
+      'Last-Translator': '',
+      'Plural-Forms': 'nplurals=2; plural=(n != 1);',
+    },
+    translations: {
+      '': {
+        '': {
+          msgid: '',
+          msgstr: [''],
+        },
+      },
+    },
+  };
+
+  // Add all extracted messages to .pot data
+  for (const message of allMessages) {
+    const messageEntry = {
+      msgid: message.text,
+      msgstr: [''],
+      comments: {
+        reference: message.references.join('\n'),
+      },
+    };
+    
+    // Add extracted comments (translator comments) if present
+    const extractedComment = extractedCommentsMap.get(message.text);
+    if (extractedComment) {
+      messageEntry.comments.extracted = extractedComment;
+    }
+    
+    potData.translations[''][message.text] = messageEntry;
+  }
+
+  // Generate .pot file
+  const potPath = join(projectRoot, 'locales', 'messages.pot');
+  const potContent = gettextParser.po.compile(potData);
+  writeFileSync(potPath, potContent);
+  console.log(`📝 Generated ${potPath}`);
+
+  // Update .po files using proper gettext workflow
   for (const locale of locales) {
     const poPath = join(projectRoot, 'locales', `${locale}.po`);
 
     try {
       console.log(`💾 Updating ${locale}.po...`);
 
-      // Read existing translations and metadata if file exists
-      const existingTranslations = {};
-      let existingHeaders = {};
+      let updatedPo;
       if (existsSync(poPath)) {
-        const existingContent = readFileSync(poPath, 'utf8');
-        const lines = existingContent.split('\n');
+        // Read existing .po file using gettext-parser
+        const existingContent = readFileSync(poPath);
+        const existingPo = gettextParser.po.parse(existingContent);
 
-        // Parse existing headers
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          if (line.startsWith('"') && line.includes(':')) {
-            const match = line.match(/^"([^:]+):\s*([^"]*?)\\?n?"$/);
-            if (match) {
-              existingHeaders[match[1]] = match[2];
-            }
-          }
-          if (line.trim() === '' && i > 0) break; // End of headers
-        }
+        // Merge with .pot template
+        updatedPo = mergePoWithPot(existingPo, potData, locale);
 
-        // Function to normalize quotes for consistent comparison
-        const normalizeQuotes = (text) => text.replace(/\\"/g, '"');
-
-        let currentMsgid = '';
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (line.startsWith('msgid "') && line !== 'msgid ""') {
-            const match = line.match(/^msgid "(.+)"$/);
-            if (match) {
-              currentMsgid = match[1];
-            }
-          } else if (line.startsWith('msgstr "') && currentMsgid) {
-            const match = line.match(/^msgstr "(.+)"$/);
-            if (match && match[1] !== '') {
-              // Store translations with normalized keys for consistent lookup
-              const normalizedKey = normalizeQuotes(currentMsgid);
-              existingTranslations[normalizedKey] = match[1];
-            }
-            currentMsgid = '';
-          }
-        }
-        console.log(
-          `📚 Preserved ${Object.keys(existingTranslations).length} existing translations for ${locale}`
-        );
+        // Count preserved translations
+        const preservedCount = Object.values(updatedPo.translations['']).filter(
+          entry => entry.msgid && entry.msgstr && entry.msgstr[0]
+        ).length;
+        console.log(`📚 Preserved ${preservedCount} existing translations for ${locale}`);
+      } else {
+        // Initialize new .po from .pot template
+        updatedPo = initializePoFromPot(potData, locale);
+        console.log(`🆕 Initialized new ${locale}.po from template`);
       }
 
-      // Check if content has actually changed by comparing actual message content
-      const currentMessages = combinedExtractor.getMessages();
-      const normalizeQuotes = (text) => text.replace(/\\"/g, '"');
-      
-      let contentChanged = !existsSync(poPath);
-      if (!contentChanged) {
-        // Compare actual message content, not just counts
-        const existingMsgids = new Set(Object.keys(existingTranslations));
-        const currentMsgids = new Set(currentMessages.map(m => normalizeQuotes(m.text)));
-        
-        contentChanged = existingMsgids.size !== currentMsgids.size || 
-                        ![...existingMsgids].every(id => currentMsgids.has(id));
-      }
-
-      // Preserve existing dates if content hasn't changed
-      const now = new Date().toISOString();
-      const headers = {
-        Language: locale,
-        'MIME-Version': '1.0',
-        'Content-Type': 'text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding': '8bit',
-        'Project-Id-Version': 'EDITME EPUB Editor',
-        'Report-Msgid-Bugs-To': '',
-        'POT-Creation-Date': contentChanged ? now : existingHeaders['POT-Creation-Date'] || now,
-        'PO-Revision-Date': contentChanged ? now : existingHeaders['PO-Revision-Date'] || now,
-        'Last-Translator': existingHeaders['Last-Translator'] || '',
-        'Language-Team': existingHeaders['Language-Team'] || '',
-        'Plural-Forms': 'nplurals=2; plural=(n != 1);',
-      };
-
-      // Generate new .po file
-      combinedExtractor.savePotFile(poPath, headers);
-
-      // Post-process to clean up the file
-      let content = readFileSync(poPath, 'utf8');
-      const lines = content.split('\n');
-      const result = [];
-
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-
-        result.push(line);
-
-        // Merge back existing translations
-        if (line.startsWith('msgid "') && line !== 'msgid ""') {
-          const match = line.match(/^msgid "(.+)"$/);
-          if (match) {
-            // Normalize the key for lookup
-            const normalizedKey = match[1].replace(/\\"/g, '"');
-            if (existingTranslations[normalizedKey]) {
-              // Look ahead for msgstr line and replace it
-              if (i + 1 < lines.length && lines[i + 1].startsWith('msgstr ""')) {
-                result[result.length] = `msgstr "${existingTranslations[normalizedKey]}"`;
-                i++; // Skip original empty msgstr
-              }
-            }
-          }
-        }
-      }
-
-      // Write back the cleaned and merged content
-      writeFileSync(poPath, result.join('\n'));
+      // Write updated .po file using gettext-parser
+      const updatedContent = gettextParser.po.compile(updatedPo);
+      writeFileSync(poPath, updatedContent);
     } catch (error) {
-      console.error(`❌ Error creating ${locale}.po:`, error.message);
+      console.error(`❌ Error updating ${locale}.po:`, error.message);
       process.exit(1);
     }
   }
 
-  const messageCount = combinedExtractor.getMessages().length;
-  console.log(`✅ Extracted ${messageCount} translatable strings`);
-  console.log(`📝 Updated ${locales.length} .po files`);
+  console.log(`✅ Generated messages.pot template`);
+  console.log(`📝 Updated ${locales.length} .po files using proper gettext workflow`);
 }
 
 // Run extraction

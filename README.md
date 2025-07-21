@@ -76,6 +76,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for comprehensive development guidelines.
 - **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Development workflows and standards
 - **[TESTING.md](./TESTING.md)** - Testing strategy and patterns
 - **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Build and deployment instructions
+- **[LOCALIZATION.md](./LOCALIZATION.md)** - Adding new languages and translations
 
 ### Project Structure
 
