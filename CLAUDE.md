@@ -129,11 +129,13 @@ OEBPS/ (standard EPUB content)
 
 - `npm run check` - **REQUIRED** TypeScript validation (must pass)
 - `npm run lint` - **REQUIRED** ESLint check (< 500 problems, zero critical errors)
+- `npm run format` - **REQUIRED** Prettier code formatting for consistency
 - `npm test` - **REQUIRED** Run unit tests (must pass)
 
 **Combined Quality Check** (recommended):
+
 ```bash
-npm run check && npm run lint && npm test
+npm run check && npm run lint && npm run format && npm test
 ```
 
 **See [LINTING.md](./LINTING.md) for detailed ESLint configuration and acceptable lint thresholds.**
@@ -173,7 +175,7 @@ npm run check && npm test
 **Quality Gates**: All code changes must pass the following validation before commit:
 
 1. ✅ **TypeScript Validation**: `npm run check` (zero errors)
-2. ✅ **ESLint Compliance**: `npm run lint` (< 500 problems, zero critical errors)  
+2. ✅ **ESLint Compliance**: `npm run lint` (< 500 problems, zero critical errors)
 3. ✅ **Unit Tests**: `npm test` (all tests passing)
 
 **See [DEVELOPMENT.md](./DEVELOPMENT.md) for complete development workflow quality standards and AI coding agent requirements.**
@@ -274,12 +276,14 @@ import { documentDirection } from '$lib/i18n';
 **TypeScript Compliance**: Claude MUST run `npm run check` after any code modification and resolve ALL TypeScript errors before considering any task complete.
 
 **Quality Gates**: Every coding task must include:
+
 1. ✅ TypeScript validation (`npm run check`)
-2. ✅ ESLint compliance (`npm run lint` - < 500 problems, zero critical errors) 
+2. ✅ ESLint compliance (`npm run lint` - < 500 problems, zero critical errors)
 3. ✅ Test execution (`npm test`)
 4. ✅ Build verification (`npm run build`)
 
 **Never Complete Tasks With**:
+
 - Outstanding TypeScript errors
 - Critical ESLint errors (undefined variables, syntax errors)
 - Failing tests due to type issues

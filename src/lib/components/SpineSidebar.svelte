@@ -189,7 +189,7 @@
 <div class="spine-sidebar">
   {#if isLoading}
     <div class="loading">
-      <p>{$t('Loading spine items...')}</p>
+      <p>{$t('Loading spine items…')}</p>
     </div>
   {:else if error}
     <div class="error">

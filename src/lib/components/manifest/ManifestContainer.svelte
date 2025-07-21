@@ -27,10 +27,10 @@
     try {
       loading = true;
       error = null;
-      
+
       // Load manifest items
       manifestItems = await manifestManager.loadManifest(workspaceId);
-      
+
       // Load SOURCE items if advanced mode is enabled
       if (advancedMode) {
         const isAdvancedModeEnabled = await manifestManager.isAdvancedModeEnabled(workspaceId);
@@ -38,10 +38,9 @@
           sourceItems = await manifestManager.listSourceItems(workspaceId);
         }
       }
-      
+
       // Validate manifest
       validationErrors = await manifestManager.validateManifest(workspaceId);
-      
     } catch (err) {
       error = $t('Failed to load manifest');
     } finally {
@@ -49,7 +48,9 @@
     }
   };
 
-  const handleItemSelection = (event: { detail: { item: ManifestItem | SourceItem; type: 'manifest' | 'source' } }) => {
+  const handleItemSelection = (event: {
+    detail: { item: ManifestItem | SourceItem; type: 'manifest' | 'source' };
+  }) => {
     selectedItem = event.detail.item;
     selectedItemType = event.detail.type;
   };
@@ -75,7 +76,7 @@
     try {
       await manifestManager.deleteManifestItem(workspaceId, event.detail.itemId);
       await loadManifest(); // Refresh the manifest
-      
+
       // Clear selection if deleted item was selected
       if (selectedItem && 'id' in selectedItem && selectedItem.id === event.detail.itemId) {
         selectedItem = null;
@@ -91,7 +92,7 @@
 
     try {
       const { item } = event.detail;
-      
+
       if (itemEditorMode === 'edit' && selectedItem && 'id' in selectedItem) {
         await manifestManager.updateManifestItem(workspaceId, selectedItem.id, item);
       } else {
@@ -102,11 +103,11 @@
             content: '',
             id: item.id,
             mediaType: item.mediaType,
-            properties: item.properties
+            properties: item.properties,
           });
         }
       }
-      
+
       showItemEditor = false;
       await loadManifest(); // Refresh the manifest
     } catch (err) {
@@ -119,11 +120,11 @@
 
     try {
       const files = event.detail.files;
-      
+
       for (const file of files) {
         await manifestManager.createFileItem(workspaceId, file);
       }
-      
+
       await loadManifest(); // Refresh the manifest
     } catch (err) {
       error = $t('Failed to upload files');
@@ -143,7 +144,7 @@
 
 {#if loading}
   <div class="loading-state">
-    <p>{$t('Loading manifest...')}</p>
+    <p>{$t('Loading manifest…')}</p>
   </div>
 {:else if error}
   <div class="error-state">

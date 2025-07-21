@@ -70,7 +70,7 @@
           <input
             type="search"
             class="search-input"
-            placeholder={$t('Search workspaces...')}
+            placeholder={$t('Search workspaces…')}
             value={searchQuery}
             on:input={handleSearchInput}
             aria-label={$t('Search workspaces')}
@@ -96,7 +96,7 @@
         <div class="skeleton-item" aria-hidden="true"></div>
         <div class="skeleton-item" aria-hidden="true"></div>
         <div class="skeleton-item" aria-hidden="true"></div>
-        <p class="loading-text">{$t('Loading workspaces...')}</p>
+        <p class="loading-text">{$t('Loading workspaces…')}</p>
       </div>
     {:else if workspaces.length === 0}
       <div class="empty-state">

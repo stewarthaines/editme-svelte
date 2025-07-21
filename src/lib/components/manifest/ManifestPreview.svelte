@@ -36,7 +36,7 @@
         const sourceItem = selectedItem as SourceItem;
         // For SOURCE items, we need to get content differently
         const content = await manifestManager.getSourceItemContent(workspaceId, sourceItem.path);
-        
+
         // Create a basic preview for SOURCE items
         contentPreview = {
           itemId: sourceItem.path,
@@ -46,8 +46,11 @@
           metadata: {
             characterCount: typeof content === 'string' ? content.length : undefined,
             lineCount: typeof content === 'string' ? content.split('\n').length : undefined,
-            wordCount: typeof content === 'string' ? content.split(/\s+/).filter(w => w.length > 0).length : undefined,
-          }
+            wordCount:
+              typeof content === 'string'
+                ? content.split(/\s+/).filter(w => w.length > 0).length
+                : undefined,
+          },
         };
       }
     } catch (err) {
@@ -75,7 +78,7 @@
 
     // Create a download link
     const link = document.createElement('a');
-    
+
     if (selectedItemType === 'manifest') {
       const manifestItem = selectedItem as ManifestItem;
       link.href = `#download:${manifestItem.id}`;
@@ -85,23 +88,23 @@
       link.href = `#download:${sourceItem.path}`;
       link.download = sourceItem.name;
     }
-    
+
     // Note: In a real implementation, you would need to get the actual file content
     // and create a blob URL. This is a placeholder.
   };
 
   const formatFileSize = (bytes: number | undefined) => {
     if (!bytes) return '-';
-    
+
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = bytes;
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   };
 
@@ -109,17 +112,22 @@
     if (!date) return '-';
     return new Intl.DateTimeFormat('en-US', {
       dateStyle: 'medium',
-      timeStyle: 'short'
+      timeStyle: 'short',
     }).format(date);
   };
 
   const getContentIcon = (contentType: string) => {
     switch (contentType) {
-      case 'text': return '📄';
-      case 'image': return '🖼️';
-      case 'audio': return '🎵';
-      case 'video': return '🎥';
-      default: return '📦';
+      case 'text':
+        return '📄';
+      case 'image':
+        return '🖼️';
+      case 'audio':
+        return '🎵';
+      case 'video':
+        return '🎥';
+      default:
+        return '📦';
     }
   };
 </script>
@@ -132,7 +140,7 @@
     </div>
   {:else if loading}
     <div class="loading-state">
-      <p>{$t('Loading preview...')}</p>
+      <p>{$t('Loading preview…')}</p>
     </div>
   {:else if error}
     <div class="error-state">
@@ -147,14 +155,18 @@
       <div class="preview-header">
         <div class="preview-info">
           <h2 class="preview-title">
-            {selectedItemType === 'manifest' ? (selectedItem as ManifestItem).id : (selectedItem as SourceItem).name}
+            {selectedItemType === 'manifest'
+              ? (selectedItem as ManifestItem).id
+              : (selectedItem as SourceItem).name}
           </h2>
           <div class="preview-metadata">
             <span class="item-type">
               {selectedItemType === 'manifest' ? $t('Manifest Item') : $t('SOURCE Item')}
             </span>
             <span class="item-path">
-              {selectedItemType === 'manifest' ? (selectedItem as ManifestItem).href : (selectedItem as SourceItem).path}
+              {selectedItemType === 'manifest'
+                ? (selectedItem as ManifestItem).href
+                : (selectedItem as SourceItem).path}
             </span>
           </div>
         </div>
@@ -165,7 +177,11 @@
               {$t('Edit')}
             </button>
           {/if}
-          <button type="button" class="action-button download-button" on:click={handleDownloadClick}>
+          <button
+            type="button"
+            class="action-button download-button"
+            on:click={handleDownloadClick}
+          >
             {$t('Download')}
           </button>
           {#if selectedItemType === 'manifest'}
@@ -194,23 +210,25 @@
             </div>
           {:else if contentPreview.contentType === 'image' && contentPreview.previewUrl}
             <div class="image-preview">
-              <img 
-                src={contentPreview.previewUrl} 
-                alt={selectedItemType === 'manifest' ? (selectedItem as ManifestItem).id : (selectedItem as SourceItem).name}
+              <img
+                src={contentPreview.previewUrl}
+                alt={selectedItemType === 'manifest'
+                  ? (selectedItem as ManifestItem).id
+                  : (selectedItem as SourceItem).name}
                 class="preview-image"
               />
             </div>
           {:else if contentPreview.contentType === 'audio' && contentPreview.previewUrl}
             <div class="audio-preview">
               <audio controls class="preview-audio">
-                <source src={contentPreview.previewUrl} type={contentPreview.mediaType}>
+                <source src={contentPreview.previewUrl} type={contentPreview.mediaType} />
                 {$t('Your browser does not support the audio element.')}
               </audio>
             </div>
           {:else if contentPreview.contentType === 'video' && contentPreview.previewUrl}
             <div class="video-preview">
               <video controls class="preview-video">
-                <source src={contentPreview.previewUrl} type={contentPreview.mediaType}>
+                <source src={contentPreview.previewUrl} type={contentPreview.mediaType} />
                 {$t('Your browser does not support the video element.')}
               </video>
             </div>
@@ -244,7 +262,13 @@
                 {/if}
                 {#if contentPreview.metadata.duration}
                   <dt>{$t('Duration')}</dt>
-                  <dd>{Math.floor(contentPreview.metadata.duration / 60)}:{(contentPreview.metadata.duration % 60).toString().padStart(2, '0')}</dd>
+                  <dd>
+                    {Math.floor(contentPreview.metadata.duration / 60)}:{(
+                      contentPreview.metadata.duration % 60
+                    )
+                      .toString()
+                      .padStart(2, '0')}
+                  </dd>
                 {/if}
               </dl>
             </div>
@@ -272,7 +296,6 @@
           </dl>
         </div>
       </div>
-
     </div>
   {/if}
 </div>

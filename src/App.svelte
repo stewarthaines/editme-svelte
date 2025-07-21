@@ -23,7 +23,7 @@
     type WorkspaceManagerContext,
     type ManifestManagerContext,
     type MetadataManagerContext,
-    type WorkspaceIdContext
+    type WorkspaceIdContext,
   } from './lib/contexts';
 
   // Get dependencies from context (stories) or create real ones (production)
@@ -72,11 +72,11 @@
           currentManifestManager = new ManifestManagerImpl(tempWorkspaceManager);
           currentMetadataManager = new MetadataManagerImpl(tempWorkspaceManager);
           currentSpineManager = new SpineItemManager(tempWorkspaceManager);
-          
+
           // Set manager only after full initialization
           currentWorkspaceManager = tempWorkspaceManager;
         }
-        
+
         initialized = true;
       } catch (error) {
         console.error('Failed to initialize workspace manager:', error);
@@ -119,7 +119,7 @@
       />
     {:else}
       <div class="placeholder-content">
-        <p>{$t('Loading workspace...')}</p>
+        <p>{$t('Loading workspace…')}</p>
       </div>
     {/if}
   </svelte:fragment>
@@ -127,20 +127,17 @@
   <svelte:fragment slot="left-content">
     <!-- Main content area - switches based on current view -->
     {#if currentView === 'workspace' && currentSpineManager}
-      <WorkspaceView 
+      <WorkspaceView
         workspaceManager={currentWorkspaceManager}
         spineManager={currentSpineManager}
-        currentWorkspaceId={currentWorkspaceId}
-        onWorkspaceChange={(workspaceId) => {
+        {currentWorkspaceId}
+        onWorkspaceChange={workspaceId => {
           currentWorkspaceId = workspaceId;
         }}
       />
     {:else if currentView === 'metadata'}
       {#if initialized && currentWorkspaceId && currentMetadataManager}
-        <MetadataEditor
-          workspaceId={currentWorkspaceId}
-          metadataManager={currentMetadataManager}
-        />
+        <MetadataEditor workspaceId={currentWorkspaceId} metadataManager={currentMetadataManager} />
       {:else}
         <PlaceholderView
           viewType="metadata"
@@ -183,7 +180,7 @@
         <PlaceholderView
           viewType="spine"
           title={$t('Spine Items')}
-          description={$t('Loading workspace...')}
+          description={$t('Loading workspace…')}
           icon="📚"
         />
       {/if}

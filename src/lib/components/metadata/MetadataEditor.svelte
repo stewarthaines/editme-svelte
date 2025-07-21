@@ -206,7 +206,7 @@
   <div class="pane-content" tabindex="-1">
     {#if loading}
       <div class="loading-state">
-        <p>{$t('Loading metadata...')}</p>
+        <p>{$t('Loading metadata…')}</p>
       </div>
     {:else if error}
       <div class="error-state">

@@ -14,7 +14,7 @@
     id: '',
     href: '',
     mediaType: '',
-    properties: []
+    properties: [],
   };
   let textContent = '';
   let fileInput: HTMLInputElement;
@@ -27,14 +27,14 @@
       id: manifestItem.id,
       href: manifestItem.href,
       mediaType: manifestItem.mediaType,
-      properties: manifestItem.properties || []
+      properties: manifestItem.properties || [],
     };
   } else {
     formData = {
       id: '',
       href: '',
       mediaType: itemEditorMode === 'create-text' ? 'text/plain' : '',
-      properties: []
+      properties: [],
     };
   }
 
@@ -53,7 +53,7 @@
     { value: 'video/mp4', label: 'MP4 Video' },
     { value: 'video/webm', label: 'WebM Video' },
     { value: 'application/pdf', label: 'PDF' },
-    { value: 'application/epub+zip', label: 'EPUB' }
+    { value: 'application/epub+zip', label: 'EPUB' },
   ];
 
   // EPUB properties for checkboxes
@@ -63,7 +63,7 @@
     { value: 'nav', label: 'Navigation' },
     { value: 'remote-resources', label: 'Remote Resources' },
     { value: 'scripted', label: 'Scripted' },
-    { value: 'svg', label: 'SVG' }
+    { value: 'svg', label: 'SVG' },
   ];
 
   const handleClose = () => {
@@ -86,7 +86,7 @@
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
       selectedFile = target.files[0];
-      
+
       // Auto-fill form data based on file
       if (!formData.id) {
         formData.id = selectedFile.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '_');
@@ -103,28 +103,28 @@
   const detectMediaType = (filename: string): string => {
     const ext = filename.split('.').pop()?.toLowerCase();
     const typeMap: Record<string, string> = {
-      'html': 'text/html',
-      'xhtml': 'application/xhtml+xml',
-      'css': 'text/css',
-      'js': 'text/javascript',
-      'txt': 'text/plain',
-      'jpg': 'image/jpeg',
-      'jpeg': 'image/jpeg',
-      'png': 'image/png',
-      'gif': 'image/gif',
-      'svg': 'image/svg+xml',
-      'mp3': 'audio/mpeg',
-      'ogg': 'audio/ogg',
-      'mp4': 'video/mp4',
-      'webm': 'video/webm',
-      'pdf': 'application/pdf'
+      html: 'text/html',
+      xhtml: 'application/xhtml+xml',
+      css: 'text/css',
+      js: 'text/javascript',
+      txt: 'text/plain',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      svg: 'image/svg+xml',
+      mp3: 'audio/mpeg',
+      ogg: 'audio/ogg',
+      mp4: 'video/mp4',
+      webm: 'video/webm',
+      pdf: 'application/pdf',
     };
     return typeMap[ext || ''] || 'application/octet-stream';
   };
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
-    
+
     // Basic validation
     if (!formData.id || !formData.href || !formData.mediaType) {
       alert($t('Please fill in all required fields'));
@@ -136,7 +136,7 @@
       id: formData.id,
       href: formData.href,
       mediaType: formData.mediaType,
-      properties: formData.properties?.filter(p => p.length > 0)
+      properties: formData.properties?.filter(p => p.length > 0),
     };
 
     dispatch('save', { item: manifestItem, textContent, selectedFile });
@@ -179,7 +179,7 @@
       'audio/ogg': '.ogg',
       'video/mp4': '.mp4',
       'video/webm': '.webm',
-      'application/pdf': '.pdf'
+      'application/pdf': '.pdf',
     };
     return typeMap[mediaType] || '.dat';
   };
@@ -196,7 +196,7 @@
 
 <svelte:window on:keydown={handleKeyDown} />
 
-<div 
+<div
   class="modal-overlay"
   bind:this={modalRef}
   on:click={handleBackdropClick}
@@ -293,7 +293,7 @@
             bind:value={formData.mediaType}
             required
           >
-            <option value="">{$t('Select media type...')}</option>
+            <option value="">{$t('Select media type…')}</option>
             {#each mediaTypes as mediaType}
               <option value={mediaType.value}>{mediaType.label}</option>
             {/each}
@@ -312,7 +312,7 @@
                   type="checkbox"
                   class="checkbox-input"
                   checked={formData.properties?.includes(property.value) || false}
-                  on:change={(e) => handlePropertyChange(property.value, e.currentTarget.checked)}
+                  on:change={e => handlePropertyChange(property.value, e.currentTarget.checked)}
                 />
                 {property.label}
               </label>
@@ -329,7 +329,7 @@
               id="text-content"
               class="form-textarea"
               bind:value={textContent}
-              placeholder={$t('Enter the initial content for this text file...')}
+              placeholder={$t('Enter the initial content for this text file…')}
               rows="10"
             ></textarea>
             <p class="field-help">
