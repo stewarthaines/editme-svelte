@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21T08:44:40.664Z\n"
-"PO-Revision-Date: 2025-07-21T08:44:40.664Z\n"
+"POT-Creation-Date: 2025-07-21T09:05:33.430Z\n"
+"PO-Revision-Date: 2025-07-21T09:05:33.430Z\n"
 "Language: \n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -159,7 +159,7 @@ msgstr ""
 msgid "Chinese"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:418
+#: src/lib/navigation/views/WorkspaceView.svelte:436
 msgid "Clean Up"
 msgstr ""
 
@@ -177,8 +177,8 @@ msgstr ""
 msgid "Click on any row in the table to see details"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestItemEditor.svelte:219
 #: src/lib/components/workspace/CurrentWorkspaceBar.svelte:45
+#: src/lib/components/manifest/ManifestItemEditor.svelte:219
 msgid "Close"
 msgstr ""
 
@@ -186,7 +186,7 @@ msgstr ""
 msgid "Close workspace"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:61
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:63
 msgid "Coming soon"
 msgstr ""
 
@@ -228,11 +228,11 @@ msgstr ""
 msgid "Coverage"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:32
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:34
 msgid "Create a new minimal EPUB project"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:36
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:38
 msgid "Create New"
 msgstr ""
 
@@ -384,7 +384,7 @@ msgstr ""
 msgid "Enter the initial content for this text file…"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:153
+#: src/lib/navigation/views/WorkspaceView.svelte:171
 msgid ""
 "EPUB import functionality is coming soon. For now, use \"Create New\" to "
 "start a fresh project."
@@ -485,11 +485,11 @@ msgstr ""
 msgid "French"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:65
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:67
 msgid "From Folder"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:66
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:68
 msgid "Future"
 msgstr ""
 
@@ -501,7 +501,7 @@ msgstr ""
 msgid "German"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:25
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:27
 msgid "Get Started"
 msgstr ""
 
@@ -524,11 +524,11 @@ msgstr ""
 msgid "Import EPUB: Convert existing .epub files to edit"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:51
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:53
 msgid "Import file"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:60
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:62
 msgid "Import from folder - coming soon"
 msgstr ""
 
@@ -601,11 +601,11 @@ msgstr ""
 msgid "Live preview with device emulation (Phase 5)"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:46
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:48
 msgid "Load an existing EPUB file for editing"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:50
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:52
 msgid "Load EPUB"
 msgstr ""
 
@@ -721,7 +721,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:261
+#: src/lib/navigation/views/WorkspaceView.svelte:279
 msgid "No corrupted workspaces found to clean up."
 msgstr ""
 
@@ -886,10 +886,10 @@ msgid "Reset all metadata to defaults?"
 msgstr ""
 
 #: src/lib/components/SpineSidebar.svelte:198
+#: src/lib/components/metadata/MetadataEditor.svelte:215
 #: src/lib/components/manifest/ManifestPreview.svelte:149
 #: src/lib/components/manifest/ManifestContainer.svelte:163
-#: src/lib/components/metadata/MetadataEditor.svelte:215
-#: src/lib/navigation/views/WorkspaceView.svelte:403
+#: src/lib/navigation/views/WorkspaceView.svelte:421
 msgid "Retry"
 msgstr ""
 
@@ -1085,7 +1085,7 @@ msgstr ""
 msgid "Spread"
 msgstr ""
 
-#: src/lib/components/workspace/WorkspaceActionBar.svelte:37
+#: src/lib/components/workspace/WorkspaceActionBar.svelte:39
 msgid "Start fresh"
 msgstr ""
 
@@ -1220,7 +1220,7 @@ msgstr ""
 msgid "You can edit the content later in the main editor"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:436
+#: src/lib/navigation/views/WorkspaceView.svelte:454
 #: src/lib/navigation/views/MetadataView.svelte:193
 msgid "You have unsaved changes"
 msgstr ""
@@ -1229,8 +1229,8 @@ msgstr ""
 msgid "You have unsaved metadata changes. Continue?"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:320
-#: src/lib/navigation/views/WorkspaceView.svelte:331
+#: src/lib/navigation/views/WorkspaceView.svelte:338
+#: src/lib/navigation/views/WorkspaceView.svelte:349
 msgid "You have unsaved workspace changes. Continue?"
 msgstr ""
 
