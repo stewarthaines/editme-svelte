@@ -330,18 +330,6 @@ describe('SourceManager', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false for SOURCE/ with only .gitkeep files', async () => {
-      const workspaceId = TEST_WORKSPACE_IDS.EMPTY;
-      await mockFileStorage.addTestFiles(workspaceId, {
-        'SOURCE/text/.gitkeep': '',
-        'SOURCE/scripts/.gitkeep': '',
-        'SOURCE/extensions/.gitkeep': '',
-      });
-
-      const result = await sourceManager.hasSourceFiles(workspaceId);
-
-      expect(result).toBe(false);
-    });
 
     it('should return true for SOURCE/ with actual content files', async () => {
       const workspaceId = TEST_WORKSPACE_IDS.MINIMAL;
@@ -369,13 +357,8 @@ describe('SourceManager', () => {
 
       await sourceManager.initializeSourceStructure(workspaceId);
 
-      // Verify directory structure was created
+      // Verify settings.json was created  
       expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/settings.json')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/text/.gitkeep')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/scripts/.gitkeep')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/extensions/.gitkeep')).toBe(
-        true
-      );
 
       // Verify default settings.json content
       const settings = await mockFileStorage.readTextFile(workspaceId, 'SOURCE/settings.json');
@@ -468,7 +451,7 @@ describe('SourceManager', () => {
       const result = await sourceManager.validateSourceStructure(workspaceId);
 
       expect(result.isValid).toBe(true);
-      expect(result.fileCount).toBe(4); // settings.json + 3 .gitkeep files
+      expect(result.fileCount).toBe(1); // settings.json only
     });
 
     it('should calculate file count and total size correctly', async () => {
@@ -531,7 +514,7 @@ describe('SourceManager', () => {
 
       const result = await sourceManager.listSourceFiles(workspaceId);
 
-      expect(result.length).toBe(1); // settings.json + no .gitkeep files
+      expect(result.length).toBe(1); // settings.json only
     });
 
     it('should include file metadata when available', async () => {
@@ -570,10 +553,10 @@ describe('SourceManager', () => {
 
       const result = await sourceManager.getSourceDirectoryStats(workspaceId);
 
-      expect(result.totalFiles).toBe(4); // settings.json + 3 .gitkeep files
-      expect(result.directories.text).toBe(1); // .gitkeep file
-      expect(result.directories.scripts).toBe(1); // .gitkeep file
-      expect(result.directories.extensions).toBe(1); // .gitkeep file
+      expect(result.totalFiles).toBe(1); // settings.json only
+      expect(result.directories.text).toBe(0); // no files in text directory
+      expect(result.directories.scripts).toBe(0); // no files in scripts directory  
+      expect(result.directories.extensions).toBe(0); // no files in extensions directory
       expect(result.hasSettingsFile).toBe(true);
     });
 

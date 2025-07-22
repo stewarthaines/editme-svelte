@@ -5,6 +5,7 @@ import { createMockZipWriter, createMockZip } from './mocks/zip-library.mock.js'
 import {
   createCompleteSourceStructure,
   createMinimalSourceStructure,
+  createEmptySourceStructure,
   createWorkspaceWithEPUBFiles,
   validateFileContent,
   TEST_WORKSPACE_IDS,
@@ -135,23 +136,19 @@ describe('SourceManager Integration Tests', () => {
       expect(extractedView.every((byte, index) => byte === originalView[index])).toBe(true);
     });
 
-    it('should handle empty SOURCE/ directories correctly', async () => {
+    it('should handle workspaces with only settings.json', async () => {
       const workspaceId = TEST_WORKSPACE_IDS.EMPTY;
 
-      // Create workspace with only .gitkeep files
-      await mockFileStorage.addTestFiles(workspaceId, {
-        'SOURCE/text/.gitkeep': '',
-        'SOURCE/scripts/.gitkeep': '',
-        'SOURCE/extensions/.gitkeep': '',
-      });
+      // Create workspace with only settings.json
+      await mockFileStorage.addTestFiles(workspaceId, createEmptySourceStructure());
 
-      // Should not create SOURCE.zip for empty directories
+      // Should create SOURCE.zip even with just settings.json 
       const sourceZip = await sourceManager.createSourceZip(workspaceId);
-      expect(sourceZip).toBeNull();
+      expect(sourceZip).not.toBeNull();
 
-      // hasSourceFiles should return false
+      // hasSourceFiles should return true (settings.json counts as a source file)
       const hasSource = await sourceManager.hasSourceFiles(workspaceId);
-      expect(hasSource).toBe(false);
+      expect(hasSource).toBe(true);
     });
   });
 
@@ -301,11 +298,6 @@ describe('SourceManager Integration Tests', () => {
 
       // Verify SOURCE/ structure was created
       expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/settings.json')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/text/.gitkeep')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/scripts/.gitkeep')).toBe(true);
-      expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/extensions/.gitkeep')).toBe(
-        true
-      );
 
       // Verify settings.json content
       const settings = await mockFileStorage.readTextFile(workspaceId, 'SOURCE/settings.json');

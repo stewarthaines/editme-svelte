@@ -20,10 +20,6 @@ export function classifySourceFile(path: string): SourceFileType {
     return 'settings';
   }
 
-  // .gitkeep files are always 'other' regardless of directory
-  if (relativePath.endsWith('.gitkeep')) {
-    return 'other';
-  }
 
   // Text files (in text/ directory)
   if (relativePath.startsWith('text/')) {
@@ -246,7 +242,7 @@ export async function calculateDirectoryStats(
       stats.hasSettingsFile = true;
     }
 
-    // Count files by directory (including .gitkeep files)
+    // Count files by directory
     if (filePath.startsWith('SOURCE/text/')) {
       stats.directories.text++;
     } else if (filePath.startsWith('SOURCE/scripts/')) {

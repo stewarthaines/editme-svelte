@@ -128,10 +128,6 @@ export function createCompleteSourceStructure(): Record<string, string | ArrayBu
     files[`SOURCE/extensions/${filename}`] = content;
   }
 
-  // Add .gitkeep files for empty directories
-  files['SOURCE/text/.gitkeep'] = '';
-  files['SOURCE/scripts/.gitkeep'] = '';
-  files['SOURCE/extensions/.gitkeep'] = '';
 
   return files;
 }
@@ -146,21 +142,15 @@ export function createMinimalSourceStructure(): Record<string, string> {
     'SOURCE/scripts/markdown-transform.js': SAMPLE_SCRIPT_FILES['markdown-transform.js'],
     'SOURCE/extensions/markdown-it/package.json':
       SAMPLE_EXTENSION_FILES['markdown-it/package.json'],
-    'SOURCE/text/.gitkeep': '',
-    'SOURCE/scripts/.gitkeep': '',
-    'SOURCE/extensions/.gitkeep': '',
   };
 }
 
 /**
- * Create an empty SOURCE/ directory structure (only .gitkeep files)
+ * Create an empty SOURCE/ directory structure
  */
 export function createEmptySourceStructure(): Record<string, string> {
   return {
     'SOURCE/settings.json': JSON.stringify(DEFAULT_SETTINGS, null, 2),
-    'SOURCE/text/.gitkeep': '',
-    'SOURCE/scripts/.gitkeep': '',
-    'SOURCE/extensions/.gitkeep': '',
   };
 }
 
@@ -308,17 +298,14 @@ export function createWorkspaceWithEPUBFiles(): Record<string, string> {
 export function getExpectedSourceZipFiles(): string[] {
   return [
     'SOURCE/settings.json',
-    'SOURCE/text/.gitkeep',
     'SOURCE/text/chapter1.txt',
     'SOURCE/text/chapter2.txt',
     'SOURCE/text/appendix.txt',
     'SOURCE/text/empty.txt',
     'SOURCE/text/large.txt',
-    'SOURCE/scripts/.gitkeep',
     'SOURCE/scripts/markdown-transform.js',
     'SOURCE/scripts/custom-dom.js',
     'SOURCE/scripts/utils.js',
-    'SOURCE/extensions/.gitkeep',
     'SOURCE/extensions/markdown-it/package.json',
     'SOURCE/extensions/markdown-it/index.js',
     'SOURCE/extensions/highlight/package.json',

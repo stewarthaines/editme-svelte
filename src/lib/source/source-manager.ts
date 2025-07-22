@@ -36,9 +36,8 @@ export class SourceManager {
       const allFiles = await this.fileStorage.listFiles(workspaceId);
       const sourceFiles = allFiles.filter(path => isSourceFile(path));
 
-      // Return null if no SOURCE/ files (excluding .gitkeep files)
-      const contentFiles = sourceFiles.filter(path => !path.endsWith('.gitkeep'));
-      if (contentFiles.length === 0) {
+      // Return null if no SOURCE/ files
+      if (sourceFiles.length === 0) {
         return null;
       }
 
@@ -108,16 +107,15 @@ export class SourceManager {
   }
 
   /**
-   * Check if workspace has SOURCE/ files (excluding .gitkeep)
+   * Check if workspace has SOURCE/ files
    */
   async hasSourceFiles(workspaceId: string): Promise<boolean> {
     try {
       const allFiles = await this.fileStorage.listFiles(workspaceId);
       const sourceFiles = allFiles.filter(path => isSourceFile(path));
 
-      // Check for content files (not just .gitkeep)
-      const contentFiles = sourceFiles.filter(path => !path.endsWith('.gitkeep'));
-      return contentFiles.length > 0;
+      // Check for SOURCE files
+      return sourceFiles.length > 0;
     } catch (error) {
       throw new Error(`Failed to check SOURCE/ files: ${error}`);
     }
@@ -169,18 +167,7 @@ export class SourceManager {
         await this.fileStorage.writeTextFile(workspaceId, settingsPath, defaultSettings);
       }
 
-      // Create .gitkeep files to maintain directory structure
-      const directories = [
-        'SOURCE/text/.gitkeep',
-        'SOURCE/scripts/.gitkeep',
-        'SOURCE/extensions/.gitkeep',
-      ];
-
-      for (const gitkeepPath of directories) {
-        if (!(await this.fileStorage.fileExists(workspaceId, gitkeepPath))) {
-          await this.fileStorage.writeTextFile(workspaceId, gitkeepPath, '');
-        }
-      }
+      // Directory structure will be created implicitly when files are written to these paths
     } catch (error) {
       throw new Error(`Failed to initialize SOURCE/ structure: ${error}`);
     }

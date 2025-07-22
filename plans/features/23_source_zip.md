@@ -326,7 +326,7 @@ class WorkspaceManager {
 **hasSourceFiles() Tests:**
 - ✅ Empty workspace (no SOURCE/ directory)
 - ✅ Empty SOURCE/ directory
-- ✅ SOURCE/ with only .gitkeep files
+- ✅ SOURCE/ with only settings.json
 - ✅ SOURCE/ with actual content files
 - ✅ Storage access errors
 
@@ -334,8 +334,7 @@ class WorkspaceManager {
 - ✅ New workspace initialization
 - ✅ Existing SOURCE/ directory (no overwrite)
 - ✅ Default settings.json creation
-- ✅ Directory structure creation (text/, scripts/, extensions/)
-- ✅ .gitkeep file placement
+- ✅ Directory structure created implicitly when files are written
 - ✅ File write permission errors
 
 **validateSourceStructure() Tests:**

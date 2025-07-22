@@ -1264,12 +1264,7 @@ ${chapterLinks}
     const opfXML = OPFUtils.generateOPFXML(opfDocument);
     await this.storage.writeTextFile(workspaceId, 'OEBPS/content.opf', opfXML);
 
-    // Create directory structure
-    const directories = ['OEBPS/Text', 'OEBPS/Images', 'OEBPS/Styles', 'OEBPS/Audio'];
-
-    for (const dir of directories) {
-      await this.storage.writeTextFile(workspaceId, `${dir}/.gitkeep`, '');
-    }
+    // Directory structure will be created implicitly when files are written to these paths
 
     // Initialize SOURCE/ directory structure using SourceManager
     await this.sourceManager.initializeSourceStructure(workspaceId);

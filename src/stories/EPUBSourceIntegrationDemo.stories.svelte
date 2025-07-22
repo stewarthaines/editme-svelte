@@ -57,7 +57,7 @@ Interactive demonstration of the complete EPUB workflow with automatic SOURCE.zi
 - **Text**: Source content files in \`text/\` directory
 - **Script**: Transform scripts in \`scripts/\` directory  
 - **Extension**: Plugin files in \`extensions/\` directory
-- **Other**: System files like \`.gitkeep\` and miscellaneous content
+- **Other**: Miscellaneous content and unclassified files
 
 This demo showcases the complete EPUB workflow with SOURCE.zip integration, demonstrating how editor files are seamlessly managed within the EPUB packaging/unpacking process.
         `,

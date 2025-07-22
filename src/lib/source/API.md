@@ -165,8 +165,7 @@ async initializeSourceStructure(workspaceId: string): Promise<void>
 **Side Effects:**
 
 - Creates `SOURCE/settings.json` with default content
-- Creates empty directories: `SOURCE/text/`, `SOURCE/scripts/`, `SOURCE/extensions/`
-- Writes `.gitkeep` files to maintain directory structure
+- Directories are created implicitly when files are written to them
 
 **Usage:**
 

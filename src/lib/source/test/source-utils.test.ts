@@ -57,10 +57,11 @@ describe('source-utils', () => {
       expect(classifySourceFile('SOURCE/unknown.xyz')).toBe('other');
     });
 
-    it('should handle .gitkeep files as other type', () => {
-      expect(classifySourceFile('SOURCE/text/.gitkeep')).toBe('other');
-      expect(classifySourceFile('SOURCE/scripts/.gitkeep')).toBe('other');
-      expect(classifySourceFile('SOURCE/extensions/.gitkeep')).toBe('other');
+    it('should classify files by directory location', () => {
+      // Files are now classified by directory location, not by special handling
+      expect(classifySourceFile('SOURCE/text/any-file.txt')).toBe('text');
+      expect(classifySourceFile('SOURCE/scripts/any-file.js')).toBe('script');
+      expect(classifySourceFile('SOURCE/extensions/any-file.json')).toBe('extension');
     });
 
     it('should handle paths without extensions', () => {
