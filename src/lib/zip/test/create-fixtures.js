@@ -51,7 +51,7 @@ function createSimpleStoreZip() {
 
   // File content
   bytes.set(contentBytes, offset);
-  const contentOffset = offset;
+  // const contentOffset = offset;
   offset += contentBytes.length;
 
   // Central directory file header

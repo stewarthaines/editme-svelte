@@ -3,7 +3,6 @@
   import { t } from '../../i18n';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
-  import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
   import DateMetadataField from './fields/DateMetadataField.svelte';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
   import type { EPUBMetadata } from '../../epub';

@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { get } from 'svelte/store';
+import { describe, it, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock layout store before any imports
 vi.mock('../stores/layout', () => ({
@@ -8,10 +7,6 @@ vi.mock('../stores/layout', () => ({
     subscribe: vi.fn(() => vi.fn()), // Return unsubscribe function
   },
 }));
-
-// Import the actual implementation after mocks
-import { navigationStore } from './navigation-store';
-import type { NavigationState, ViewType, NavigationOptions, NavigationGuard } from './types';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -45,7 +40,7 @@ describe('Navigation Store', () => {
   describe('State Management', () => {
     it('should have correct initial state', () => {
       // Test will verify default state matches API specification
-      const expectedInitialState = {
+      const _expectedInitialState = {
         currentView: 'workspace',
         previousView: null,
         viewHistory: ['workspace'],

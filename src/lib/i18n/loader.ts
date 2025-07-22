@@ -43,7 +43,7 @@ class TranslationLoader implements I18nLoader {
           if (!response.ok) {
             throw new Error(`Failed to fetch i18n-bundle.zip: ${response.status}`);
           }
-        } catch (error) {
+        } catch {
           throw new Error(
             'Translation data not found. For single file builds, please run "npm run build" to generate a new build with embedded translations.'
           );

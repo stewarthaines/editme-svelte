@@ -57,7 +57,7 @@ export default defineConfig({
             '</head>',
             `<script>window.__EDITME_I18N_BUNDLE__ = '${dataUrl}';</script></head>`
           );
-        } catch (error) {
+        } catch {
           console.warn('⚠️ Translation file not found, app will use English fallback only');
           return html;
         }

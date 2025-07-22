@@ -2,7 +2,7 @@
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import Sidebar from './Sidebar.svelte';
   import { layoutStore } from './stores/layout';
-  import { t } from './i18n';
+  import { t as _t } from './i18n';
 
   // Props
   export let hasWorkspace: boolean = false;
@@ -44,7 +44,7 @@
     </svelte:fragment>
   </Sidebar>
 
-  <main class="main-content" title={$t('Main View')}>
+  <main class="main-content">
     {#if showPreviewPane}
       <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
         <Pane defaultSize={50} minSize={25}>

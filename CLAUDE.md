@@ -128,7 +128,7 @@ OEBPS/ (standard EPUB content)
 **MANDATORY**: All changes must pass TypeScript validation before commit. Zero TypeScript errors are tolerated in the codebase.
 
 - `npm run check` - **REQUIRED** TypeScript validation (must pass)
-- `npm run lint` - **REQUIRED** ESLint check (< 500 problems, zero critical errors)
+- `npm run lint` - **REQUIRED** ESLint check (zero warnings, zero errors)
 - `npm run format` - **REQUIRED** Prettier code formatting for consistency
 - `npm test` - **REQUIRED** Run unit tests (must pass)
 

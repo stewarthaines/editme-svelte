@@ -6,7 +6,7 @@
  */
 
 import type { FileStorageAPI } from '../storage';
-import type { SourceFileType, SourceStats, SettingsValidation, SourceSettings } from './types.js';
+import type { SourceFileType, SourceStats, SettingsValidation } from './types.js';
 
 /**
  * Classify a SOURCE/ file by its path and extension
@@ -19,7 +19,6 @@ export function classifySourceFile(path: string): SourceFileType {
   if (relativePath === 'settings.json') {
     return 'settings';
   }
-
 
   // Text files (in text/ directory)
   if (relativePath.startsWith('text/')) {

@@ -4,6 +4,7 @@
   import Sidebar from '../../lib/Sidebar.svelte';
   import { layoutStore } from '../../lib/stores/layout';
   import { WorkspaceManager } from '../../lib/workspace';
+  import { SpineItemManager } from '../../lib/spine/spine-item-manager';
 
   // Story props
   export let preloadChapters = false;
@@ -14,6 +15,7 @@
   let selectedItemId: string | null = null;
   let selectedItemContent = '';
   let workspaceManager: WorkspaceManager;
+  let spineManager: SpineItemManager;
   let initialized = false;
   let error: string | null = null;
   let workspaceId = 'spine-demo-workspace';
@@ -169,8 +171,8 @@
         <svelte:fragment slot="sidebar-spine">
           <SpineSidebar
             {workspaceId}
-            {workspaceManager}
             {selectedItemId}
+            {spineManager}
             isExpanded={$layoutStore.sidebar.isExpanded}
           />
         </svelte:fragment>

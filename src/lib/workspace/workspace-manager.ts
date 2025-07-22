@@ -12,7 +12,6 @@ import { SourceManager } from '../source/index.js';
 import { SampleContentGenerator } from '../content/sample-content-generator.js';
 import { TransformExecutor } from '../transform/transform-executor.js';
 import { i18nService } from '../i18n/index.js';
-import { get } from 'svelte/store';
 import pageCSS from '../../assets/universal/page.css?raw';
 import transformTextJS from '../../assets/universal/transformText.js?raw';
 import transformDomJS from '../../assets/universal/transformDom.js?raw';
@@ -1448,7 +1447,7 @@ ${chapterLinks}
         modified: new Date(), // SourceFileInfo doesn't have modified date, use current date
         mediaType: getMimeType(fileInfo.path), // Add mediaType using existing utility
       }));
-    } catch (error: any) {
+    } catch {
       return [];
     }
   }

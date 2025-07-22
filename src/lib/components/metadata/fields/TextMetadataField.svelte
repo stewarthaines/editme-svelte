@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { t } from '../../../i18n';
+  import { t as _t } from '../../../i18n';
 
   const dispatch = createEventDispatcher();
 

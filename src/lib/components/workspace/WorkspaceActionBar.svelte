@@ -17,7 +17,7 @@
   };
 
   // Future: import from folder functionality
-  const handleImportFolder = () => {
+  const _handleImportFolder = () => {
     // Placeholder for future implementation
     console.log('Import from folder - coming soon');
   };
@@ -129,11 +129,6 @@
   .action-button.primary:not(:disabled):hover {
     border-color: var(--color-primary-hover);
     background-color: var(--color-primary-hover);
-  }
-
-  .action-button.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 
   .action-button:disabled {

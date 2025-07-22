@@ -1,6 +1,6 @@
 /**
  * ManifestManager Implementation
- * 
+ *
  * Core implementation of the ManifestManager API that integrates with WorkspaceManager
  * for EPUB manifest management and content operations.
  */
@@ -12,7 +12,7 @@ import type {
   ContentMetadata,
   SourceItem,
   ValidationResult,
-  MediaTypeCategories
+  MediaTypeCategories,
 } from './types.js';
 
 import {
@@ -21,14 +21,12 @@ import {
   ItemNotFoundError,
   DuplicateItemError,
   ValidationError,
-  StorageQuotaExceededError,
-  ContentTooBigError
+  ContentTooBigError,
 } from './types.js';
 
 import { ManifestValidator } from './validation.js';
 import { ManifestUtils } from './utils.js';
 import { resolveManifestPath } from '../blob-url/utils.js';
-import type { WorkspaceManager } from '../workspace/index.js';
 import type { IWorkspaceManager } from '../workspace/types.js';
 
 /**
@@ -38,7 +36,11 @@ export interface IManifestManager {
   // Core data operations
   loadManifest(workspaceId: string): Promise<ManifestItem[]>;
   getManifestItem(workspaceId: string, itemId: string): Promise<ManifestItem>;
-  updateManifestItem(workspaceId: string, itemId: string, updates: Partial<ManifestItem>): Promise<void>;
+  updateManifestItem(
+    workspaceId: string,
+    itemId: string,
+    updates: Partial<ManifestItem>
+  ): Promise<void>;
   deleteManifestItem(workspaceId: string, itemId: string): Promise<void>;
 
   // Content operations
@@ -49,7 +51,11 @@ export interface IManifestManager {
   // Item creation operations
   createTextItem(workspaceId: string, itemData: CreateTextItemData): Promise<ManifestItem>;
   createFileItem(workspaceId: string, file: File, targetPath?: string): Promise<ManifestItem>;
-  importFileItem(workspaceId: string, filePath: string, content: ArrayBuffer): Promise<ManifestItem>;
+  importFileItem(
+    workspaceId: string,
+    filePath: string,
+    content: ArrayBuffer
+  ): Promise<ManifestItem>;
 
   // Manifest structure operations
   reorderManifestItems(workspaceId: string, itemIds: string[]): Promise<void>;
@@ -95,7 +101,7 @@ export class ManifestManagerImpl implements IManifestManager {
       manifests: new Map(),
       content: new Map(),
       previews: new Map(),
-      blobUrls: new Set()
+      blobUrls: new Set(),
     };
   }
 
@@ -113,7 +119,7 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Load from workspace
       const opf = await this.workspaceManager.getWorkspaceOPF(workspaceId);
-      
+
       if (!opf) {
         throw new ManifestCorruptedError('OPF document is null or undefined');
       }
@@ -123,10 +129,10 @@ export class ManifestManagerImpl implements IManifestManager {
       }
 
       const manifest = Array.isArray(opf.manifest) ? opf.manifest : [];
-      
+
       // Cache the result
       this.cache.manifests.set(workspaceId, manifest);
-      
+
       return manifest;
     } catch (error: any) {
       if (error.message.includes('Workspace not found')) {
@@ -142,19 +148,23 @@ export class ManifestManagerImpl implements IManifestManager {
   async getManifestItem(workspaceId: string, itemId: string): Promise<ManifestItem> {
     const manifest = await this.loadManifest(workspaceId);
     const item = manifest.find(item => item.id === itemId);
-    
+
     if (!item) {
       throw new ItemNotFoundError(itemId);
     }
-    
+
     return item;
   }
 
-  async updateManifestItem(workspaceId: string, itemId: string, updates: Partial<ManifestItem>): Promise<void> {
+  async updateManifestItem(
+    workspaceId: string,
+    itemId: string,
+    updates: Partial<ManifestItem>
+  ): Promise<void> {
     try {
       const manifest = await this.loadManifest(workspaceId);
       const itemIndex = manifest.findIndex(item => item.id === itemId);
-      
+
       if (itemIndex === -1) {
         throw new ItemNotFoundError(itemId);
       }
@@ -190,7 +200,11 @@ export class ManifestManagerImpl implements IManifestManager {
       // Update cache
       this.cache.manifests.set(workspaceId, manifest);
     } catch (error: any) {
-      if (error instanceof ItemNotFoundError || error instanceof ValidationError || error instanceof DuplicateItemError) {
+      if (
+        error instanceof ItemNotFoundError ||
+        error instanceof ValidationError ||
+        error instanceof DuplicateItemError
+      ) {
         throw error;
       }
       throw new Error(`Failed to update manifest item: ${error.message}`);
@@ -201,7 +215,7 @@ export class ManifestManagerImpl implements IManifestManager {
     try {
       const manifest = await this.loadManifest(workspaceId);
       const itemIndex = manifest.findIndex(item => item.id === itemId);
-      
+
       if (itemIndex === -1) {
         throw new ItemNotFoundError(itemId);
       }
@@ -216,7 +230,7 @@ export class ManifestManagerImpl implements IManifestManager {
         const pathInfo = await this.workspaceManager.getWorkspacePathInfo(workspaceId);
         const resolvedPath = resolveManifestPath(item.href, pathInfo.basePath);
         await this.workspaceManager.deleteFile(workspaceId, resolvedPath);
-      } catch (error) {
+      } catch {
         // File might not exist, continue with manifest update
       }
 
@@ -251,14 +265,14 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Get item info
       const item = await this.getManifestItem(workspaceId, itemId);
-      
+
       // Get workspace path info to resolve relative paths correctly
       const pathInfo = await this.workspaceManager.getWorkspacePathInfo(workspaceId);
       const resolvedPath = resolveManifestPath(item.href, pathInfo.basePath);
-      
+
       // Read content from workspace using resolved path
       let content: ArrayBuffer | string;
-      
+
       // Determine if we should read as text or binary based on media type
       if (this.isTextMediaType(item.mediaType)) {
         content = await this.workspaceManager.readTextFile(workspaceId, resolvedPath);
@@ -283,7 +297,11 @@ export class ManifestManagerImpl implements IManifestManager {
     }
   }
 
-  async setItemContent(workspaceId: string, itemId: string, content: ArrayBuffer | string): Promise<void> {
+  async setItemContent(
+    workspaceId: string,
+    itemId: string,
+    content: ArrayBuffer | string
+  ): Promise<void> {
     try {
       // Check content size
       const contentSize = typeof content === 'string' ? content.length : content.byteLength;
@@ -293,7 +311,7 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Get item info
       const item = await this.getManifestItem(workspaceId, itemId);
-      
+
       // Write content to workspace using resolved path
       const pathInfo = await this.workspaceManager.getWorkspacePathInfo(workspaceId);
       const resolvedPath = resolveManifestPath(item.href, pathInfo.basePath);
@@ -311,12 +329,12 @@ export class ManifestManagerImpl implements IManifestManager {
       if (itemIndex !== -1) {
         manifest[itemIndex].size = contentSize;
         manifest[itemIndex].modified = new Date();
-        
+
         // Save updated manifest
         const opf = await this.workspaceManager.getWorkspaceOPF(workspaceId);
         opf.manifest = manifest;
         await this.workspaceManager.updateWorkspaceOPF(workspaceId, opf);
-        
+
         this.cache.manifests.set(workspaceId, manifest);
       }
     } catch (error: any) {
@@ -345,12 +363,12 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Determine content type
       const contentType = this.getContentType(item.mediaType);
-      
+
       // Create preview
       const preview: ContentPreview = {
         itemId,
         mediaType: item.mediaType,
-        contentType
+        contentType,
       };
 
       // Add content-specific data
@@ -361,7 +379,10 @@ export class ManifestManagerImpl implements IManifestManager {
         preview.previewUrl = ManifestUtils.createBlobUrl(content, item.mediaType);
         preview.metadata = this.extractImageMetadata(content);
         this.cache.blobUrls.add(preview.previewUrl);
-      } else if ((contentType === 'audio' || contentType === 'video') && content instanceof ArrayBuffer) {
+      } else if (
+        (contentType === 'audio' || contentType === 'video') &&
+        content instanceof ArrayBuffer
+      ) {
         preview.previewUrl = ManifestUtils.createBlobUrl(content, item.mediaType);
         this.cache.blobUrls.add(preview.previewUrl);
       }
@@ -375,7 +396,7 @@ export class ManifestManagerImpl implements IManifestManager {
         itemId,
         mediaType: 'application/octet-stream',
         contentType: 'binary',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -393,10 +414,10 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Generate ID if not provided
       const id = itemData.id || this.generateItemId(itemData.fileName);
-      
+
       // Detect media type if not provided
       const mediaType = itemData.mediaType || this.detectMediaType(itemData.fileName);
-      
+
       // Build target path
       const targetDirectory = itemData.targetDirectory || 'OEBPS/';
       const href = targetDirectory + itemData.fileName;
@@ -419,7 +440,7 @@ export class ManifestManagerImpl implements IManifestManager {
         href,
         mediaType,
         size: itemData.content.length,
-        modified: new Date()
+        modified: new Date(),
       };
 
       if (itemData.properties) {
@@ -459,7 +480,11 @@ export class ManifestManagerImpl implements IManifestManager {
     }
   }
 
-  async createFileItem(workspaceId: string, file: File, targetPath?: string): Promise<ManifestItem> {
+  async createFileItem(
+    workspaceId: string,
+    file: File,
+    targetPath?: string
+  ): Promise<ManifestItem> {
     try {
       // Check file size (enforce 100MB limit for tests)
       if (file.size > this.CONTENT_SIZE_LIMIT) {
@@ -471,10 +496,10 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Generate target path if not provided
       const href = targetPath || `OEBPS/${file.name}`;
-      
+
       // Generate ID from filename
       const id = this.generateItemId(file.name);
-      
+
       // Detect media type
       const mediaType = this.detectMediaType(file.name, content);
 
@@ -496,7 +521,7 @@ export class ManifestManagerImpl implements IManifestManager {
         href,
         mediaType,
         size: file.size,
-        modified: new Date()
+        modified: new Date(),
       };
 
       // Write the file
@@ -522,15 +547,19 @@ export class ManifestManagerImpl implements IManifestManager {
     }
   }
 
-  async importFileItem(workspaceId: string, filePath: string, content: ArrayBuffer): Promise<ManifestItem> {
+  async importFileItem(
+    workspaceId: string,
+    filePath: string,
+    content: ArrayBuffer
+  ): Promise<ManifestItem> {
     // Extract filename from path
     const fileName = filePath.split('/').pop() || 'imported-file';
-    
+
     // Create a mock File object
     const mockFile = {
       name: fileName,
       size: content.byteLength,
-      arrayBuffer: () => Promise.resolve(content)
+      arrayBuffer: () => Promise.resolve(content),
     } as File;
 
     return this.createFileItem(workspaceId, mockFile, filePath);
@@ -543,7 +572,7 @@ export class ManifestManagerImpl implements IManifestManager {
   async reorderManifestItems(workspaceId: string, itemIds: string[]): Promise<void> {
     try {
       const manifest = await this.loadManifest(workspaceId);
-      
+
       // Validate all IDs exist
       const existingIds = new Set(manifest.map(item => item.id));
       for (const id of itemIds) {
@@ -554,7 +583,7 @@ export class ManifestManagerImpl implements IManifestManager {
 
       // Reorder the manifest
       const reorderedManifest: ManifestItem[] = [];
-      
+
       // Add items in the specified order
       for (const id of itemIds) {
         const item = manifest.find(item => item.id === id);
@@ -595,11 +624,13 @@ export class ManifestManagerImpl implements IManifestManager {
       const manifest = await this.loadManifest(workspaceId);
       return ManifestValidator.validateManifestStructure(manifest);
     } catch (error: any) {
-      return [{
-        field: 'manifest',
-        message: `Validation failed: ${error.message}`,
-        severity: 'error'
-      }];
+      return [
+        {
+          field: 'manifest',
+          message: `Validation failed: ${error.message}`,
+          severity: 'error',
+        },
+      ];
     }
   }
 
@@ -610,12 +641,15 @@ export class ManifestManagerImpl implements IManifestManager {
   async listSourceItems(workspaceId: string): Promise<SourceItem[]> {
     try {
       return await this.workspaceManager.listSourceFiles(workspaceId);
-    } catch (error: any) {
+    } catch {
       return [];
     }
   }
 
-  async getSourceItemContent(workspaceId: string, sourcePath: string): Promise<ArrayBuffer | string> {
+  async getSourceItemContent(
+    workspaceId: string,
+    sourcePath: string
+  ): Promise<ArrayBuffer | string> {
     return await this.workspaceManager.getSourceFile(workspaceId, sourcePath);
   }
 
@@ -647,7 +681,7 @@ export class ManifestManagerImpl implements IManifestManager {
     if (workspaceId) {
       // Clear cache for specific workspace
       this.cache.manifests.delete(workspaceId);
-      
+
       // Clear content cache for this workspace
       const keysToDelete: string[] = [];
       for (const key of this.cache.content.keys()) {
@@ -670,7 +704,7 @@ export class ManifestManagerImpl implements IManifestManager {
       this.cache.manifests.clear();
       this.cache.content.clear();
       this.cache.previews.clear();
-      
+
       // Revoke all blob URLs
       for (const url of this.cache.blobUrls) {
         ManifestUtils.revokeBlobUrl(url);
@@ -714,10 +748,12 @@ export class ManifestManagerImpl implements IManifestManager {
   // ========================================
 
   private isTextMediaType(mediaType: string): boolean {
-    return mediaType.startsWith('text/') || 
-           mediaType.includes('json') ||
-           mediaType.includes('xml') ||
-           mediaType.includes('javascript');
+    return (
+      mediaType.startsWith('text/') ||
+      mediaType.includes('json') ||
+      mediaType.includes('xml') ||
+      mediaType.includes('javascript')
+    );
   }
 
   private shouldCacheContent(content: ArrayBuffer | string): boolean {
@@ -745,16 +781,16 @@ export class ManifestManagerImpl implements IManifestManager {
     return {
       characterCount: content.length,
       lineCount: content.split('\n').length,
-      wordCount: content.split(/\s+/).filter(word => word.length > 0).length
+      wordCount: content.split(/\s+/).filter(word => word.length > 0).length,
     };
   }
 
-  private extractImageMetadata(content: ArrayBuffer): ContentMetadata {
+  private extractImageMetadata(_content: ArrayBuffer): ContentMetadata {
     // Basic metadata - in a real implementation, this would parse image headers
     // For now, return placeholder values for testing
     return {
       width: 800,
-      height: 600
+      height: 600,
     };
   }
 }

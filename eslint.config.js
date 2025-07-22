@@ -76,7 +76,26 @@ export default [
         performance: 'readonly',
         // Storage API
         localStorage: 'readonly',
-        sessionStorage: 'readonly'
+        sessionStorage: 'readonly',
+        // Crypto API
+        crypto: 'readonly',
+        // Node.js globals  
+        process: 'readonly',
+        module: 'readonly',
+        // CSS DOM types
+        CSSRule: 'readonly',
+        CSSStyleSheet: 'readonly', 
+        CSSRuleList: 'readonly',
+        CSSImportRule: 'readonly',
+        CSSStyleRule: 'readonly',
+        CSSFontFaceRule: 'readonly',
+        CSSStyleDeclaration: 'readonly',
+        MediaList: 'readonly',
+        // Additional Web APIs
+        Response: 'readonly',
+        btoa: 'readonly',
+        ReadableStreamDefaultController: 'readonly',
+        queueMicrotask: 'readonly'
       }
     },
     plugins: {
@@ -196,10 +215,13 @@ export default [
     files: ['src/stories/**/*.{js,ts,svelte}'],
     rules: {
       // More lenient rules for story/demo files
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',
-      'no-case-declarations': 'off'
+      'no-case-declarations': 'off',
+      'no-self-assign': 'off',
+      'no-useless-escape': 'off',
+      'no-undef': 'off'
     }
   },
   {

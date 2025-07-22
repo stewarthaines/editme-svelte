@@ -6,7 +6,6 @@
  */
 
 import type { FileStorageAPI } from '../storage/index.js';
-import { TransformError } from './transform-error.js';
 
 export interface TransformSettings {
   transform_pipeline?: {
@@ -106,7 +105,7 @@ export class TransformManager {
           size: metadata.size,
           lastModified: metadata.lastModified,
         };
-      } catch (error) {
+      } catch {
         throw new Error(`File not found: ${settings.transform_pipeline.text_transform}`);
       }
     }
@@ -131,7 +130,7 @@ export class TransformManager {
             size: metadata.size,
             lastModified: metadata.lastModified,
           });
-        } catch (error) {
+        } catch {
           throw new Error(`File not found: ${scriptName}`);
         }
       }

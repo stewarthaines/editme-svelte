@@ -44,7 +44,7 @@ export class ExtensionCache {
         try {
           const info = await this.getExtensionInfo(extensionName);
           extensions.push(info);
-        } catch (error) {
+        } catch {
           // Skip corrupted extensions silently
         }
       }
@@ -201,7 +201,7 @@ export class ExtensionCache {
 
       // No conflict if signatures match
       return !compareExtensionSignatures(newSignature, existingSignature);
-    } catch (_error) {
+    } catch {
       // No conflict if extension doesn't exist in cache
       return false;
     }
@@ -231,7 +231,7 @@ export class ExtensionCache {
           try {
             const fileInfo = await this.fileStorage.getFileInfo(CACHE_WORKSPACE_ID, filePath);
             fileInfos.push({ name: filename, size: fileInfo.size });
-          } catch (error) {
+          } catch {
             // If getFileInfo fails, fall back to reading content
             const content = await this.fileStorage.readFile(CACHE_WORKSPACE_ID, filePath);
             fileInfos.push({ name: filename, size: content.byteLength });
@@ -240,7 +240,7 @@ export class ExtensionCache {
       }
 
       return createExtensionSignature(fileInfos);
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
@@ -333,7 +333,7 @@ export class ExtensionCache {
     try {
       await this.getExtensionInfo(extensionName);
       return true;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }
@@ -379,7 +379,7 @@ export class ExtensionCache {
       );
 
       return !compareExtensionSignatures(workspaceSignature, cacheSignature);
-    } catch (error) {
+    } catch {
       // If either extension doesn't exist, they're different
       return true;
     }
@@ -436,22 +436,17 @@ export class ExtensionCache {
     totalSize: number;
     extensionCount: Record<string, number>;
   }> {
-    try {
-      const extensions = await this.listCachedExtensions();
-      const extensionCount: Record<string, number> = {};
+    const extensions = await this.listCachedExtensions();
+    const extensionCount: Record<string, number> = {};
 
-      for (const ext of extensions) {
-        extensionCount[ext.name] = ext.files.length;
-      }
-
-      return {
-        totalExtensions: extensions.length,
-        totalSize: extensions.reduce((sum, ext) => sum + ext.totalSize, 0),
-        extensionCount,
-      };
-    } catch (error) {
-      // Re-throw error for test compatibility
-      throw error;
+    for (const ext of extensions) {
+      extensionCount[ext.name] = ext.files.length;
     }
+
+    return {
+      totalExtensions: extensions.length,
+      totalSize: extensions.reduce((sum, ext) => sum + ext.totalSize, 0),
+      extensionCount,
+    };
   }
 }

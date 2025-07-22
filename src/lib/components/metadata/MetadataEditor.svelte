@@ -68,7 +68,7 @@
     }
   };
 
-  const validateCurrentTab = (tabId: string, metadata: EPUBMetadata) => {
+  const validateCurrentTab = (tabId: string, _metadata: EPUBMetadata) => {
     const tabFields = getTabFields(tabId);
     return validationErrors.filter(error => tabFields.includes(error.field));
   };

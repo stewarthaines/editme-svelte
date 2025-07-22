@@ -70,7 +70,7 @@
   // Generate compact label for collapsed sidebar
   function generateCompactLabel(itemId: string): string {
     // Handle numbered patterns like "chapter1", "chapter-1", "chapter_1"
-    const numberedMatch = itemId.match(/^(\w+)[\-_]?(\d+)$/i);
+    const numberedMatch = itemId.match(/^(\w+)[-_]?(\d+)$/i);
     if (numberedMatch) {
       const [, prefix, number] = numberedMatch;
       return prefix.charAt(0).toUpperCase() + number;

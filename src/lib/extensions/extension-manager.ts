@@ -88,7 +88,7 @@ export class ExtensionManager {
     const files = new Map([[file.name, arrayBuffer]]);
     try {
       await this.cache.cacheExtension(normalizedName, files);
-    } catch (error) {
+    } catch {
       // Cache conflicts are non-fatal for import
     }
 
@@ -142,7 +142,7 @@ export class ExtensionManager {
     try {
       const allFiles = await this.getWorkspaceExtensionFiles(workspaceId, extensionName);
       await this.cache.cacheExtension(extensionName, allFiles);
-    } catch (error) {
+    } catch {
       // Cache update failures are non-fatal
     }
   }
@@ -173,7 +173,7 @@ export class ExtensionManager {
         try {
           const info = await this.getWorkspaceExtensionInfo(workspaceId, extensionName);
           extensions.push(info);
-        } catch (error) {
+        } catch {
           // Skip corrupted extensions silently
         }
       }
@@ -409,15 +409,18 @@ export class ExtensionManager {
    * @returns Sanitized filename
    */
   sanitizeFilename(filename: string): string {
-    return filename
-      .replace(/\.\.\//g, '') // Remove ../ traversal
-      .replace(/\.\.\\/g, '') // Remove ..\ traversal
-      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '-') // Replace dangerous chars
-      .replace(/^\.+/, '') // Remove leading dots
-      .replace(/\.+$/, '') // Remove trailing dots
-      .replace(/-+/g, '-') // Collapse multiple hyphens
-      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-      .substring(0, 255); // Limit length
+    return (
+      filename
+        .replace(/\.\.\//g, '') // Remove ../ traversal
+        .replace(/\.\.\\/g, '') // Remove ..\ traversal
+        // oxlint-disable-next-line no-control-regex
+        .replace(/[<>:"/\\|?*\x00-\x1f]/g, '-') // Replace dangerous chars
+        .replace(/^\.+/, '') // Remove leading dots
+        .replace(/\.+$/, '') // Remove trailing dots
+        .replace(/-+/g, '-') // Collapse multiple hyphens
+        .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+        .substring(0, 255)
+    ); // Limit length
   }
 
   // Private Helper Methods
@@ -446,7 +449,7 @@ export class ExtensionManager {
         try {
           const fileInfo = await this.fileStorage.getFileInfo(workspaceId, filePath);
           fileInfos.push({ name: filename, size: fileInfo.size });
-        } catch (error) {
+        } catch {
           // Fallback to reading file content
           const content = await this.fileStorage.readFile(workspaceId, filePath);
           fileInfos.push({ name: filename, size: content.byteLength });

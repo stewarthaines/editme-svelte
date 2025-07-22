@@ -76,7 +76,7 @@
           },
         };
       }
-    } catch (err) {
+    } catch {
       error = $t('Failed to load content preview');
       contentPreview = null;
     } finally {
@@ -84,7 +84,7 @@
     }
   };
 
-  const handleEditClick = () => {
+  const _handleEditClick = () => {
     if (selectedItem && selectedItemType === 'manifest') {
       dispatch('itemEdit', { item: selectedItem });
     }
@@ -251,6 +251,7 @@
           {:else if contentPreview.contentType === 'video' && contentPreview.previewUrl}
             <div class="video-preview">
               <video controls class="preview-video">
+                <track kind="captions" />
                 <source src={contentPreview.previewUrl} type={contentPreview.mediaType} />
                 {$t('Your browser does not support the video element.')}
               </video>
@@ -598,11 +599,6 @@
   .action-button:focus {
     outline: none;
     box-shadow: 0 0 0 2px var(--color-focus-ring);
-  }
-
-  .edit-button:hover {
-    color: var(--color-interactive-primary);
-    border-color: var(--color-interactive-primary);
   }
 
   .download-button:hover {

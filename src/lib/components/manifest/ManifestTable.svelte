@@ -114,12 +114,12 @@
     }
   };
 
-  const handleEditClick = (event: Event, item: ManifestItem) => {
+  const _handleEditClick = (event: Event, item: ManifestItem) => {
     event.stopPropagation();
     dispatch('itemEdit', { item });
   };
 
-  const handleDeleteClick = (event: Event, item: ManifestItem) => {
+  const _handleDeleteClick = (event: Event, item: ManifestItem) => {
     event.stopPropagation();
     dispatch('itemDelete', { itemId: item.id });
   };
@@ -723,10 +723,6 @@
     max-width: 200px;
   }
 
-  .source-icon {
-    font-size: 1rem;
-  }
-
   .item-id {
     font-weight: 500;
     word-break: break-word;
@@ -767,40 +763,6 @@
     font-weight: 500;
   }
 
-  .actions-overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: auto;
-    padding: 0;
-    border: none;
-    background: none;
-    pointer-events: none;
-  }
-
-  .row-actions {
-    position: absolute;
-    top: 50%;
-    right: 0.5rem;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 0.25rem;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-    background-color: var(--color-surface);
-    border-radius: var(--radius-sm);
-    padding: 0.25rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    pointer-events: auto;
-  }
-
-  .manifest-row:hover .row-actions,
-  .manifest-row.selected .row-actions,
-  .manifest-row:focus-within .row-actions {
-    opacity: 1;
-  }
-
   .action-button {
     padding: 0.375rem;
     border: 1px solid var(--color-border-default);
@@ -825,16 +787,6 @@
   .action-button:focus {
     outline: none;
     box-shadow: 0 0 0 2px var(--color-focus-ring);
-  }
-
-  .edit-button:hover {
-    color: var(--color-interactive-primary);
-    border-color: var(--color-interactive-primary);
-  }
-
-  .delete-button:hover {
-    color: var(--color-error);
-    border-color: var(--color-error);
   }
 
   /* Responsive design */
@@ -872,16 +824,6 @@
 
     .properties-list {
       flex-direction: column;
-    }
-
-    .row-actions {
-      position: static;
-      transform: none;
-      opacity: 1;
-      background: none;
-      box-shadow: none;
-      padding: 0;
-      margin-top: 0.5rem;
     }
   }
 </style>

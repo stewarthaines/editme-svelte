@@ -69,7 +69,7 @@
         try {
           const sourcePath = `SOURCE/text/${selectedItemId}.txt`;
           sourceContent = await workspaceManager.readTextFile(workspaceId, sourcePath);
-        } catch (err) {
+        } catch {
           // Source file might not exist
           sourceContent = '';
         }

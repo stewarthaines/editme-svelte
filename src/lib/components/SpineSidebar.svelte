@@ -9,7 +9,6 @@
 
   // Props
   export let workspaceId: string;
-  export let workspaceManager: IWorkspaceManager;
   export let spineManager: SpineItemManager;
   export let selectedItemId: string | null = null;
   export let isExpanded = true;
@@ -98,7 +97,7 @@
 
       // Announce move for screen readers
       announceMove(spineItems[index - 1].id, index, index - 1);
-    } catch (_err) {
+    } catch {
       // Failed to move chapter up
       // Reload to restore correct order
       await loadSpineItems();
@@ -117,7 +116,7 @@
 
       // Announce move for screen readers
       announceMove(spineItems[index + 1].id, index, index + 1);
-    } catch (_err) {
+    } catch {
       // Failed to move chapter down
       // Reload to restore correct order
       await loadSpineItems();
@@ -176,7 +175,7 @@
 
       // Announce move for screen readers
       announceMove(spineItems[dropIndex].id, dragIndex, dropIndex);
-    } catch (_err) {
+    } catch {
       // Failed to reorder items
       // Reload to restore correct order
       await loadSpineItems();

@@ -38,7 +38,7 @@
       // Load SOURCE items if advanced mode is enabled
       if (advancedMode) {
         console.log('🔍 Advanced mode enabled, loading SOURCE items...');
-        const isAdvancedModeEnabled = await manifestManager.isAdvancedModeEnabled(workspaceId);
+        const _isAdvancedModeEnabled = await manifestManager.isAdvancedModeEnabled(workspaceId);
         
         // Always try to load source items for debugging
         sourceItems = await manifestManager.listSourceItems(workspaceId);
@@ -49,7 +49,7 @@
 
       // Validate manifest
       validationErrors = await manifestManager.validateManifest(workspaceId);
-    } catch (err) {
+    } catch {
       error = $t('Failed to load manifest');
     } finally {
       loading = false;
@@ -96,7 +96,7 @@
         selectedItem = null;
         selectedItemType = null;
       }
-    } catch (err) {
+    } catch {
       error = $t('Failed to delete item');
     }
   };
@@ -124,7 +124,7 @@
 
       showItemEditor = false;
       await loadManifest(); // Refresh the manifest
-    } catch (err) {
+    } catch {
       error = $t('Failed to save item');
     }
   };
@@ -140,7 +140,7 @@
       }
 
       await loadManifest(); // Refresh the manifest
-    } catch (err) {
+    } catch {
       error = $t('Failed to upload files');
     }
   };

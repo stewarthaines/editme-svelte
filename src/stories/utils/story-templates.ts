@@ -5,7 +5,6 @@
  */
 
 import { onMount } from 'svelte';
-import type { WorkspaceManager } from '../../lib/workspace';
 import { layoutStore } from '../../lib/stores/layout';
 import type { SidebarSection } from '../../lib/stores/layout';
 import {
@@ -118,7 +117,6 @@ export function createWorkspaceStoryComposition(): WorkspaceStoryComposition {
       state.workspaceId = result.workspaceId;
       state.initialized = true;
       state.error = null;
-
 
       logger.addLog('success', `Workspace created: ${result.workspaceId}`);
       logger.addLog('info', `Added ${scenario.chapters.length} chapters`);
