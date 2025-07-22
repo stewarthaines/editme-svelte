@@ -52,6 +52,82 @@ vi.mock('../../i18n/index.js', () => ({
     hasTranslation: vi.fn(() => true),
     isLocaleSupported: vi.fn(() => true),
     isRTL: vi.fn(() => false),
+    getCatalogs: vi.fn(() => ({
+      en: {
+        locale: 'en',
+        messages: {
+          'sample.book.title': 'Introduction to EPUB',
+          'sample.book.description': 'A comprehensive guide',
+          'sample.author.name': 'EDITME Editorial Team',
+          'sample.publisher.name': 'EDITME Publications',
+          'sample.prologue.title': 'Prologue',
+          'sample.prologue.content': 'Test content',
+          'sample.chapter1.title': 'Chapter 1',
+          'sample.chapter1.content': 'Test content',
+          'sample.chapter2.title': 'Chapter 2', 
+          'sample.chapter2.content': 'Test content',
+          'sample.appendix.title': 'Appendix',
+          'sample.appendix.content': 'Test content',
+        },
+        headers: {}
+      },
+      ar: {
+        locale: 'ar',
+        messages: {
+          'sample.book.title': 'مقدمة إلى EPUB',
+          'sample.book.description': 'دليل شامل',
+          'sample.author.name': 'فريق تحرير EDITME',
+          'sample.publisher.name': 'منشورات EDITME',
+          'sample.prologue.title': 'Prologue',
+          'sample.prologue.content': 'Test content',
+          'sample.chapter1.title': 'Chapter 1',
+          'sample.chapter1.content': 'Test content',
+          'sample.chapter2.title': 'Chapter 2',
+          'sample.chapter2.content': 'Test content',
+          'sample.appendix.title': 'Appendix',
+          'sample.appendix.content': 'Test content',
+        },
+        headers: {}
+      },
+      de: {
+        locale: 'de',
+        messages: {
+          'sample.book.title': 'Einführung in EPUB',
+          'sample.book.description': 'Ein umfassender Leitfaden',
+          'sample.author.name': 'EDITME Redaktionsteam',
+          'sample.publisher.name': 'EDITME Publikationen',
+          'sample.prologue.title': 'Prologue',
+          'sample.prologue.content': 'Test content',
+          'sample.chapter1.title': 'Chapter 1',
+          'sample.chapter1.content': 'Test content',
+          'sample.chapter2.title': 'Chapter 2',
+          'sample.chapter2.content': 'Test content',
+          'sample.appendix.title': 'Appendix',
+          'sample.appendix.content': 'Test content',
+        },
+        headers: {}
+      },
+      ja: {
+        locale: 'ja',
+        messages: {
+          'sample.book.title': 'EPUBの紹介',
+          'sample.book.description': '包括的なガイド',
+          'sample.author.name': 'EDITME編集チーム',
+          'sample.publisher.name': 'EDITME出版',
+          'sample.prologue.title': 'Prologue',
+          'sample.prologue.content': 'Test content',
+          'sample.chapter1.title': 'Chapter 1',
+          'sample.chapter1.content': 'Test content',
+          'sample.chapter2.title': 'Chapter 2',
+          'sample.chapter2.content': 'Test content',
+          'sample.appendix.title': 'Appendix',
+          'sample.appendix.content': 'Test content',
+        },
+        headers: {}
+      }
+    })),
+    isInitialized: vi.fn(() => true),
+    init: vi.fn(() => Promise.resolve()),
   },
 }));
 

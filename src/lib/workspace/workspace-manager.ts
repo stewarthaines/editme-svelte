@@ -37,13 +37,11 @@ export class WorkspaceManager {
   private cache: WorkspaceMetadataCache;
   private dependencyTracker: ManifestDependencyTracker;
   private sourceManager: SourceManager;
-  private contentGenerator: SampleContentGenerator;
   private transformExecutor: TransformExecutor;
   private config: WorkspaceConfig;
 
   constructor(
     config?: Partial<WorkspaceConfig>,
-    contentGenerator?: SampleContentGenerator,
     transformExecutor?: TransformExecutor
   ) {
     this.config = { ...DEFAULT_WORKSPACE_CONFIG, ...config };
@@ -51,7 +49,6 @@ export class WorkspaceManager {
     this.cache = new WorkspaceMetadataCache(this.storage, this.config.cache);
     this.dependencyTracker = new ManifestDependencyTracker(this.storage);
     this.sourceManager = new SourceManager(this.storage);
-    this.contentGenerator = contentGenerator || new SampleContentGenerator(i18nService);
     this.transformExecutor = transformExecutor || new TransformExecutor();
   }
 
@@ -60,6 +57,15 @@ export class WorkspaceManager {
    */
   async init(): Promise<void> {
     await this.storage.init();
+  }
+
+  /**
+   * Ensure i18n catalogs are loaded before creating SampleContentGenerator
+   */
+  private async ensureCatalogsLoaded(): Promise<void> {
+    if (!i18nService.isInitialized()) {
+      await i18nService.init();
+    }
   }
 
   /**
@@ -216,8 +222,15 @@ export class WorkspaceManager {
     workspaceId: string, 
     locale: string
   ): Promise<void> {
+    // Ensure catalogs are loaded before creating SampleContentGenerator
+    await this.ensureCatalogsLoaded();
+    
+    // Create fresh SampleContentGenerator with loaded catalogs
+    const catalogs = i18nService.getCatalogs();
+    const contentGenerator = new SampleContentGenerator(catalogs);
+    
     // Generate sample content
-    const sampleContent = await this.contentGenerator.generateLocalizedContent(locale);
+    const sampleContent = await contentGenerator.generateLocalizedContent(locale);
 
     // Handle both test mock format (flat object) and real API format (LocalizedSampleContent)
     let chapters: any[];

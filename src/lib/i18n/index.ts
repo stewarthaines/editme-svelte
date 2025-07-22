@@ -242,4 +242,13 @@ export const i18nService = {
   },
   isLocaleSupported: (locale: string) => !!(LOCALE_CONFIGS[locale]),
   isRTL,
+  getCatalogs: () => {
+    const state = get(i18nState);
+    return state.catalogs;
+  },
+  isInitialized: () => {
+    const state = get(i18nState);
+    return state.initialized;
+  },
+  init: initI18n,
 };

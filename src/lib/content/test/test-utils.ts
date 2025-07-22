@@ -5,182 +5,15 @@
  * for testing the SampleContentGenerator in isolation.
  */
 
-import { vi, expect } from 'vitest';
-import type { TranslationCatalog } from '../../i18n/types.js';
-import type { LocaleConfig } from '../../i18n/types.js';
-import { LOCALE_CONFIGS } from '../../i18n/locale-config.js';
-import { createTestCatalogs, createIncompleteCatalogs } from './fixtures.js';
+import { expect } from 'vitest';
 
-/**
- * Mock I18n System interface matching the real I18nSystem
- */
-export interface MockI18nSystem {
-  translate: (key: string, params?: Record<string, any>) => string;
-  getCurrentLocale: () => string;
-  getAvailableLocales: () => LocaleConfig[];
-  hasTranslation: (locale: string, key: string) => boolean;
-  isLocaleSupported: (locale: string) => boolean;
-  isRTL: (locale: string) => boolean;
-}
 
-/**
- * Create a mock I18n system with realistic behavior
- */
-export function createMockI18nSystem(
-  catalogs: Record<string, TranslationCatalog> = createTestCatalogs()
-): MockI18nSystem {
-  const localeState = { current: 'en' };
 
-  const mockSystem = {
-    translate: vi.fn((key: string, params: Record<string, any> = {}) => {
-      // Get translation from current locale catalog
-      const catalog = catalogs[localeState.current];
-      let translation = catalog?.messages[key];
 
-      // Fallback to English if not found (but not for empty strings)
-      if (translation === undefined && localeState.current !== 'en') {
-        translation = catalogs.en?.messages[key];
-      }
 
-      // Ultimate fallback to key itself
-      if (translation === undefined) {
-        translation = key;
-      }
 
-      // Simple parameter interpolation
-      if (Object.keys(params).length > 0) {
-        for (const [param, value] of Object.entries(params)) {
-          translation = translation.replace(new RegExp(`\\{${param}\\}`, 'g'), String(value));
-        }
-      }
 
-      return translation;
-    }),
 
-    getCurrentLocale: vi.fn(() => localeState.current),
-
-    getAvailableLocales: vi.fn(() => {
-      return Object.keys(LOCALE_CONFIGS).map(code => LOCALE_CONFIGS[code]);
-    }),
-
-    hasTranslation: vi.fn((locale: string, key: string) => {
-      const catalog = catalogs[locale];
-      if (!catalog) return false;
-
-      const translation = catalog.messages[key];
-      return translation !== undefined && translation.trim() !== '';
-    }),
-
-    isLocaleSupported: vi.fn((locale: string) => {
-      return locale in LOCALE_CONFIGS;
-    }),
-
-    isRTL: vi.fn((locale: string) => {
-      const config = LOCALE_CONFIGS[locale];
-      return config ? config.direction === 'rtl' : false;
-    }),
-  };
-
-  // Add a way to change the locale state
-  (mockSystem as any)._setLocale = (locale: string) => {
-    localeState.current = locale;
-    (mockSystem.getCurrentLocale as any).mockReturnValue(locale);
-  };
-
-  return mockSystem;
-}
-
-/**
- * Create a mock I18n system with missing translations for error testing
- */
-export function createMockI18nSystemWithMissing(): MockI18nSystem {
-  const incompleteCatalogData = createIncompleteCatalogs();
-  const allCatalogs = { ...createTestCatalogs(), ...incompleteCatalogData };
-
-  const mockSystem = createMockI18nSystem(allCatalogs);
-
-  // Override isLocaleSupported to include the test locales for error testing
-  mockSystem.isLocaleSupported = vi.fn((locale: string) => {
-    // Include the standard supported locales plus the test locales
-    return (
-      locale in LOCALE_CONFIGS || locale === 'fr' || locale === 'es' || locale === 'problematic'
-    );
-  });
-
-  // Add catalog introspection helper for distinguishing missing vs empty keys
-  (mockSystem as any)._hasKeyInCatalog = (locale: string, key: string) => {
-    const catalog = allCatalogs[locale];
-    return catalog && key in catalog.messages;
-  };
-
-  // Update hasTranslation to distinguish missing vs empty more accurately
-  mockSystem.hasTranslation = vi.fn((locale: string, key: string) => {
-    const catalog = allCatalogs[locale];
-    if (!catalog || !(key in catalog.messages)) return false;
-
-    const translation = catalog.messages[key];
-    // Return true if the key exists in the catalog, even if it's empty
-    // This allows the validation logic to distinguish between missing and empty keys
-    return translation !== undefined;
-  });
-
-  return mockSystem;
-}
-
-/**
- * Create a mock I18n system that simulates unsupported locale
- */
-export function createMockI18nSystemUnsupported(): MockI18nSystem {
-  const mockSystem = createMockI18nSystem();
-
-  // Override to return false for unsupported locales
-  mockSystem.isLocaleSupported = vi.fn((locale: string) => {
-    return locale !== 'invalid-xx' && locale in LOCALE_CONFIGS;
-  });
-
-  return mockSystem;
-}
-
-/**
- * Helper to set current locale on mock system
- */
-export function setMockLocale(mockSystem: MockI18nSystem, locale: string): void {
-  // Use the internal _setLocale method to properly update the locale state
-  if ('_setLocale' in mockSystem) {
-    (mockSystem as any)._setLocale(locale);
-  } else {
-    // Fallback for older mock systems
-    (mockSystem.getCurrentLocale as any).mockReturnValue(locale);
-  }
-}
-
-/**
- * Verify that mock system methods were called correctly
- */
-export function expectTranslationCalls(
-  mockSystem: MockI18nSystem,
-  expectedKeys: readonly string[]
-): void {
-  const translateSpy = mockSystem.translate as any;
-
-  expectedKeys.forEach(key => {
-    expect(translateSpy).toHaveBeenCalledWith(key, expect.any(Object));
-  });
-}
-
-/**
- * Verify locale support checks
- */
-export function expectLocaleSupportCheck(mockSystem: MockI18nSystem, locale: string): void {
-  expect(mockSystem.isLocaleSupported).toHaveBeenCalledWith(locale);
-}
-
-/**
- * Verify RTL direction checks
- */
-export function expectRTLCheck(mockSystem: MockI18nSystem, locale: string): void {
-  expect(mockSystem.isRTL).toHaveBeenCalledWith(locale);
-}
 
 /**
  * Create EPUBMetadata type mock for testing (based on EPUB spec)
@@ -286,37 +119,7 @@ export function expectValidationResult(
   }
 }
 
-/**
- * Mock browser console for error/warning testing
- */
-export function createMockConsole() {
-  return {
-    error: vi.fn(),
-    warn: vi.fn(),
-    log: vi.fn(),
-    info: vi.fn(),
-  };
-}
 
-/**
- * Reset all mocks helper
- */
-export function resetAllMocks(mockSystem: MockI18nSystem): void {
-  // Preserve current locale state before reset
-  const currentLocale = mockSystem.getCurrentLocale();
-
-  vi.clearAllMocks();
-  Object.values(mockSystem).forEach(method => {
-    if (typeof method === 'function' && 'mockReset' in method) {
-      (method as any).mockReset();
-    }
-  });
-
-  // Restore locale state after reset
-  if ('_setLocale' in mockSystem) {
-    (mockSystem as any)._setLocale(currentLocale);
-  }
-}
 
 /**
  * Expected sample content keys for validation testing
