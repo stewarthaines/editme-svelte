@@ -531,7 +531,7 @@ describe('SourceManager', () => {
 
       const result = await sourceManager.listSourceFiles(workspaceId);
 
-      expect(result.length).toBe(4); // settings.json + 3 .gitkeep files
+      expect(result.length).toBe(1); // settings.json + no .gitkeep files
     });
 
     it('should include file metadata when available', async () => {
