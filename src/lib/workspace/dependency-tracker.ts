@@ -109,7 +109,7 @@ export class ManifestDependencyTracker {
       });
 
       return dependencies;
-    } catch (error) {
+    } catch (_error) {
       // If DOM parsing fails completely, fall back to regex
       try {
         const content = await this.storage.readTextFile(workspaceId, manifestItem.href);
@@ -345,8 +345,8 @@ export class ManifestDependencyTracker {
    * Analyze circular dependencies (placeholder for future implementation)
    */
   async findCircularDependencies(
-    workspaceId: string,
-    manifestItems: ManifestItem[]
+    _workspaceId: string,
+    _manifestItems: ManifestItem[]
   ): Promise<string[][]> {
     // TODO: Implement circular dependency detection
     // This would involve building a dependency graph and detecting cycles

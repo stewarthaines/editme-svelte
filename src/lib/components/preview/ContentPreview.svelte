@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, afterUpdate } from 'svelte';
+  import { onMount } from 'svelte';
 
   // Component props
   export let content: string;
@@ -182,9 +182,6 @@
     };
   });
 
-  afterUpdate(() => {
-    updateLayout();
-  });
 </script>
 
 <div 

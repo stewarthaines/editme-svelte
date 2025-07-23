@@ -49,7 +49,7 @@ export class WorkspaceMetadataCache {
           this.memoryCache.set(workspaceId, workspaceInfo);
           return workspaceInfo;
         }
-      } catch (error) {
+      } catch (_error) {
         // Disk cache read failed - not a critical error
         return null;
       }
@@ -117,7 +117,7 @@ export class WorkspaceMetadataCache {
     if (this.config.enableDiskCache) {
       try {
         return await this.loadDiskCache(workspaceId);
-      } catch (error) {
+      } catch (_error) {
         // Disk cache read failed - not a critical error
         return null;
       }

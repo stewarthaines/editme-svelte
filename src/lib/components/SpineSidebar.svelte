@@ -5,7 +5,6 @@
   import SpineItem from './SpineItem.svelte';
   import type { SpineItemManager } from '../spine/spine-item-manager';
   import type { SpineItemWithSource } from '../spine/types';
-  import type { IWorkspaceManager } from '../workspace/types';
 
   // Props
   export let workspaceId: string;

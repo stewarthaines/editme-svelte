@@ -7,8 +7,6 @@
 
 import type { TranslationCatalog } from '../../i18n/types.js';
 import type { 
-  LocalizedSampleContent, 
-  DemoChapter, 
   ValidationResult,
   SampleContentKey 
 } from '../types.js';

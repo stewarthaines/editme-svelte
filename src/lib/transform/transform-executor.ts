@@ -180,33 +180,29 @@ export class TransformExecutor {
     functionName: string,
     args: any[],
     globals: Record<string, any>,
-    scriptName: string
+    _scriptName: string
   ): any {
-    try {
-      // Create function with restricted globals
-      const globalNames = Object.keys(globals);
-      const globalValues = Object.values(globals);
+    // Create function with restricted globals
+    const globalNames = Object.keys(globals);
+    const globalValues = Object.values(globals);
 
-      // Wrap script content to execute in restricted scope
-      const wrappedScript = `(function(${globalNames.join(', ')}) {
-          ${scriptContent}
-          
-          if (typeof ${functionName} !== 'function') {
-            throw new Error('Function ${functionName} is not defined or not a function');
-          }
-          
-          return ${functionName};
-        })`;
+    // Wrap script content to execute in restricted scope
+    const wrappedScript = `(function(${globalNames.join(', ')}) {
+        ${scriptContent}
+        
+        if (typeof ${functionName} !== 'function') {
+          throw new Error('Function ${functionName} is not defined or not a function');
+        }
+        
+        return ${functionName};
+      })`;
 
-      // Execute the wrapped script to get the function
-      const scriptFunction = new Function('return ' + wrappedScript)();
-      const transformFunction = scriptFunction(...globalValues);
+    // Execute the wrapped script to get the function
+    const scriptFunction = new Function('return ' + wrappedScript)();
+    const transformFunction = scriptFunction(...globalValues);
 
-      // Execute the transform function with provided arguments
-      return transformFunction(...args);
-    } catch (error) {
-      throw error;
-    }
+    // Execute the transform function with provided arguments
+    return transformFunction(...args);
   }
 
   /**

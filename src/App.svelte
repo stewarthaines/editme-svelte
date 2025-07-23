@@ -127,7 +127,6 @@
     {#if initialized && currentWorkspaceId && currentWorkspaceManager && currentSpineManager}
       <SpineSidebar
         workspaceId={currentWorkspaceId}
-        workspaceManager={currentWorkspaceManager}
         spineManager={currentSpineManager}
         selectedItemId={selectedSpineItemId}
         {isExpanded}
