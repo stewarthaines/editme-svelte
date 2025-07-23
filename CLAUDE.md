@@ -229,7 +229,7 @@ Complete reactive internationalization system supporting 7 languages with instan
 
 ```svelte
 <script>
-  import { t } from '$lib/i18n';
+  import { t } from '../i18n';
 </script>
 
 <!-- Reactive translation --><h1>{$t('Welcome')}</h1><p>{$t('Hello {name}', { name: 'User' })}</p>
@@ -238,7 +238,7 @@ Complete reactive internationalization system supporting 7 languages with instan
 **Non-Component Usage:**
 
 ```typescript
-import { translate } from '$lib/i18n';
+import { translate } from '../i18n';
 
 // Non-reactive function for use outside components
 const message = translate('Save');
@@ -247,7 +247,7 @@ const message = translate('Save');
 **RTL Detection:**
 
 ```typescript
-import { documentDirection } from '$lib/i18n';
+import { documentDirection } from '../i18n';
 // Reactive store: 'ltr' | 'rtl'
 ```
 
