@@ -45,6 +45,7 @@ const REQUIRED_SAMPLE_KEYS: SampleContentKey[] = [
 export class SampleContentGenerator {
   constructor(private catalogs: Record<string, TranslationCatalog>) {}
 
+
   /**
    * Simple translation method using direct catalog lookup
    */

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21T09:05:33.430Z\n"
-"PO-Revision-Date: 2025-07-21T09:05:33.449Z\n"
+"POT-Creation-Date: 2025-07-28T00:16:44.712Z\n"
+"PO-Revision-Date: 2025-07-28T00:16:44.732Z\n"
 "Language: en\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -33,11 +33,11 @@ msgstr ""
 msgid "Add Author"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:222
+#: src/lib/components/metadata/AdvancedFields.svelte:221
 msgid "Add Contributor"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:185
+#: src/lib/components/metadata/AdvancedFields.svelte:184
 msgid "Add Subject"
 msgstr ""
 
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Add/remove manifest items"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:108
+#: src/lib/components/metadata/AdvancedFields.svelte:107
 msgid "Additional Information"
 msgstr ""
 
@@ -55,6 +55,7 @@ msgid ""
 "implemented in Phase 3."
 msgstr ""
 
+#: src/lib/components/manifest/ManifestView.svelte:59
 #: src/lib/components/metadata/MetadataEditor.svelte:24
 msgid "Advanced"
 msgstr ""
@@ -78,11 +79,11 @@ msgstr ""
 msgid "Application preferences"
 msgstr ""
 
-#: src/App.svelte:203
+#: src/App.svelte:205
 msgid "Application Settings"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:83
+#: src/lib/components/manifest/ManifestContainer.svelte:87
 msgid "Are you sure you want to delete this item?"
 msgstr ""
 
@@ -127,11 +128,11 @@ msgstr ""
 msgid "Basic Information"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:237
+#: src/lib/components/manifest/ManifestPreview.svelte:261
 msgid "Binary file - preview not available"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:25
+#: src/lib/components/metadata/AdvancedFields.svelte:24
 msgid "Biography"
 msgstr ""
 
@@ -143,15 +144,19 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:155
+msgid "Chapter Content"
+msgstr ""
+
 #: src/lib/navigation/views/PlaceholderView.svelte:119
 msgid "Chapter ordering interface"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:248
+#: src/lib/components/manifest/ManifestPreview.svelte:272
 msgid "Characters"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:28
+#: src/lib/components/metadata/AdvancedFields.svelte:27
 msgid "Children"
 msgstr ""
 
@@ -159,12 +164,12 @@ msgstr ""
 msgid "Chinese"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:436
+#: src/lib/navigation/views/WorkspaceView.svelte:432
 msgid "Clean Up"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:88
-#: src/lib/components/manifest/ManifestTable.svelte:241
+#: src/lib/components/manifest/ManifestTable.svelte:261
 msgid "Clear filter"
 msgstr ""
 
@@ -173,58 +178,61 @@ msgstr ""
 msgid "Clear search"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:139
+#: src/lib/components/manifest/ManifestPreview.svelte:162
 msgid "Click on any row in the table to see details"
 msgstr ""
 
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:45
 #: src/lib/components/manifest/ManifestItemEditor.svelte:219
 msgid "Close"
-msgstr ""
-
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:43
-msgid "Close workspace"
 msgstr ""
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte:63
 msgid "Coming soon"
 msgstr ""
 
+#: src/lib/navigation/views/PlaceholderView.svelte:97
 #: src/lib/components/metadata/MetadataEditor.svelte:248
 #: src/lib/components/metadata/MetadataEditor.svelte:257
-#: src/lib/navigation/views/PlaceholderView.svelte:97
 msgid "Coming Soon"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:156
+msgid "Complex Interactive"
 msgstr ""
 
 #: src/lib/navigation/views/MetadataView.svelte:106
 msgid "Configure basic information about your EPUB publication"
 msgstr ""
 
-#: src/App.svelte:204
+#: src/App.svelte:206
 msgid "Configure preferences and options"
 msgstr ""
 
-#: src/App.svelte:157
+#: src/App.svelte:159
 msgid "Configure publication metadata and details"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:245
+#: src/lib/components/manifest/ManifestPreview.svelte:269
 msgid "Content Details"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:97
+#: src/lib/components/metadata/AdvancedFields.svelte:96
 msgid "Content Type"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:199
+#: src/stories/preview/ContentPreviewDemo.svelte:148
+msgid "Content Type:"
+msgstr ""
+
+#: src/lib/components/metadata/AdvancedFields.svelte:198
 msgid "Contributor name"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:191
+#: src/lib/components/metadata/AdvancedFields.svelte:190
 msgid "Contributors"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:132
+#: src/lib/components/metadata/AdvancedFields.svelte:131
 msgid "Coverage"
 msgstr ""
 
@@ -241,13 +249,13 @@ msgid "Create New: Start with a template or blank project"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:114
-#: src/lib/components/manifest/ManifestTable.svelte:267
+#: src/lib/components/manifest/ManifestTable.svelte:287
 #: src/lib/components/manifest/ManifestItemEditor.svelte:212
 #: src/lib/components/manifest/ManifestItemEditor.svelte:348
 msgid "Create Text File"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:300
+#: src/lib/components/manifest/ManifestTable.svelte:320
 msgid "Create your first item using the buttons above"
 msgstr ""
 
@@ -255,7 +263,11 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-#: src/App.svelte:227
+#: src/stories/preview/ContentPreviewDemo.svelte:183
+msgid "Current Settings:"
+msgstr ""
+
+#: src/App.svelte:229
 msgid "Current view"
 msgstr ""
 
@@ -263,11 +275,12 @@ msgstr ""
 msgid "Currently open"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:139
 #: src/lib/components/metadata/BasicInfoFields.svelte:39
 msgid "Default"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:189
+#: src/lib/components/manifest/ManifestPreview.svelte:212
 msgid "Delete"
 msgstr ""
 
@@ -283,15 +296,24 @@ msgstr ""
 msgid "Demo Action 2"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:73
+msgid "Demo Controls"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte:180
 msgid "Description"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:260
+#: src/stories/preview/ContentPreviewDemo.svelte:76
+#: src/stories/preview/ContentPreviewDemo.svelte:185
+msgid "Device:"
+msgstr ""
+
+#: src/lib/components/manifest/ManifestPreview.svelte:284
 msgid "Dimensions"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:185
+#: src/lib/components/manifest/ManifestPreview.svelte:208
 msgid "Download"
 msgstr ""
 
@@ -299,20 +321,20 @@ msgstr ""
 msgid "Drag-and-drop reordering"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:24
+#: src/lib/components/metadata/AdvancedFields.svelte:23
 msgid "Drama"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:132
-#: src/lib/components/manifest/ManifestTable.svelte:285
+#: src/lib/components/manifest/ManifestTable.svelte:305
 msgid "Drop files here to add them to the manifest"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:264
+#: src/lib/components/manifest/ManifestPreview.svelte:288
 msgid "Duration"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:177
+#: src/lib/components/manifest/ManifestPreview.svelte:200
 msgid "Edit"
 msgstr ""
 
@@ -320,7 +342,7 @@ msgstr ""
 msgid "Edit Manifest Item"
 msgstr ""
 
-#: src/App.svelte:181
+#: src/App.svelte:183
 msgid "Edit navigation structure and TOC"
 msgstr ""
 
@@ -352,7 +374,7 @@ msgstr ""
 msgid "Enter book title"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:89
+#: src/lib/components/metadata/AdvancedFields.svelte:88
 msgid "Enter copyright information"
 msgstr ""
 
@@ -360,23 +382,23 @@ msgstr ""
 msgid "Enter EPUB title"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:144
+#: src/lib/components/metadata/AdvancedFields.svelte:143
 msgid "Enter format information"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:70
+#: src/lib/components/metadata/AdvancedFields.svelte:69
 msgid "Enter publisher name"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:124
+#: src/lib/components/metadata/AdvancedFields.svelte:123
 msgid "Enter related work information"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:114
+#: src/lib/components/metadata/AdvancedFields.svelte:113
 msgid "Enter source information"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:134
+#: src/lib/components/metadata/AdvancedFields.svelte:133
 msgid "Enter spatial or temporal coverage"
 msgstr ""
 
@@ -384,13 +406,13 @@ msgstr ""
 msgid "Enter the initial content for this text file…"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:171
+#: src/lib/navigation/views/WorkspaceView.svelte:169
 msgid ""
 "EPUB import functionality is coming soon. For now, use \"Create New\" to "
 "start a fresh project."
 msgstr ""
 
-#: src/App.svelte:156
+#: src/App.svelte:158
 #: src/lib/navigation/views/MetadataView.svelte:105
 msgid "EPUB Metadata"
 msgstr ""
@@ -415,15 +437,15 @@ msgstr ""
 msgid "Export/import settings"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:96
+#: src/lib/components/manifest/ManifestContainer.svelte:100
 msgid "Failed to delete item"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:57
+#: src/lib/components/manifest/ManifestPreview.svelte:80
 msgid "Failed to load content preview"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:49
+#: src/lib/components/manifest/ManifestContainer.svelte:53
 msgid "Failed to load manifest"
 msgstr ""
 
@@ -431,23 +453,23 @@ msgstr ""
 msgid "Failed to load metadata"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:83
+#: src/lib/navigation/views/WorkspaceView.svelte:81
 msgid "Failed to load workspaces"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:124
+#: src/lib/components/manifest/ManifestContainer.svelte:128
 msgid "Failed to save item"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:140
+#: src/lib/components/manifest/ManifestContainer.svelte:144
 msgid "Failed to upload files"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:21
+#: src/lib/components/metadata/AdvancedFields.svelte:20
 msgid "Fiction"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:280
+#: src/lib/components/manifest/ManifestPreview.svelte:304
 msgid "File Information"
 msgstr ""
 
@@ -455,7 +477,8 @@ msgstr ""
 msgid "File listing and management"
 msgstr ""
 
-#: src/App.svelte:172
+#: src/App.svelte:174
+#: src/lib/components/manifest/ManifestView.svelte:50
 msgid "File Manifest"
 msgstr ""
 
@@ -468,16 +491,28 @@ msgid "files"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:72
-#: src/lib/components/manifest/ManifestTable.svelte:225
+#: src/lib/components/manifest/ManifestTable.svelte:245
 msgid "Filter"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:79
-#: src/lib/components/manifest/ManifestTable.svelte:232
+#: src/lib/components/manifest/ManifestTable.svelte:252
 msgid "Filter by ID, path, or media type..."
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:142
+#: src/stories/preview/ContentPreviewDemo.svelte:133
+msgid "Font Family:"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:114
+msgid "Font Size:"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:188
+msgid "Font:"
+msgstr ""
+
+#: src/lib/components/metadata/AdvancedFields.svelte:141
 msgid "Format"
 msgstr ""
 
@@ -509,14 +544,14 @@ msgstr ""
 msgid "Get started by creating your first EPUB"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:314
-#: src/lib/components/manifest/ManifestItemEditor.svelte:249
 #: src/lib/navigation/views/SpineView.svelte:156
+#: src/lib/components/manifest/ManifestTable.svelte:334
+#: src/lib/components/manifest/ManifestItemEditor.svelte:249
 msgid "ID"
 msgstr ""
 
-#: src/lib/components/metadata/BasicInfoFields.svelte:121
 #: src/lib/navigation/views/MetadataView.svelte:154
+#: src/lib/components/metadata/BasicInfoFields.svelte:121
 msgid "Identifier"
 msgstr ""
 
@@ -538,6 +573,30 @@ msgstr ""
 
 #: src/lib/components/manifest/ManifestItemEditor.svelte:326
 msgid "Initial Content"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:87
+msgid "iPad Air (820×1180)"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:86
+msgid "iPad mini (744×1133)"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:88
+msgid "iPad Pro 13\" (1024×1366)"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:84
+msgid "iPhone 13 (390×844)"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:85
+msgid "iPhone 15 Pro Max (430×932)"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:83
+msgid "iPhone SE (375×667)"
 msgstr ""
 
 #: src/lib/navigation/views/MetadataView.svelte:160
@@ -564,12 +623,13 @@ msgstr ""
 msgid "Korean"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:108
 #: src/lib/components/metadata/BasicInfoFields.svelte:46
 msgid "Landscape"
 msgstr ""
 
-#: src/lib/components/metadata/BasicInfoFields.svelte:108
 #: src/lib/navigation/views/MetadataView.svelte:139
+#: src/lib/components/metadata/BasicInfoFields.svelte:108
 msgid "Language"
 msgstr ""
 
@@ -589,7 +649,7 @@ msgstr ""
 msgid "Linear"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:252
+#: src/lib/components/manifest/ManifestPreview.svelte:276
 msgid "Lines"
 msgstr ""
 
@@ -610,11 +670,11 @@ msgid "Load EPUB"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:105
-#: src/lib/components/manifest/ManifestTable.svelte:258
+#: src/lib/components/manifest/ManifestTable.svelte:278
 msgid "Load File"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestContainer.svelte:157
+#: src/lib/components/manifest/ManifestContainer.svelte:161
 msgid "Loading manifest…"
 msgstr ""
 
@@ -622,7 +682,7 @@ msgstr ""
 msgid "Loading metadata…"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:143
+#: src/lib/components/manifest/ManifestPreview.svelte:166
 msgid "Loading preview…"
 msgstr ""
 
@@ -630,12 +690,12 @@ msgstr ""
 msgid "Loading spine item..."
 msgstr ""
 
-#: src/lib/components/SpineSidebar.svelte:192
+#: src/lib/components/SpineSidebar.svelte:190
 msgid "Loading spine items…"
 msgstr ""
 
-#: src/App.svelte:134
-#: src/App.svelte:196
+#: src/App.svelte:136
+#: src/App.svelte:198
 msgid "Loading workspace…"
 msgstr ""
 
@@ -647,11 +707,11 @@ msgstr ""
 msgid "Main navigation"
 msgstr ""
 
-#: src/lib/LayoutManager.svelte:47
-msgid "Main View"
+#: src/stories/preview/ContentPreviewDemo.svelte:157
+msgid "Malformed XHTML"
 msgstr ""
 
-#: src/App.svelte:173
+#: src/App.svelte:175
 msgid "Manage EPUB files and resources"
 msgstr ""
 
@@ -660,11 +720,11 @@ msgid "Manifest"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestToolbar.svelte:63
-#: src/lib/components/manifest/ManifestTable.svelte:216
+#: src/lib/components/manifest/ManifestTable.svelte:236
 msgid "Manifest actions"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:164
+#: src/lib/components/manifest/ManifestPreview.svelte:187
 msgid "Manifest Item"
 msgstr ""
 
@@ -696,13 +756,25 @@ msgstr ""
 msgid "Missing"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:344
-#: src/lib/components/manifest/ManifestPreview.svelte:284
+#: src/lib/components/manifest/ManifestView.svelte:59
+msgid "Mode"
+msgstr ""
+
+#: src/lib/components/manifest/ManifestTable.svelte:367
+#: src/lib/components/manifest/ManifestPreview.svelte:308
 msgid "Modified"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:142
+msgid "Monospace"
 msgstr ""
 
 #: src/lib/Sidebar.svelte:20
 msgid "Navigation"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:154
+msgid "Navigation (TOC)"
 msgstr ""
 
 #: src/lib/navigation/views/PlaceholderView.svelte:138
@@ -725,20 +797,16 @@ msgstr ""
 msgid "No corrupted workspaces found to clean up."
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:296
+#: src/lib/components/manifest/ManifestTable.svelte:316
 msgid "No items match your filter"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:299
+#: src/lib/components/manifest/ManifestTable.svelte:319
 msgid "No manifest items found"
 msgstr ""
 
 #: src/lib/navigation/views/SpineView.svelte:146
 msgid "No spine item selected"
-msgstr ""
-
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:51
-msgid "No workspace selected"
 msgstr ""
 
 #: src/lib/components/workspace/WorkspaceList.svelte:120
@@ -749,7 +817,7 @@ msgstr ""
 msgid "No workspaces yet"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:22
+#: src/lib/components/metadata/AdvancedFields.svelte:21
 msgid "Non-fiction"
 msgstr ""
 
@@ -765,11 +833,16 @@ msgstr ""
 msgid "Orientation"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:94
+#: src/stories/preview/ContentPreviewDemo.svelte:187
+msgid "Orientation:"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte:209
 msgid "Page Progression"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:324
+#: src/lib/components/manifest/ManifestTable.svelte:345
 msgid "Path"
 msgstr ""
 
@@ -785,10 +858,11 @@ msgstr ""
 msgid "Please fix errors before switching tabs"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:23
+#: src/lib/components/metadata/AdvancedFields.svelte:22
 msgid "Poetry"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:101
 #: src/lib/components/metadata/BasicInfoFields.svelte:47
 msgid "Portrait"
 msgstr ""
@@ -805,7 +879,7 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:205
+#: src/lib/components/manifest/ManifestPreview.svelte:228
 msgid "Preview Error"
 msgstr ""
 
@@ -813,30 +887,30 @@ msgstr ""
 msgid "Preview file contents"
 msgstr ""
 
-#: src/App.svelte:225
+#: src/App.svelte:227
 msgid "Preview Pane"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:347
-#: src/lib/components/manifest/ManifestPreview.svelte:287
+#: src/lib/components/manifest/ManifestTable.svelte:371
+#: src/lib/components/manifest/ManifestPreview.svelte:311
 msgid "Properties"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:64
+#: src/lib/components/metadata/AdvancedFields.svelte:63
 msgid "Publication"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:78
+#: src/lib/components/metadata/AdvancedFields.svelte:77
 msgid "Publication Date"
 msgstr ""
 
+#: src/lib/navigation/views/MetadataView.svelte:170
 #: src/lib/components/metadata/MetadataEditor.svelte:250
 #: src/lib/components/metadata/MetadataEditor.svelte:25
-#: src/lib/navigation/views/MetadataView.svelte:170
 msgid "Publication Details"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:68
+#: src/lib/components/metadata/AdvancedFields.svelte:67
 msgid "Publisher"
 msgstr ""
 
@@ -844,7 +918,7 @@ msgstr ""
 msgid "Quick Start Tips:"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:27
+#: src/lib/components/metadata/AdvancedFields.svelte:26
 msgid "Reference"
 msgstr ""
 
@@ -852,7 +926,7 @@ msgstr ""
 msgid "Reflowable"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:122
+#: src/lib/components/metadata/AdvancedFields.svelte:121
 msgid "Relation"
 msgstr ""
 
@@ -860,11 +934,11 @@ msgstr ""
 msgid "Remove author"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:209
+#: src/lib/components/metadata/AdvancedFields.svelte:208
 msgid "Remove contributor"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:172
+#: src/lib/components/metadata/AdvancedFields.svelte:171
 msgid "Remove subject"
 msgstr ""
 
@@ -885,11 +959,19 @@ msgstr ""
 msgid "Reset all metadata to defaults?"
 msgstr ""
 
-#: src/lib/components/SpineSidebar.svelte:198
+#: src/stories/preview/ContentPreviewDemo.svelte:177
+msgid "Reset Demo"
+msgstr ""
+
+#: src/stories/preview/ContentPreviewDemo.svelte:82
+msgid "Responsive"
+msgstr ""
+
+#: src/lib/components/SpineSidebar.svelte:196
+#: src/lib/navigation/views/WorkspaceView.svelte:417
+#: src/lib/components/manifest/ManifestPreview.svelte:172
+#: src/lib/components/manifest/ManifestContainer.svelte:167
 #: src/lib/components/metadata/MetadataEditor.svelte:215
-#: src/lib/components/manifest/ManifestPreview.svelte:149
-#: src/lib/components/manifest/ManifestContainer.svelte:163
-#: src/lib/navigation/views/WorkspaceView.svelte:421
 msgid "Retry"
 msgstr ""
 
@@ -897,257 +979,81 @@ msgstr ""
 msgid "Right to Left"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:87
+#: src/lib/components/metadata/AdvancedFields.svelte:86
 msgid "Rights"
 msgstr ""
 
-#: src/lib/content/sample-content-generator.ts:233
+#: src/lib/content/sample-content-generator.ts:225
 msgid "sample.appendix.content"
 msgstr ""
-"# Technical Reference\n"
-"\n"
-"## File Structure\n"
-"\n"
-"Active EPUBs follow this enhanced structure:\n"
-"\n"
-"```\n"
-"your-book.epub\n"
-"├── mimetype\n"
-"├── META-INF/\n"
-"│   ├── container.xml\n"
-"│   └── com.apple.ibooks.display-options.xml\n"
-"├── OEBPS/\n"
-"│   ├── content.opf          # Package document\n"
-"│   ├── toc.xhtml           # Table of contents\n"
-"│   ├── Text/               # Chapter content\n"
-"│   ├── Images/             # Graphics and media\n"
-"│   └── Styles/             # CSS stylesheets\n"
-"└── SOURCE/\n"
-"    ├── text/               # Plain text sources\n"
-"    ├── scripts/            # Transform processors\n"
-"    └── settings.json       # Editor configuration\n"
-"```\n"
-"\n"
-"## Transform Pipeline\n"
-"\n"
-"The conversion process works as follows:\n"
-"1. **Source Text**: Written in markdown-like plain text\n"
-"2. **Text Transform**: Converts to basic HTML structure\n"
-"3. **DOM Transform**: Adds navigation IDs and EPUB-specific elements\n"
-"4. **XHTML Output**: Valid EPUB content ready for reading\n"
-"\n"
-"## Extending the Editor\n"
-"\n"
-"Customize functionality by modifying:\n"
-"- **Transform Scripts**: Add new formatting rules\n"
-"- **CSS Styles**: Change visual appearance\n"
-"- **Settings**: Configure editor behavior\n"
-"\n"
-"The modular design ensures your customizations remain intact when sharing "
-"or updating the EPUB file.\n"
-"\n"
-"*Build better books with Active EPUB technology.*"
+"This appendix contains additional resources and information that supplement "
+"the main content. It demonstrates how supplementary materials can be "
+"included in an EPUB publication."
 
-#: src/lib/content/sample-content-generator.ts:232
+#: src/lib/content/sample-content-generator.ts:224
 msgid "sample.appendix.title"
-msgstr "Technical Reference"
+msgstr "Appendix"
 
-#: src/lib/content/sample-content-generator.ts:89
-#: src/lib/content/sample-content-generator.ts:160
+#: src/lib/content/sample-content-generator.ts:99
+#: src/lib/content/sample-content-generator.ts:161
 msgid "sample.author.name"
-msgstr "EDITME Editorial Team"
+msgstr "Sample Author"
 
-#: src/lib/content/sample-content-generator.ts:88
-#: src/lib/content/sample-content-generator.ts:162
+#: src/lib/content/sample-content-generator.ts:98
+#: src/lib/content/sample-content-generator.ts:163
 msgid "sample.book.description"
 msgstr ""
-"A comprehensive guide to creating and editing EPUB files with Active EPUB "
-"technology. Learn how to build interactive digital books with embedded "
-"editors and plain text workflows."
+"This is a sample EPUB book created for demonstration purposes. It showcases "
+"the basic structure and content of an EPUB publication."
 
-#: src/lib/content/sample-content-generator.ts:87
-#: src/lib/content/sample-content-generator.ts:157
+#: src/lib/content/sample-content-generator.ts:97
+#: src/lib/content/sample-content-generator.ts:158
 msgid "sample.book.title"
-msgstr "Introduction to EPUB"
-
-#: src/lib/content/sample-content-generator.ts:219
-msgid "sample.chapter1.content"
-msgstr ""
-"# Getting Started with Active EPUB\n"
-"\n"
-"Welcome to the world of **Active EPUB** - a revolutionary approach to "
-"digital publishing that puts the power of content creation directly into "
-"your EPUB files.\n"
-"\n"
-"## What Makes Active EPUB Special?\n"
-"\n"
-"Unlike traditional EPUB files that are static once created, Active EPUB "
-"files contain their own editing environment. This means:\n"
-"\n"
-"- **Self-contained editing**: No need for external software\n"
-"- **Plain text workflow**: Write in simple, readable format\n"
-"- **Automatic transformation**: Your text becomes beautifully formatted "
-"EPUB content\n"
-"- **Embedded editor**: The editing tools travel with your book\n"
-"\n"
-"## Your First Steps\n"
-"\n"
-"1. **Explore the interface**: Navigate through the different sections using "
-"the sidebar\n"
-"2. **Edit metadata**: Customize your book's title, author, and description\n"
-"3. **Browse the manifest**: See all the files that make up your EPUB\n"
-"4. **Preview content**: Watch your changes appear in real-time\n"
-"\n"
-"## The Plain Text Advantage\n"
-"\n"
-"Active EPUB uses a simple text format that's easy to read and edit:\n"
-"\n"
-"```\n"
-"# This becomes a heading\n"
-"**This text is bold**\n"
-"*This text is italic*\n"
-"\n"
-"Paragraphs are separated by blank lines.\n"
-"```\n"
-"\n"
-"This approach keeps your content portable and future-proof while still "
-"creating professional-looking books.\n"
-"\n"
-"*Ready to dive deeper? Continue to the next chapter to learn about advanced "
-"features.*"
-
-#: src/lib/content/sample-content-generator.ts:218
-msgid "sample.chapter1.title"
-msgstr "Getting Started"
-
-#: src/lib/content/sample-content-generator.ts:226
-msgid "sample.chapter2.content"
-msgstr ""
-"# Advanced Features and Customization\n"
-"\n"
-"Now that you've mastered the basics, let's explore the powerful features "
-"that make Active EPUB truly special.\n"
-"\n"
-"## Transform Scripts\n"
-"\n"
-"One of the most powerful features of Active EPUB is the ability to "
-"customize how your plain text is converted to EPUB content through "
-"**transform scripts**.\n"
-"\n"
-"### Text Transformations\n"
-"\n"
-"The text transformation pipeline works in two stages:\n"
-"\n"
-"1. **Text Transform**: Converts your plain text to basic HTML\n"
-"2. **DOM Transform**: Adds EPUB-specific elements and navigation\n"
-"\n"
-"You can customize both stages by modifying the transform scripts in your "
-"book's SOURCE folder.\n"
-"\n"
-"### Custom Formatting\n"
-"\n"
-"Create your own formatting rules:\n"
-"\n"
-"```javascript\n"
-"// Example: Convert [[note]] to footnote\n"
-"text = text.replace(/\\[\\[(.+?)\\]\\]/g, '<footnote>$1</footnote>');\n"
-"```\n"
-"\n"
-"## Workspace Management\n"
-"\n"
-"Active EPUB includes a complete workspace system:\n"
-"\n"
-"- **Multiple projects**: Switch between different books easily\n"
-"- **Auto-save**: Your work is saved automatically\n"
-"- **Version control**: Track changes to your content\n"
-"- **Export options**: Generate standard EPUB files when ready\n"
-"\n"
-"## Collaboration Features\n"
-"\n"
-"Share your Active EPUB files with others:\n"
-"\n"
-"- **Self-contained**: Recipients can edit without installing software\n"
-"- **Plain text sources**: Easy to version control with Git\n"
-"- **Portable**: Works on any modern device with a web browser\n"
-"\n"
-"## Performance Optimization\n"
-"\n"
-"Active EPUB is built for performance:\n"
-"\n"
-"- **OPFS storage**: Lightning-fast file operations\n"
-"- **Lazy loading**: Only loads content when needed\n"
-"- **Compression**: Efficient storage of resources\n"
-"\n"
-"*In the next section, we'll explore the technical details of how Active "
-"EPUB works under the hood.*"
-
-#: src/lib/content/sample-content-generator.ts:225
-msgid "sample.chapter2.title"
-msgstr "Advanced Features"
-
-#: src/lib/content/sample-content-generator.ts:212
-msgid "sample.prologue.content"
-msgstr ""
-"This document demonstrates the power of **Active EPUB** technology - a "
-"revolutionary approach to digital publishing that embeds a complete editing "
-"environment directly within EPUB files.\n"
-"\n"
-"## What You're Looking At\n"
-"\n"
-"You're not just reading a book - you're experiencing an **Active EPUB**. "
-"This means:\n"
-"\n"
-"- ✨ **Self-editing capability**: This EPUB file contains its own editor\n"
-"- 📝 **Plain text sources**: Content is stored in readable, editable format\n"
-"- 🔄 **Live transformation**: Text automatically becomes beautiful EPUB "
-"content\n"
-"- 📱 **Universal compatibility**: Works on any device with a modern web "
-"browser\n"
-"\n"
-"## How It Works\n"
-"\n"
-"Active EPUB extends the standard EPUB format by including:\n"
-"\n"
-"1. **SOURCE folder**: Contains your plain text content and editing scripts\n"
-"2. **EDITME.html**: The embedded editor application\n"
-"3. **Transform pipeline**: Converts your text to valid EPUB content\n"
-"4. **Workspace system**: Manages multiple projects and file storage\n"
-"\n"
-"## The Plain Text Advantage\n"
-"\n"
-"Unlike traditional word processors, Active EPUB uses simple, readable text:\n"
-"\n"
-"```\n"
-"# This becomes a chapter heading\n"
-"**Bold text** and *italic text*\n"
-"\n"
-"Paragraphs are separated by blank lines.\n"
-"```\n"
-"\n"
-"This approach ensures your content is:\n"
-"- **Future-proof**: Plain text never becomes obsolete\n"
-"- **Version-controllable**: Easy to track changes with Git\n"
-"- **Portable**: Works across all platforms and devices\n"
-"- **Readable**: No complex formatting codes\n"
-"\n"
-"## Ready to Explore?\n"
-"\n"
-"Use the sidebar to navigate through different sections:\n"
-"- **Metadata**: Edit book information\n"
-"- **Manifest**: Browse all book files\n"
-"- **Content**: Edit and preview chapters\n"
-"- **Settings**: Customize your editing experience\n"
-"\n"
-"*Welcome to the future of digital publishing!*"
+msgstr "Sample EPUB Book"
 
 #: src/lib/content/sample-content-generator.ts:211
-msgid "sample.prologue.title"
-msgstr "Welcome to Active EPUB"
+msgid "sample.chapter1.content"
+msgstr ""
+"This is the first chapter of our sample book. Here we begin our journey "
+"into the world of digital publishing. EPUB is a widely supported format "
+"that allows for reflowable text, making books readable on various devices "
+"and screen sizes."
 
-#: src/lib/content/sample-content-generator.ts:90
-#: src/lib/content/sample-content-generator.ts:161
+#: src/lib/content/sample-content-generator.ts:210
+msgid "sample.chapter1.title"
+msgstr "Chapter 1: Getting Started"
+
+#: src/lib/content/sample-content-generator.ts:218
+msgid "sample.chapter2.content"
+msgstr ""
+"In this second chapter, we explore how content is structured within an EPUB "
+"file. The format uses XHTML for text content, CSS for styling, and a "
+"manifest to organize all the components that make up a complete digital "
+"book."
+
+#: src/lib/content/sample-content-generator.ts:217
+msgid "sample.chapter2.title"
+msgstr "Chapter 2: Content Structure"
+
+#: src/lib/content/sample-content-generator.ts:204
+msgid "sample.prologue.content"
+msgstr ""
+"Welcome to this sample EPUB book. This prologue introduces you to the "
+"structure and content that follows. In the chapters ahead, you'll discover "
+"how EPUB books are organized and formatted for digital reading."
+
+#: src/lib/content/sample-content-generator.ts:203
+msgid "sample.prologue.title"
+msgstr "Prologue"
+
+#: src/lib/content/sample-content-generator.ts:100
+#: src/lib/content/sample-content-generator.ts:162
 msgid "sample.publisher.name"
-msgstr "EDITME Publishing"
+msgstr "Sample Publisher"
+
+#: src/stories/preview/ContentPreviewDemo.svelte:141
+msgid "Sans-serif"
+msgstr ""
 
 #: src/lib/navigation/views/MetadataView.svelte:186
 msgid "Save & Continue"
@@ -1177,12 +1083,12 @@ msgstr ""
 msgid "Select a spine item from the sidebar to view its details"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:138
+#: src/lib/components/manifest/ManifestPreview.svelte:161
 msgid "Select an item to preview its content"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:100
-#: src/lib/components/metadata/AdvancedFields.svelte:20
+#: src/lib/components/metadata/AdvancedFields.svelte:99
+#: src/lib/components/metadata/AdvancedFields.svelte:19
 msgid "Select content type"
 msgstr ""
 
@@ -1206,6 +1112,10 @@ msgstr ""
 msgid "Series information, EPUB version, and publication-specific metadata"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:140
+msgid "Serif"
+msgstr ""
+
 #: src/lib/components/metadata/fields/DateMetadataField.svelte:67
 msgid "Set to today"
 msgstr ""
@@ -1214,28 +1124,28 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:334
-#: src/lib/components/manifest/ManifestPreview.svelte:282
+#: src/lib/components/manifest/ManifestTable.svelte:356
+#: src/lib/components/manifest/ManifestPreview.svelte:306
 msgid "Size"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:312
+#: src/lib/components/manifest/ManifestTable.svelte:332
 msgid "Sort by ID"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:342
+#: src/lib/components/manifest/ManifestTable.svelte:365
 msgid "Sort by modification date"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:322
+#: src/lib/components/manifest/ManifestTable.svelte:343
 msgid "Sort by path"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:332
+#: src/lib/components/manifest/ManifestTable.svelte:354
 msgid "Sort by size"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:112
+#: src/lib/components/metadata/AdvancedFields.svelte:111
 msgid "Source"
 msgstr ""
 
@@ -1247,7 +1157,7 @@ msgstr ""
 msgid "Source file not found"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:164
+#: src/lib/components/manifest/ManifestPreview.svelte:187
 msgid "SOURCE Item"
 msgstr ""
 
@@ -1271,7 +1181,7 @@ msgstr ""
 msgid "Spine item management"
 msgstr ""
 
-#: src/App.svelte:195
+#: src/App.svelte:197
 #: src/lib/Sidebar.svelte:105
 #: src/lib/Sidebar.svelte:119
 msgid "Spine Items"
@@ -1285,23 +1195,15 @@ msgstr ""
 msgid "Start fresh"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:162
+#: src/lib/components/metadata/AdvancedFields.svelte:161
 msgid "Subject or keyword"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:154
+#: src/lib/components/metadata/AdvancedFields.svelte:153
 msgid "Subjects"
 msgstr ""
 
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:37
-msgid "Switch"
-msgstr ""
-
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:35
-msgid "Switch workspace"
-msgstr ""
-
-#: src/App.svelte:180
+#: src/App.svelte:182
 msgid "Table of Contents"
 msgstr ""
 
@@ -1313,7 +1215,7 @@ msgstr ""
 msgid "Text Editor"
 msgstr ""
 
-#: src/lib/components/metadata/AdvancedFields.svelte:26
+#: src/lib/components/metadata/AdvancedFields.svelte:25
 msgid "Textbook"
 msgstr ""
 
@@ -1321,9 +1223,9 @@ msgstr ""
 msgid "Theme and UI settings"
 msgstr ""
 
-#: src/lib/components/metadata/BasicInfoFields.svelte:97
 #: src/lib/navigation/views/SpineView.svelte:160
 #: src/lib/navigation/views/MetadataView.svelte:115
+#: src/lib/components/metadata/BasicInfoFields.svelte:97
 msgid "Title"
 msgstr ""
 
@@ -1335,11 +1237,15 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
+#: src/stories/preview/ContentPreviewDemo.svelte:171
+msgid "Toggle Empty State"
+msgstr ""
+
 #: src/lib/Sidebar.svelte:63
 msgid "Toggle sidebar"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestTable.svelte:297
+#: src/lib/components/manifest/ManifestTable.svelte:317
 msgid "Try adjusting your search terms"
 msgstr ""
 
@@ -1351,15 +1257,11 @@ msgstr ""
 msgid "Unique identifier for this item"
 msgstr ""
 
-#: src/lib/components/workspace/CurrentWorkspaceBar.svelte:26
-msgid "Unknown"
-msgstr ""
-
 #: src/lib/components/workspace/WorkspaceItem.svelte:93
 msgid "Unknown Author"
 msgstr ""
 
-#: src/App.svelte:209
+#: src/App.svelte:211
 msgid "Unknown View"
 msgstr ""
 
@@ -1372,7 +1274,7 @@ msgstr ""
 msgid "Upload File"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:238
+#: src/lib/components/manifest/ManifestPreview.svelte:262
 msgid "Use the download button to access the file"
 msgstr ""
 
@@ -1380,11 +1282,11 @@ msgstr ""
 msgid "View and manage spine item content"
 msgstr ""
 
-#: src/App.svelte:210
+#: src/App.svelte:212
 msgid "View type"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:256
+#: src/lib/components/manifest/ManifestPreview.svelte:280
 msgid "Words"
 msgstr ""
 
@@ -1404,7 +1306,7 @@ msgstr ""
 msgid "XHTML Path"
 msgstr ""
 
-#: src/App.svelte:226
+#: src/App.svelte:228
 msgid "XHTML preview will go here (Phase 4)"
 msgstr ""
 
@@ -1416,7 +1318,7 @@ msgstr ""
 msgid "You can edit the content later in the main editor"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:454
+#: src/lib/navigation/views/WorkspaceView.svelte:450
 #: src/lib/navigation/views/MetadataView.svelte:193
 msgid "You have unsaved changes"
 msgstr ""
@@ -1425,15 +1327,15 @@ msgstr ""
 msgid "You have unsaved metadata changes. Continue?"
 msgstr ""
 
-#: src/lib/navigation/views/WorkspaceView.svelte:338
-#: src/lib/navigation/views/WorkspaceView.svelte:349
+#: src/lib/navigation/views/WorkspaceView.svelte:341
+#: src/lib/navigation/views/WorkspaceView.svelte:352
 msgid "You have unsaved workspace changes. Continue?"
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:225
+#: src/lib/components/manifest/ManifestPreview.svelte:248
 msgid "Your browser does not support the audio element."
 msgstr ""
 
-#: src/lib/components/manifest/ManifestPreview.svelte:232
+#: src/lib/components/manifest/ManifestPreview.svelte:256
 msgid "Your browser does not support the video element."
 msgstr ""

@@ -125,12 +125,22 @@ async function extractStrings() {
     },
   };
 
+  // Configure extraction options for this.translate(locale, 'key') pattern
+  const classMethodExtractorOptions = {
+    arguments: {
+      text: 1, // key is the second argument
+      context: 0, // locale is the first argument (used as context)
+    },
+  };
+
   // Extract from TypeScript files using JavaScript parser
   const jsParser = extractor.createJsParser([
     JsExtractors.callExpression('t', extractorOptions),
     JsExtractors.callExpression('$t', extractorOptions),
     JsExtractors.callExpression('_', extractorOptions),
     JsExtractors.callExpression('translate', extractorOptions),
+    // Add support for this.translate(locale, 'key') patterns
+    JsExtractors.callExpression('this.translate', classMethodExtractorOptions),
   ]);
 
   for (const file of tsFiles) {

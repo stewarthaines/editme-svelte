@@ -2,7 +2,9 @@
 
 ## Claude Interaction Guidelines
 
-If it's not been established yet ask the user whether this session is primarily DOCUMENTATION, TESTING or DEVELOPMENT based.
+First thing - ask the user whether this session is primarily **DOCUMENTATION**, **TESTING** or **DEVELOPMENT** based.
+
+When the user asks you to document a plan or write a new document describing detailed technical information to be reviewed, create a new markdown document in @process/
 
 **See [DEVELOPMENT.md](./DEVELOPMENT.md) for complete AI coding agent requirements and development best practices.**
 
