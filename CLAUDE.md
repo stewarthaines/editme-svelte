@@ -85,6 +85,10 @@ The build process creates a single `EDITME.html` file (~2-3MB) with all assets i
 - **Import Paths**: Use relative imports (`../`, `../../`) instead of absolute paths (`$lib/`) for consistency and explicit dependency tracking
 - Browser-native APIs preferred over regex for structured data handling
 
+### Build Configuration Constraints
+
+- **Treeshaking**: Do NOT enable aggressive Rollup treeshaking options (`moduleSideEffects: false`, `propertyReadSideEffects: false`, `unknownGlobalSideEffects: false`). Svelte 5's reactivity system requires runtime side effects for signal registration and context initialization. Aggressive treeshaking removes these dependencies, causing runtime errors like `"can't access property 'r1', t.l is null"`. Use Vite's default treeshaking instead.
+
 ### Storage Strategy
 
 - OPFS (Origin Private File System) for performance

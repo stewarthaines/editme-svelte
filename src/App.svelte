@@ -35,27 +35,26 @@
   const contextWorkspaceId: WorkspaceIdContext = getContext(WORKSPACE_ID_CONTEXT);
 
   // Subscribe to navigation state
-  $: currentView = $navigationStore.currentView;
-  $: isExpanded = $layoutStore.sidebar.isExpanded;
+  let currentView = $derived($navigationStore.currentView);
+  let isExpanded = $derived($layoutStore.sidebar.isExpanded);
 
   // Spine management state
-  let currentWorkspaceManager: IWorkspaceManager;
-  let currentWorkspaceId: string | null = null;
-  let selectedSpineItemId: string | null = null;
-  let initialized = false;
-  let currentManifestManager: ManifestManagerImpl | null = null;
-  let currentMetadataManager: MetadataManagerImpl | null = null;
-  let currentSpineManager: SpineItemManager | null = null;
+  let currentWorkspaceManager: IWorkspaceManager = $state()!;
+  let currentWorkspaceId: string | null = $state(null);
+  let selectedSpineItemId: string | null = $state(null);
+  let initialized = $state(false);
+  let currentManifestManager: ManifestManagerImpl | null = $state(null);
+  let currentMetadataManager: MetadataManagerImpl | null = $state(null);
+  let currentSpineManager: SpineItemManager | null = $state(null);
 
   // Manifest preview state
-  let selectedManifestItem: ManifestItem | SourceItem | null = null;
-  let selectedManifestItemType: 'manifest' | 'source' | null = null;
+  let selectedManifestItem: ManifestItem | SourceItem | null = $state(null);
+  let selectedManifestItemType: 'manifest' | 'source' | null = $state(null);
 
   // Handler for manifest item selection
   const handleManifestItemSelect = (
     event: CustomEvent<{ item: ManifestItem | SourceItem; type: 'manifest' | 'source' }>
   ) => {
-    console.log('handleManifestItemSelect', event.detail.item);
     selectedManifestItem = event.detail.item;
     selectedManifestItemType = event.detail.type;
   };

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28T00:16:44.712Z\n"
-"PO-Revision-Date: 2025-07-28T00:16:44.808Z\n"
+"POT-Creation-Date: 2025-07-28T01:45:38.988Z\n"
+"PO-Revision-Date: 2025-07-28T01:45:39.069Z\n"
 "Language: he\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -57,8 +57,8 @@ msgstr ""
 "🇮🇱 Additional metadata fields (publisher, date, description, etc.) will "
 "be implemented in Phase 3."
 
-#: src/lib/components/manifest/ManifestView.svelte:59
 #: src/lib/components/metadata/MetadataEditor.svelte:24
+#: src/lib/components/manifest/ManifestView.svelte:59
 msgid "Advanced"
 msgstr ""
 
@@ -81,7 +81,7 @@ msgstr "🇮🇱 Append Item"
 msgid "Application preferences"
 msgstr "🇮🇱 Application preferences"
 
-#: src/App.svelte:205
+#: src/App.svelte:204
 msgid "Application Settings"
 msgstr "🇮🇱 Application Settings"
 
@@ -206,11 +206,11 @@ msgstr ""
 msgid "Configure basic information about your EPUB publication"
 msgstr "🇮🇱 Configure basic information about your EPUB publication"
 
-#: src/App.svelte:206
+#: src/App.svelte:205
 msgid "Configure preferences and options"
 msgstr "🇮🇱 Configure preferences and options"
 
-#: src/App.svelte:159
+#: src/App.svelte:158
 msgid "Configure publication metadata and details"
 msgstr "🇮🇱 Configure publication metadata and details"
 
@@ -269,7 +269,7 @@ msgstr "🇮🇱 Current"
 msgid "Current Settings:"
 msgstr ""
 
-#: src/App.svelte:229
+#: src/App.svelte:228
 msgid "Current view"
 msgstr "🇮🇱 Current view"
 
@@ -344,7 +344,7 @@ msgstr "🇮🇱 Edit"
 msgid "Edit Manifest Item"
 msgstr "🇮🇱 Edit Manifest Item"
 
-#: src/App.svelte:183
+#: src/App.svelte:182
 msgid "Edit navigation structure and TOC"
 msgstr "🇮🇱 Edit navigation structure and TOC"
 
@@ -414,7 +414,7 @@ msgid ""
 "start a fresh project."
 msgstr ""
 
-#: src/App.svelte:158
+#: src/App.svelte:157
 #: src/lib/navigation/views/MetadataView.svelte:105
 msgid "EPUB Metadata"
 msgstr "🇮🇱 EPUB Metadata"
@@ -479,7 +479,7 @@ msgstr "🇮🇱 File Information"
 msgid "File listing and management"
 msgstr "🇮🇱 File listing and management"
 
-#: src/App.svelte:174
+#: src/App.svelte:173
 #: src/lib/components/manifest/ManifestView.svelte:50
 msgid "File Manifest"
 msgstr "🇮🇱 File Manifest"
@@ -696,8 +696,8 @@ msgstr "🇮🇱 Loading spine item..."
 msgid "Loading spine items…"
 msgstr ""
 
-#: src/App.svelte:136
-#: src/App.svelte:198
+#: src/App.svelte:135
+#: src/App.svelte:197
 msgid "Loading workspace…"
 msgstr ""
 
@@ -713,7 +713,7 @@ msgstr "🇮🇱 Main navigation"
 msgid "Malformed XHTML"
 msgstr ""
 
-#: src/App.svelte:175
+#: src/App.svelte:174
 msgid "Manage EPUB files and resources"
 msgstr "🇮🇱 Manage EPUB files and resources"
 
@@ -889,7 +889,7 @@ msgstr "🇮🇱 Preview Error"
 msgid "Preview file contents"
 msgstr "🇮🇱 Preview file contents"
 
-#: src/App.svelte:227
+#: src/App.svelte:226
 msgid "Preview Pane"
 msgstr "🇮🇱 Preview Pane"
 
@@ -971,9 +971,9 @@ msgstr ""
 
 #: src/lib/components/SpineSidebar.svelte:196
 #: src/lib/navigation/views/WorkspaceView.svelte:417
+#: src/lib/components/metadata/MetadataEditor.svelte:215
 #: src/lib/components/manifest/ManifestPreview.svelte:172
 #: src/lib/components/manifest/ManifestContainer.svelte:167
-#: src/lib/components/metadata/MetadataEditor.svelte:215
 msgid "Retry"
 msgstr "🇮🇱 Retry"
 
@@ -1183,7 +1183,7 @@ msgstr "🇮🇱 Spine Item Details"
 msgid "Spine item management"
 msgstr "🇮🇱 Spine item management"
 
-#: src/App.svelte:197
+#: src/App.svelte:196
 #: src/lib/Sidebar.svelte:105
 #: src/lib/Sidebar.svelte:119
 msgid "Spine Items"
@@ -1205,7 +1205,7 @@ msgstr "🇮🇱 Subject or keyword"
 msgid "Subjects"
 msgstr "🇮🇱 Subjects"
 
-#: src/App.svelte:182
+#: src/App.svelte:181
 msgid "Table of Contents"
 msgstr "🇮🇱 Table of Contents"
 
@@ -1263,7 +1263,7 @@ msgstr "🇮🇱 Unique identifier for this item"
 msgid "Unknown Author"
 msgstr ""
 
-#: src/App.svelte:211
+#: src/App.svelte:210
 msgid "Unknown View"
 msgstr "🇮🇱 Unknown View"
 
@@ -1284,7 +1284,7 @@ msgstr "🇮🇱 Use the download button to access the file"
 msgid "View and manage spine item content"
 msgstr "🇮🇱 View and manage spine item content"
 
-#: src/App.svelte:212
+#: src/App.svelte:211
 msgid "View type"
 msgstr "🇮🇱 View type"
 
@@ -1308,7 +1308,7 @@ msgstr "🇮🇱 Workspaces"
 msgid "XHTML Path"
 msgstr "🇮🇱 XHTML Path"
 
-#: src/App.svelte:228
+#: src/App.svelte:227
 msgid "XHTML preview will go here (Phase 4)"
 msgstr "🇮🇱 XHTML preview will go here (Phase 4)"
 

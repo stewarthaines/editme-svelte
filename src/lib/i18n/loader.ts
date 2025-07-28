@@ -34,39 +34,56 @@ class TranslationLoader implements I18nLoader {
     try {
       // Try to get embedded translation data URL from global variable
       let translationsDataUrl = (globalThis as any).__EDITME_I18N_BUNDLE__;
-      let response: Response;
+      let zipArrayBuffer: ArrayBuffer;
 
       if (!translationsDataUrl) {
         // Development fallback: try to fetch from static directory
         try {
-          response = await fetch('/i18n-bundle.zip');
+          const response = await fetch('/i18n-bundle.zip');
           if (!response.ok) {
             throw new Error(`Failed to fetch i18n-bundle.zip: ${response.status}`);
           }
+          zipArrayBuffer = await response.arrayBuffer();
         } catch {
           throw new Error(
             'Translation data not found. For single file builds, please run "npm run build" to generate a new build with embedded translations.'
           );
         }
       } else {
-        // Production: fetch from embedded data URL
-        response = await fetch(translationsDataUrl);
-        // Clean up memory after reading the data URL
-        delete (globalThis as any).__EDITME_I18N_BUNDLE__;
-        if (!response.ok) {
-          throw new Error(`Failed to fetch translation data: ${response.status}`);
+        // Production: decode base64 directly to avoid data URL fetch issues
+        try {
+          // Extract base64 data from data URL (format: "data:application/zip;base64,<base64data>")
+          const base64Data = translationsDataUrl.split(',')[1];
+          if (!base64Data) {
+            throw new Error('Invalid data URL format: missing base64 data');
+          }
+
+          // Decode base64 to binary string using atob()
+          const binaryString = atob(base64Data);
+          
+          // Convert binary string to Uint8Array
+          const uint8Array = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
+          }
+          
+          // Convert to ArrayBuffer
+          zipArrayBuffer = uint8Array.buffer;
+          
+        } catch (decodeError) {
+          throw new Error(`Failed to decode embedded translation data: ${decodeError instanceof Error ? decodeError.message : 'Unknown error'}`);
+        } finally {
+          // Clean up memory after processing the data URL
+          delete (globalThis as any).__EDITME_I18N_BUNDLE__;
         }
       }
-
-      // Get ZIP data as ArrayBuffer
-      const zipArrayBuffer = await response.arrayBuffer();
 
       // Parse ZIP using our ZIP library
       let zip: Zip;
       try {
         zip = new Zip(zipArrayBuffer);
       } catch (error) {
-        console.error('❌ ZIP parsing failed:', error);
+        
         throw new Error(
           `Failed to parse ZIP archive: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
@@ -82,7 +99,6 @@ class TranslationLoader implements I18nLoader {
       try {
         await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
       } catch (workspaceError) {
-        console.error(`❌ Failed to create workspace ${LOCALES_WORKSPACE_ID}:`, workspaceError);
         throw workspaceError;
       }
 
@@ -101,7 +117,6 @@ class TranslationLoader implements I18nLoader {
           try {
             JSON.parse(content);
           } catch (parseError) {
-            console.error(`❌ ${entry.fileName}: Invalid JSON from ZIP:`, parseError);
             throw new Error(
               `Invalid JSON in ${entry.fileName}: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
             );
@@ -110,86 +125,13 @@ class TranslationLoader implements I18nLoader {
           // Write to storage
           await this.storage.writeTextFile(LOCALES_WORKSPACE_ID, entry.fileName, content);
 
-          // Verification
-          try {
-            // Add small delay to ensure write completes
-            await new Promise(resolve => setTimeout(resolve, 50));
-
-            // First check if file exists
-            const fileExists = await this.storage.fileExists(LOCALES_WORKSPACE_ID, entry.fileName);
-
-            if (fileExists) {
-              // Retry read with exponential backoff handling
-              let readBack = '';
-              let attempts = 0;
-              const maxAttempts = 3;
-
-              while (attempts < maxAttempts) {
-                try {
-                  readBack = await this.storage.readTextFile(LOCALES_WORKSPACE_ID, entry.fileName);
-
-                  if (readBack.length > 0) {
-                    // Double-check by trying to parse the read-back content
-                    try {
-                      JSON.parse(readBack);
-                      break; // Success, exit retry loop
-                    } catch (jsonError) {
-                      console.error(`❌ Read-back JSON invalid for ${entry.fileName}:`, jsonError);
-                      break; // Don't retry JSON parse errors
-                    }
-                  } else {
-                    attempts++;
-
-                    if (attempts < maxAttempts) {
-                      // Exponential backoff: 100ms, 200ms, 400ms
-                      await new Promise(resolve =>
-                        setTimeout(resolve, 100 * Math.pow(2, attempts - 1))
-                      );
-                    }
-                  }
-                } catch (readError) {
-                  console.error(
-                    `❌ Read attempt ${attempts + 1} failed for ${entry.fileName}:`,
-                    readError
-                  );
-                  attempts++;
-
-                  if (attempts < maxAttempts) {
-                    await new Promise(resolve =>
-                      setTimeout(resolve, 100 * Math.pow(2, attempts - 1))
-                    );
-                  }
-                }
-              }
-
-              if (attempts >= maxAttempts && readBack.length === 0) {
-                console.error(`❌ Failed to read ${entry.fileName} after ${maxAttempts} attempts`);
-                console.error(`❌ Storage backend: ${this.storage.getBackendType()}`);
-              }
-            } else {
-              console.error(`❌ File ${entry.fileName} does not exist after write!`);
-            }
-          } catch (error) {
-            console.error(`❌ Failed to read back ${entry.fileName}:`, error);
-            console.error(`❌ Storage backend type: ${this.storage.getBackendType()}`);
-            console.error(`❌ Storage initialized: ${this.storage.isInitialized()}`);
-          }
         } catch (extractError) {
-          console.error(`❌ Failed to extract ${entry.fileName}:`, extractError);
           throw extractError;
         }
       }
 
-      // After all writes, verify the workspace exists
-      try {
-        await this.storage.listFiles(LOCALES_WORKSPACE_ID);
-      } catch (listError) {
-        console.error(`❌ Failed to list workspace contents:`, listError);
-        console.error(`❌ Storage backend: ${this.storage.getBackendType()}`);
-      }
 
     } catch (error) {
-      console.error('❌ Failed to extract translations:', error);
       throw error;
     }
   }
@@ -219,7 +161,6 @@ class TranslationLoader implements I18nLoader {
           try {
             jsonData = JSON.parse(content);
           } catch (parseError) {
-            console.error(`❌ ${filePath}: JSON parse failed:`, parseError);
             throw parseError;
           }
 
@@ -236,19 +177,13 @@ class TranslationLoader implements I18nLoader {
 
           catalogs[locale] = catalog;
         } catch (error) {
-          console.error(`Failed to load ${filePath}:`, error);
           // Continue with other files
         }
       }
 
-      // Only keep the sample key validation for debugging workspace creation
-      if (catalogs.en && !Object.keys(catalogs.en.messages).filter(k => k.startsWith('sample.')).length) {
-        console.warn('⚠️ No sample keys found in English catalog - workspace creation may fail');
-      }
 
       return catalogs;
     } catch (error) {
-      console.error('❌ Failed to load translations from storage:', error);
       throw error;
     }
   }

@@ -18,13 +18,12 @@ const dirname =
 export default defineConfig({
   build: {
     target: 'es2022',
+    minify: true,
     rollupOptions: {
-      // Use treeshake to eliminate unused modules
-      treeshake: {
-        moduleSideEffects: false,
-        propertyReadSideEffects: false,
-        unknownGlobalSideEffects: false
-      }
+      // DO NOT enable aggressive treeshaking - it breaks Svelte 5's reactivity system
+      // Svelte 5 requires runtime side effects for signal registration and context initialization
+      // Aggressive treeshaking removes these "invisible" dependencies, causing runtime errors
+      // Use Vite's default treeshaking instead, which is tuned for Svelte compatibility
     }
   },
   define: {
