@@ -31,7 +31,6 @@ class TranslationLoader implements I18nLoader {
    * Extract translations from ZIP archive to storage
    */
   async extractTranslations(): Promise<void> {
-    try {
       // Try to get embedded translation data URL from global variable
       let translationsDataUrl = (globalThis as any).__EDITME_I18N_BUNDLE__;
       let zipArrayBuffer: ArrayBuffer;
@@ -96,11 +95,7 @@ class TranslationLoader implements I18nLoader {
       }
 
       // Ensure workspace exists
-      try {
-        await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
-      } catch (workspaceError) {
-        throw workspaceError;
-      }
+      await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
 
       // Extract each JSON file from ZIP
       for (const entry of zip.entries) {
@@ -108,39 +103,28 @@ class TranslationLoader implements I18nLoader {
           continue;
         }
 
+        // Extract file content as text
+        const blob = await entry.extract();
+        const content = await blob.text();
+
+        // Validate JSON before writing
         try {
-          // Extract file content as text
-          const blob = await entry.extract();
-          const content = await blob.text();
-
-          // Validate JSON before writing
-          try {
-            JSON.parse(content);
-          } catch (parseError) {
-            throw new Error(
-              `Invalid JSON in ${entry.fileName}: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
-            );
-          }
-
-          // Write to storage
-          await this.storage.writeTextFile(LOCALES_WORKSPACE_ID, entry.fileName, content);
-
-        } catch (extractError) {
-          throw extractError;
+          JSON.parse(content);
+        } catch (parseError) {
+          throw new Error(
+            `Invalid JSON in ${entry.fileName}: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
+          );
         }
+
+        // Write to storage
+        await this.storage.writeTextFile(LOCALES_WORKSPACE_ID, entry.fileName, content);
       }
-
-
-    } catch (error) {
-      throw error;
-    }
   }
 
   /**
    * Load translations from storage
    */
   async loadTranslations(): Promise<Record<string, TranslationCatalog>> {
-    try {
       const catalogs: Record<string, TranslationCatalog> = {};
 
       // Initialize storage if needed
@@ -158,11 +142,7 @@ class TranslationLoader implements I18nLoader {
           const content = await this.storage.readTextFile(LOCALES_WORKSPACE_ID, filePath);
 
           let jsonData;
-          try {
-            jsonData = JSON.parse(content);
-          } catch (parseError) {
-            throw parseError;
-          }
+          jsonData = JSON.parse(content);
 
           // Extract locale code from filename (e.g., 'en.json' -> 'en')
           const filename = filePath.split('/').pop() || filePath;
@@ -176,16 +156,13 @@ class TranslationLoader implements I18nLoader {
           };
 
           catalogs[locale] = catalog;
-        } catch (error) {
+        } catch {
           // Continue with other files
         }
       }
 
 
       return catalogs;
-    } catch (error) {
-      throw error;
-    }
   }
 
   /**
