@@ -41,8 +41,6 @@
   let currentWorkspaceId = $derived(appState.currentWorkspaceId);
   let selectedSpineItemId = $derived(appState.selectedSpineItemId);
   let initialized = $derived(appState.initialized);
-  let currentManifestManager = $derived(appState.currentManifestManager);
-  let currentSpineManager = $derived(appState.currentSpineManager);
   let currentTransformPipeline = $derived(appState.currentTransformPipeline);
   let selectedManifestItem = $derived(appState.selectedManifestItem);
   let selectedManifestItemType = $derived(appState.selectedManifestItemType);
@@ -150,10 +148,9 @@
 
   <svelte:fragment slot="left-content">
     <!-- Main content area - switches based on current view -->
-    {#if currentView === 'workspace' && currentSpineManager && workspaceService}
+    {#if currentView === 'workspace' && workspaceService}
       <WorkspaceView
         {workspaceService}
-        spineManager={currentSpineManager}
         {currentWorkspaceId}
         {appState}
         onWorkspaceChange={appState.onWorkspaceChange.bind(appState)}

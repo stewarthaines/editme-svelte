@@ -4,7 +4,6 @@
   import { t, currentLocale } from '../../i18n';
   import type { WorkspaceInfo } from '../../workspace/types';
   import type { EPUBMetadata } from '../../epub/opf-utils';
-  import type { SpineItemManager } from '../../spine/spine-item-manager';
   import WorkspaceActionBar from '../../components/workspace/WorkspaceActionBar.svelte';
   import WorkspaceList from '../../components/workspace/WorkspaceList.svelte';
 
@@ -20,7 +19,6 @@
 
   // Props for dependency injection
   export let workspaceService: WorkspaceService;
-  export let spineManager: SpineItemManager;
   export let appState: AppState;
   export let onWorkspaceChange: ((workspaceId: string | null) => void) | null = null;
   export let currentWorkspaceId: string | null = null;
@@ -192,34 +190,11 @@
       // Set as current workspace
       setCurrentWorkspace(workspaceId);
 
-      // Smart navigation: check for spine items first
-      try {
-        const spineItems = await spineManager.loadSpineItems(workspaceId);
-
-        if (spineItems.length > 0) {
-          // Navigate to first spine item
-          const firstSpineItem = spineItems[0];
-          window.dispatchEvent(
-            new CustomEvent('select-spine-item', {
-              detail: { itemId: firstSpineItem.id },
-            })
-          );
-          // Navigation to spine view happens automatically via existing event handler in App.svelte
-        } else {
-          // Fallback to metadata view if no spine items
-          dispatch('navigationRequested', {
-            view: 'metadata',
-            workspaceId,
-          });
-        }
-      } catch (spineError) {
-        // Error loading spine items - fallback to metadata view
-        console.warn('Failed to load spine items, falling back to metadata view:', spineError);
-        dispatch('navigationRequested', {
-          view: 'metadata',
-          workspaceId,
-        });
-      }
+      // Navigate to metadata view after opening workspace
+      dispatch('navigationRequested', {
+        view: 'metadata',
+        workspaceId,
+      });
 
       dispatch('workspaceOpened', { workspaceId });
     } catch (err) {
