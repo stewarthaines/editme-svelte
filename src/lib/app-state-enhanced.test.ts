@@ -223,7 +223,7 @@ describe('EnhancedAppState Integration Tests', () => {
 
       expect(workspaceId).toBe('workspace-123');
       expect(appState.workspace).not.toBeNull();
-      expect(appState.workspace?.metadata.title).toBe('Test Book');
+      expect(appState.workspace?.opf.metadata.title).toBe('Test Book');
     });
 
     test('loadWorkspace() updates workspace state', async () => {
@@ -231,7 +231,7 @@ describe('EnhancedAppState Integration Tests', () => {
 
       expect(appState.workspace).not.toBeNull();
       expect(appState.workspace?.id).toBe('workspace-123');
-      expect(appState.workspace?.metadata.title).toBe('Test Book');
+      expect(appState.workspace?.opf.metadata.title).toBe('Test Book');
     });
 
     test('deleteWorkspace() clears current workspace if deleted', async () => {
@@ -375,7 +375,7 @@ describe('EnhancedAppState Integration Tests', () => {
       await appState.incrementDraftId();
 
       expect(appState.workspaceSettings?.draft_id).toBe(1);
-      expect(appState.workspace?.metadata.title).toContain('(Draft 1)');
+      expect(appState.workspace?.opf.metadata.title).toContain('(Draft 1)');
     });
   });
 

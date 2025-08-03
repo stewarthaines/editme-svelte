@@ -5,7 +5,7 @@
  * following the clean service architecture with single responsibility principle.
  */
 
-import type { WorkspaceState } from '../workspace/workspace.service.js';
+import type { WorkspaceState, ChapterContent } from '../workspace/workspace.service.js';
 import type { WorkspaceService } from '../workspace/workspace.service.js';
 import type { TransformExecutor, TransformContext } from '../../transform/transform-executor.js';
 import type { TranslationFunction } from '../../i18n/types.js';
@@ -28,20 +28,16 @@ export interface ContentPreview {
   warnings: string[];
 }
 
-export interface ChapterContent {
-  id: string;
-  href: string;
-  xhtmlContent: string;
-  linear: boolean;
-}
 
 export interface NavigationDocument {
   xhtmlContent: string;
   metadata: {
     id: string;
+    href: string;
+    mediaType: string;
     properties: string[];
+    linear: boolean;
   };
-  sourceType: 'auto-generated' | 'user-content';
 }
 
 export interface DemoChapter {
@@ -376,9 +372,11 @@ ${navEntries}
       xhtmlContent,
       metadata: {
         id: 'nav',
-        properties: ['nav']
-      },
-      sourceType: 'auto-generated'
+        href: 'nav.xhtml',
+        mediaType: 'application/xhtml+xml',
+        properties: ['nav'],
+        linear: false
+      }
     };
   }
 
@@ -408,9 +406,11 @@ ${navEntries}
         xhtmlContent,
         metadata: {
           id: 'nav',
-          properties: ['nav']
-        },
-        sourceType: 'user-content'
+          href: 'nav.xhtml',
+          mediaType: 'application/xhtml+xml',
+          properties: ['nav'],
+          linear: false
+        }
       };
     }
 
@@ -440,9 +440,11 @@ ${navEntriesHtml}
       xhtmlContent,
       metadata: {
         id: 'nav',
-        properties: ['nav']
-      },
-      sourceType: 'user-content'
+        href: 'nav.xhtml',
+        mediaType: 'application/xhtml+xml',
+        properties: ['nav'],
+        linear: false
+      }
     };
   }
 

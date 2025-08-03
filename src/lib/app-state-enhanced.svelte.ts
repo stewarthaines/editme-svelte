@@ -136,6 +136,9 @@ export class EnhancedAppState {
       lastModified: new Date(), // Could be enhanced with actual timestamp
       fileCount: this.workspace.opf.manifest.length,
       totalSize: 0, // Could be enhanced with actual size calculation
+      author: this.workspace.opf.metadata.creator?.[0] || undefined,
+      hasError: false,
+      epubVersion: '3.0'
     };
   }
 
@@ -153,6 +156,7 @@ export class EnhancedAppState {
       href: manifestItem.href,
       xhtmlContent: '', // Will be loaded reactively
       linear: true, // Could be determined from spine
+      mediaType: manifestItem.mediaType || 'application/xhtml+xml',
     };
   }
 
@@ -261,6 +265,21 @@ export class EnhancedAppState {
   }
 
   // Workspace operations
+  async listWorkspaces(): Promise<WorkspaceInfo[]> {
+    try {
+      this.isLoading = true;
+      this.errorMessage = null;
+
+      const workspaces = await this.workspaceService.listWorkspaces();
+      return workspaces;
+    } catch (error) {
+      this.errorMessage = `Failed to list workspaces: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      throw error;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   async createWorkspace(title: string, language: string = 'en'): Promise<string> {
     try {
       this.isLoading = true;

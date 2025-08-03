@@ -6,7 +6,6 @@
  */
 
 // Main classes
-export { WorkspaceManager } from './workspace-manager.js';
 export { ReactiveWorkspaceCache } from './workspace-cache.js';
 export { ManifestDependencyTracker } from './dependency-tracker.js';
 

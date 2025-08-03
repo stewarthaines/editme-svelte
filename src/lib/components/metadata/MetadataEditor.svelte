@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { t } from '../../i18n';
   import MetadataTabBar from './MetadataTabBar.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
@@ -7,17 +6,19 @@
   import type { EPUBMetadata } from '../../epub';
 
   // Service layer imports
-  import type { MetadataService, ValidationResult } from '../../services/metadata/metadata.service.js';
+  import { MetadataService } from '../../services/metadata/metadata.service.js';
   import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
 
   export let workspace: WorkspaceState | null = null;
   export let metadataService: MetadataService;
 
-  let metadata: EPUBMetadata = { title: '', language: '', identifier: '' };
-  let validationErrors: ValidationResult[] = [];
+  // Reactive state derived from workspace prop
+  $: metadata = workspace?.opf.metadata ?? { title: '', language: '', identifier: '' };
+  $: validationErrors = metadataService.validateMetadata(metadata);
+  $: loading = !workspace;
+  
   let activeTab = 'basic';
   let saving = false;
-  let loading = true;
   let error: string | null = null;
 
   // Tab definitions with labels
@@ -75,30 +76,10 @@
     return validationErrors.filter(error => tabFields.includes(error.field));
   };
 
-  const loadMetadata = () => {
-    if (!workspace) return;
 
-    try {
-      loading = true;
-      metadata = metadataService.loadMetadata(workspace);
-      validationErrors = metadataService.validateMetadata(metadata);
-      error = null;
-    } catch (err) {
-      console.error('Failed to load metadata:', err);
-      error = $t('Failed to load metadata');
-    } finally {
-      loading = false;
-    }
-  };
-
-  const handleFieldChange = (event: { detail: any }) => {
-    const { field, value } = event.detail;
-
-    // Update local state immediately for UI responsiveness
-    metadata = { ...metadata, [field]: value };
-
-    // Update validation errors
-    validationErrors = metadataService.validateMetadata(metadata);
+  const handleFieldChange = (_event: { detail: any }) => {
+    // Field changes are handled by the input component's internal state
+    // No action needed here since we only persist on blur/save
   };
 
   const handleFieldSave = async (event: { detail: any }) => {
@@ -107,12 +88,13 @@
     if (!workspace) return;
 
     try {
-      // Save in background without blocking UI
+      // Save field and update workspace via two-way binding
       workspace = await metadataService.updateField(workspace, field, value);
-    } catch (err) {
+      
+      error = null;
+    } catch (err: any) {
       console.error(`Failed to save field ${field}:`, err);
-      // Show error indicator - in a real implementation, you might want to
-      // show a toast notification or update the field with an error state
+      error = $t('Failed to save metadata field');
     }
   };
 
@@ -127,11 +109,11 @@
       if (field === 'creator' || field === 'subject' || field === 'contributor') {
         // Add new item using service
         workspace = await metadataService.addArrayItem(workspace, field);
-        metadata = metadataService.loadMetadata(workspace);
-        validationErrors = metadataService.validateMetadata(metadata);
       }
-    } catch (err) {
+      error = null;
+    } catch (err: any) {
       console.error(`Failed to add ${field}:`, err);
+      error = $t('Failed to add metadata item');
     } finally {
       saving = false;
     }
@@ -148,11 +130,11 @@
       if (field === 'creator' || field === 'subject' || field === 'contributor') {
         // Remove item using service
         workspace = await metadataService.removeArrayItem(workspace, field, index);
-        metadata = metadataService.loadMetadata(workspace);
-        validationErrors = metadataService.validateMetadata(metadata);
       }
-    } catch (err) {
+      error = null;
+    } catch (err: any) {
       console.error(`Failed to remove ${field}:`, err);
+      error = $t('Failed to remove metadata item');
     } finally {
       saving = false;
     }
@@ -180,11 +162,6 @@
     activeTab = newTabId;
   };
 
-  // Load metadata when component mounts or dependencies change
-  onMount(loadMetadata);
-  $: if (workspace && metadataService) {
-    loadMetadata();
-  }
 </script>
 
 <div class="metadata-editor">
@@ -200,7 +177,7 @@
     {:else if error}
       <div class="error-state">
         <p class="error-message">{error}</p>
-        <button type="button" class="retry-button" on:click={loadMetadata}>
+        <button type="button" class="retry-button" on:click={() => error = null}>
           {$t('Retry')}
         </button>
       </div>

@@ -2,14 +2,12 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { navigationStore } from '../navigation-store';
   import { t, currentLocale } from '../../i18n';
-  import type { WorkspaceInfo } from '../../workspace/types';
   import type { EPUBMetadata } from '../../epub/opf-utils';
   import WorkspaceActionBar from '../../components/workspace/WorkspaceActionBar.svelte';
   import WorkspaceList from '../../components/workspace/WorkspaceList.svelte';
 
-  // Service layer imports
-  import type { WorkspaceService } from '../../services/workspace/workspace.service.js';
-  import type { AppState } from '../../app-state.svelte.js';
+  // Service layer types for return values
+  import type { WorkspaceInfo } from '../../services/workspace/workspace.service.js';
 
   const dispatch = createEventDispatcher<{
     workspaceOpened: { workspaceId: string };
@@ -17,9 +15,11 @@
     workspaceChanged: { workspaceId: string | null };
   }>();
 
-  // Props for dependency injection
-  export let workspaceService: WorkspaceService;
-  export let appState: AppState;
+  // Props for callback-based operations
+  export let onListWorkspaces: () => Promise<WorkspaceInfo[]>;
+  export let onCreateWorkspace: (data: { title: string; language: string }) => Promise<string>;
+  export let onDeleteWorkspace: (id: string) => Promise<void>;
+  export let onLoadWorkspace: (id: string) => Promise<void>;
   export let onWorkspaceChange: ((workspaceId: string | null) => void) | null = null;
   export let currentWorkspaceId: string | null = null;
 
@@ -43,10 +43,17 @@
   }
 
   // Helper to update workspace selection and notify parent
-  const setCurrentWorkspace = (workspaceId: string | null) => {
+  const setCurrentWorkspace = async (workspaceId: string | null) => {
     if (workspaceId) {
       currentWorkspace = workspaces.find(w => w.id === workspaceId) || null;
       localStorage.setItem('currentWorkspace', workspaceId);
+      
+      // Load workspace using callback
+      try {
+        await onLoadWorkspace(workspaceId);
+      } catch (error) {
+        console.error('Failed to load workspace:', error);
+      }
     } else {
       currentWorkspace = null;
       localStorage.removeItem('currentWorkspace');
@@ -69,13 +76,13 @@
   
   // Service layer initialization handled on-demand
 
-  // Load workspaces using service layer
+  // Load workspaces using callback
   const loadWorkspaces = async () => {
     try {
       loading = true;
       error = null;
       
-      const serviceWorkspaces = await workspaceService.listWorkspaces();
+      const serviceWorkspaces = await onListWorkspaces();
       
       // Convert service workspace info to component format
       workspaces = serviceWorkspaces.map(w => ({
@@ -85,8 +92,7 @@
         lastModified: w.lastModified,
         fileCount: w.fileCount,
         totalSize: w.totalSize,
-        epubVersion: '3.0', // Service layer defaults to EPUB 3.0
-        hasError: false // Service layer handles errors differently
+        epubVersion: '3.0' // Service layer defaults to EPUB 3.0
       }));
       
       loadCurrentWorkspace();
@@ -107,7 +113,7 @@
     creator: ['Unknown'],
   });
 
-  // Handle create new workspace using orchestrated service layer
+  // Handle create new workspace using callback
   const handleCreateNew = async () => {
     try {
       loading = true;
@@ -116,24 +122,27 @@
       const locale = $currentLocale;
       const metadata = createMinimalEPUBMetadata();
 
-      // Create workspace with localized sample content using AppState orchestration
-      const workspace = await appState.createLocalizedWorkspace(metadata, locale);
+      // Create workspace using callback function
+      const workspaceId = await onCreateWorkspace({
+        title: metadata.title || 'Untitled Book Project',
+        language: locale
+      });
       
-      console.log('✅ Localized workspace created with sample content:', workspace.id);
+      console.log('✅ Workspace created:', workspaceId);
       
       // Refresh workspace list
       await loadWorkspaces();
 
       // Set as current workspace
-      setCurrentWorkspace(workspace.id);
+      await setCurrentWorkspace(workspaceId);
 
       // Navigate to first content for immediate preview
       dispatch('navigationRequested', {
         view: 'text',
-        workspaceId: workspace.id,
+        workspaceId: workspaceId,
       });
 
-      dispatch('workspaceOpened', { workspaceId: workspace.id });
+      dispatch('workspaceOpened', { workspaceId: workspaceId });
     } catch (err) {
       console.error('Failed to create workspace:', err);
       alert(
@@ -160,7 +169,7 @@
       try {
         loading = true;
 
-        // TODO: Implement EPUB import in WorkspaceManager
+        // TODO: Implement EPUB import in WorkspaceService
         // For now, show a placeholder message
         alert(
           $t(
@@ -188,7 +197,7 @@
 
     try {
       // Set as current workspace
-      setCurrentWorkspace(workspaceId);
+      await setCurrentWorkspace(workspaceId);
 
       // Navigate to metadata view after opening workspace
       dispatch('navigationRequested', {
@@ -225,15 +234,15 @@
     try {
       loading = true;
 
-      // Delete workspace using service layer
-      await workspaceService.deleteWorkspace(workspaceId);
+      // Delete workspace using callback
+      await onDeleteWorkspace(workspaceId);
       
       // Refresh workspace list
       await loadWorkspaces();
 
       // If this was the current workspace, clear it
       if (currentWorkspaceId === workspaceId) {
-        setCurrentWorkspace(null);
+        await setCurrentWorkspace(null);
       }
     } catch (err) {
       console.error('Failed to delete workspace:', err);
@@ -263,13 +272,13 @@
     }
   };
 
-  const handleCloseWorkspace = () => {
+  const handleCloseWorkspace = async () => {
     if (hasUnsavedChanges) {
       const confirmed = confirm($t('You have unsaved workspace changes. Continue?'));
       if (!confirmed) return;
     }
 
-    setCurrentWorkspace(null);
+    await setCurrentWorkspace(null);
     hasUnsavedChanges = false;
   };
 
@@ -298,9 +307,9 @@
     };
   }
 
-  export function setViewData(data: any): void {
+  export async function setViewData(data: any): Promise<void> {
     if (data.currentWorkspaceId) {
-      setCurrentWorkspace(data.currentWorkspaceId);
+      await setCurrentWorkspace(data.currentWorkspaceId);
     }
     if (data.hasUnsavedChanges !== undefined) {
       hasUnsavedChanges = data.hasUnsavedChanges;
@@ -354,20 +363,7 @@
       </div>
     {/if}
 
-    <!-- Cleanup Banner (show when there are error workspaces) -->
-    {#if workspaces.some(w => w.hasError)}
-      <div class="cleanup-banner">
-        <span class="cleanup-icon" aria-hidden="true">🧹</span>
-        <span class="cleanup-text">
-          {$t('{count} corrupted workspace(s) detected', {
-            count: workspaces.filter(w => w.hasError).length,
-          })}
-        </span>
-        <button type="button" class="cleanup-button" on:click={handleCleanupOrphaned}>
-          {$t('Clean Up')}
-        </button>
-      </div>
-    {/if}
+    <!-- Cleanup Banner removed - service layer handles error detection -->
 
     <!-- Workspace List -->
     <WorkspaceList

@@ -90,15 +90,8 @@ export class OutlineGenerator {
     spineItems: SpineItemWithSource[],
     workspaceService: WorkspaceService,
     workspaceId: string,
-    pathInfo?: WorkspacePathInfo,
-    options?: GenerationOptions
+    pathInfo?: WorkspacePathInfo
   ): Promise<NavigationDocument> {
-    // If pathInfo is actually options (backward compatibility)
-    if (pathInfo && 'titleStrategy' in pathInfo) {
-      options = pathInfo as any;
-      pathInfo = undefined;
-    }
-    
     // Default pathInfo if not provided
     if (!pathInfo) {
       pathInfo = {
@@ -107,12 +100,13 @@ export class OutlineGenerator {
         opfFileName: 'content.opf'
       };
     }
+    
+    // Use fixed options for the current architecture
     const opts = {
       includeUntitled: true,
       titleStrategy: 'heading' as const,
       documentTitle: 'Table of Contents',
       cssClasses: {},
-      ...options,
     };
 
     // Generate navigation items from spine items
@@ -136,7 +130,7 @@ export class OutlineGenerator {
           xhtmlContent,
           spineItem.href,
           chapterNumber,
-          opts.titleStrategy
+          'heading'
         );
 
         // Only add if we can extract title or includeUntitled is true

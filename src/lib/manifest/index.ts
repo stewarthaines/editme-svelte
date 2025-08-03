@@ -4,8 +4,7 @@
  * Complete public interface for EPUB manifest management and content operations.
  */
 
-// Core implementation
-export { ManifestManagerImpl, type IManifestManager } from './manifest-manager.js';
+// Note: ManifestManagerImpl removed - use WorkspaceService for manifest operations
 
 // Validation utilities
 export { ManifestValidator } from './validation.js';

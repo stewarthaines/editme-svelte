@@ -13,62 +13,65 @@
   import ContentPreview from './lib/components/preview/ContentPreview.svelte';
   import { layoutStore } from './lib/stores/layout';
   import { t } from './lib/i18n';
-  import { AppState } from './lib/app-state.svelte.js';
-  import {
-    WORKSPACE_MANAGER_CONTEXT,
-    MANIFEST_MANAGER_CONTEXT,
-    METADATA_MANAGER_CONTEXT,
-    WORKSPACE_ID_CONTEXT,
-    type WorkspaceManagerContext,
-    type ManifestManagerContext,
-    type MetadataManagerContext,
-    type WorkspaceIdContext,
-  } from './lib/contexts';
+  import { EnhancedAppState } from './lib/app-state-enhanced.svelte.js';
+  import { FileStorageAPI } from './lib/storage/index.js';
+  import { TransformExecutor } from './lib/transform/transform-executor.js';
+  import { i18nService } from './lib/i18n/index.js';
+  import { WorkspaceService } from './lib/services/workspace/workspace.service.js';
+  import { SpineService } from './lib/services/spine/spine.service.js';
+  import { MetadataService } from './lib/services/metadata/metadata.service.js';
 
-  // Get dependencies from context (stories) or create real ones (production)
-  const contextWorkspaceManager: WorkspaceManagerContext = getContext(WORKSPACE_MANAGER_CONTEXT);
-  const contextManifestManager: ManifestManagerContext = getContext(MANIFEST_MANAGER_CONTEXT);
-  const contextMetadataManager: MetadataManagerContext = getContext(METADATA_MANAGER_CONTEXT);
-  const contextWorkspaceId: WorkspaceIdContext = getContext(WORKSPACE_ID_CONTEXT);
+  // Simple implementations for required dependencies
+  const simpleExtensionManager = {
+    getAvailableTransforms: async () => []
+  };
+  
+  const simpleThemeStore = {
+    setTheme: () => {},
+    useSystemPreference: () => {},
+    getCurrentTheme: () => 'system'
+  };
+  
+  const simpleI18nStore = {
+    setLocale: () => {},
+    getCurrentLocale: () => 'en'
+  };
 
-  // Create AppState instance
-  const appState = new AppState();
+  // Create singleton FileStorageAPI and services with shared instance
+  const fileStorage = FileStorageAPI.getInstance();
+  const transformExecutor = new TransformExecutor();
+  
+  // Create services using shared FileStorageAPI
+  const workspaceService = new WorkspaceService(fileStorage);
+  const spineService = new SpineService(workspaceService);
+  const metadataService = new MetadataService(workspaceService);
+  
+  const appState = new EnhancedAppState(
+    fileStorage,
+    transformExecutor,
+    i18nService,
+    simpleExtensionManager,
+    simpleThemeStore,
+    simpleI18nStore
+  );
 
   // Reactive getters for template access
   let currentView = $derived($navigationStore.currentView);
   let isExpanded = $derived($layoutStore.sidebar.isExpanded);
-  let currentWorkspaceManager = $derived(appState.currentWorkspaceManager);
   let currentWorkspaceId = $derived(appState.currentWorkspaceId);
-  let selectedSpineItemId = $derived(appState.selectedSpineItemId);
+  let selectedSpineItemId = $derived(appState.selectedChapterId); // renamed in enhanced
   let initialized = $derived(appState.initialized);
-  let currentTransformPipeline = $derived(appState.currentTransformPipeline);
-  let selectedManifestItem = $derived(appState.selectedManifestItem);
-  let selectedManifestItemType = $derived(appState.selectedManifestItemType);
-  let navigationPreviewContent = $derived(appState.navigationPreviewContent);
-
-  // New service layer reactive getters (Phase 2 migration)
-  let workspaceService = $derived(appState.workspaceService);
-  let metadataService = $derived(appState.metadataService);
-  let spineService = $derived(appState.spineService);
-  let currentWorkspaceState = $derived(appState.currentWorkspaceState);
+  let currentWorkspaceState = $derived(appState.workspace);
+  
+  // Services are private in EnhancedAppState - workspace operations go through app state methods
+  // No direct service access needed since EnhancedAppState handles service coordination
 
   // Initialize app state
   onMount(() => {
     // Async initialization
     (async () => {
       try {
-        if (contextWorkspaceManager) {
-          // Use context-provided managers (from stories)
-          appState.initializeFromContext(
-            contextWorkspaceManager,
-            contextManifestManager,
-            contextMetadataManager,
-            contextWorkspaceId
-          );
-        } else {
-          // Production: create and initialize real managers
-          await appState.initializeForProduction();
-        }
+        await appState.initialize();
       } catch (error) {
         console.error('Failed to initialize app state:', error);
       }
@@ -77,7 +80,7 @@
     // Listen for spine item selection events
     const handleSelectSpineItem = (event: Event) => {
       const customEvent = event as CustomEvent<{ itemId: string }>;
-      appState.setSelectedSpineItem(customEvent.detail.itemId);
+      appState.selectChapter(customEvent.detail.itemId);
 
       // Automatically navigate to spine view when a spine item is selected
       navigationStore.navigateTo('spine');
@@ -85,7 +88,7 @@
 
     // Listen for spine item clear events
     const handleClearSpineSelection = () => {
-      appState.setSelectedSpineItem(null);
+      appState.selectChapter(null);
     };
 
     window.addEventListener('select-spine-item', handleSelectSpineItem);
@@ -98,24 +101,6 @@
     };
   });
 
-  // Subscribe to reactive workspace store for auto-updating currentWorkspaceId
-  $effect(() => {
-    appState.setupWorkspaceSubscription();
-  });
-
-  // Create workspace-specific dependencies when workspace changes
-  $effect(() => {
-    if (appState.currentWorkspaceId && appState.currentWorkspaceManager) {
-      appState.createWorkspaceSpecificDependencies(appState.currentWorkspaceId);
-    }
-  });
-
-  // Load workspace state for services when workspace changes
-  $effect(() => {
-    if (appState.currentWorkspaceId && appState.workspaceService && !appState.currentWorkspaceState) {
-      appState.loadWorkspaceViaService(appState.currentWorkspaceId);
-    }
-  });
 </script>
 
 <LayoutManager hasWorkspace={!!currentWorkspaceId}>
@@ -128,15 +113,14 @@
       <div class="placeholder-content">
         <p>{$t('No workspace selected')}</p>
       </div>
-    {:else if currentWorkspaceState && spineService}
+    {:else if currentWorkspaceState}
       <SpineSidebar
-        bind:this={appState.spineSidebar}
         workspace={currentWorkspaceState}
         {spineService}
         selectedItemId={selectedSpineItemId}
         {isExpanded}
-        onWorkspaceUpdate={(updatedWorkspace: import('./lib/services/workspace/workspace.service.js').WorkspaceState) => {
-          appState.currentWorkspaceState = updatedWorkspace;
+        onWorkspaceUpdate={(updatedWorkspace) => {
+          appState.workspace = updatedWorkspace;
         }}
       />
     {:else}
@@ -148,17 +132,17 @@
 
   <svelte:fragment slot="left-content">
     <!-- Main content area - switches based on current view -->
-    {#if currentView === 'workspace' && workspaceService}
+    {#if currentView === 'workspace' && initialized}
       <WorkspaceView
-        {workspaceService}
+        onListWorkspaces={() => appState.listWorkspaces()}
+        onCreateWorkspace={(data) => appState.createWorkspace(data.title, data.language)}
+        onDeleteWorkspace={(id) => appState.deleteWorkspace(id)}
+        onLoadWorkspace={(id) => appState.loadWorkspace(id)}
         {currentWorkspaceId}
-        {appState}
-        onWorkspaceChange={appState.onWorkspaceChange.bind(appState)}
-        on:workspaceOpened={appState.onWorkspaceOpened.bind(appState)}
       />
     {:else if currentView === 'metadata'}
-      {#if initialized && currentWorkspaceState && metadataService}
-        <MetadataEditor workspace={currentWorkspaceState} {metadataService} />
+      {#if initialized && currentWorkspaceState}
+        <MetadataEditor bind:workspace={currentWorkspaceState} {metadataService} />
       {:else}
         <PlaceholderView
           viewType="metadata"
@@ -168,12 +152,11 @@
         />
       {/if}
     {:else if currentView === 'manifest'}
-      {#if initialized && appState.currentWorkspaceState && appState.workspaceService}
+      {#if initialized && currentWorkspaceState}
         <ManifestContainer
-          workspace={appState.currentWorkspaceState}
-          workspaceService={appState.workspaceService}
+          workspace={currentWorkspaceState}
+          {workspaceService}
           advancedMode={true}
-          on:itemSelect={appState.handleManifestItemSelect.bind(appState)}
         />
       {:else}
         <PlaceholderView
@@ -184,28 +167,18 @@
         />
       {/if}
     {:else if currentView === 'navigation'}
-      {#if initialized && appState.currentWorkspaceState && appState.workspaceService && appState.spineService && currentTransformPipeline}
-        <OutlineView
-          workspace={appState.currentWorkspaceState}
-          workspaceService={appState.workspaceService}
-          spineService={appState.spineService}
-          transformPipeline={currentTransformPipeline}
-          on:previewUpdate={appState.handleNavigationPreviewUpdate.bind(appState)}
-        />
-      {:else}
-        <PlaceholderView
-          viewType="navigation"
-          title={$t('Table of Contents')}
-          description={$t('Loading workspace…')}
-          icon="📖"
-        />
-      {/if}
+      <PlaceholderView
+        viewType="navigation"
+        title={$t('Table of Contents')}
+        description={$t('Navigation features will be implemented in the enhanced app state')}
+        icon="📖"
+      />
     {:else if currentView === 'spine'}
-      {#if initialized && currentWorkspaceState && workspaceService && spineService}
+      {#if initialized && currentWorkspaceState}
         <SpineView
           workspace={currentWorkspaceState}
-          workspaceService={workspaceService}
-          spineService={spineService}
+          {workspaceService}
+          {spineService}
           selectedItemId={selectedSpineItemId}
         />
       {:else}
@@ -232,25 +205,18 @@
   </svelte:fragment>
 
   <svelte:fragment slot="right-content">
-    {#if currentView === 'manifest' && initialized && appState.currentWorkspaceState && appState.workspaceService}
+    {#if currentView === 'manifest' && initialized && currentWorkspaceState}
       <ManifestPreview
-        selectedItem={selectedManifestItem}
-        selectedItemType={selectedManifestItemType}
-        workspace={appState.currentWorkspaceState}
-        workspaceService={appState.workspaceService}
+        selectedItem={null}
+        selectedItemType="manifest"
+        workspace={currentWorkspaceState}
+        {workspaceService}
       />
     {:else if currentView === 'navigation'}
-      {#if navigationPreviewContent}
-        <ContentPreview
-          content={navigationPreviewContent}
-          deviceSize="responsive"
-        />
-      {:else}
-        <div class="placeholder-content">
-          <h3>{$t('Navigation Preview')}</h3>
-          <p>{$t('Navigation preview will appear here once content is generated')}</p>
-        </div>
-      {/if}
+      <div class="placeholder-content">
+        <h3>{$t('Navigation Preview')}</h3>
+        <p>{$t('Navigation preview will be implemented in the enhanced app state')}</p>
+      </div>
     {:else}
       <div class="placeholder-content">
         <h3>{$t('Preview Pane')}</h3>

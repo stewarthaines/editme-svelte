@@ -7,8 +7,7 @@
  * - EPUB Settings (SOURCE/settings.json): Book-specific settings that travel with EPUB
  */
 
-// Export the implementation class
-export { DefaultSettingsManager } from './settings-manager.js';
+// Note: DefaultSettingsManager removed - use SettingsService instead
 
 // ============================================================================
 // Type Definitions

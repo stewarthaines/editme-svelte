@@ -104,13 +104,15 @@ describe('ContentService Contract Tests', () => {
           id: 'chapter1', 
           href: 'Text/chapter1.xhtml', 
           xhtmlContent: '<html><body><h1>Chapter 1: The Beginning</h1><p>Content...</p></body></html>',
-          linear: true 
+          linear: true,
+          mediaType: 'application/xhtml+xml'
         },
         { 
           id: 'chapter2', 
           href: 'Text/chapter2.xhtml', 
           xhtmlContent: '<html><body><h1>Chapter 2: The Middle</h1><p>Content...</p></body></html>',
-          linear: true 
+          linear: true,
+          mediaType: 'application/xhtml+xml'
         }
       ];
       
@@ -122,7 +124,6 @@ describe('ContentService Contract Tests', () => {
       expect(result.xhtmlContent).toContain('<a href="Text/chapter1.xhtml">Chapter 1: The Beginning</a>');
       expect(result.xhtmlContent).toContain('<a href="Text/chapter2.xhtml">Chapter 2: The Middle</a>');
       expect(result.metadata.properties).toEqual(['nav']);
-      expect(result.sourceType).toBe('auto-generated');
     });
     
     test('generateNavigationFromContent extracts titles from XHTML headings', () => {
@@ -131,7 +132,8 @@ describe('ContentService Contract Tests', () => {
           id: 'intro', 
           href: 'Text/intro.xhtml', 
           xhtmlContent: '<html><body><h2>Introduction to the Story</h2><p>Content...</p></body></html>',
-          linear: true 
+          linear: true,
+          mediaType: 'application/xhtml+xml'
         }
       ];
       
@@ -147,7 +149,8 @@ describe('ContentService Contract Tests', () => {
           id: 'chapter1', 
           href: 'Text/chapter1.xhtml', 
           xhtmlContent: '<html><body><p>Content without heading...</p></body></html>',
-          linear: true 
+          linear: true,
+          mediaType: 'application/xhtml+xml'
         }
       ];
       
@@ -172,13 +175,15 @@ describe('ContentService Contract Tests', () => {
           id: 'chapter1', 
           href: 'Text/chapter1.xhtml', 
           xhtmlContent: '<html><body><h1>Chapter 1</h1></body></html>',
-          linear: true 
+          linear: true,
+          mediaType: 'application/xhtml+xml'
         },
         { 
           id: 'appendix', 
           href: 'Text/appendix.xhtml', 
           xhtmlContent: '<html><body><h1>Appendix</h1></body></html>',
-          linear: false 
+          linear: false,
+          mediaType: 'application/xhtml+xml'
         }
       ];
       
@@ -238,7 +243,6 @@ describe('ContentService Contract Tests', () => {
       expect(result.xhtmlContent).toContain('epub:type="toc"');
       expect(result.xhtmlContent).toContain('role="navigation"');
       expect(result.xhtmlContent).toContain('<a href="Text/chapter1.xhtml">Chapter 1: The Beginning</a>');
-      expect(result.sourceType).toBe('user-content');
     });
     
     test('processUserNavigation handles plain text navigation', () => {

@@ -16,7 +16,6 @@ export type {
   ProcessingOptions,
 } from './outline-generator';
 
-// Re-export related types from other modules for convenience
+// Re-export related types from other modules for convenience  
 export type { SpineItemWithSource } from '../spine/types';
-export type { IWorkspaceManager } from '../workspace/types';
 export type { TransformPipeline } from '../transform/transform-pipeline';

@@ -30,6 +30,9 @@ export interface WorkspaceInfo {
   lastModified: Date;
   fileCount: number;
   totalSize: number;
+  author?: string;
+  hasError?: boolean;
+  epubVersion: string;
 }
 
 export interface ChapterContent {
@@ -37,6 +40,7 @@ export interface ChapterContent {
   href: string;
   xhtmlContent: string;
   linear: boolean;
+  mediaType: string;
 }
 
 // Service error types
@@ -433,7 +437,10 @@ export class WorkspaceService {
           language: workspace.opf.metadata.language,
           lastModified: workspace.opf.metadata.modifiedDate ? new Date(workspace.opf.metadata.modifiedDate) : new Date(),
           fileCount: files.length,
-          totalSize
+          totalSize,
+          author: workspace.opf.metadata.creator?.[0] || undefined,
+          hasError: false,
+          epubVersion: '3.0'
         });
       } catch (error) {
         // Skip corrupted workspaces
@@ -476,7 +483,8 @@ export class WorkspaceService {
           id,
           href: manifestItem.href,
           xhtmlContent,
-          linear: spineItem.linear ?? true
+          linear: spineItem.linear ?? true,
+          mediaType: manifestItem.mediaType || 'application/xhtml+xml'
         });
       } catch (error) {
         // Skip missing files

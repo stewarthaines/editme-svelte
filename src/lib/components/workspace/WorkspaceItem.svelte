@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
-  import type { WorkspaceInfo } from '../../workspace/types';
+  import type { WorkspaceInfo } from '../../services/workspace/workspace.service.js';
 
   const dispatch = createEventDispatcher();
 

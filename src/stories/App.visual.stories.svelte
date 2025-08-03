@@ -1,11 +1,11 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   // Standard testing library imports will be done inside play functions
-  import AppStoryProvider from './AppStoryProvider.svelte';
+  import App from '../App.svelte';
 
   const { Story } = defineMeta({
     title: 'Application/App (Visual)',
-    component: AppStoryProvider,
+    component: App,
     parameters: {
       layout: 'fullscreen',
       docs: {
@@ -21,7 +21,6 @@
 
 <Story
   name="With Sample Content"
-  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -34,7 +33,6 @@
 
 <Story
   name="Empty Project"
-  args={{ scenario: 'empty' }}
   parameters={{
     docs: {
       description: {
@@ -46,7 +44,6 @@
 
 <Story
   name="Large Book"
-  args={{ scenario: 'largeBook' }}
   parameters={{
     docs: {
       description: {
@@ -59,7 +56,6 @@
 
 <Story
   name="Section Navigation Demo"
-  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -101,7 +97,6 @@
 
 <Story
   name="Spine Item Selection"
-  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -146,7 +141,6 @@
 
 <Story
   name="Firefox Debug Test"
-  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
@@ -212,7 +206,6 @@
 
 <Story
   name="Navigation Spine Selection Clear Test"
-  args={{ scenario: 'withContent' }}
   parameters={{
     docs: {
       description: {
