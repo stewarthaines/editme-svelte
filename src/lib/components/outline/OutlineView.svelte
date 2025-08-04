@@ -12,7 +12,7 @@
   export let workspace: WorkspaceState;
   export let workspaceService: WorkspaceService;
   export let spineService: SpineService;
-  export let transformPipeline: TransformPipeline;
+  export let transformPipeline: TransformPipeline | undefined = undefined;
 
   // Event dispatcher with typed events
   const dispatch = createEventDispatcher<{
@@ -89,6 +89,13 @@
   async function processUserContent() {
     const content = outlineStore.getContent();
     
+    // Skip manual editing if transformPipeline is not available
+    if (!transformPipeline) {
+      console.warn('TransformPipeline not available - falling back to auto-generation');
+      await generateFromSpine();
+      return;
+    }
+    
     try {
       // Process user content through transform pipeline
       const navigationDoc = await OutlineGenerator.processUserContent(
@@ -155,12 +162,22 @@
           workspace.id,
           workspace.pathInfo
         );
-      } else {
-        // User content mode
+      } else if (transformPipeline) {
+        // User content mode (only if transformPipeline is available)
         navigationDoc = await OutlineGenerator.processUserContent(
           content,
           transformPipeline,
           workspace.id
+        );
+      } else {
+        // Fallback to auto-generation if transformPipeline not available
+        console.warn('TransformPipeline not available - using auto-generation instead of user content');
+        const spineItems = await spineService.loadSpineItems(workspace);
+        navigationDoc = await OutlineGenerator.generateFromSpine(
+          spineItems,
+          workspaceService,
+          workspace.id,
+          workspace.pathInfo
         );
       }
       

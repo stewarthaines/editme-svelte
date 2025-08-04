@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, getContext } from 'svelte';
+  import { onMount } from 'svelte';
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
@@ -63,8 +63,26 @@
   let initialized = $derived(appState.initialized);
   let currentWorkspaceState = $derived(appState.workspace);
   
+  // Manifest item selection state
+  let selectedManifestItem = $state<any>(null);
+  let selectedManifestItemType = $state<'manifest' | 'source' | null>(null);
+  
+  // Navigation preview state
+  let navigationPreviewContent = $state<string | null>(null);
+  
   // Services are private in EnhancedAppState - workspace operations go through app state methods
   // No direct service access needed since EnhancedAppState handles service coordination
+
+  // Handle manifest item selection
+  const handleManifestItemSelect = (event: CustomEvent<{ item: any; type: 'manifest' | 'source' }>) => {
+    selectedManifestItem = event.detail.item;
+    selectedManifestItemType = event.detail.type;
+  };
+
+  // Handle navigation preview update
+  const handleNavigationPreviewUpdate = (event: CustomEvent<{ xhtml: string; warnings?: string[] }>) => {
+    navigationPreviewContent = event.detail.xhtml;
+  };
 
   // Initialize app state
   onMount(() => {
@@ -157,6 +175,7 @@
           workspace={currentWorkspaceState}
           {workspaceService}
           advancedMode={true}
+          on:itemSelect={handleManifestItemSelect}
         />
       {:else}
         <PlaceholderView
@@ -167,12 +186,21 @@
         />
       {/if}
     {:else if currentView === 'navigation'}
-      <PlaceholderView
-        viewType="navigation"
-        title={$t('Table of Contents')}
-        description={$t('Navigation features will be implemented in the enhanced app state')}
-        icon="📖"
-      />
+      {#if initialized && currentWorkspaceState}
+        <OutlineView
+          workspace={currentWorkspaceState}
+          {workspaceService}
+          {spineService}
+          on:previewUpdate={handleNavigationPreviewUpdate}
+        />
+      {:else}
+        <PlaceholderView
+          viewType="navigation"
+          title={$t('Table of Contents')}
+          description={$t('Loading workspace…')}
+          icon="📖"
+        />
+      {/if}
     {:else if currentView === 'spine'}
       {#if initialized && currentWorkspaceState}
         <SpineView
@@ -207,16 +235,24 @@
   <svelte:fragment slot="right-content">
     {#if currentView === 'manifest' && initialized && currentWorkspaceState}
       <ManifestPreview
-        selectedItem={null}
-        selectedItemType="manifest"
+        selectedItem={selectedManifestItem}
+        selectedItemType={selectedManifestItemType}
         workspace={currentWorkspaceState}
         {workspaceService}
       />
     {:else if currentView === 'navigation'}
-      <div class="placeholder-content">
-        <h3>{$t('Navigation Preview')}</h3>
-        <p>{$t('Navigation preview will be implemented in the enhanced app state')}</p>
-      </div>
+      {#if navigationPreviewContent}
+        <ContentPreview
+          content={navigationPreviewContent}
+          contentType="xhtml"
+          title={$t('Navigation Preview')}
+        />
+      {:else}
+        <div class="placeholder-content">
+          <h3>{$t('Navigation Preview')}</h3>
+          <p>{$t('Generating navigation from chapters...')}</p>
+        </div>
+      {/if}
     {:else}
       <div class="placeholder-content">
         <h3>{$t('Preview Pane')}</h3>
