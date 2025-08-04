@@ -244,8 +244,6 @@
       {#if navigationPreviewContent}
         <ContentPreview
           content={navigationPreviewContent}
-          contentType="xhtml"
-          title={$t('Navigation Preview')}
         />
       {:else}
         <div class="placeholder-content">

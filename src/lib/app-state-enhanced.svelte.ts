@@ -435,7 +435,7 @@ export class EnhancedAppState {
     }
   }
 
-  private async loadWorkspaceSettings(workspaceId: string): Promise<void> {
+  async loadWorkspaceSettings(workspaceId: string): Promise<void> {
     try {
       this.workspaceSettings = await this.settingsService.loadWorkspaceSettings(workspaceId);
     } catch (error) {
@@ -457,7 +457,7 @@ export class EnhancedAppState {
     }
   }
 
-  private async loadEPUBSettings(workspaceId: string): Promise<void> {
+  async loadEPUBSettings(workspaceId: string): Promise<void> {
     try {
       this.epubSettings = await this.settingsService.loadEPUBSettings(workspaceId);
     } catch (error) {
