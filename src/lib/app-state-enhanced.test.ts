@@ -101,12 +101,49 @@ vi.mock('./services/workspace/workspace.service.js', () => ({
       pathInfo: { basePath: 'OEBPS', rootfilePath: 'OEBPS/content.opf' }
     }),
     saveWorkspace: vi.fn().mockResolvedValue(undefined),
-    deleteWorkspace: vi.fn().mockResolvedValue(undefined)
+    deleteWorkspace: vi.fn().mockResolvedValue(undefined),
+    populateWithContent: vi.fn().mockResolvedValue({
+      id: 'workspace-123',
+      opf: {
+        metadata: {
+          title: 'Test Book',
+          language: 'en',
+          identifier: 'test-123'
+        },
+        manifest: [
+          { id: 'chapter1', href: 'Text/chapter1.xhtml', mediaType: 'application/xhtml+xml' }
+        ],
+        spine: [
+          { idref: 'chapter1', linear: true }
+        ]
+      },
+      pathInfo: { basePath: 'OEBPS', rootfilePath: 'OEBPS/content.opf' }
+    })
   }))
 }));
 
 vi.mock('./services/content/content.service.js', () => ({
   ContentService: vi.fn().mockImplementation(() => ({
+    generateSampleContentData: vi.fn().mockResolvedValue({
+      chapters: [
+        {
+          id: 'chapter1',
+          title: 'Chapter 1',
+          fileName: 'chapter1.txt',
+          content: '# Chapter 1\n\nThis is sample content.',
+          xhtmlContent: '<h1>Chapter 1</h1><p>This is sample content.</p>'
+        }
+      ],
+      assets: [
+        { path: 'OEBPS/Styles/page.css', content: 'body { margin: 0; }' }
+      ],
+      manifestUpdates: [
+        { id: 'chapter1', href: 'Text/chapter1.xhtml', mediaType: 'application/xhtml+xml' }
+      ],
+      spineUpdates: [
+        { idref: 'chapter1' }
+      ]
+    }),
     generateLocalizedContent: vi.fn().mockResolvedValue({
       metadata: {
         title: 'Sample Book',

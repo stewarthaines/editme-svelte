@@ -90,7 +90,7 @@ export class EnhancedAppState {
     this.fileStorage = fileStorage;
 
     // Initialize services with dependency injection
-    this.contentService = new ContentService(transformExecutor, i18nSystem);
+    // Create services without circular dependencies first
     this.settingsService = new SettingsService(
       fileStorage,
       extensionManager,
@@ -99,6 +99,9 @@ export class EnhancedAppState {
     );
     this.epubProcessor = new EPUBProcessor(fileStorage);
     this.workspaceService = new WorkspaceService(fileStorage);
+    
+    // Create ContentService without dependencies (pure functions only)
+    this.contentService = new ContentService(transformExecutor, i18nSystem);
 
     // Initialize global settings immediately
     this.loadGlobalSettings();
@@ -285,14 +288,21 @@ export class EnhancedAppState {
       this.isLoading = true;
       this.errorMessage = null;
 
+      // Step 1: Create empty workspace
       const workspace = await this.workspaceService.createWorkspace({
         title,
         language,
         identifier: `urn:uuid:${crypto.randomUUID()}`,
       });
 
+      // Step 2: Generate sample content data (pure function - no file I/O)
+      const sampleContentData = await this.contentService.generateSampleContentData(language);
+
+      // Step 3: Populate workspace with sample content (file I/O operation)
+      const populatedWorkspace = await this.workspaceService.populateWithContent(workspace.id, sampleContentData);
+
       // Set the newly created workspace
-      this.workspace = workspace;
+      this.workspace = populatedWorkspace;
 
       return workspace.id;
     } catch (error) {

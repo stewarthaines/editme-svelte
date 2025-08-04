@@ -136,9 +136,9 @@
       // Set as current workspace
       await setCurrentWorkspace(workspaceId);
 
-      // Navigate to first content for immediate preview
+      // Navigate to metadata view for immediate review
       dispatch('navigationRequested', {
-        view: 'text',
+        view: 'metadata',
         workspaceId: workspaceId,
       });
 

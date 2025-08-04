@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
+  import type { ViewType } from './lib/navigation/types';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
   import MetadataEditor from './lib/components/metadata/MetadataEditor.svelte';
   import PlaceholderView from './lib/navigation/views/PlaceholderView.svelte';
@@ -157,6 +158,9 @@
         onDeleteWorkspace={(id) => appState.deleteWorkspace(id)}
         onLoadWorkspace={(id) => appState.loadWorkspace(id)}
         {currentWorkspaceId}
+        on:navigationRequested={(event) => {
+          navigationStore.navigateTo(event.detail.view as ViewType);
+        }}
       />
     {:else if currentView === 'metadata'}
       {#if initialized && currentWorkspaceState}

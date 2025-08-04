@@ -43,6 +43,23 @@ export interface ChapterContent {
   mediaType: string;
 }
 
+// Pure data structure for sample content (no file I/O)
+export interface SampleContentData {
+  chapters: Array<{
+    id: string;
+    title: string;
+    fileName: string;
+    content: string; // Plain text content
+    xhtmlContent: string; // Transformed XHTML
+  }>;
+  assets: Array<{
+    path: string;
+    content: string;
+  }>;
+  manifestUpdates: ManifestItem[];
+  spineUpdates: SpineItem[];
+}
+
 // Service error types
 export class WorkspaceServiceError extends Error {
   constructor(message: string, public code: string, public workspaceId?: string) {
@@ -127,6 +144,54 @@ export class WorkspaceService {
     };
 
     return workspaceState;
+  }
+
+  /**
+   * Populate workspace with sample content data
+   * Pure file I/O operation - takes structured data and writes files
+   */
+  async populateWithContent(workspaceId: string, sampleData: SampleContentData): Promise<WorkspaceState> {
+    // Write all asset files
+    for (const asset of sampleData.assets) {
+      await this.fileStorage.writeTextFile(workspaceId, asset.path, asset.content);
+    }
+
+    // Write all chapter files
+    for (const chapter of sampleData.chapters) {
+      // Write source text file
+      await this.fileStorage.writeTextFile(
+        workspaceId, 
+        `SOURCE/text/${chapter.fileName}`, 
+        chapter.content
+      );
+      
+      // Write XHTML file
+      await this.fileStorage.writeTextFile(
+        workspaceId,
+        `OEBPS/Text/${chapter.id}.xhtml`,
+        chapter.xhtmlContent
+      );
+    }
+
+    // Load current workspace to update OPF
+    const workspace = await this.loadWorkspace(workspaceId);
+    
+    // Update OPF with new manifest and spine items
+    const updatedOPF: OPFDocument = {
+      ...workspace.opf,
+      manifest: [...workspace.opf.manifest, ...sampleData.manifestUpdates],
+      spine: [...workspace.opf.spine, ...sampleData.spineUpdates]
+    };
+
+    // Write updated OPF
+    const opfXML = OPFUtils.generateOPFXML(updatedOPF);
+    await this.fileStorage.writeTextFile(workspaceId, workspace.pathInfo.rootfilePath, opfXML);
+
+    // Return updated workspace state
+    return {
+      ...workspace,
+      opf: updatedOPF
+    };
   }
 
   /**

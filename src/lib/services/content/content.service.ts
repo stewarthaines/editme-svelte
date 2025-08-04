@@ -5,8 +5,7 @@
  * following the clean service architecture with single responsibility principle.
  */
 
-import type { WorkspaceState, ChapterContent } from '../workspace/workspace.service.js';
-import type { WorkspaceService } from '../workspace/workspace.service.js';
+import type { WorkspaceState, ChapterContent, SampleContentData } from '../workspace/workspace.service.js';
 import type { TransformExecutor, TransformContext } from '../../transform/transform-executor.js';
 import type { TranslationFunction } from '../../i18n/types.js';
 import type { EPUBMetadata } from '../../epub/opf-utils.js';
@@ -88,99 +87,25 @@ export class ContentService {
 
   constructor(
     private transformExecutor: TransformExecutor,
-    private i18nSystem: { translate: TranslationFunction; getCatalogs: () => any; isInitialized: () => boolean; getCurrentLocale: () => string },
-    private workspaceService?: WorkspaceService
+    private i18nSystem: { translate: TranslationFunction; getCatalogs: () => any; isInitialized: () => boolean; getCurrentLocale: () => string }
   ) {}
 
   /**
-   * Add localized sample content to a workspace (NEW SERVICE INTEGRATION METHOD)
+   * Generate complete sample content data structure (PURE FUNCTION - NO FILE I/O)
    */
-  async addLocalizedSampleContent(workspace: WorkspaceState, locale: string = 'en'): Promise<WorkspaceState> {
-    if (!this.workspaceService) {
-      throw new ContentServiceError('WorkspaceService not provided to ContentService', 'MISSING_WORKSPACE_SERVICE');
-    }
-
+  async generateSampleContentData(locale: string = 'en'): Promise<SampleContentData> {
     try {
-      // Step 1: Install universal assets
-      let updatedWorkspace = await this.installUniversalAssets(workspace);
-
-      // Step 2: Generate and install sample content using existing method
+      // Generate localized content
       const sampleContent = await this.generateLocalizedContent(locale);
-      updatedWorkspace = await this.createSampleContentFiles(updatedWorkspace, sampleContent);
+      const { chapters, isRTL } = sampleContent;
 
-      return updatedWorkspace;
-    } catch (error) {
-      throw new ContentServiceError(
-        `Failed to add localized sample content: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'SAMPLE_CONTENT_ERROR'
-      );
-    }
-  }
-
-  /**
-   * Install universal CSS and transform scripts
-   */
-  private async installUniversalAssets(workspace: WorkspaceState): Promise<WorkspaceState> {
-    if (!this.workspaceService) {
-      throw new ContentServiceError('WorkspaceService not provided', 'MISSING_WORKSPACE_SERVICE');
-    }
-
-    // Install universal CSS
-    await this.workspaceService.writeFile(workspace.id, 'OEBPS/Styles/page.css', pageCSS);
-
-    // Install transform scripts
-    await this.workspaceService.writeFile(workspace.id, 'SOURCE/scripts/transformText.js', transformTextJS);
-    await this.workspaceService.writeFile(workspace.id, 'SOURCE/scripts/transformDom.js', transformDomJS);
-
-    // Create settings.json with transform configuration
-    const settings = {
-      version: '1.0.0',
-      transforms: {
-        text: {
-          script: 'transformText.js',
-          enabled: true,
-        },
-        dom: {
-          script: 'transformDom.js',
-          enabled: true,
-        },
-      },
-    };
-
-    await this.workspaceService.writeFile(
-      workspace.id,
-      'SOURCE/settings.json',
-      JSON.stringify(settings, null, 2)
-    );
-
-    return workspace;
-  }
-
-  /**
-   * Create sample content files in workspace
-   */
-  private async createSampleContentFiles(workspace: WorkspaceState, sampleContent: LocalizedSampleContent): Promise<WorkspaceState> {
-    if (!this.workspaceService) {
-      throw new ContentServiceError('WorkspaceService not provided', 'MISSING_WORKSPACE_SERVICE');
-    }
-
-    const { chapters, locale, isRTL } = sampleContent;
-
-    // Create SOURCE text files
-    for (const chapter of chapters) {
-      await this.workspaceService.writeFile(
-        workspace.id,
-        `SOURCE/text/${chapter.id}.txt`,
-        chapter.content
-      );
-    }
-
-    // Transform text to XHTML and create OEBPS files
-    for (const chapter of chapters) {
-      const transformedContent = await this.transformContent(chapter.content);
-      
-      // Generate complete XHTML document
-      const xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+      // Transform text to XHTML for each chapter
+      const transformedChapters = [];
+      for (const chapter of chapters) {
+        const transformedContent = await this.transformContent(chapter.content);
+        
+        // Generate complete XHTML document
+        const xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="${locale}"${isRTL ? ' dir="rtl"' : ''}>
 <head>
@@ -192,35 +117,95 @@ export class ContentService {
 </body>
 </html>`;
 
-      await this.workspaceService.writeFile(
-        workspace.id,
-        `OEBPS/Text/${chapter.id}.xhtml`,
-        xhtmlContent
+        transformedChapters.push({
+          id: chapter.id,
+          title: chapter.title,
+          fileName: `${chapter.id}.txt`,
+          content: chapter.content,
+          xhtmlContent
+        });
+      }
+
+      // Generate navigation document content
+      const navContent = this.generateNavigationContent(chapters, locale, isRTL);
+
+      // Create asset files
+      const assets = [
+        {
+          path: 'OEBPS/Styles/page.css',
+          content: pageCSS
+        },
+        {
+          path: 'SOURCE/scripts/transformText.js', 
+          content: transformTextJS
+        },
+        {
+          path: 'SOURCE/scripts/transformDom.js',
+          content: transformDomJS
+        },
+        {
+          path: 'SOURCE/settings.json',
+          content: JSON.stringify({
+            version: '1.0.0',
+            transforms: {
+              text: {
+                script: 'transformText.js',
+                enabled: true,
+              },
+              dom: {
+                script: 'transformDom.js',
+                enabled: true,
+              },
+            },
+          }, null, 2)
+        },
+        {
+          path: 'OEBPS/Text/nav.xhtml',
+          content: navContent
+        }
+      ];
+
+      // Generate manifest updates
+      const manifestUpdates = [
+        {
+          id: 'page-css',
+          href: 'Styles/page.css',
+          mediaType: 'text/css',
+        },
+        {
+          id: 'nav',
+          href: 'Text/nav.xhtml',
+          mediaType: 'application/xhtml+xml',
+          properties: ['nav'],
+        },
+        ...chapters.map(chapter => ({
+          id: chapter.id,
+          href: `Text/${chapter.id}.xhtml`,
+          mediaType: 'application/xhtml+xml',
+        }))
+      ];
+
+      // Generate spine updates
+      const spineUpdates = chapters.map(chapter => ({ idref: chapter.id }));
+
+      return {
+        chapters: transformedChapters,
+        assets,
+        manifestUpdates,
+        spineUpdates
+      };
+    } catch (error) {
+      throw new ContentServiceError(
+        `Failed to generate sample content: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'SAMPLE_CONTENT_ERROR'
       );
     }
-
-    // Create navigation document
-    await this.createNavigationDocument(workspace, chapters, locale, isRTL);
-
-    // Update manifest and spine
-    let updatedWorkspace = await this.updateManifestAndSpine(workspace, chapters);
-
-    return updatedWorkspace;
   }
 
   /**
-   * Create localized navigation document
+   * Generate navigation document content (PURE FUNCTION)
    */
-  private async createNavigationDocument(
-    workspace: WorkspaceState,
-    chapters: DemoChapter[],
-    locale: string,
-    isRTL: boolean
-  ): Promise<void> {
-    if (!this.workspaceService) {
-      throw new ContentServiceError('WorkspaceService not provided', 'MISSING_WORKSPACE_SERVICE');
-    }
-
+  private generateNavigationContent(chapters: DemoChapter[], locale: string, isRTL: boolean): string {
     const navTitle = this.i18nSystem.translate('navigation.title') || 'Navigation';
     const tocTitle = this.i18nSystem.translate('navigation.tableOfContents') || 'Table of Contents';
 
@@ -231,7 +216,7 @@ export class ContentService {
       })
       .join('\n');
 
-    const navContent = `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${locale}"${isRTL ? ' dir="rtl"' : ''}>
 <head>
@@ -246,48 +231,10 @@ ${chapterLinks}
   </nav>
 </body>
 </html>`;
-
-    await this.workspaceService.writeFile(workspace.id, 'OEBPS/Text/nav.xhtml', navContent);
   }
 
-  /**
-   * Update manifest and spine with generated content
-   */
-  private async updateManifestAndSpine(workspace: WorkspaceState, chapters: DemoChapter[]): Promise<WorkspaceState> {
-    if (!this.workspaceService) {
-      throw new ContentServiceError('WorkspaceService not provided', 'MISSING_WORKSPACE_SERVICE');
-    }
 
-    // Add CSS to manifest
-    let updatedWorkspace = await this.workspaceService.addManifestItem(workspace, {
-      id: 'page-css',
-      href: 'Styles/page.css',
-      mediaType: 'text/css',
-    });
 
-    // Add navigation document to manifest
-    updatedWorkspace = await this.workspaceService.addManifestItem(updatedWorkspace, {
-      id: 'nav',
-      href: 'Text/nav.xhtml',
-      mediaType: 'application/xhtml+xml',
-      properties: ['nav'],
-    });
-
-    // Add chapters to manifest
-    for (const chapter of chapters) {
-      updatedWorkspace = await this.workspaceService.addManifestItem(updatedWorkspace, {
-        id: chapter.id,
-        href: `Text/${chapter.id}.xhtml`,
-        mediaType: 'application/xhtml+xml',
-      });
-    }
-
-    // Update spine order
-    const spineItems = chapters.map(chapter => chapter.id);
-    updatedWorkspace = await this.workspaceService.updateSpineOrder(updatedWorkspace, spineItems);
-
-    return updatedWorkspace;
-  }
 
   /**
    * Transform plain text content to XHTML using transform pipeline

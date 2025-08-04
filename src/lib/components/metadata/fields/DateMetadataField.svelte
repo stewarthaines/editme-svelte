@@ -29,6 +29,7 @@
   const setToday = () => {
     const today = new Date().toISOString().split('T')[0];
     dispatch('change', { value: today });
+    dispatch('blur', { value: today }); // Also trigger blur to save the value
   };
 </script>
 
