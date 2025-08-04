@@ -18,7 +18,7 @@
   let dragActive = false;
   let fileInputRef: HTMLInputElement;
 
-  type SortableFields = 'id' | 'href' | 'size' | 'modified';
+  type SortableFields = 'id' | 'href' | 'size';
   let sortField: SortableFields = 'id';
   let sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -66,29 +66,35 @@
     }
   });
 
-  // Sort filtered items
-  $: sortedItems = [...filteredItems].sort((a, b) => {
-    let aValue: string | number | Date = '';
-    let bValue: string | number | Date = '';
+  // Sort filtered items - manifest items first, then source items (each group sorted internally)
+  $: sortedItems = (() => {
+    const manifestItems = filteredItems.filter(item => item._type === 'manifest');
+    const sourceItems = filteredItems.filter(item => item._type === 'source');
 
-    if (sortField === 'id') {
-      aValue = a._type === 'manifest' ? (a as ManifestItem).id : (a as SourceItem).name;
-      bValue = b._type === 'manifest' ? (b as ManifestItem).id : (b as SourceItem).name;
-    } else if (sortField === 'href') {
-      aValue = a._type === 'manifest' ? (a as ManifestItem).href : (a as SourceItem).path;
-      bValue = b._type === 'manifest' ? (b as ManifestItem).href : (b as SourceItem).path;
-    } else if (sortField === 'size') {
-      aValue = a.size || 0;
-      bValue = b.size || 0;
-    } else if (sortField === 'modified') {
-      aValue = a.modified || new Date(0);
-      bValue = b.modified || new Date(0);
-    }
+    const sortGroup = (items: typeof filteredItems) => {
+      return [...items].sort((a, b) => {
+        let aValue: string | number | Date = '';
+        let bValue: string | number | Date = '';
 
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
+        if (sortField === 'id') {
+          aValue = a._type === 'manifest' ? (a as ManifestItem).id : (a as SourceItem).name;
+          bValue = b._type === 'manifest' ? (b as ManifestItem).id : (b as SourceItem).name;
+        } else if (sortField === 'href') {
+          aValue = a._type === 'manifest' ? (a as ManifestItem).href : (a as SourceItem).path;
+          bValue = b._type === 'manifest' ? (b as ManifestItem).href : (b as SourceItem).path;
+        } else if (sortField === 'size') {
+          aValue = a.size || 0;
+          bValue = b.size || 0;
+        }
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    };
+
+    return [...sortGroup(manifestItems), ...sortGroup(sourceItems)];
+  })();
 
   const handleSort = (field: SortableFields) => {
     if (sortField === field) {
@@ -357,26 +363,28 @@
                 {getSortIcon('size')}
               </button>
             </th>
-            <th scope="col">
-              <button
-                type="button"
-                class="sort-button"
-                on:click={() => handleSort('modified')}
-                aria-label={$t('Sort by modification date')}
-              >
-                {$t('Modified')}
-                {getSortIcon('modified')}
-              </button>
-            </th>
             <th scope="col">{$t('Properties')}</th>
           </tr>
         </thead>
         <tbody>
-          {#each sortedItems as item}
+          {#each sortedItems as item, index}
             {@const itemType = item._type}
             {@const isSelected = isItemSelected(item, itemType)}
             {@const hasError =
               itemType === 'manifest' ? hasValidationError(item as ManifestItem) : false}
+            {@const prevItemType = index > 0 ? sortedItems[index - 1]._type : null}
+            {@const showSourceSeparator = itemType === 'source' && prevItemType === 'manifest'}
+            
+            <!-- Source items separator -->
+            {#if showSourceSeparator}
+              <tr class="source-separator">
+                <td colspan="4" class="separator-cell">
+                  <div class="separator-content">
+                    <span class="separator-label">{$t('SOURCE Files')}</span>
+                  </div>
+                </td>
+              </tr>
+            {/if}
             <tr
               class="manifest-row"
               class:selected={isSelected}
@@ -401,9 +409,6 @@
               </td>
               <td class="size-cell">
                 {formatFileSize(item.size)}
-              </td>
-              <td class="modified-cell">
-                {formatDate(item.modified)}
               </td>
               <td class="properties-cell">
                 {#if itemType === 'manifest' && (item as ManifestItem).properties && ((item as ManifestItem).properties?.length ?? 0) > 0}
@@ -698,22 +703,48 @@
     background-color: var(--color-surface-hover);
   }
 
-  .manifest-row:focus {
-    outline: none;
+  .manifest-row:focus:not(.selected) {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -2px;
     background-color: var(--color-surface-hover);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
+  }
+
+  .manifest-row.selected:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -2px;
   }
 
   .manifest-row.selected {
-    background-color: var(--color-interactive-primary-subtle);
+    background-color: var(--color-bg-accent);
   }
 
   .manifest-row.error {
-    background-color: var(--color-error-subtle);
+    background-color: var(--color-bg-error);
   }
 
-  .manifest-row.source-item {
-    background-color: var(--color-surface-tertiary);
+
+  .source-separator {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .separator-cell {
+    padding: 0.75rem 0.75rem;
+    border-bottom: 2px solid var(--color-border-strong);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .separator-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .separator-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .id-cell {
@@ -743,10 +774,6 @@
     color: var(--color-text-secondary);
   }
 
-  .modified-cell {
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-  }
 
   .properties-list {
     display: flex;
@@ -755,7 +782,7 @@
   }
 
   .property-tag {
-    background-color: var(--color-primary-subtle);
+    background-color: var(--color-bg-accent);
     color: var(--color-primary);
     padding: 0.125rem 0.375rem;
     border-radius: var(--radius-xs);
@@ -816,10 +843,6 @@
 
     .href-cell {
       max-width: 150px;
-    }
-
-    .modified-cell {
-      display: none;
     }
 
     .properties-list {

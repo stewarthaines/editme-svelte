@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { navigationStore } from '../navigation-store';
-  import type { WorkspaceService, WorkspaceState } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceService,
+    WorkspaceState,
+  } from '../../services/workspace/workspace.service.js';
   import type { SpineService } from '../../services/spine/spine.service.js';
   import type { SpineItemWithSource } from '../../spine/types';
   import { t } from '../../i18n';
@@ -125,11 +128,6 @@
 </script>
 
 <div class="spine-view">
-  <header class="view-header">
-    <h2>{$t('Spine Item Details')}</h2>
-    <p>{$t('View and manage spine item content')}</p>
-  </header>
-
   <div class="view-content">
     {#if isLoading}
       <div class="loading-state">

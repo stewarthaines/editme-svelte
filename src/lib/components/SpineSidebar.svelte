@@ -77,7 +77,7 @@
 
   // Handle item selection
   function handleSelectItem(itemId: string) {
-    selectedItemId = itemId;
+    // Don't update local selectedItemId - let the parent control this via props
     // Dispatch custom event for parent to handle main view navigation
     const event = new CustomEvent('select-spine-item', {
       detail: { itemId },
