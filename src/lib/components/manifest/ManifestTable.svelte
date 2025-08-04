@@ -374,13 +374,13 @@
               itemType === 'manifest' ? hasValidationError(item as ManifestItem) : false}
             {@const prevItemType = index > 0 ? sortedItems[index - 1]._type : null}
             {@const showSourceSeparator = itemType === 'source' && prevItemType === 'manifest'}
-            
+
             <!-- Source items separator -->
             {#if showSourceSeparator}
               <tr class="source-separator">
                 <td colspan="4" class="separator-cell">
                   <div class="separator-content">
-                    <span class="separator-label">{$t('SOURCE Files')}</span>
+                    <span class="separator-label">{$t('SOURCE.zip')}</span>
                   </div>
                 </td>
               </tr>
@@ -722,7 +722,6 @@
     background-color: var(--color-bg-error);
   }
 
-
   .source-separator {
     background-color: var(--color-bg-secondary);
   }
@@ -743,7 +742,6 @@
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--color-text-secondary);
-    text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
@@ -773,7 +771,6 @@
     text-align: right;
     color: var(--color-text-secondary);
   }
-
 
   .properties-list {
     display: flex;
