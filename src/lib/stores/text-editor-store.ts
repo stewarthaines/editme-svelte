@@ -59,6 +59,9 @@ export function createTextEditorStore(
     lastUpdated: getUniqueTimestamp(),
   });
 
+  // Track all subscription unsubscribe functions for proper cleanup
+  const subscriptions: (() => void)[] = [];
+
   // ============================================================================
   // Store Methods
   // ============================================================================
@@ -104,10 +107,20 @@ export function createTextEditorStore(
   }
 
   /**
-   * Subscribes to state changes
+   * Subscribes to state changes and tracks the subscription for cleanup
    */
   function subscribe(subscriber: (state: TextEditorState) => void): () => void {
-    return stateStore.subscribe(subscriber);
+    const unsubscribe = stateStore.subscribe(subscriber);
+    subscriptions.push(unsubscribe);
+    
+    // Return a wrapped unsubscribe function that also removes from tracking
+    return () => {
+      unsubscribe();
+      const index = subscriptions.indexOf(unsubscribe);
+      if (index > -1) {
+        subscriptions.splice(index, 1);
+      }
+    };
   }
 
   // ============================================================================
@@ -115,10 +128,15 @@ export function createTextEditorStore(
   // ============================================================================
 
   /**
-   * Cleanup function to remove the editor ID from the registry
+   * Cleanup function to remove the editor ID from the registry and clean up all subscriptions
    * Should be called when the component using this store is destroyed
    */
   function destroy(): void {
+    // Clean up all tracked subscriptions
+    subscriptions.forEach(unsubscribe => unsubscribe());
+    subscriptions.length = 0;
+    
+    // Remove from registry
     activeEditorIds.delete(editorId);
   }
 

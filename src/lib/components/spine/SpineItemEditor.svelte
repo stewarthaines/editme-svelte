@@ -170,7 +170,8 @@
     <!-- Editor Pane (Left) -->
     <div class="editor-pane">
       <EditorPane
-        availableFiles={[]}
+        availableFiles1={[]}
+        availableFiles2={[]}
         transformError={$transformError}
         transformWarnings={$transformWarnings}
         isTransforming={$isTransforming}

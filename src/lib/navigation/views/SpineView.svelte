@@ -27,6 +27,9 @@
   import { t } from '../../i18n';
   import { themeStore } from '../../stores/theme.js';
   import { i18nService } from '../../i18n/index.js';
+  import { createTextEditorStore } from '../../stores/text-editor-store.js';
+  import { getTextFilePath } from '../../source/source-utils.js';
+  import type { TextEditorStore } from '../../stores/index.js';
 
   // Props using clean service architecture
   export let workspace: WorkspaceState;
@@ -54,8 +57,12 @@
     text: ''
   };
   
-  // Available files for editor pane dropdowns
+  // Available files for editor pane dropdowns  
   let availableFiles: Array<{ value: string; label: string; path: string; href: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
+  
+  // Pane-specific available files (filtered to prevent conflicts)
+  let availableFiles1: Array<{ value: string; label: string; path: string; href: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
+  let availableFiles2: Array<{ value: string; label: string; path: string; href: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
 
   // Track previous selectedItemId to prevent unnecessary reloads
   let previousSelectedItemId: string | null = null;
@@ -65,12 +72,12 @@
   
   // Spine editor configuration interface for persistence (content never persisted)
   interface SpineEditorConfig {
-    pane1: { fileType: string; selectedFile?: string; content?: string } | null;
-    pane2: { fileType: string; selectedFile?: string; content?: string } | null;
+    pane1: { fileType: string; selectedFile?: string } | null;
+    pane2: { fileType: string; selectedFile?: string } | null;
     mode: 'single' | 'dual';
   }
 
-  // Complete pane state tracking including UI state
+  // Complete pane state tracking including UI state (content for non-text files only)
   let paneState = {
     mode: 'single' as 'single' | 'dual',
     pane1: { 
@@ -79,7 +86,7 @@
       fileType: '', 
       contentType: null as ContentType | null,
       selectedFileValue: '', // For dropdown display 
-      content: ''
+      content: '' // For non-text files only (CSS, JS)
     },
     pane2: { 
       filePath: '', 
@@ -87,7 +94,7 @@
       fileType: '', 
       contentType: null as ContentType | null,
       selectedFileValue: '', // For dropdown display
-      content: ''
+      content: '' // For CSS/JS files
     }
   };
 
@@ -97,6 +104,31 @@
   const transformError = writable<TransformError | null>(null);
   const isTransforming = writable<boolean>(false);
   const executionTime = writable<number>(0);
+  
+  // Pane-specific error state for inline error display
+  let pane1Error: string | null = null;
+  let pane2Error: string | null = null;
+
+  // File-backed content stores for any text-based file (text, CSS, JS, transform scripts)
+  let fileContentStores = new Map<string, TextEditorStore>();
+
+  // Simple reactive store variables - assigned imperatively in handleFileSelect
+  let pane1Store: TextEditorStore | null = null;
+  let pane2Store: TextEditorStore | null = null;
+
+  // Debug store assignments
+  $: {
+    if (pane1Store || pane2Store) {
+      console.log('🔍 Store assignments:', {
+        pane1Store: !!pane1Store,
+        pane2Store: !!pane2Store,
+        pane1Content: pane1Store ? pane1Store.content?.length : 0,
+        pane2Content: pane2Store ? pane2Store.content?.length : 0
+      });
+    }
+  }
+
+  // Store subscriptions will be handled after implementing direct assignment
 
   // Event dispatcher to notify parent of preview data changes
   const dispatch = createEventDispatcher();
@@ -161,6 +193,34 @@
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to initialize services';
       console.error('Failed to initialize spine editor services:', err);
+    }
+  }
+
+  // Update pane-specific available files based on current selections
+  function updatePaneSpecificFiles() {
+    if (paneState.mode === 'single') {
+      // Single pane mode - no conflicts possible, all files available to both panes
+      availableFiles1 = availableFiles;
+      availableFiles2 = availableFiles;
+    } else {
+      // Dual pane mode - prevent text content conflicts between visible panes
+      const pane1HasText = paneState.pane1.fileType === 'text';
+      const pane2HasText = paneState.pane2.fileType === 'text';
+      
+      // Filter available files for each pane to prevent conflicts
+      availableFiles1 = availableFiles.filter(file => {
+        if (file.type === 'text' && pane2HasText) {
+          return false; // Hide text option from pane 1 if pane 2 has it
+        }
+        return true;
+      });
+      
+      availableFiles2 = availableFiles.filter(file => {
+        if (file.type === 'text' && pane1HasText) {
+          return false; // Hide text option from pane 2 if pane 1 has it  
+        }
+        return true;
+      });
     }
   }
 
@@ -242,6 +302,9 @@
       }
       
       availableFiles = files;
+      
+      // Update pane-specific files based on current selections
+      updatePaneSpecificFiles();
     } catch (err) {
       console.error('Failed to load available files:', err);
       // Fallback to just text content
@@ -254,45 +317,155 @@
           type: 'text'
         }
       ];
+      
+      // Update pane-specific files for fallback case too
+      updatePaneSpecificFiles();
     }
   }
+
+  // File-backed text editor store functions
+  /**
+   * Create a file-backed store for any text-based file
+   * Implements the pattern from text-editor-store-API.md
+   */
+  async function createFileBackedStore(
+    manifestItem: { value: string; label: string; path: string; href: string; type: 'text' | 'css' | 'javascript' | 'transform' },
+    workspaceId: string,
+    workspaceService: WorkspaceService
+  ): Promise<TextEditorStore> {
+    const filePath = manifestItem.path;
+    const editorId = `file-content-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`;
+    
+    // Load initial content from file
+    let initialContent = '';
+    try {
+      const buffer = await workspaceService.readFile(workspaceId, filePath);
+      initialContent = new TextDecoder().decode(buffer);
+    } catch {
+      // File doesn't exist, start with empty content
+    }
+    
+    const store = createTextEditorStore(editorId, initialContent);
+    
+    // Combined save and preview subscription - ensures sequential operations
+    let debounceTimeout: ReturnType<typeof setTimeout>;
+    store.subscribe(state => {
+      if (!previewManager) return;
+      
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(async () => {
+        try {
+          // Step 1: Save file first (required for blob URL generation)
+          await workspaceService.writeFile(workspaceId, manifestItem.path, state.content);
+          
+          // Step 2: Then update preview (reads from saved file)
+          if (manifestItem.type === 'text') {
+            previewManager.updateContent('text', state.content);
+          } else if (['css', 'javascript', 'transform'].includes(manifestItem.type)) {
+            if (manifestItem.href && blobURLManager) {
+              blobURLManager.revokeFileBlob(manifestItem.href);
+            }
+            previewManager.forcePreviewUpdate();
+          }
+        } catch (error) {
+          console.error('Auto-save failed:', error);
+        }
+      }, 300); // Single 300ms debounce for both save and preview
+    });
+    
+    return store;
+  }
+
+  /**
+   * Get existing store or create new one (lazy initialization)
+   * Stores are cached for session-level performance
+   */
+  async function getOrCreateFileStore(
+    manifestItem: { value: string; label: string; path: string; href: string; type: 'text' | 'css' | 'javascript' | 'transform' },
+    workspaceId: string, 
+    workspaceService: WorkspaceService
+  ): Promise<TextEditorStore | null> {
+    try {
+      const filePath = manifestItem.path;
+      
+      // Check if store already exists
+      if (fileContentStores.has(filePath)) {
+        return fileContentStores.get(filePath)!;
+      }
+      
+      // Create new file-backed store
+      const store = await createFileBackedStore(manifestItem, workspaceId, workspaceService);
+      
+      // Cache for session (check again in case of concurrent creation)
+      if (!fileContentStores.has(filePath)) {
+        fileContentStores.set(filePath, store);
+        console.log('📝 Created new file store for:', filePath, 'Total stores:', fileContentStores.size);
+        return store;
+      } else {
+        // Someone else created it, destroy ours and return theirs
+        store.destroy();
+        return fileContentStores.get(filePath)!;
+      }
+    } catch (error) {
+      console.error(`Failed to get/create file store for ${manifestItem.path}:`, error);
+      return null;
+    }
+  }
+
 
   // Initialize spine editor preview manager
   async function initializeSpineEditor() {
     if (!selectedItemId || !servicesInitialized) return;
-    
-    // Clear existing preview manager when switching spine items
-    if (previewManager) {
-      previewManager = null;
-    }
 
     try {
       // Load available files for editor panes
       await loadAvailableFiles();
       
-      // Initialize preview manager
-      previewManager = createSpinePreviewManager(
-        workspace.id,
-        selectedItemId,
-        fileStorage,
-        extensionManager,
-        blobURLManager,
-        workspaceService,
-        settingsService,
-        transformEngine,
-        DEFAULT_PREVIEW_CONFIG,
-        handlePreviewUpdate,
-        handlePreviewError,
-        selectedItem
-      );
+      // Validate spine item synchronization before proceeding
+      if (!selectedItem || selectedItem.id !== selectedItemId) {
+        console.warn('⚠️ Spine item synchronization issue:', {
+          selectedItemId,
+          selectedItemActualId: selectedItem?.id,
+          selectedItem: selectedItem
+        });
+        // Skip preview manager operation if spine item data is mismatched
+        return;
+      }
 
-      // Initialize transform pipeline first
-      await previewManager.initialize();
+      // Create or reuse preview manager (workspace singleton pattern)
+      if (!previewManager) {
+        console.log('✅ Creating new workspace-scoped preview manager for spine:', selectedItemId);
+        
+        // First time creation - initialize workspace-scoped preview manager
+        previewManager = createSpinePreviewManager(
+          workspace.id,
+          selectedItemId,
+          fileStorage,
+          extensionManager,
+          blobURLManager,
+          workspaceService,
+          settingsService,
+          transformEngine,
+          DEFAULT_PREVIEW_CONFIG,
+          handlePreviewUpdate,
+          handlePreviewError,
+          selectedItem
+        );
 
-      // Load initial content and render
-      await previewManager.loadInitialContent();
+        // Initialize transform pipeline first
+        await previewManager.initialize();
+
+        // Load initial content and render
+        await previewManager.loadInitialContent();
+      } else {
+        console.log('🔄 Reusing existing preview manager, switching to spine:', selectedItemId);
+        
+        // Existing preview manager - switch spine context
+        await previewManager.switchToSpineItem(selectedItemId, selectedItem);
+      }
+
+      // Update current content reference
       currentContent = previewManager.getCurrentContent();
-
       
       // Restore saved pane configuration or initialize with defaults
       await restoreOrInitializePaneContent();
@@ -312,19 +485,15 @@
   
   // Restore saved pane configuration or initialize with defaults
   async function restoreOrInitializePaneContent() {
-    console.log('[SpineView] restoreOrInitializePaneContent called, availableFiles:', availableFiles.length);
     if (availableFiles.length === 0) return;
     
     // Try to restore saved configuration from navigationStore
     const savedConfig = navigationStore.getViewData<SpineEditorConfig>('spine');
-    console.log('[SpineView] Saved config from navigationStore:', savedConfig);
     
     if (savedConfig && (savedConfig.pane1 || savedConfig.pane2)) {
-      console.log('[SpineView] Restoring saved pane configuration:', savedConfig);
       // Restore saved pane configuration
       await restorePaneConfiguration(savedConfig);
     } else {
-      console.log('[SpineView] No saved config, using default initialization');
       // Default initialization - text content in pane 1
       const textFile = availableFiles.find(f => f.type === 'text');
       if (textFile) {
@@ -336,11 +505,11 @@
           fileType: textFile.type, 
           contentType,
           selectedFileValue: textFile.value,
-          content: ''
+          content: '' // Empty for text files (handled by store)
         };
         
-        // Load content into pane 1
-        await loadFileIntoPane(1, textFile.path, textFile.type);
+        // Remove conditional bypass - text store should handle content loading
+        console.warn('restoreOrInitializePaneContent bypassed loadFileIntoPane for text content');
         
         // Persist the default configuration
         persistPaneConfiguration();
@@ -367,14 +536,12 @@
   }
   
   // Handle file selection in editor panes
-  function handleFileSelect(event: CustomEvent<{ pane: 1 | 2; filePath: string; fileType: string }>) {
+  async function handleFileSelect(event: CustomEvent<{ pane: 1 | 2; filePath: string; fileType: string }>) {
     const { pane, filePath, fileType } = event.detail;
-    console.log('[SpineView] handleFileSelect called:', { pane, filePath, fileType });
     
     // Find the file in availableFiles to get the href and value
     const selectedFile = availableFiles.find(f => f.path === filePath);
     if (!selectedFile) {
-      console.error('[SpineView] File not found in availableFiles:', filePath);
       return;
     }
     
@@ -392,33 +559,119 @@
       fileType, 
       contentType,
       selectedFileValue: fileValue,
-      content: '' // Clear content to prevent mismatch during loading
+      content: '' // Will be loaded below for non-text files
     };
+    
+    // Clear any existing pane-specific error when switching files
+    if (pane === 1) {
+      pane1Error = null;
+    } else {
+      pane2Error = null;
+    }
     
     // Switch to dual mode if pane 2 is being used
     if (pane === 2 && paneState.mode === 'single') {
       paneState.mode = 'dual';
     }
     
-    console.log('[SpineView] Updated pane state for file selection:', paneState);
     
     // Persist pane configuration to navigationStore
     persistPaneConfiguration();
     
-    // Load file content into the selected pane
-    loadFileIntoPane(pane, filePath, fileType);
+    // DEBUG: Trace file store creation and assignment
+    console.log('🔍 handleFileSelect creating store for:', {
+      fileType,
+      filePath,
+      pane,
+      existingStore: fileContentStores.has(filePath)
+    });
+    
+    // Get or create store for this file (stores are cached in fileContentStores map)
+    const store = await getOrCreateFileStore(selectedFile, workspace.id, workspaceService);
+    
+    if (store) {
+      console.log('✅ File store ready:', filePath, 'Content length:', store.content?.length || 0);
+      
+      // Directly assign store to the appropriate pane (imperative assignment)
+      if (pane === 1) {
+        pane1Store = store;
+        console.log('📌 Assigned store to pane1:', filePath);
+      } else {
+        pane2Store = store;
+        console.log('📌 Assigned store to pane2:', filePath);
+      }
+    } else {
+      console.error('❌ Failed to create file store for:', filePath);
+    }
+    
+    // Update pane-specific available files to reflect new selections
+    updatePaneSpecificFiles();
   }
   
-  // Handle content changes from editor panes
+  /**
+   * Validate JavaScript syntax before execution
+   * Returns null if valid, error message if invalid
+   * 
+   * Note: CSS validation is not supported due to browser limitations.
+   * CSS parsers are designed for graceful error recovery rather than validation.
+   */
+  function validateJavaScriptSyntax(code: string): string | null {
+    if (!code || code.trim() === '') {
+      return null; // Empty content is valid
+    }
+    
+    try {
+      // Use Function constructor to validate syntax without executing
+      new Function(code);
+      return null; // Syntax is valid
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        return `JavaScript syntax error: ${error.message}`;
+      }
+      return `JavaScript validation error: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  }
+
+
+  // Handle content changes from editor panes (for non-text files only)
   function handlePaneContentChange(event: CustomEvent<{ pane: 1 | 2; content: string }>) {
     const { pane, content } = event.detail;
     
-    // Update pane state content
     const paneKey = `pane${pane}` as keyof Pick<typeof paneState, 'pane1' | 'pane2'>;
+    
+    // Update pane state content for non-text files (CSS, JS)
     paneState[paneKey].content = content;
     
     // Get the content type for this pane
-    const { contentType, filePath, fileHref } = paneState[paneKey];
+    const { contentType, filePath, fileHref, fileType } = paneState[paneKey];
+    
+    // Validate JavaScript syntax for JS and transform files
+    if ((fileType === 'javascript' || fileType === 'transform') && content.trim()) {
+      const syntaxError = validateJavaScriptSyntax(content);
+      if (syntaxError) {
+        // Set pane-specific error for inline display
+        if (pane === 1) {
+          pane1Error = syntaxError;
+        } else {
+          pane2Error = syntaxError;
+        }
+        return; // Don't proceed with auto-save if syntax is invalid
+      } else {
+        // Clear pane error if syntax becomes valid
+        if (pane === 1) {
+          pane1Error = null;
+        } else {
+          pane2Error = null;
+        }
+      }
+    } else {
+      // Clear error for non-JavaScript files or empty content
+      if (pane === 1) {
+        pane1Error = null;
+      } else {
+        pane2Error = null;
+      }
+    }
     
     // Update preview manager if this is text content (only text content flows to preview)
     if (contentType && previewManager) {
@@ -432,11 +685,49 @@
     }
   }
   
-  // Handle pane toggle
-  function handlePaneToggle() {
-    paneState.mode = paneState.mode === 'single' ? 'dual' : 'single';
+  // Handle pane toggle with smart conflict resolution and auto-selection
+  async function handlePaneToggle() {
+    const newMode = paneState.mode === 'single' ? 'dual' : 'single';
+    
+    if (newMode === 'dual') {
+      let defaultFile = null;
+      
+      // Check for text content conflicts when switching to dual mode
+      if (paneState.pane1.fileType === 'text' && paneState.pane2.fileType === 'text') {
+        // Conflict: keep text in pane 1, find alternative for pane 2
+        defaultFile = availableFiles.find(f => f.type !== 'text');
+        console.log('🔄 Text conflict resolved: moving pane 2 from text to', defaultFile?.label || 'empty');
+      } else if (!paneState.pane2.selectedFileValue || paneState.pane2.selectedFileValue === '') {
+        // No conflict, but pane 2 needs default selection - use first available file
+        defaultFile = availableFiles[0];
+        console.log('📋 Auto-selecting default file for pane 2:', defaultFile?.label);
+      }
+      
+      // Apply default selection and create store if needed
+      if (defaultFile) {
+        paneState.pane2 = {
+          selectedFileValue: defaultFile.value,
+          filePath: defaultFile.path,
+          fileType: defaultFile.type,
+          fileHref: defaultFile.href
+        };
+        
+        // Create store for the default file
+        try {
+          const store = await getOrCreateFileStore(defaultFile, workspace.id, workspaceService);
+          if (store) {
+            pane2Store = store;
+            console.log('✅ Created store for pane 2 default selection:', defaultFile.path);
+          }
+        } catch (error) {
+          console.error('Failed to create store for pane 2 default selection:', error);
+        }
+      }
+    }
+    
+    paneState.mode = newMode;
     persistPaneConfiguration();
-    console.log('[SpineView] Pane mode toggled to:', paneState.mode);
+    updatePaneSpecificFiles();
   }
   
   // Debounced auto-save functionality
@@ -456,12 +747,10 @@
         // This prevents race conditions where user switches spine items during debounce
         const isStillValid = validateAutoSaveStillValid(filePath, content);
         if (!isStillValid) {
-          console.warn(`[SpineView] Auto-save canceled - file path no longer valid: ${filePath}`);
           return;
         }
         
         await fileStorage.writeTextFile(workspace.id, filePath, content);
-        console.log(`Auto-saved: ${filePath}`);
         
         // Invalidate blob URL cache using manifest href for CSS/JS files
         if (blobURLManager && (filePath.includes('/Styles/') || filePath.includes('/Scripts/'))) {
@@ -473,7 +762,7 @@
           }
         }
       } catch (err) {
-        console.error(`Failed to auto-save ${filePath}:`, err);
+        // Auto-save failed, but continue
       } finally {
         autoSaveTimeouts.delete(filePath);
       }
@@ -488,7 +777,6 @@
     if (filePath.includes('SOURCE/text/') && selectedItemId) {
       const expectedTextPath = `SOURCE/text/${selectedItemId}.txt`;
       if (filePath !== expectedTextPath) {
-        console.warn(`[SpineView] Auto-save validation failed: Expected ${expectedTextPath}, got ${filePath}`);
         return false;
       }
       
@@ -500,7 +788,6 @@
                                         !content.toLowerCase().includes(`chapter ${pathChapter}`) &&
                                         !content.toLowerCase().includes(`chapter${pathChapter}`);
           if (contentHasWrongChapter) {
-            console.warn(`[SpineView] Auto-save validation failed: Content doesn't match chapter ${pathChapter} for file ${filePath}`);
             return false;
           }
         }
@@ -526,27 +813,22 @@
       mode: paneState.mode
     };
     
-    console.log('[SpineView] Persisting pane configuration (no content):', config);
     navigationStore.setViewData('spine', config);
-    console.log('[SpineView] Configuration persisted to navigationStore');
   }
   
   // Restore pane configuration from saved state
   async function restorePaneConfiguration(savedConfig: SpineEditorConfig) {
-    console.log('[SpineView] restorePaneConfiguration called with:', savedConfig);
     
     // Restore editor mode
     paneState.mode = savedConfig.mode;
     
     // Restore pane 1 configuration
     if (savedConfig.pane1) {
-      console.log('[SpineView] Restoring pane 1:', savedConfig.pane1);
       await restorePaneState(1, savedConfig.pane1);
     }
     
     // Restore pane 2 configuration
     if (savedConfig.pane2) {
-      console.log('[SpineView] Restoring pane 2:', savedConfig.pane2);
       await restorePaneState(2, savedConfig.pane2);
     }
   }
@@ -554,7 +836,6 @@
   // Restore individual pane state
   async function restorePaneState(pane: 1 | 2, paneConfig: { fileType: string; selectedFile?: string; content?: string }) {
     const { fileType, selectedFile, content } = paneConfig;
-    console.log('[SpineView] restorePaneState for pane', pane, ':', { fileType, selectedFile, content: content?.length });
     
     // Find appropriate file for this pane
     let targetFile;
@@ -562,24 +843,19 @@
     if (fileType === 'text') {
       // Text files: always use current spine item's text file
       targetFile = availableFiles.find(f => f.type === 'text');
-      console.log('[SpineView] Looking for text file, found:', targetFile);
     } else if (selectedFile) {
       // Global files (CSS/JS/transform): try to find the same file
       targetFile = availableFiles.find(f => f.path === selectedFile);
-      console.log('[SpineView] Looking for exact file:', selectedFile, 'found:', targetFile);
       if (!targetFile) {
         // If exact file not found, find any file of the same type
         targetFile = availableFiles.find(f => f.type === fileType);
-        console.log('[SpineView] Exact file not found, looking for type:', fileType, 'found:', targetFile);
       }
     } else {
       // Fallback: find any file of the requested type
       targetFile = availableFiles.find(f => f.type === fileType);
-      console.log('[SpineView] Fallback: looking for type:', fileType, 'found:', targetFile);
     }
     
     if (targetFile) {
-      console.log('[SpineView] Restoring pane', pane, 'with file:', targetFile);
       // Update pane state
       const contentType = getContentType(targetFile.type);
       const paneKey = `pane${pane}` as keyof Pick<typeof paneState, 'pane1' | 'pane2'>;
@@ -589,92 +865,36 @@
         fileType: targetFile.type,
         contentType,
         selectedFileValue: targetFile.value,
-        content: '' // Always start empty - content loaded from disk below
+        content: '' // Will be loaded below for non-text files
       };
       
-      // Always load content from file - never use saved content to prevent cross-contamination
-      await loadFileIntoPane(pane, targetFile.path, targetFile.type);
-      console.log('[SpineView] Content loaded fresh from disk for:', targetFile.path);
-    } else {
-      console.log('[SpineView] No target file found for pane', pane, 'config:', paneConfig);
+      // Create store and assign to appropriate pane (same logic as handleFileSelect)
+      const store = await getOrCreateFileStore(targetFile, workspace.id, workspaceService);
+      
+      if (store) {
+        console.log('✅ Pane restoration - store created:', targetFile.path, 'Content length:', store.content?.length || 0);
+        
+        // Assign store to appropriate pane  
+        if (pane === 1) {
+          pane1Store = store;
+          console.log('📌 Restored store to pane1:', targetFile.path);
+        } else {
+          pane2Store = store;
+          console.log('📌 Restored store to pane2:', targetFile.path);
+        }
+      } else {
+        console.error('❌ Pane restoration failed - could not create store for:', targetFile.path);
+      }
     }
   }
   
   
   // Load file content into a specific pane with validation
   async function loadFileIntoPane(pane: 1 | 2, filePath: string, fileType: string) {
-    if (!fileStorage || !workspace?.id) return;
-    
-    console.log(`[SpineView] === LOADING FILE INTO PANE ${pane} ===`);
-    console.log(`[SpineView] File path:`, filePath);
-    console.log(`[SpineView] File type:`, fileType);
-    console.log(`[SpineView] Workspace ID:`, workspace.id);
-    
-    const paneKey = `pane${pane}` as keyof Pick<typeof paneState, 'pane1' | 'pane2'>;
-    const oldContent = paneState[paneKey].content;
-    
-    console.log(`[SpineView] Previous content length in pane ${pane}:`, oldContent.length);
-    
-    try {
-      const content = await fileStorage.readTextFile(workspace.id, filePath);
-      
-      console.log(`[SpineView] Successfully read file:`, filePath);
-      console.log(`[SpineView] New content length:`, content.length);
-      console.log(`[SpineView] Content preview:`, content.substring(0, 200) + (content.length > 200 ? '...' : ''));
-      
-      // Validate that we're not accidentally loading the wrong file's content
-      if (fileType === 'text' && filePath.includes('chapter') && content.length > 0) {
-        const expectedChapter = filePath.match(/chapter(\d+)/)?.[1];
-        const contentMightBeWrongChapter = content.toLowerCase().includes('chapter') && 
-                                          expectedChapter && 
-                                          !content.toLowerCase().includes(`chapter ${expectedChapter}`) &&
-                                          !content.toLowerCase().includes(`chapter${expectedChapter}`);
-        
-        if (contentMightBeWrongChapter) {
-          console.warn(`[SpineView] POTENTIAL DATA CORRUPTION: Loading ${filePath} but content doesn't mention expected chapter ${expectedChapter}`);
-          console.warn(`[SpineView] Content start:`, content.substring(0, 300));
-        }
-      }
-      
-      // Update pane state content
-      paneState[paneKey].content = content;
-      
-      // Validate that file type matches expected content (debugging aid)
-      validateContentTypeMatch(fileType, content, filePath);
-      
-      // Update preview manager for text content only (CSS/JS are handled by auto-save)
-      const contentType = getContentType(fileType);
-      if (contentType && previewManager) {
-        console.log(`[SpineView] Updating preview manager with ${contentType} content (${content.length} chars)`);
-        currentContent[contentType] = content;
-        previewManager.updateContent(contentType, content);
-      }
-      
-      console.log(`[SpineView] Successfully loaded content into pane ${pane}`);
-    } catch (err) {
-      console.warn(`[SpineView] File ${filePath} doesn't exist, creating empty content`);
-      console.warn(`[SpineView] Error:`, err);
-      
-      // If file doesn't exist, create empty content
-      paneState[paneKey].content = '';
-      
-      // For text files, create with default content to help identify the chapter
-      if (fileType === 'text' && filePath.includes('chapter')) {
-        const chapterNum = filePath.match(/chapter(\d+)/)?.[1] || 'X';
-        const defaultContent = `# Chapter ${chapterNum}\n\nThis is sample content for chapter ${chapterNum}.`;
-        paneState[paneKey].content = defaultContent;
-        
-        // Auto-save the default content
-        try {
-          await fileStorage.writeTextFile(workspace.id, filePath, defaultContent);
-          console.log(`[SpineView] Created default content for ${filePath}`);
-        } catch (saveErr) {
-          console.warn(`[SpineView] Failed to save default content:`, saveErr);
-        }
-      }
-    }
-    
-    console.log(`[SpineView] === PANE ${pane} LOAD COMPLETE ===`);
+    // COMPLETELY DISABLED - all content must flow through proper store channels
+    console.error('🚫 loadFileIntoPane called but disabled! File:', filePath, 'Type:', fileType);
+    console.error('🚫 All content should flow through text/CSS/JS stores, not direct file loading');
+    throw new Error(`loadFileIntoPane disabled - content must use proper stores for ${fileType} files`);
   }
 
   // Validate that file content matches expected file type (debugging aid)
@@ -683,17 +903,8 @@
     
     const lowerContent = content.toLowerCase().trim();
     
-    if (fileType === 'css' && !lowerContent.includes('{') && !lowerContent.includes('color') && !lowerContent.includes('@')) {
-      console.warn(`[SpineView] File type mismatch: Expected CSS but content doesn't look like CSS`, { filePath, fileType, contentPreview: content.substring(0, 100) });
-    }
     
-    if (fileType === 'javascript' && !lowerContent.includes('function') && !lowerContent.includes('var') && !lowerContent.includes('const') && !lowerContent.includes('let')) {
-      console.warn(`[SpineView] File type mismatch: Expected JavaScript but content doesn't look like JS`, { filePath, fileType, contentPreview: content.substring(0, 100) });
-    }
     
-    if (fileType === 'text' && (lowerContent.includes('function(') || lowerContent.includes('margin:') || lowerContent.includes('color:'))) {
-      console.warn(`[SpineView] File type mismatch: Expected text but content looks like code`, { filePath, fileType, contentPreview: content.substring(0, 100) });
-    }
   }
 
 
@@ -720,7 +931,6 @@
   function handlePreviewError(event: PreviewErrorEvent) {
     transformError.set(event.error);
     isTransforming.set(false);
-    console.error('Transform error in preview:', event.error);
     
     // Notify parent component of error state
     dispatch('previewUpdate', {
@@ -761,22 +971,16 @@
 
     // Guard against concurrent spine item loads
     if (isLoadingSpineItem) {
-      console.log(`[SpineView] Load already in progress for ${selectedItemId}, skipping`);
       return;
     }
 
-    console.log('[SpineView] === SPINE ITEM LOAD REQUESTED ===');
-    console.log('[SpineView] Requested spine item:', selectedItemId);
-    console.log('[SpineView] Current selected item:', selectedItem?.id);
-    console.log('[SpineView] Services initialized:', servicesInitialized);
 
     // Prevent race conditions - if another load is in progress, wait for it
     if (currentSpineItemLoadPromise) {
-      console.log('[SpineView] Another spine item load in progress, waiting...');
       try {
         await currentSpineItemLoadPromise;
       } catch (err) {
-        console.warn('[SpineView] Previous spine item load failed, proceeding with new load');
+        // Previous load failed, proceed
       }
     }
 
@@ -799,55 +1003,41 @@
     error = null;
 
     try {
-      console.log('[SpineView] Loading spine items from service...');
       
       // Load spine items to find the selected one
       const spineItems = await spineService.loadSpineItems(workspace);
       const newSelectedItem = spineItems.find(item => item.id === selectedItemId) || null;
       
-      console.log('[SpineView] Found spine item:', newSelectedItem?.id);
       
       // Check if this is a spine item switch (not initial load)
       const oldItemId = selectedItem?.id;
       const newItemId = newSelectedItem?.id;
       const isSpineItemSwitch = oldItemId && newItemId && oldItemId !== newItemId;
       
-      console.log('[SpineView] Switch analysis:');
-      console.log('[SpineView] - Old item ID:', oldItemId);
-      console.log('[SpineView] - New item ID:', newItemId);
-      console.log('[SpineView] - Is spine item switch:', isSpineItemSwitch);
-      console.log('[SpineView] - Is initial load:', !isSpineItemSwitch);
       
       // Update selected item reference
       selectedItem = newSelectedItem;
       
       if (selectedItem && servicesInitialized) {
+        
+        // File stores are now created on-demand when files are selected
+        
+        // Initialize services and preview as needed
         if (isSpineItemSwitch) {
-          console.log('[SpineView] Performing smart spine item switch...');
-          dumpCurrentState('before-spine-switch');
           await handleSpineItemSwitch();
-          dumpCurrentState('after-spine-switch');
         } else {
-          console.log('[SpineView] Performing full editor initialization...');
-          dumpCurrentState('before-initialization');
           await initializeSpineEditor();
-          dumpCurrentState('after-initialization');
         }
-      } else {
-        console.log('[SpineView] Skipping editor initialization - item or services not ready');
       }
     } catch (err) {
-      console.error('[SpineView] Spine item load failed:', err);
       error = err instanceof Error ? err.message : 'Failed to load spine item';
     } finally {
       isLoading = false;
-      console.log('[SpineView] === SPINE ITEM LOAD COMPLETE ===');
     }
   }
 
   // Handle spine item switching with preserved global file selections
   async function handleSpineItemSwitch() {
-    console.log('[SpineView] Handling spine item switch to:', selectedItemId);
     
     try {
       // Update available files for new spine item
@@ -856,28 +1046,18 @@
       // Update only spine-specific content in panes while preserving global selections
       await updateSpineSpecificContent();
       
-      // Update preview manager with new spine item context
-      if (previewManager) {
-        await previewManager.updateSpineItemContext?.(selectedItemId);
-        await previewManager.forcePreviewUpdate();
-      }
+      // Use the same initialization logic that handles both creation and reuse
+      await initializeSpineEditor();
     } catch (err) {
-      console.error('[SpineView] Failed to handle spine item switch:', err);
       error = err instanceof Error ? err.message : 'Failed to switch spine item';
     }
   }
 
   // Update only spine-specific content in panes (preserve global file selections)
   async function updateSpineSpecificContent() {
-    console.log('[SpineView] === UPDATING SPINE-SPECIFIC CONTENT ===');
-    console.log('[SpineView] Target spine item:', selectedItemId);
-    console.log('[SpineView] Current pane state before update:', JSON.parse(JSON.stringify(paneState)));
-    
     // CRITICAL: Cancel all pending auto-saves to prevent race conditions
-    console.log('[SpineView] Canceling all pending auto-saves to prevent race conditions');
     for (const [filePath, timeout] of autoSaveTimeouts) {
       clearTimeout(timeout);
-      console.log('[SpineView] Canceled auto-save for:', filePath);
     }
     autoSaveTimeouts.clear();
     
@@ -887,15 +1067,13 @@
     // Update pane 1 if it contains spine-specific content
     if (paneState.pane1.fileType && isSpineSpecificFile(paneState.pane1.fileType)) {
       const oldFilePath = paneState.pane1.filePath;
-      const oldContent = paneState.pane1.content;
+      // const oldContent = paneState.pane1.content; // No longer used with store architecture
       const newFilePath = `SOURCE/text/${selectedItemId}.txt`;
       
-      console.log('[SpineView] Pane 1 - Spine-specific file detected');
-      console.log('[SpineView] Pane 1 - Old path:', oldFilePath);
-      console.log('[SpineView] Pane 1 - New path:', newFilePath);
-      console.log('[SpineView] Pane 1 - Content length before switch:', oldContent.length);
       
       // Auto-save current content before switching (CRITICAL for data integrity)
+      // Auto-save is now handled by store subscriptions - no manual save needed
+      /*
       if (oldContent && oldFilePath && oldFilePath !== newFilePath) {
         console.log('[SpineView] Pane 1 - Auto-saving current content before switch');
         try {
@@ -907,31 +1085,27 @@
           throw new Error(`Failed to save current content for ${oldFilePath}: ${err}`);
         }
       }
+      */
       
       // Update paths
       paneState.pane1.filePath = newFilePath;
       paneState.pane1.fileHref = newFilePath;
       
-      // Load new content
-      await loadFileIntoPane(1, newFilePath, paneState.pane1.fileType);
+      // Content loading now handled by store switching - no manual file loading needed
+      // await loadFileIntoPane(1, newFilePath, paneState.pane1.fileType);
       
-      console.log('[SpineView] Pane 1 - Content length after switch:', paneState.pane1.content.length);
-    } else {
-      console.log('[SpineView] Pane 1 - Global file, no change needed:', paneState.pane1.fileType);
+      // console.log('[SpineView] Pane 1 - Content length after switch:', paneState.pane1.content.length);
     }
     
     // Update pane 2 if it contains spine-specific content  
     if (paneState.pane2.fileType && isSpineSpecificFile(paneState.pane2.fileType)) {
       const oldFilePath = paneState.pane2.filePath;
-      const oldContent = paneState.pane2.content;
+      // const oldContent = paneState.pane2.content; // No longer used with store architecture
       const newFilePath = `SOURCE/text/${selectedItemId}.txt`;
       
-      console.log('[SpineView] Pane 2 - Spine-specific file detected');
-      console.log('[SpineView] Pane 2 - Old path:', oldFilePath);
-      console.log('[SpineView] Pane 2 - New path:', newFilePath);
-      console.log('[SpineView] Pane 2 - Content length before switch:', oldContent.length);
       
-      // Auto-save current content before switching (CRITICAL for data integrity)
+      // Auto-save is now handled by store subscriptions - no manual save needed
+      /*
       if (oldContent && oldFilePath && oldFilePath !== newFilePath) {
         console.log('[SpineView] Pane 2 - Auto-saving current content before switch');
         try {
@@ -943,176 +1117,22 @@
           throw new Error(`Failed to save current content for ${oldFilePath}: ${err}`);
         }
       }
+      */
       
       // Update paths
       paneState.pane2.filePath = newFilePath;
       paneState.pane2.fileHref = newFilePath;
       
-      // Load new content
-      await loadFileIntoPane(2, newFilePath, paneState.pane2.fileType);
+      // Content loading now handled by store switching - no manual file loading needed
+      // await loadFileIntoPane(2, newFilePath, paneState.pane2.fileType);
       
-      console.log('[SpineView] Pane 2 - Content length after switch:', paneState.pane2.content.length);
-    } else {
-      console.log('[SpineView] Pane 2 - Global file, no change needed:', paneState.pane2.fileType);
     }
     
-    console.log('[SpineView] Final pane state after update:', JSON.parse(JSON.stringify(paneState)));
-    console.log('[SpineView] === SPINE-SPECIFIC CONTENT UPDATE COMPLETE ===');
     
-    // Verify data integrity
-    verifySpineItemContentIntegrity(oldPaneState);
+    // Data integrity verification removed
   }
 
-  // Verify that the spine item switch didn't corrupt data
-  function verifySpineItemContentIntegrity(oldPaneState: any) {
-    console.log('[SpineView] === DATA INTEGRITY VERIFICATION ===');
-    
-    // Check that text content paths match the selected spine item
-    if (paneState.pane1.fileType === 'text') {
-      const expectedPath = `SOURCE/text/${selectedItemId}.txt`;
-      if (paneState.pane1.filePath !== expectedPath) {
-        console.error('[SpineView] INTEGRITY ERROR: Pane 1 text path mismatch!');
-        console.error('[SpineView] Expected:', expectedPath);
-        console.error('[SpineView] Actual:', paneState.pane1.filePath);
-      }
-    }
-    
-    if (paneState.pane2.fileType === 'text') {
-      const expectedPath = `SOURCE/text/${selectedItemId}.txt`;
-      if (paneState.pane2.filePath !== expectedPath) {
-        console.error('[SpineView] INTEGRITY ERROR: Pane 2 text path mismatch!');
-        console.error('[SpineView] Expected:', expectedPath);
-        console.error('[SpineView] Actual:', paneState.pane2.filePath);
-      }
-    }
-    
-    // Check that global file selections were preserved
-    const globalPanes = [
-      { name: 'pane1', old: oldPaneState.pane1, new: paneState.pane1 },
-      { name: 'pane2', old: oldPaneState.pane2, new: paneState.pane2 }
-    ];
-    
-    for (const pane of globalPanes) {
-      if (pane.old.fileType && !isSpineSpecificFile(pane.old.fileType)) {
-        if (pane.old.filePath !== pane.new.filePath) {
-          console.error(`[SpineView] INTEGRITY ERROR: ${pane.name} global file path changed unexpectedly!`);
-          console.error(`[SpineView] Old path:`, pane.old.filePath);
-          console.error(`[SpineView] New path:`, pane.new.filePath);
-        }
-        if (pane.old.selectedFileValue !== pane.new.selectedFileValue) {
-          console.error(`[SpineView] INTEGRITY ERROR: ${pane.name} global file selection changed unexpectedly!`);
-          console.error(`[SpineView] Old selection:`, pane.old.selectedFileValue);
-          console.error(`[SpineView] New selection:`, pane.new.selectedFileValue);
-        }
-      }
-    }
-    
-    console.log('[SpineView] === DATA INTEGRITY VERIFICATION COMPLETE ===');
-  }
-
-  // Comprehensive state dump for debugging
-  function dumpCurrentState(context: string) {
-    console.log(`[SpineView] === STATE DUMP (${context}) ===`);
-    console.log('[SpineView] Context:', context);
-    console.log('[SpineView] Selected spine item ID:', selectedItemId);
-    console.log('[SpineView] Selected item object:', selectedItem);
-    console.log('[SpineView] Workspace ID:', workspace?.id);
-    console.log('[SpineView] Services initialized:', servicesInitialized);
-    console.log('[SpineView] Loading state:', isLoading);
-    console.log('[SpineView] Error state:', error);
-    console.log('[SpineView] Preview manager exists:', !!previewManager);
-    console.log('[SpineView] Available files:', availableFiles.map(f => ({ value: f.value, path: f.path, type: f.type })));
-    console.log('[SpineView] Pane state:', JSON.parse(JSON.stringify(paneState)));
-    console.log('[SpineView] Current content:', JSON.parse(JSON.stringify(currentContent)));
-    
-    // Check if panes have consistent state
-    if (paneState.pane1.fileType === 'text' && selectedItemId && paneState.pane1.filePath) {
-      const expectedPath = `SOURCE/text/${selectedItemId}.txt`;
-      const pathMatches = paneState.pane1.filePath === expectedPath;
-      console.log('[SpineView] Pane 1 text path consistency:', pathMatches);
-      if (!pathMatches) {
-        console.error('[SpineView] Pane 1 path mismatch - Expected:', expectedPath, 'Actual:', paneState.pane1.filePath);
-      }
-    }
-    
-    if (paneState.pane2.fileType === 'text' && selectedItemId && paneState.pane2.filePath) {
-      const expectedPath = `SOURCE/text/${selectedItemId}.txt`;
-      const pathMatches = paneState.pane2.filePath === expectedPath;
-      console.log('[SpineView] Pane 2 text path consistency:', pathMatches);
-      if (!pathMatches) {
-        console.error('[SpineView] Pane 2 path mismatch - Expected:', expectedPath, 'Actual:', paneState.pane2.filePath);
-      }
-    }
-    
-    console.log(`[SpineView] === STATE DUMP COMPLETE (${context}) ===`);
-  }
-
-  // Add global debugging function for manual testing
-  if (typeof window !== 'undefined') {
-    (window as any).dumpSpineViewState = dumpCurrentState;
-    (window as any).fixCorruptedChapterFiles = fixCorruptedChapterFiles;
-  }
-
-  // Emergency data recovery function for corrupted chapter files
-  async function fixCorruptedChapterFiles() {
-    if (!fileStorage || !workspace?.id) {
-      console.error('[SpineView] Cannot fix files - no storage or workspace');
-      return;
-    }
-
-    console.log('[SpineView] === EMERGENCY DATA RECOVERY ===');
-    
-    try {
-      // Create correct default content for each chapter
-      const chapter1Content = `# Chapter 1
-
-This is sample content for demonstration purposes.
-
-## Section 1
-
-Here is some **bold text** and *italic text*.
-
-## Section 2
-
-Here is more sample content with additional paragraphs to demonstrate the transformation process.
-
-This concludes the sample chapter.`;
-
-      const chapter2Content = `# Chapter 2
-
-This is sample content for demonstration purposes.
-
-## Section 1
-
-Here is some **bold text** and *italic text*.
-
-## Section 2
-
-Here is more sample content with additional paragraphs to demonstrate the transformation process.
-
-This concludes the sample chapter.`;
-
-      // Write correct content to each file
-      await fileStorage.writeTextFile(workspace.id, 'SOURCE/text/chapter1.txt', chapter1Content);
-      console.log('[SpineView] Fixed chapter1.txt with correct content');
-      
-      await fileStorage.writeTextFile(workspace.id, 'SOURCE/text/chapter2.txt', chapter2Content);
-      console.log('[SpineView] Fixed chapter2.txt with correct content');
-      
-      // Verify the fix worked
-      const verifyChapter1 = await fileStorage.readTextFile(workspace.id, 'SOURCE/text/chapter1.txt');
-      const verifyChapter2 = await fileStorage.readTextFile(workspace.id, 'SOURCE/text/chapter2.txt');
-      
-      console.log('[SpineView] Verification - chapter1.txt starts with:', verifyChapter1.substring(0, 50));
-      console.log('[SpineView] Verification - chapter2.txt starts with:', verifyChapter2.substring(0, 50));
-      
-      console.log('[SpineView] === DATA RECOVERY COMPLETE ===');
-      console.log('[SpineView] Please refresh the page or switch chapters to see the fix');
-      
-    } catch (err) {
-      console.error('[SpineView] Data recovery failed:', err);
-    }
-  }
+  // Debug functions removed
 
   // Component lifecycle
   onMount(() => {
@@ -1124,6 +1144,14 @@ This concludes the sample chapter.`;
   });
 
   onDestroy(() => {
+    // Clean up file content stores
+    for (const [filePath, store] of fileContentStores) {
+      store.destroy(); // Remove from text-editor-store registry
+    }
+    fileContentStores.clear();
+    
+    // Store subscriptions are automatically cleaned up with store destruction
+    
     // Clean up guard
     if (guardId) {
       navigationStore.removeNavigationGuard(guardId);
@@ -1177,7 +1205,8 @@ This concludes the sample chapter.`;
 {:else if selectedItem && servicesInitialized && previewManager}
   <!-- Editor Pane -->
   <EditorPane
-    {availableFiles}
+    availableFiles1={availableFiles1}
+    availableFiles2={availableFiles2}
     transformError={$transformError}
     transformWarnings={$transformWarnings}
     isTransforming={$isTransforming}
@@ -1185,8 +1214,10 @@ This concludes the sample chapter.`;
     editorMode={paneState.mode}
     pane1SelectedFile={paneState.pane1.selectedFileValue}
     pane2SelectedFile={paneState.pane2.selectedFileValue}
-    pane1Content={paneState.pane1.content}
-    pane2Content={paneState.pane2.content}
+    {pane1Error}
+    {pane2Error}
+    pane1FileStore={pane1Store}
+    pane2FileStore={pane2Store}
     on:paneToggle={handlePaneToggle}
     on:fileSelect={handleFileSelect}
     on:contentChange={handlePaneContentChange}

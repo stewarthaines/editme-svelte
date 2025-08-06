@@ -17,6 +17,7 @@
   import type { 
     TransformError 
   } from '$lib/types/spine-editor.js';
+  import type { TextEditorStore } from '$lib/stores/index.js';
   import { t } from '$lib/i18n';
   
   // Props
@@ -24,14 +25,21 @@
   export let transformWarnings: string[] = [];
   export let isTransforming: boolean = false;
   export let executionTime: number = 0;
-  export let availableFiles: Array<{ value: string; label: string; path: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
+  export let availableFiles1: Array<{ value: string; label: string; path: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
+  export let availableFiles2: Array<{ value: string; label: string; path: string; type: 'text' | 'css' | 'javascript' | 'transform' }> = [];
   
   // Controlled component props - parent owns all state
   export let editorMode: 'single' | 'dual' = 'single';
   export let pane1SelectedFile: string = '';
   export let pane2SelectedFile: string = '';
-  export let pane1Content: string = '';
-  export let pane2Content: string = '';
+  
+  // Pane-specific error props for inline error display
+  export let pane1Error: string | null = null;
+  export let pane2Error: string | null = null;
+  
+  // Per-pane file stores for independent file content management
+  export let pane1FileStore: TextEditorStore | null = null;
+  export let pane2FileStore: TextEditorStore | null = null;
   
   const dispatch = createEventDispatcher<{
     paneToggle: void;
@@ -52,6 +60,9 @@
    */
   function handleFileSelect(pane: 1 | 2, event: Event): void {
     const target = event.target as HTMLSelectElement;
+    
+    // Use the appropriate available files array for each pane
+    const availableFiles = pane === 1 ? availableFiles1 : availableFiles2;
     const selectedFile = availableFiles.find(f => f.value === target.value);
     
     if (selectedFile) {
@@ -64,11 +75,12 @@
   }
   
   /**
-   * Handle content changes in textarea
+   * Handle content changes in textarea (for non-text files like CSS/JS)
    */
   function handleContentInput(pane: 1 | 2, event: Event): void {
     const target = event.target as HTMLTextAreaElement;
     
+    // For non-text files (CSS, JS), dispatch content change event
     dispatch('contentChange', {
       pane,
       content: target.value
@@ -148,10 +160,15 @@
           <div class="status-spinner"></div>
           <span>Transforming...</span>
         </div>
-      {:else if transformError}
+      {:else if transformError && transformError.stage !== 'syntax-validation'}
         <div class="status-indicator error" title="Transform error">
           <span class="status-icon">⚠️</span>
           <span>Error</span>
+        </div>
+      {:else if (pane1Error || pane2Error)}
+        <div class="status-indicator error" title="Syntax error prevents transform">
+          <span class="status-icon">⚠️</span>
+          <span>Syntax Error</span>
         </div>
       {:else if transformWarnings.length > 0}
         <div class="status-indicator warning" title={`${transformWarnings.length} warnings`}>
@@ -191,7 +208,7 @@
               aria-label="Select file for pane 2"
             >
               <option value="" disabled>Select file...</option>
-              {#each availableFiles as file}
+              {#each availableFiles2 as file}
                 <option value={file.value}>{file.label}</option>
               {/each}
             </select>
@@ -200,14 +217,38 @@
           <div class="textarea-container">
             <textarea
               class="content-textarea {getSyntaxClass(pane2SelectedFile)}"
-              value={pane2Content}
+              class:has-error={pane2Error}
+              value={(() => {
+                const hasStore = !!pane2FileStore;
+                const storeContent = pane2FileStore ? $pane2FileStore?.content || '' : '';
+                
+                console.log('🔍 Pane2 per-file textarea value:', {
+                  pane2SelectedFile,
+                  hasStore,
+                  storeContentLength: storeContent.length
+                });
+                
+                return storeContent;
+              })()}
               placeholder={getPlaceholder(pane2SelectedFile)}
-              on:input={(e) => handleContentInput(2, e)}
+              on:input={(e) => {
+                if (pane2FileStore) {
+                  pane2FileStore.updateContent((e.target as HTMLTextAreaElement).value);
+                } else {
+                  console.warn('🚫 No file store available for input in pane 2');
+                }
+              }}
               spellcheck={pane2SelectedFile === 'text'}
               autocomplete="off"
               autocapitalize="off"
               aria-label="Pane 2 content"
             ></textarea>
+            {#if pane2Error}
+              <div class="pane-error-overlay">
+                <span class="error-icon" aria-hidden="true">⚠️</span>
+                <span class="error-message">{pane2Error}</span>
+              </div>
+            {/if}
           </div>
         </div>
       {/if}
@@ -222,7 +263,7 @@
             aria-label="Select file for pane 1"
           >
             <option value="" disabled>Select file...</option>
-            {#each availableFiles as file}
+            {#each availableFiles1 as file}
               <option value={file.value}>{file.label}</option>
             {/each}
           </select>
@@ -231,22 +272,46 @@
         <div class="textarea-container">
           <textarea
             class="content-textarea {getSyntaxClass(pane1SelectedFile)}"
-            value={pane1Content}
+            class:has-error={pane1Error}
+            value={(() => {
+              const hasStore = !!pane1FileStore;
+              const storeContent = pane1FileStore ? $pane1FileStore?.content || '' : '';
+              
+              console.log('🔍 Pane1 per-file textarea value:', {
+                pane1SelectedFile,
+                hasStore,
+                storeContentLength: storeContent.length
+              });
+              
+              return storeContent;
+            })()}
             placeholder={getPlaceholder(pane1SelectedFile)}
-            on:input={(e) => handleContentInput(1, e)}
+            on:input={(e) => {
+              if (pane1FileStore) {
+                pane1FileStore.updateContent((e.target as HTMLTextAreaElement).value);
+              } else {
+                console.warn('🚫 No file store available for input in pane 1');
+              }
+            }}
             spellcheck={pane1SelectedFile === 'text'}
             autocomplete="off"
             autocapitalize="off"
             aria-label="Pane 1 content"
           ></textarea>
+          {#if pane1Error}
+            <div class="pane-error-overlay">
+              <span class="error-icon" aria-hidden="true">⚠️</span>
+              <span class="error-message">{pane1Error}</span>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
   </div>
   
   
-  <!-- Error display -->
-  {#if transformError}
+  <!-- Global error display (suppress for pane-specific syntax errors) -->
+  {#if transformError && transformError.stage !== 'syntax-validation'}
     <div class="error-display">
       <div class="error-header">
         <span class="error-icon" aria-hidden="true">🚨</span>
@@ -461,6 +526,7 @@
     flex: 1;
     padding: var(--space-2);
     overflow: hidden;
+    position: relative; /* For absolute positioning of error overlay */
   }
   
   .content-textarea {
@@ -481,6 +547,43 @@
   .content-textarea:focus {
     border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus);
+  }
+  
+  .content-textarea.has-error {
+    border-color: var(--color-error-border);
+  }
+  
+  .content-textarea.has-error:focus {
+    border-color: var(--color-error-border);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--color-error-text);
+  }
+  
+  .pane-error-overlay {
+    position: absolute;
+    bottom: var(--space-3);
+    left: var(--space-3);
+    right: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-error-text);
+    font-size: var(--text-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  
+  .pane-error-overlay .error-icon {
+    font-size: var(--text-base);
+    flex-shrink: 0;
+  }
+  
+  .pane-error-overlay .error-message {
+    flex: 1;
+    font-family: var(--font-mono);
   }
   
   

@@ -24,6 +24,7 @@ When the user asks you to document a plan or write a new document describing det
 - **CRITICAL**: The user expects zero TypeScript errors in the codebase at all times
 - The user will run the npm dev server, so the agent never needs to
 - When writing api docs only document methods specified. do not invent features that haven't been requested.
+- don't write fallback style code (auto-creating files, or other content) unless explicitly approved by the user
 
 ## EDITME.html - EPUB Editor
 

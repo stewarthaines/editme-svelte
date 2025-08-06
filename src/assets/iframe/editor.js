@@ -373,8 +373,9 @@ class TransformExecutionEngine {
       }
     }
 
-    // Return transformed HTML content
-    return document.body.innerHTML;
+    // Return transformed HTML content with XHTML compliance
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(document.body);
   }
 
   /**

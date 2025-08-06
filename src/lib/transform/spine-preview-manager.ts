@@ -40,20 +40,51 @@ export class SpinePreviewManager {
   private isTransforming = false;
   private lastTransformTime = 0;
 
+  // Workspace-scoped properties (immutable)
+  private readonly workspaceId: string;
+  private readonly fileStorage: FileStorageAPI;
+  private readonly extensionManager: ExtensionManager;
+  private readonly blobURLManager: BlobURLManager;
+  private readonly workspaceService: WorkspaceService;
+  private readonly settingsService: SettingsService;
+  private readonly transformEngine: TransformEngine;
+  private readonly config: PreviewManagerConfig;
+  private readonly onPreviewUpdate: (event: PreviewUpdateEvent) => void;
+  private readonly onError: (event: PreviewErrorEvent) => void;
+
+  // Spine-scoped properties (mutable - updated during spine switching)
+  private spineItemId: string;
+  private spineItem?: any;
+
   constructor(
-    private workspaceId: string,
-    private spineItemId: string,
-    private fileStorage: FileStorageAPI,
-    private extensionManager: ExtensionManager,
-    private blobURLManager: BlobURLManager,
-    private workspaceService: WorkspaceService,
-    private settingsService: SettingsService,
-    private transformEngine: TransformEngine,
-    private config: PreviewManagerConfig,
-    private onPreviewUpdate: (event: PreviewUpdateEvent) => void,
-    private onError: (event: PreviewErrorEvent) => void,
-    private spineItem?: any
+    workspaceId: string,
+    spineItemId: string,
+    fileStorage: FileStorageAPI,
+    extensionManager: ExtensionManager,
+    blobURLManager: BlobURLManager,
+    workspaceService: WorkspaceService,
+    settingsService: SettingsService,
+    transformEngine: TransformEngine,
+    config: PreviewManagerConfig,
+    onPreviewUpdate: (event: PreviewUpdateEvent) => void,
+    onError: (event: PreviewErrorEvent) => void,
+    spineItem?: any
   ) {
+    // Initialize workspace-scoped properties (these never change)
+    this.workspaceId = workspaceId;
+    this.fileStorage = fileStorage;
+    this.extensionManager = extensionManager;
+    this.blobURLManager = blobURLManager;
+    this.workspaceService = workspaceService;
+    this.settingsService = settingsService;
+    this.transformEngine = transformEngine;
+    this.config = config;
+    this.onPreviewUpdate = onPreviewUpdate;
+    this.onError = onError;
+
+    // Initialize spine-scoped properties (these change during spine switching)
+    this.spineItemId = spineItemId;
+    this.spineItem = spineItem;
     // Initialize transform pipeline
     this.transformPipeline = new SpineTransformPipeline(
       workspaceId,
@@ -106,47 +137,14 @@ export class SpinePreviewManager {
         this.currentContent.text = '';
       }
 
-      // Show manifest XHTML content immediately (even if transform pipeline isn't ready)
-      await this.showManifestContent();
-      
-      // Then trigger transform pipeline when ready
+      // Remove showManifestContent() fallback - force proper text store content flow
+      // Trigger transform pipeline directly to expose text store integration issues
       this.debounceRender();
     } catch (error) {
       this.handleError('initialization', error);
     }
   }
 
-  /**
-   * Show manifest XHTML content immediately using spine item href
-   */
-  private async showManifestContent(): Promise<void> {
-    if (!this.spineItem?.href) {
-      // No spine item or href available, skip initial content
-      return;
-    }
-
-    try {
-      // Load the XHTML file using the spine item's href
-      const xhtmlContent = await this.fileStorage.readTextFile(
-        this.workspaceId,
-        this.spineItem.href
-      );
-
-      // Process through BlobURLManager to fix asset references
-      const processedXhtml = await this.blobURLManager.processXHTMLForPreview(xhtmlContent);
-
-      // Trigger immediate preview update with manifest XHTML
-      this.onPreviewUpdate({
-        xhtml: processedXhtml,
-        warnings: ['Showing current manifest content - will update when transform completes'],
-        executionTime: 0,
-        timestamp: Date.now()
-      });
-    } catch (error) {
-      // XHTML file doesn't exist yet, that's okay - transform pipeline will create it
-      console.info('No existing XHTML found for spine item, will create on first transform');
-    }
-  }
 
   /**
    * Get current content state
@@ -446,6 +444,41 @@ ${transformedContent}
     } catch (error) {
       console.warn('Transform pipeline ping failed:', error);
       return false;
+    }
+  }
+
+  /**
+   * Switch to a different spine item without recreating the manager
+   * This maintains workspace-level resources while updating spine-specific context
+   */
+  async switchToSpineItem(newSpineItemId: string, newSpineItem?: any): Promise<void> {
+    console.log('🔄 Switching spine context from', this.spineItemId, 'to', newSpineItemId);
+    
+    // Clear any pending operations
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = undefined;
+    }
+
+    // Reset transform state
+    this.isTransforming = false;
+    this.lastTransformTime = 0;
+
+    // Update spine-scoped context
+    this.spineItemId = newSpineItemId;
+    this.spineItem = newSpineItem;
+
+    // Reset content state for new spine item
+    this.currentContent = {
+      text: ''
+    };
+
+    // Load initial content for new spine item
+    try {
+      await this.loadInitialContent();
+    } catch (error) {
+      console.warn('Failed to load initial content for spine item switch:', error);
+      // Continue - this is not critical, content will load on first edit
     }
   }
 

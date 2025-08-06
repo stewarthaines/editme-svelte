@@ -283,3 +283,11 @@ export function sanitizeSourcePath(path: string): string {
 
   return sanitized;
 }
+
+/**
+ * Get the text file path for a spine ID
+ * Used by the file-backed text editor store pattern
+ */
+export function getTextFilePath(spineId: string): string {
+  return `SOURCE/text/${spineId}.txt`;
+}
