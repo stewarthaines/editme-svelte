@@ -7,6 +7,16 @@
 
 /// <reference lib="dom" />
 
+/**
+ * Generate EPUB-compliant timestamp without decimal seconds
+ * 
+ * EPUB validation requires dcterms:modified format without decimal seconds
+ * @returns ISO 8601 timestamp without milliseconds (e.g., "2023-12-07T14:30:45Z")
+ */
+export function generateEPUBTimestamp(): string {
+  return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
 export interface EPUBMetadata {
   // Required Dublin Core elements
   title: string;
@@ -227,24 +237,38 @@ export class OPFUtils {
       throw new Error('Missing required dc:identifier in OPF metadata');
     }
 
-    // Extract optional fields
-    const creatorElements = doc.getElementsByTagNameNS(DC_NS, 'creator');
-    const contributorElements = doc.getElementsByTagNameNS(DC_NS, 'contributor');
+    // Extract optional fields with fallback for namespace parsing issues
+    let creatorElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'creator');
+    if (creatorElements.length === 0) {
+      creatorElements = doc.querySelectorAll('dc\\:creator, creator');
+    }
+    
+    let contributorElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'contributor');
+    if (contributorElements.length === 0) {
+      contributorElements = doc.querySelectorAll('dc\\:contributor, contributor');
+    }
+    
+    let subjectElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'subject');
+    if (subjectElements.length === 0) {
+      subjectElements = doc.querySelectorAll('dc\\:subject, subject');
+    }
+    
     const publisherElements = doc.getElementsByTagNameNS(DC_NS, 'publisher');
     const dateElements = doc.getElementsByTagNameNS(DC_NS, 'date');
     const descriptionElements = doc.getElementsByTagNameNS(DC_NS, 'description');
-    const subjectElements = doc.getElementsByTagNameNS(DC_NS, 'subject');
     const rightsElements = doc.getElementsByTagNameNS(DC_NS, 'rights');
     const sourceElements = doc.getElementsByTagNameNS(DC_NS, 'source');
     const relationElements = doc.getElementsByTagNameNS(DC_NS, 'relation');
     const coverageElements = doc.getElementsByTagNameNS(DC_NS, 'coverage');
     const typeElements = doc.getElementsByTagNameNS(DC_NS, 'type');
     const formatElements = doc.getElementsByTagNameNS(DC_NS, 'format');
+    
 
     // Convert NodeLists to arrays
     const creators = Array.from(creatorElements)
       .map(el => el.textContent?.trim())
       .filter(Boolean) as string[];
+    
     const contributors = Array.from(contributorElements)
       .map(el => el.textContent?.trim())
       .filter(Boolean) as string[];

@@ -13,6 +13,7 @@
  */
 
 import type { FileStorageAPI } from '../storage/index.js';
+import { convertManifestPathToXHTMLPath } from '../epub/path-utils.js';
 import type { ExtensionManager } from '../extensions/extension-manager.js';
 import type { SettingsService } from '../services/settings/settings.service.js';
 import type { WorkspaceService } from '../services/workspace/workspace.service.js';
@@ -348,11 +349,11 @@ export class SpinePreviewManager {
     metadata: ChapterMetadata
   ): string {
     const stylesheetLinks = metadata.stylesheets
-      .map(href => `  <link rel="stylesheet" type="text/css" href="${this.escapeHtml(href)}" />`)
+      .map(href => `  <link rel="stylesheet" type="text/css" href="${this.escapeHtml(convertManifestPathToXHTMLPath(href))}" />`)
       .join('\n');
 
     const scriptTags = metadata.scripts
-      .map(src => `  <script src="${this.escapeHtml(src)}"></script>`)
+      .map(src => `  <script src="${this.escapeHtml(convertManifestPathToXHTMLPath(src))}"></script>`)
       .join('\n');
 
     return `<?xml version="1.0" encoding="utf-8"?>
@@ -452,7 +453,6 @@ ${transformedContent}
    * This maintains workspace-level resources while updating spine-specific context
    */
   async switchToSpineItem(newSpineItemId: string, newSpineItem?: any): Promise<void> {
-    console.log('🔄 Switching spine context from', this.spineItemId, 'to', newSpineItemId);
     
     // Clear any pending operations
     if (this.debounceTimer) {

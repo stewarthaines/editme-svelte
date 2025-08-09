@@ -375,7 +375,9 @@ class TransformExecutionEngine {
 
     // Return transformed HTML content with XHTML compliance
     const serializer = new XMLSerializer();
-    return serializer.serializeToString(document.body);
+    const fullBodySerialization = serializer.serializeToString(document.body);
+    // Remove the opening and closing body tags to get just the content
+    return fullBodySerialization.replace(/^<body[^>]*>|<\/body>$/g, '');
   }
 
   /**
@@ -572,8 +574,8 @@ class TransformExecutionEngine {
           type: 'TRANSFORM_RESULT',
           messageId,
           payload: {
-            result: result
-          }
+            result: result,
+          },
         },
         '*'
       );

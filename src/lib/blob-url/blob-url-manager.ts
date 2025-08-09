@@ -12,6 +12,7 @@
  */
 
 import { getMimeType } from '../utils/mime-types.js';
+import { convertXHTMLPathToManifestPath } from '../epub/path-utils.js';
 import type { FileStorageAPI } from '../storage/index.js';
 import type { BlobURLManagerConfig, BlobURLRegistry } from './types.js';
 import { BlobURLError, BlobURLCapacityError, XHTMLProcessingError } from './types.js';
@@ -305,7 +306,9 @@ export class BlobURLManager {
         throw new BlobURLCapacityError(this.getBlobURLCount(), this.registry.maxCount);
       }
 
-      const blobURL = await this.createBlobURL(href);
+      // Convert XHTML-relative path to manifest path for registry lookup
+      const manifestPath = convertXHTMLPathToManifestPath(href);
+      const blobURL = await this.createBlobURL(manifestPath);
       element.setAttribute(attr, blobURL);
     } catch (error) {
       this.handleMissingAsset(element, href, error as Error);
@@ -317,7 +320,9 @@ export class BlobURLManager {
    */
   private handleMissingAsset(element: Element, href: string, _error: Error): void {
     const tagName = element.tagName.toLowerCase();
-    const resolvedPath = this.resolveManifestPath(href);
+    // Convert XHTML path to manifest path before resolving
+    const manifestPath = convertXHTMLPathToManifestPath(href);
+    const resolvedPath = this.resolveManifestPath(manifestPath);
 
     // Visual assets get error icons
     if (['img', 'video', 'audio', 'object', 'image'].includes(tagName)) {
