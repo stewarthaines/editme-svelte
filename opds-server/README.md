@@ -83,6 +83,7 @@ Perfect for EDITME's iterative development workflow:
 - **`GET /opds.xml`** - OPDS Atom feed
 - **`GET /books/:filename`** - Download EPUB file  
 - **`GET /catalog-info`** - Catalog statistics (JSON)
+- **`GET /debug-catalog`** - Detailed catalog inspection with book metadata (JSON)
 - **`GET /health`** - Server health check
 - **`GET /`** - Redirects to OPDS feed
 
@@ -113,7 +114,7 @@ Environment variables:
 
 ### Dependencies
 - `chokidar` - File system watching
-- `yauzl` + `xml2js` - EPUB metadata parsing
+- `node-stream-zip` + `xml2js` - EPUB metadata parsing (more robust ZIP handling)
 - `feed` - OPDS Atom XML generation  
 - `express` - HTTP server
 
@@ -123,6 +124,7 @@ Environment variables:
 - Validates metadata format and structure
 
 ### Performance
-- Efficient file watching with debounced updates
+- Efficient file watching with debounced updates (1000ms stability threshold)
 - In-memory catalog for fast feed generation
 - Streaming file downloads for large EPUBs
+- Feed entries sorted by modification date (newest first) per OPDS 1.2 spec
