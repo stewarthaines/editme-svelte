@@ -37,7 +37,9 @@ export function generateOPDSFeed(bookCatalog, options = {}) {
   });
   
   // Add OPDS namespace and acquisition links for each book
-  const books = Array.from(bookCatalog.values());
+  // Sort by modification date (newest first) per OPDS 1.2 spec
+  const books = Array.from(bookCatalog.values())
+    .sort((a, b) => b.metadata.modifiedDate - a.metadata.modifiedDate);
   
   for (const book of books) {
     const { file, metadata } = book;
