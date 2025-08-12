@@ -150,15 +150,15 @@
         
         workspace = await workspaceService.addManifestItem(workspace, manifestItem);
         
-        // For text files, write as text; for binary files, we need a different approach
+        // Write file content based on type
         const filePath = `${workspace.pathInfo.basePath}/${file.name}`;
         if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
           const text = await file.text();
           await workspaceService.writeFile(workspace.id, filePath, text);
         } else {
-          // For binary files, we'd need a writeBinaryFile method or different handling
-          // For now, skip binary file upload functionality
-          console.warn('Binary file upload not yet implemented:', file.name);
+          // Handle binary files (images, etc.)
+          const arrayBuffer = await file.arrayBuffer();
+          await workspaceService.writeBinaryFile(workspace.id, filePath, arrayBuffer);
         }
       }
 

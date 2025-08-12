@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import { t } from '../../i18n';
   import type { ManifestItem, SourceItem, ContentPreview } from '../../manifest/types';
   import type { WorkspaceService, WorkspaceState } from '../../services/workspace/workspace.service.js';
@@ -14,6 +14,7 @@
   let contentPreview: ContentPreview | null = null;
   let loading = false;
   let error: string | null = null;
+  let activeBlobUrl: string | null = null;
 
   // Helper function to determine if mediaType represents text content
   const isTextMediaType = (mediaType: string): boolean => {
@@ -25,19 +26,39 @@
     );
   };
 
+  // Helper function to determine if mediaType represents image content
+  const isImageMediaType = (mediaType: string): boolean => {
+    return mediaType.startsWith('image/');
+  };
+
+  // Clean up blob URLs to prevent memory leaks
+  const cleanupBlobUrl = () => {
+    if (activeBlobUrl) {
+      URL.revokeObjectURL(activeBlobUrl);
+      activeBlobUrl = null;
+    }
+  };
+
   $: if (selectedItem && selectedItemType && workspaceService && workspace) {
     loadContentPreview();
   }
 
+  // Clean up on component destroy
+  onDestroy(() => {
+    cleanupBlobUrl();
+  });
+
   const loadContentPreview = async () => {
     if (!selectedItem || !selectedItemType || !workspaceService || !workspace) {
       contentPreview = null;
+      cleanupBlobUrl();
       return;
     }
 
     try {
       loading = true;
       error = null;
+      cleanupBlobUrl();
 
       if (selectedItemType === 'manifest') {
         const manifestItem = selectedItem as ManifestItem;
@@ -47,20 +68,41 @@
           `${workspace.pathInfo.basePath}/${manifestItem.href}`;
         
         try {
-          const content = await workspaceService.readFile(workspace.id, filePath);
+          let content;
+          try {
+            content = await workspaceService.readFile(workspace.id, filePath);
+          } catch (err) {
+            // Try original href if constructed path fails
+            content = await workspaceService.readFile(workspace.id, manifestItem.href);
+          }
+          
           const isText = isTextMediaType(manifestItem.mediaType);
+          const isImage = isImageMediaType(manifestItem.mediaType);
           
           let textContent: string | undefined;
+          let previewUrl: string | undefined;
+          let contentType: string;
+          
           if (isText) {
             const decoder = new TextDecoder('utf-8');
             textContent = decoder.decode(content);
+            contentType = 'text';
+          } else if (isImage) {
+            // Create blob URL for image preview
+            const blob = new Blob([content], { type: manifestItem.mediaType });
+            previewUrl = URL.createObjectURL(blob);
+            activeBlobUrl = previewUrl;
+            contentType = 'image';
+          } else {
+            contentType = 'binary';
           }
           
           contentPreview = {
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,
-            contentType: isText ? 'text' : 'binary',
+            contentType,
             textContent,
+            previewUrl,
             metadata: {
               characterCount: textContent ? textContent.length : undefined,
               lineCount: textContent ? textContent.split('\n').length : undefined,
@@ -69,7 +111,7 @@
                 : undefined,
             },
           };
-        } catch {
+        } catch (err) {
           contentPreview = {
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,
@@ -162,11 +204,8 @@
   const handleDownloadClick = () => {
     if (!selectedItem || !workspaceService || !workspace) return;
 
-    // For now, just log - proper download implementation would need file content handling
-    console.log('Download requested for:', selectedItem);
-    
-    // Note: In a real implementation, you would need to get the actual file content
-    // and create a blob URL. This is a placeholder.
+    // TODO: Implement proper download functionality
+    // Would need to get file content and create blob URL for download
   };
 
   const formatFileSize = (bytes: number | undefined) => {

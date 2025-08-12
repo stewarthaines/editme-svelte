@@ -48,7 +48,105 @@
   $: updatePreviewContent(xhtmlContent);
 
   /**
-   * Update iframe with new XHTML content
+   * Find a scroll anchor element that can be used to restore scroll position
+   */
+  function findScrollAnchor(iframeDoc: Document): { element: Element | null; id: string | null; offset: number } | null {
+    try {
+      const viewport = iframeDoc.documentElement;
+      const scrollTop = viewport.scrollTop || iframeDoc.body.scrollTop;
+      
+      // Find element at current scroll position (center of viewport)
+      const centerX = viewport.clientWidth / 2;
+      const checkY = Math.min(100, viewport.clientHeight / 4); // Look near top of viewport
+      const elementAtScroll = iframeDoc.elementFromPoint(centerX, checkY);
+      
+      if (!elementAtScroll || elementAtScroll === iframeDoc.body || elementAtScroll === viewport) {
+        return { element: null, id: null, offset: scrollTop };
+      }
+
+      // Try to find an element with an ID (most reliable anchor)
+      let current: Element | null = elementAtScroll;
+      while (current && current !== iframeDoc.body) {
+        if (current.id) {
+          const elementRect = current.getBoundingClientRect();
+          const offset = scrollTop - (elementRect.top + scrollTop - checkY);
+          return { element: current, id: current.id, offset };
+        }
+        current = current.parentElement;
+      }
+
+      // Fall back to tag name + index if no ID found
+      const tagName = elementAtScroll.tagName.toLowerCase();
+      const siblings = Array.from(iframeDoc.querySelectorAll(tagName));
+      const index = siblings.indexOf(elementAtScroll);
+      
+      if (index >= 0) {
+        const elementRect = elementAtScroll.getBoundingClientRect();
+        const offset = scrollTop - (elementRect.top + scrollTop - checkY);
+        return { element: elementAtScroll, id: `${tagName}[${index}]`, offset };
+      }
+
+      return { element: null, id: null, offset: scrollTop };
+    } catch (error) {
+      console.warn('Failed to find scroll anchor:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Restore scroll position using anchor element or fallback to pixel position
+   */
+  function restoreScrollPosition(iframeDoc: Document, anchor: { element: Element | null; id: string | null; offset: number } | null, fallbackScrollTop: number): void {
+    if (!anchor) {
+      // Simple fallback to pixel position
+      iframeDoc.documentElement.scrollTop = fallbackScrollTop;
+      iframeDoc.body.scrollTop = fallbackScrollTop;
+      return;
+    }
+
+    try {
+      let targetElement: Element | null = null;
+
+      // Try to find element by ID first
+      if (anchor.id) {
+        if (anchor.id.includes('[') && anchor.id.includes(']')) {
+          // Tag name + index format
+          const [tagName, indexStr] = anchor.id.split('[');
+          const index = parseInt(indexStr.replace(']', ''), 10);
+          const elements = iframeDoc.querySelectorAll(tagName);
+          targetElement = elements[index] || null;
+        } else {
+          // Direct ID lookup
+          targetElement = iframeDoc.getElementById(anchor.id);
+        }
+      }
+
+      if (targetElement) {
+        // Scroll to element with offset
+        targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+        
+        // Apply additional offset if needed
+        if (anchor.offset !== 0) {
+          const currentScroll = iframeDoc.documentElement.scrollTop || iframeDoc.body.scrollTop;
+          const newScroll = Math.max(0, currentScroll + anchor.offset);
+          iframeDoc.documentElement.scrollTop = newScroll;
+          iframeDoc.body.scrollTop = newScroll;
+        }
+      } else {
+        // Fallback to pixel position
+        iframeDoc.documentElement.scrollTop = fallbackScrollTop;
+        iframeDoc.body.scrollTop = fallbackScrollTop;
+      }
+    } catch (error) {
+      console.warn('Failed to restore scroll position:', error);
+      // Final fallback
+      iframeDoc.documentElement.scrollTop = fallbackScrollTop;
+      iframeDoc.body.scrollTop = fallbackScrollTop;
+    }
+  }
+
+  /**
+   * Update iframe with new XHTML content while preserving scroll position
    */
   function updatePreviewContent(content: string): void {
     if (!previewIframe || !content) return;
@@ -57,10 +155,19 @@
       const iframeDoc = previewIframe.contentDocument;
       if (!iframeDoc) return;
 
-      // Clear existing content
+      // Save scroll position and find anchor before updating
+      const scrollTop = iframeDoc.documentElement.scrollTop || iframeDoc.body.scrollTop;
+      const scrollAnchor = scrollTop > 0 ? findScrollAnchor(iframeDoc) : null;
+
+      // Update content (preserves XHTML and blob URLs)
       iframeDoc.open();
       iframeDoc.write(content);
       iframeDoc.close();
+
+      // Restore scroll position after DOM is ready
+      requestAnimationFrame(() => {
+        restoreScrollPosition(iframeDoc, scrollAnchor, scrollTop);
+      });
 
       lastUpdateTime.set(Date.now());
     } catch (error) {

@@ -788,6 +788,21 @@ export class WorkspaceService {
   }
 
   /**
+   * Write a binary file to the workspace
+   */
+  async writeBinaryFile(workspaceId: string, filePath: string, content: ArrayBuffer): Promise<void> {
+    try {
+      await this.fileStorage.writeFile(workspaceId, filePath, content);
+    } catch (error) {
+      throw new WorkspaceServiceError(
+        `Failed to write binary file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'WRITE_BINARY_FILE_ERROR',
+        workspaceId
+      );
+    }
+  }
+
+  /**
    * List SOURCE files in the workspace for manifest display
    */
   async listSourceFiles(workspace: WorkspaceState): Promise<SourceItem[]> {
