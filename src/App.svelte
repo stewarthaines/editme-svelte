@@ -151,6 +151,34 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     };
   };
 
+  // Handle manifest item deletion
+  const handleManifestItemDelete = async (event: CustomEvent<{ itemId: string }>) => {
+    if (!currentWorkspaceState || !appState) return;
+
+    const confirmed = confirm($t('Are you sure you want to delete this item?'));
+    if (!confirmed) return;
+
+    try {
+      // Use workspaceService to remove the manifest item
+      const updatedWorkspace = await workspaceService.removeManifestItem(
+        currentWorkspaceState, 
+        event.detail.itemId
+      );
+      
+      // Update the workspace state in appState
+      await appState.loadWorkspace(updatedWorkspace.id);
+      
+      // Clear selection if deleted item was selected
+      if (selectedManifestItem && selectedManifestItem.id === event.detail.itemId) {
+        selectedManifestItem = null;
+        selectedManifestItemType = null;
+      }
+    } catch (error) {
+      console.error('Failed to delete manifest item:', error);
+      // Could add a toast notification here in the future
+    }
+  };
+
   // Initialize app state
   onMount(() => {
     // Async initialization - transform engine first, then app state
@@ -386,6 +414,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
           selectedItemType={selectedManifestItemType}
           workspace={currentWorkspaceState}
           {workspaceService}
+          on:itemDelete={handleManifestItemDelete}
         />
       {:else if currentView === 'navigation'}
         {#if navigationPreviewContent}

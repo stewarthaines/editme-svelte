@@ -319,11 +319,13 @@ class TransformExecutionEngine {
           stage:
             (error && typeof error === 'object' && 'stage' in error ? error.stage : null) ||
             'execution',
-          message: error instanceof Error ? error.message : String(error),
+          message: (error instanceof Error ? error.message : 
+                   (error && typeof error === 'object' && 'message' in error ? error.message : String(error))),
           line: error && typeof error === 'object' && 'line' in error ? error.line : undefined,
           column:
             error && typeof error === 'object' && 'column' in error ? error.column : undefined,
-          stack: error instanceof Error ? error.stack : undefined,
+          stack: (error instanceof Error ? error.stack : 
+                  (error && typeof error === 'object' && 'stack' in error ? error.stack : undefined)),
         },
         executionTime: Math.round(executionTime),
       });
@@ -413,10 +415,87 @@ class TransformExecutionEngine {
   }
 
   /**
-   * Execute DOM transforms synchronously
+   * Execute DOM transforms synchronously with direct live DOM when layout is needed
    * @param {any} html
    */
   executeDOMTransformsSync(html) {
+    // Check if any transform scripts need layout calculations
+    const needsLayout = this.checkIfLayoutNeeded();
+    
+    if (this.debugMode) {
+      this.debugLog(`DOM transform mode decision: needsLayout=${needsLayout}`, {
+        scriptCount: this.domTransformScripts.length,
+        scriptsWithLayout: this.domTransformScripts.filter(script => script.includes('getElementLayout')).length
+      });
+    }
+    
+    if (needsLayout) {
+      // Use live DOM approach for layout-dependent transforms
+      return this.executeDOMTransformsWithLiveDOM(html);
+    } else {
+      // Use standard parsed document approach for simple transforms  
+      return this.executeDOMTransformsWithParsedDOM(html);
+    }
+  }
+
+  /**
+   * Check if transform scripts need layout calculations
+   */
+  checkIfLayoutNeeded() {
+    // Simple heuristic: check if any scripts mention getElementLayout
+    return this.domTransformScripts.some(script => 
+      script.includes('getElementLayout')
+    );
+  }
+
+  /**
+   * Execute DOM transforms using live DOM for layout calculations
+   */
+  executeDOMTransformsWithLiveDOM(html) {
+    const tempContainer = this.createLiveDOMContainer();
+    
+    try {
+      // Put content directly in live DOM
+      tempContainer.innerHTML = html;
+      
+      if (this.debugMode) {
+        this.debugLog('Live DOM container created:', {
+          innerHTML: tempContainer.innerHTML.substring(0, 200) + '...',
+          elementCount: tempContainer.querySelectorAll('*').length,
+          containerWidth: tempContainer.offsetWidth,
+          containerHeight: tempContainer.offsetHeight,
+          firstElementInfo: tempContainer.firstElementChild ? {
+            tagName: tempContainer.firstElementChild.tagName,
+            offsetWidth: tempContainer.firstElementChild.offsetWidth,
+            offsetHeight: tempContainer.firstElementChild.offsetHeight,
+            textContent: tempContainer.firstElementChild.textContent?.substring(0, 50)
+          } : 'no first element'
+        });
+      }
+      
+      // Execute transforms on live DOM elements
+      for (let i = 0; i < this.domTransformScripts.length; i++) {
+        try {
+          // Pass the live container as a document-like object
+          const mockDocument = this.createMockDocument(tempContainer);
+          this.executeSingleDOMTransform(mockDocument, this.domTransformScripts[i], i);
+        } catch (error) {
+          if (error instanceof Error) error.stage = `dom-transform-${i}`;
+          throw error;
+        }
+      }
+      
+      // Return the transformed HTML from live DOM
+      return tempContainer.innerHTML;
+    } finally {
+      this.cleanupTempAttachment(tempContainer);
+    }
+  }
+
+  /**
+   * Execute DOM transforms using parsed DOM (traditional approach)
+   */
+  executeDOMTransformsWithParsedDOM(html) {
     // Parse HTML to DOM document
     const parser = new DOMParser();
     let document = parser.parseFromString(
@@ -437,8 +516,96 @@ class TransformExecutionEngine {
     // Return transformed HTML content with XHTML compliance
     const serializer = new XMLSerializer();
     const fullBodySerialization = serializer.serializeToString(document.body);
-    // Remove the opening and closing body tags to get just the content
     return fullBodySerialization.replace(/^<body[^>]*>|<\/body>$/g, '');
+  }
+
+  /**
+   * Create a live DOM container for layout calculations
+   */
+  createLiveDOMContainer() {
+    const container = document.createElement('div');
+    container.id = 'transform-live-container';
+    
+    // Set styles via JavaScript properties instead of CSS strings
+    // This works better in iframe environments
+    const style = container.style;
+    style.position = 'fixed';
+    style.top = '0px';
+    style.left = '0px';
+    style.width = '800px';
+    style.minHeight = '600px';
+    style.visibility = 'hidden';
+    style.pointerEvents = 'none';
+    style.fontFamily = 'Georgia, serif';
+    style.fontSize = '16px';
+    style.lineHeight = '1.6';
+    style.color = 'black';
+    style.backgroundColor = 'white';
+    style.display = 'block';
+    style.boxSizing = 'border-box';
+    style.padding = '20px';
+    
+    document.body.appendChild(container);
+    
+    // Force layout calculation by accessing offsetWidth immediately
+    const forceLayout1 = container.offsetWidth;
+    
+    // Try a different approach if that didn't work - temporarily make visible
+    if (forceLayout1 === 0) {
+      style.visibility = 'visible';
+      style.opacity = '0';
+      const forceLayout2 = container.offsetWidth;
+      style.visibility = 'hidden';
+      style.opacity = '1';
+      
+      if (this.debugMode) {
+        this.debugLog('Container had zero width, tried visibility workaround', {
+          beforeWorkaround: forceLayout1,
+          afterWorkaround: forceLayout2
+        });
+      }
+    }
+    
+    if (this.debugMode) {
+      this.debugLog('Created live DOM container for layout calculations', {
+        offsetWidth: container.offsetWidth,
+        offsetHeight: container.offsetHeight,
+        clientWidth: container.clientWidth,
+        clientHeight: container.clientHeight,
+        computedWidth: window.getComputedStyle(container).width,
+        computedDisplay: window.getComputedStyle(container).display,
+        parentElement: container.parentElement ? container.parentElement.tagName : 'none',
+        documentBody: document.body ? 'exists' : 'missing'
+      });
+    }
+    
+    return container;
+  }
+
+  /**
+   * Create a mock document object that uses the live container as its body
+   */
+  createMockDocument(container) {
+    return {
+      body: container,
+      querySelector: (selector) => container.querySelector(selector),
+      querySelectorAll: (selector) => container.querySelectorAll(selector),
+      createElement: (tagName) => document.createElement(tagName),
+      // Add other document methods as needed
+    };
+  }
+
+  /**
+   * Clean up temporary DOM container
+   */
+  cleanupTempAttachment(container) {
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+      
+      if (this.debugMode) {
+        this.debugLog('Cleaned up temporary DOM container');
+      }
+    }
   }
 
   /**
@@ -501,6 +668,9 @@ class TransformExecutionEngine {
       document: typeof document !== 'undefined' ? document : undefined,
       DOMParser: typeof DOMParser !== 'undefined' ? DOMParser : undefined,
 
+      // Layout calculation utilities for attached DOM elements
+      getElementLayout: this.createLayoutUtility(),
+
       // Extension libraries are available as native window globals after dynamic loading
     };
 
@@ -544,6 +714,89 @@ class TransformExecutionEngine {
     });
 
     return safeGlobals;
+  }
+
+  /**
+   * Create layout calculation utility for transform scripts
+   */
+  createLayoutUtility() {
+    return (element) => {
+      // Check if this is a real DOM element in the browser
+      if (!element || !element.getBoundingClientRect) {
+        if (this.debugMode) {
+          this.debugLog('Layout requested for non-live element, returning defaults');
+        }
+        return {
+          width: 0,
+          height: 0,
+          offsetWidth: 0,
+          offsetHeight: 0,
+          clientWidth: 0,
+          clientHeight: 0,
+          scrollWidth: 0,
+          scrollHeight: 0,
+          isAttached: false
+        };
+      }
+
+      // Element is live DOM - calculate real layout information
+      const computedStyle = window.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      
+      const layout = {
+        // Dimensions from getBoundingClientRect (actual rendered size)
+        width: rect.width,
+        height: rect.height,
+        
+        // Element properties (includes padding/border/scrollbars)
+        offsetWidth: element.offsetWidth,
+        offsetHeight: element.offsetHeight,
+        
+        // Client dimensions (content + padding, excludes scrollbars/border)
+        clientWidth: element.clientWidth,
+        clientHeight: element.clientHeight,
+        
+        // Scroll dimensions (total content size)
+        scrollWidth: element.scrollWidth,
+        scrollHeight: element.scrollHeight,
+        
+        // Computed styles (useful for layout calculations)
+        marginLeft: parseInt(computedStyle.marginLeft, 10) || 0,
+        marginRight: parseInt(computedStyle.marginRight, 10) || 0,
+        marginTop: parseInt(computedStyle.marginTop, 10) || 0,
+        marginBottom: parseInt(computedStyle.marginBottom, 10) || 0,
+        
+        paddingLeft: parseInt(computedStyle.paddingLeft, 10) || 0,
+        paddingRight: parseInt(computedStyle.paddingRight, 10) || 0,
+        paddingTop: parseInt(computedStyle.paddingTop, 10) || 0,
+        paddingBottom: parseInt(computedStyle.paddingBottom, 10) || 0,
+        
+        borderLeftWidth: parseInt(computedStyle.borderLeftWidth, 10) || 0,
+        borderRightWidth: parseInt(computedStyle.borderRightWidth, 10) || 0,
+        borderTopWidth: parseInt(computedStyle.borderTopWidth, 10) || 0,
+        borderBottomWidth: parseInt(computedStyle.borderBottomWidth, 10) || 0,
+        
+        // Position information
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        
+        // Attachment status
+        isAttached: true
+      };
+
+      if (this.debugMode) {
+        this.debugLog('Layout calculated for live DOM element', {
+          tagName: element.tagName,
+          width: layout.width,
+          height: layout.height,
+          isAttached: layout.isAttached
+        });
+      }
+
+      return layout;
+    };
   }
 
   /**

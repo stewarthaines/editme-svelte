@@ -179,12 +179,12 @@ export class TransformEngine {
    */
   private createPersistentIframe(): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
+    iframe.style.visibility = 'hidden';
     iframe.style.position = 'absolute';
     iframe.style.left = '-9999px';
-    iframe.style.top = '-9999px';
-    iframe.style.width = '1px';
-    iframe.style.height = '1px';
+    iframe.style.top = '0px';
+    iframe.style.width = '800px';
+    iframe.style.height = '600px';
     
     // No sandbox restrictions - iframe needs full access for transform scripts and blob URLs
     
@@ -286,7 +286,7 @@ ${editorJs}
           const error = payload?.result?.error || { message: 'Unknown transform error' };
           const transformError: TransformError = {
             stage: error.stage || 'unknown',
-            message: error.message || 'Transform failed',
+            message: String(error.message || error || 'Transform failed'),
             line: error.line,
             column: error.column,
             stack: error.stack
@@ -301,6 +301,7 @@ ${editorJs}
       console.error(`Transform engine ${type.toLowerCase()}:`, payload);
     }
   }
+
 
   /**
    * Wait for iframe ready signal
