@@ -14,7 +14,7 @@
     icon: string;
     label: string;
   }> = [
-    { id: 'workspace', icon: '🏠', label: $t('Workspace') },
+    { id: 'workspace', icon: '🏠', label: $t('Projects') },
     { id: 'metadata', icon: '📄', label: $t('Metadata') },
     { id: 'manifest', icon: '📋', label: $t('Manifest') },
     { id: 'navigation', icon: '📖', label: $t('Navigation') },

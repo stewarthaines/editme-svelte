@@ -63,9 +63,9 @@
   <div class="list-header">
     <!--h3 class="list-title">
       {#if workspaces.length === 0}
-        {$t('Workspaces')}
+        {$t('Projects')}
       {:else}
-        {$t('Workspaces ({count} total)', { count: workspaces.length })}
+        {$t('Projects ({count} total)', { count: workspaces.length })}
       {/if}
     </h3-->
 
@@ -75,10 +75,10 @@
           <input
             type="search"
             class="search-input"
-            placeholder={$t('Search workspaces…')}
+            placeholder={$t('Search projects…')}
             value={searchQuery}
             on:input={handleSearchInput}
-            aria-label={$t('Search workspaces')}
+            aria-label={$t('Search projects')}
           />
           {#if searchQuery}
             <button
@@ -101,12 +101,12 @@
         <div class="skeleton-item" aria-hidden="true"></div>
         <div class="skeleton-item" aria-hidden="true"></div>
         <div class="skeleton-item" aria-hidden="true"></div>
-        <p class="loading-text">{$t('Loading workspaces…')}</p>
+        <p class="loading-text">{$t('Loading projects…')}</p>
       </div>
     {:else if workspaces.length === 0}
       <div class="empty-state">
         <div class="empty-icon" aria-hidden="true">📚</div>
-        <h4 class="empty-title">{$t('No workspaces yet')}</h4>
+        <h4 class="empty-title">{$t('No projects yet')}</h4>
         <p class="empty-description">
           {$t('Get started by creating your first EPUB')}
         </p>
@@ -122,9 +122,9 @@
     {:else if filteredWorkspaces.length === 0}
       <div class="no-results">
         <div class="no-results-icon" aria-hidden="true">🔍</div>
-        <h4 class="no-results-title">{$t('No workspaces found')}</h4>
+        <h4 class="no-results-title">{$t('No projects found')}</h4>
         <p class="no-results-description">
-          {$t('No workspaces match your search for "{query}"', { query: searchQuery })}
+          {$t('No projects match your search for "{query}"', { query: searchQuery })}
         </p>
         <button type="button" class="clear-search-button" on:click={clearSearch}>
           {$t('Clear search')}

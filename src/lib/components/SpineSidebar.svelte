@@ -290,7 +290,7 @@
     </div>
   {:else}
     <div class="empty-state">
-      <p>{$t('No workspace selected')}</p>
+      <p>{$t('No project selected')}</p>
     </div>
   {/if}
 </div>

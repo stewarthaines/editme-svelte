@@ -72,7 +72,7 @@
   tabindex="0"
   onclick={handleSelect}
   onkeydown={handleKeyDown}
-  aria-label={$t('Open workspace: {title}', { title: workspace.title })}
+  aria-label={$t('Open project: {title}', { title: workspace.title })}
 >
   <div class="workspace-main">
     <div class="workspace-icon-container">
@@ -80,7 +80,7 @@
         <span
           class="workspace-icon error"
           aria-label={$t('Error')}
-          title={$t('Workspace has errors')}>⚠️</span
+          title={$t('Project has errors')}>⚠️</span
         >
       {:else}
         <span class="workspace-icon" aria-hidden="true">📖</span>
@@ -128,8 +128,8 @@
       type="button"
       class="delete-button"
       onclick={handleDeleteRequest}
-      aria-label={$t('Delete workspace: {title}', { title: workspace.title })}
-      title={$t('Delete workspace')}
+      aria-label={$t('Delete project: {title}', { title: workspace.title })}
+      title={$t('Delete project')}
     >
       <span aria-hidden="true">🗑️</span>
     </button>

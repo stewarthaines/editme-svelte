@@ -80,7 +80,7 @@ The build process creates a single `EDITME.html` file (~2-3MB) with all assets i
 - OPFS (Origin Private File System) for performance
 - IndexedDB fallback for broader browser support
 - Feature detection for `.createWritable()` support
-- Workspace-based organization with unique IDs
+- Project-based organization with unique IDs
 
 ### State Persistence Pattern
 

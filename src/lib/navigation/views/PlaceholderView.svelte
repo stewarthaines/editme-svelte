@@ -147,7 +147,7 @@
             class="btn btn-secondary"
             onclick={() => navigationStore.navigateTo('workspace')}
           >
-            {$t('Back to Workspace')}
+            {$t('Back to Projects')}
           </button>
         </div>
       </div>

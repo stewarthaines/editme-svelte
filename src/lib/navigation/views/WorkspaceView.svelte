@@ -102,7 +102,7 @@
       loadCurrentWorkspace();
     } catch (err) {
       console.error('Failed to load workspaces:', err);
-      error = $t('Failed to load workspaces');
+      error = $t('Failed to load projects');
       workspaces = []; // Clear workspaces on error
     } finally {
       loading = false;
@@ -309,7 +309,7 @@
 
   const handleCloseWorkspace = async () => {
     if (hasUnsavedChanges) {
-      const confirmed = confirm($t('You have unsaved workspace changes. Continue?'));
+      const confirmed = confirm($t('You have unsaved project changes. Continue?'));
       if (!confirmed) return;
     }
 
@@ -320,7 +320,7 @@
   // Navigation guard
   export async function canLeave(): Promise<boolean> {
     if (hasUnsavedChanges) {
-      return window.confirm($t('You have unsaved workspace changes. Continue?'));
+      return window.confirm($t('You have unsaved project changes. Continue?'));
     }
     return true;
   }

@@ -27,7 +27,7 @@ EDITME.html is a browser-based EPUB editor built with Svelte 5 and TypeScript. I
 
 ### Key Design Principles
 
-1. **Workspace-Centric**: All operations revolve around workspace management
+1. **Project-Centric**: All operations revolve around project management
 2. **Service Architecture**: Clean 3-layer architecture with dependency injection
 3. **Progressive Enhancement**: Optimal performance with broad compatibility
 4. **Browser-Native**: Leverages modern APIs with fallbacks

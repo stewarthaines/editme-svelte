@@ -291,11 +291,11 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     <svelte:fragment slot="sidebar-spine">
       {#if !initialized}
         <div class="placeholder-content">
-          <p>{$t('Loading workspace…')}</p>
+          <p>{$t('Loading project…')}</p>
         </div>
       {:else if !currentWorkspaceState}
         <div class="placeholder-content">
-          <p>{$t('No workspace selected')}</p>
+          <p>{$t('No project selected')}</p>
         </div>
       {:else if currentWorkspaceState}
         <SpineSidebar
@@ -309,7 +309,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
         />
       {:else}
         <div class="placeholder-content">
-          <p>{$t('Loading workspace…')}</p>
+          <p>{$t('Loading project…')}</p>
         </div>
       {/if}
     </svelte:fragment>
@@ -377,7 +377,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
           <PlaceholderView
             viewType="navigation"
             title={$t('Table of Contents')}
-            description={$t('Loading workspace…')}
+            description={$t('Loading project…')}
             icon="📖"
           />
         {/if}
@@ -396,7 +396,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
           <PlaceholderView
             viewType="spine"
             title={$t('Spine Items')}
-            description={$t('Loading workspace…')}
+            description={$t('Loading project…')}
             icon="📚"
           />
         {/if}

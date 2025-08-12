@@ -170,7 +170,7 @@
     <div class="settings-content">
       <!-- Full-width settings layout with responsive grid -->
       <section class="workspace-settings">
-        <h2>Workspace Settings</h2>
+        <h2>Project Settings</h2>
 
         <div class="setting-group">
           <label class="setting-label">
