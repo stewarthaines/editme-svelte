@@ -487,6 +487,7 @@ describe('OPFUtils', () => {
         expect(xml).not.toContain('</package> idref="chapter2"');
       });
     });
+
   });
 
   describe('detectEPUBVersion', () => {
