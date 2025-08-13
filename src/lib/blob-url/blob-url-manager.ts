@@ -82,15 +82,29 @@ export class BlobURLManager {
     try {
       let blobURL: string;
 
-      if (this.supportsDirectBlobs) {
-        // OPFS: Zero-copy approach
+      // Check if this is a CSS file that needs font URL processing
+      const isCSSFile = filePath.toLowerCase().endsWith('.css');
+
+      if (this.supportsDirectBlobs && !isCSSFile) {
+        // OPFS: Zero-copy approach (only for non-CSS files)
         const file = await this.fileStorage.getFile(this.activeWorkspaceId, resolvedPath);
         const mimeType = this.getMimeType(filePath);
         const correctedFile = new File([file], file.name, { type: mimeType });
         blobURL = URL.createObjectURL(correctedFile);
       } else {
-        // IndexedDB: Traditional approach
-        const content = await this.fileStorage.readFile(this.activeWorkspaceId, resolvedPath);
+        // IndexedDB approach OR CSS processing
+        let content: ArrayBuffer;
+        
+        if (isCSSFile) {
+          // CSS files: read as text, process font URLs, then convert back to ArrayBuffer
+          const textContent = await this.fileStorage.readTextFile(this.activeWorkspaceId, resolvedPath);
+          const processedCSS = await this.processCSSFontURLs(textContent);
+          content = new TextEncoder().encode(processedCSS);
+        } else {
+          // Non-CSS files: read as binary
+          content = await this.fileStorage.readFile(this.activeWorkspaceId, resolvedPath);
+        }
+        
         const mimeType = this.getMimeType(filePath);
         const blob = new Blob([content], { type: mimeType });
         blobURL = URL.createObjectURL(blob);
@@ -381,6 +395,52 @@ export class BlobURLManager {
         break;
       }
     }
+  }
+
+  /**
+   * Process CSS content to replace font url() references with blob URLs
+   */
+  private async processCSSFontURLs(cssContent: string): Promise<string> {
+    // Regex to match url() patterns: url('path'), url("path"), url(path)
+    const urlPattern = /url\(\s*(['"]?)(.*?)\1\s*\)/g;
+    let processedCSS = cssContent;
+    const matches = Array.from(cssContent.matchAll(urlPattern));
+
+    for (const match of matches) {
+      const fullMatch = match[0]; // Complete url(...) expression
+      const quote = match[1]; // Quote character (' or " or empty)
+      const url = match[2]; // The actual URL
+
+      // Skip if not a resource path (absolute URLs, data URLs, etc.)
+      if (!this.isResourcePath(url)) {
+        continue;
+      }
+
+      try {
+        // Check capacity before creating blob URL
+        if (this.getBlobURLCount() >= this.registry.maxCount) {
+          this.onCapacityReached?.();
+          throw new BlobURLCapacityError(this.getBlobURLCount(), this.registry.maxCount);
+        }
+
+        // Convert XHTML path to manifest path
+        const manifestPath = convertXHTMLPathToManifestPath(url);
+
+        // Create blob URL for the font file (recursive call but for non-CSS file)
+        // createBlobURL() will handle path resolution internally
+        const blobURL = await this.createBlobURL(manifestPath);
+        
+        // Replace the URL in CSS while preserving quotes and syntax
+        const replacement = `url(${quote}${blobURL}${quote})`;
+        processedCSS = processedCSS.replace(fullMatch, replacement);
+
+      } catch (error) {
+        // Log CSS URL processing errors but don't break the whole CSS
+        console.warn(`Failed to process CSS url(${url}):`, error);
+      }
+    }
+
+    return processedCSS;
   }
 
   /**
