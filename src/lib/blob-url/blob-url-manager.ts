@@ -99,7 +99,8 @@ export class BlobURLManager {
           // CSS files: read as text, process font URLs, then convert back to ArrayBuffer
           const textContent = await this.fileStorage.readTextFile(this.activeWorkspaceId, resolvedPath);
           const processedCSS = await this.processCSSFontURLs(textContent);
-          content = new TextEncoder().encode(processedCSS);
+          const uint8Array = new TextEncoder().encode(processedCSS);
+          content = uint8Array.buffer;
         } else {
           // Non-CSS files: read as binary
           content = await this.fileStorage.readFile(this.activeWorkspaceId, resolvedPath);
@@ -290,7 +291,6 @@ export class BlobURLManager {
    * Process a single asset element
    */
   private async processAssetElement(element: Element): Promise<void> {
-    const _tagName = element.tagName.toLowerCase();
 
     // Determine attribute name
     let attr: string;
