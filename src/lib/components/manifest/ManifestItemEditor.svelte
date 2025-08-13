@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import { generateEPUBPath } from '../../epub/opf-utils.js';
+  import { ManifestUtils } from '../../manifest/utils.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
 
   export let itemEditorMode: 'create-text' | 'create-file' | 'edit' = 'create-text';
@@ -98,37 +99,25 @@
       if (!formData.id) {
         formData.id = selectedFile.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '_');
       }
+      // Determine reliable media type once
+      const browserType = selectedFile.type;
+      const filenameType = ManifestUtils.detectMediaType(selectedFile.name);
+      
+      // For font files, always use filename detection (browsers are unreliable)
+      // For other files, prefer browser detection unless it's generic
+      const isGeneric = !browserType || browserType === 'application/octet-stream';
+      const isFontFile = filenameType.startsWith('font/');
+      const reliableMediaType = (isGeneric || isFontFile) ? filenameType : browserType;
+      
       if (!formData.href) {
-        const mediaType = selectedFile.type || detectMediaType(selectedFile.name);
-        formData.href = generateEPUBPath(selectedFile.name, mediaType);
+        formData.href = generateEPUBPath(selectedFile.name, reliableMediaType);
       }
       if (!formData.mediaType) {
-        formData.mediaType = selectedFile.type || detectMediaType(selectedFile.name);
+        formData.mediaType = reliableMediaType;
       }
     }
   };
 
-  const detectMediaType = (filename: string): string => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    const typeMap: Record<string, string> = {
-      html: 'text/html',
-      xhtml: 'application/xhtml+xml',
-      css: 'text/css',
-      js: 'text/javascript',
-      txt: 'text/plain',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      png: 'image/png',
-      gif: 'image/gif',
-      svg: 'image/svg+xml',
-      mp3: 'audio/mpeg',
-      ogg: 'audio/ogg',
-      mp4: 'video/mp4',
-      webm: 'video/webm',
-      pdf: 'application/pdf',
-    };
-    return typeMap[ext || ''] || 'application/octet-stream';
-  };
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
