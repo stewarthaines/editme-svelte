@@ -26,6 +26,9 @@
   import { MetadataService } from './lib/services/metadata/metadata.service.js';
   import { BlobURLManager } from './lib/blob-url/blob-url-manager.js';
 import { ExtensionManager } from './lib/extensions/extension-manager.js';
+  import { EPUBPackager } from './lib/epub/EPUBPackager.js';
+  import { EPUBUnpacker } from './lib/epub/EPUBUnpacker.js';
+  import { generateEPUBTimestamp } from './lib/epub/opf-utils.js';
 
   // Extension manager instance
   let extensionManager: ExtensionManager;
@@ -49,6 +52,8 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
   const workspaceService = new WorkspaceService(fileStorage);
   const spineService = new SpineService(workspaceService);
   const metadataService = new MetadataService(workspaceService);
+  const epubPackager = new EPUBPackager();
+  const epubUnpacker = new EPUBUnpacker();
 
   // BlobURLManager will be created after FileStorageAPI is initialized
   let blobURLManager: BlobURLManager;
@@ -193,6 +198,147 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     }
   };
 
+  // Handle EPUB import (unified handler for local files and remote URLs)
+  const handleEpubImport = async (file?: File, sourceUrl?: string) => {
+    if (!appState) {
+      console.error('AppState not initialized');
+      return;
+    }
+
+    try {
+      let epubFile: File;
+
+      if (file) {
+        // Local file provided
+        epubFile = file;
+      } else if (sourceUrl) {
+        // Remote URL provided - fetch the EPUB directly
+        console.log(`Downloading EPUB from: ${sourceUrl}`);
+        const response = await fetch(sourceUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to download EPUB: ${response.status} ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const filename = extractFilenameFromUrl(sourceUrl);
+        epubFile = new File([blob], filename, { type: 'application/epub+zip' });
+      } else {
+        // No file or URL provided - show file picker
+        epubFile = await showFilePickerForEpub();
+      }
+
+      // Generate unique workspace ID
+      const workspaceId = 'workspace-' + crypto.randomUUID();
+
+      console.log(`Importing EPUB: ${epubFile.name} to workspace: ${workspaceId}`);
+
+      // Unpack EPUB to workspace
+      const result = await epubUnpacker.unpackEPUB(epubFile, workspaceId);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to unpack EPUB');
+      }
+
+      console.log(`✅ Successfully imported EPUB: ${result.extractedFiles?.length} files extracted`);
+
+      // Load the new workspace
+      await appState.loadWorkspace(workspaceId);
+
+      // Navigate to first spine item if available
+      const firstSpineItem = appState.workspace?.opf?.spine?.[0];
+      if (firstSpineItem) {
+        // Select first spine item
+        appState.selectChapter(firstSpineItem.idref);
+        // Navigate to spine view
+        navigationStore.navigateTo('spine');
+      } else {
+        // Fallback to metadata view if no spine items
+        navigationStore.navigateTo('metadata');
+      }
+
+      // Clear hash to clean up URL after successful import
+      location.hash = '';
+
+    } catch (error) {
+      console.error('Failed to import EPUB:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to import EPUB: ${errorMessage}`);
+    }
+  };
+
+  // Helper function to extract filename from URL
+  const extractFilenameFromUrl = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const filename = pathname.split('/').pop() || 'imported-epub.epub';
+      return filename.endsWith('.epub') ? filename : `${filename}.epub`;
+    } catch {
+      return 'imported-epub.epub';
+    }
+  };
+
+  // Helper function to show file picker
+  const showFilePickerForEpub = (): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.epub';
+
+      input.onchange = (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (file) {
+          resolve(file);
+        } else {
+          reject(new Error('No file selected'));
+        }
+      };
+
+      input.oncancel = () => {
+        reject(new Error('File selection cancelled'));
+      };
+
+      input.click();
+    });
+  };
+
+  // Handle EPUB package request
+  const handlePackageRequest = async (workspaceId: string) => {
+    if (!currentWorkspaceState) return;
+
+    try {
+      // Update metadata.modifiedDate first
+      const updatedWorkspace = await workspaceService.updateMetadata(currentWorkspaceState, {
+        modifiedDate: generateEPUBTimestamp()
+      });
+
+      // Update the workspace state in appState
+      if (appState) {
+        appState.workspace = updatedWorkspace;
+      }
+
+      // Then package EPUB with progress tracking
+      const result = await epubPackager.packageEPUB(workspaceId, {
+        progressCallback: (progress) => {
+          console.log(`Packaging progress: ${progress.phase} - ${progress.processedFiles}/${progress.totalFiles} files`);
+        }
+      });
+
+      if (result.success && result.blob && result.filename) {
+        // Immediately download the packaged EPUB
+        epubPackager.downloadEPUB(result.blob, result.filename);
+        
+        console.log(`✅ Successfully packaged and downloaded: ${result.filename}`);
+      } else {
+        throw new Error(result.error || 'Unknown packaging error');
+      }
+    } catch (error) {
+      console.error('Failed to package EPUB:', error);
+      throw error; // Re-throw so SpineSidebar can handle UI feedback
+    }
+  };
+
   // Initialize app state
   onMount(() => {
     // Async initialization - transform engine first, then app state
@@ -254,12 +400,36 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
       appState.selectChapter(null);
     };
 
+    // Handle hashchange events for remote EPUB imports
+    const handleHashChange = () => {
+      const fragment = window.location.hash.slice(1); // Remove #
+      
+      if (fragment.startsWith('http')) {
+        // URL-encoded EPUB URL in hash fragment
+        try {
+          const decodedUrl = decodeURIComponent(fragment);
+          console.log(`Hash change detected: importing EPUB from ${decodedUrl}`);
+          handleEpubImport(undefined, decodedUrl);
+        } catch (error) {
+          console.error('Failed to decode URL from hash:', error);
+          alert('Invalid URL in hash fragment');
+        }
+      }
+    };
+
+    // Check hash on initial load
+    if (window.location.hash) {
+      handleHashChange();
+    }
+
     window.addEventListener('select-spine-item', handleSelectSpineItem);
     window.addEventListener('clear-spine-selection', handleClearSpineSelection);
+    window.addEventListener('hashchange', handleHashChange);
 
     return () => {
       window.removeEventListener('select-spine-item', handleSelectSpineItem);
       window.removeEventListener('clear-spine-selection', handleClearSpineSelection);
+      window.removeEventListener('hashchange', handleHashChange);
       appState?.cleanup();
       transformEngine?.cleanup();
     };
@@ -306,6 +476,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
           onWorkspaceUpdate={updatedWorkspace => {
             if (appState) appState.workspace = updatedWorkspace;
           }}
+          onPackageRequested={handlePackageRequest}
         />
       {:else}
         <div class="placeholder-content">
@@ -323,6 +494,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
             appState?.createWorkspace(data.title, data.language) ?? Promise.resolve('')}
           onDeleteWorkspace={id => appState?.deleteWorkspace(id) ?? Promise.resolve()}
           onLoadWorkspace={id => appState?.loadWorkspace(id) ?? Promise.resolve()}
+          onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
           onNavigationRequested={view => {
             navigationStore.navigateTo(view as ViewType);

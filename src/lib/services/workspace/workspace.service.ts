@@ -34,6 +34,7 @@ export interface WorkspaceInfo {
   author?: string;
   hasError?: boolean;
   epubVersion: string;
+  extensionIds?: string[];
 }
 
 export interface ChapterContent {
@@ -108,12 +109,17 @@ export class ValidationError extends WorkspaceServiceError {
 
 // Import OPF utilities for internal use
 import { OPFUtils } from '../../epub/opf-utils.js';
+import { ExtensionManager } from '../../extensions/extension-manager.js';
 
 /**
  * WorkspaceService - Single responsibility for workspace lifecycle and EPUB structure
  */
 export class WorkspaceService {
-  constructor(private fileStorage: FileStorageAPI) {}
+  private extensionManager: ExtensionManager;
+
+  constructor(private fileStorage: FileStorageAPI) {
+    this.extensionManager = new ExtensionManager(fileStorage);
+  }
 
   /**
    * Create a new workspace with initial EPUB structure
@@ -259,15 +265,8 @@ export class WorkspaceService {
    * Save workspace state to storage
    */
   async saveWorkspace(workspace: WorkspaceState): Promise<WorkspaceState> {
-    // Update modification timestamp
+    // Save workspace without updating modification timestamp (only updated during EPUB packaging)
     const updatedWorkspace = { ...workspace };
-    updatedWorkspace.opf = {
-      ...workspace.opf,
-      metadata: {
-        ...workspace.opf.metadata,
-        modifiedDate: generateEPUBTimestamp(),
-      },
-    };
 
     // Generate and save OPF
     const opfXML = OPFUtils.generateOPFXML(updatedWorkspace.opf);
@@ -312,7 +311,6 @@ export class WorkspaceService {
         metadata: {
           ...workspace.opf.metadata,
           ...updates,
-          modifiedDate: generateEPUBTimestamp(),
         },
       },
     };
@@ -430,8 +428,29 @@ export class WorkspaceService {
       throw new ValidationError(`Manifest item with ID '${itemId}' not found`);
     }
 
-    // Check if media type changed to/from JavaScript
+    // Get the old item for comparison
     const oldItem = workspace.opf.manifest[itemIndex];
+
+    // Handle file path changes by moving the actual file
+    if (updates.href && updates.href !== oldItem.href) {
+      const oldFullPath = this.resolveManifestPath(oldItem.href, workspace.pathInfo.basePath);
+      const newFullPath = this.resolveManifestPath(updates.href, workspace.pathInfo.basePath);
+      
+      // Only move if source file exists
+      if (await this.fileStorage.fileExists(workspace.id, oldFullPath)) {
+        try {
+          await this.fileStorage.renameFile(workspace.id, oldFullPath, newFullPath);
+        } catch (error) {
+          throw new WorkspaceServiceError(
+            `Failed to move file from ${oldItem.href} to ${updates.href}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            'FILE_MOVE_ERROR',
+            workspace.id
+          );
+        }
+      }
+    }
+
+    // Check if media type changed to/from JavaScript
     const oldIsJS = oldItem.mediaType === 'text/javascript' || oldItem.mediaType === 'application/javascript';
     const newIsJS = updates.mediaType === 'text/javascript' || updates.mediaType === 'application/javascript';
 
@@ -574,18 +593,40 @@ export class WorkspaceService {
         const files = await this.fileStorage.listFiles(id);
         const totalSize = await this.fileStorage.estimateWorkspaceSize(id);
 
+        // Get OPF file modification time for workspace last modified timestamp
+        let lastModified: Date;
+        try {
+          const opfFileInfo = await this.fileStorage.getFileInfo(id, workspace.pathInfo.rootfilePath);
+          lastModified = opfFileInfo.lastModified;
+        } catch (error) {
+          // Fallback to metadata timestamp or current date if file info unavailable
+          lastModified = workspace.opf.metadata.modifiedDate
+            ? new Date(workspace.opf.metadata.modifiedDate)
+            : new Date();
+        }
+
+        // Get extension IDs for workspace
+        let extensionIds: string[] | undefined;
+        try {
+          const extensions = await this.extensionManager.listWorkspaceExtensions(id);
+          if (extensions.length > 0) {
+            extensionIds = extensions.map(ext => ext.name);
+          }
+        } catch {
+          // Extensions are optional, don't fail if they can't be loaded
+        }
+
         workspaces.push({
           id,
           title: workspace.opf.metadata.title,
           language: workspace.opf.metadata.language,
-          lastModified: workspace.opf.metadata.modifiedDate
-            ? new Date(workspace.opf.metadata.modifiedDate)
-            : new Date(),
+          lastModified,
           fileCount: files.length,
           totalSize,
           author: workspace.opf.metadata.creator?.[0] || undefined,
           hasError: false,
           epubVersion: '3.0',
+          extensionIds,
         });
       } catch (error) {
         // Skip corrupted workspaces

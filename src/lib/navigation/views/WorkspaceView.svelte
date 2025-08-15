@@ -16,6 +16,7 @@
     onCreateWorkspace,
     onDeleteWorkspace,
     onLoadWorkspace,
+    onEpubImportRequested,
     onWorkspaceChange = null,
     onWorkspaceOpened,
     onNavigationRequested,
@@ -26,6 +27,7 @@
     onCreateWorkspace: (data: { title: string; language: string }) => Promise<string>;
     onDeleteWorkspace: (id: string) => Promise<void>;
     onLoadWorkspace: (id: string) => Promise<void>;
+    onEpubImportRequested: (file?: File, sourceUrl?: string) => Promise<void>;
     onWorkspaceChange?: ((workspaceId: string | null) => void) | null;
     onWorkspaceOpened?: (workspaceId: string) => void;
     onNavigationRequested?: (view: string, workspaceId?: string) => void;
@@ -157,39 +159,23 @@
   };
 
   // Handle load EPUB file
-  const handleLoadEpub = () => {
-    // Create file input element
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.epub';
-
-    input.onchange = async event => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      try {
-        loading = true;
-
-        // TODO: Implement EPUB import in WorkspaceService
-        // For now, show a placeholder message
-        alert(
-          $t(
-            'EPUB import functionality is coming soon. For now, use "Create New" to start a fresh project.'
-          )
-        );
-      } catch (err) {
-        console.error('Failed to import EPUB:', err);
-        alert(
-          $t('Failed to import EPUB: {error}', {
-            error: err instanceof Error ? err.message : 'Unknown error',
-          })
-        );
-      } finally {
-        loading = false;
-      }
-    };
-
-    input.click();
+  const handleLoadEpub = async () => {
+    try {
+      loading = true;
+      await onEpubImportRequested();
+      
+      // Refresh workspace list after import
+      await loadWorkspaces();
+    } catch (err) {
+      console.error('Failed to import EPUB:', err);
+      alert(
+        $t('Failed to import EPUB: {error}', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+        })
+      );
+    } finally {
+      loading = false;
+    }
   };
 
   // Handle workspace selection (open workspace) with smart navigation

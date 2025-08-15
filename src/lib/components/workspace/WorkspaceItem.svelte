@@ -6,7 +6,6 @@
   const dispatch = createEventDispatcher<{
     selected: { workspaceId: string };
     deleteRequested: { workspaceId: string };
-    packageRequested: { workspaceId: string };
   }>();
 
   export let workspace: WorkspaceInfo;
@@ -22,10 +21,6 @@
     dispatch('deleteRequested', { workspaceId: workspace.id });
   };
 
-  const handlePackageRequest = (event: Event) => {
-    event.stopPropagation(); // Prevent workspace selection
-    dispatch('packageRequested', { workspaceId: workspace.id });
-  };
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -91,6 +86,9 @@
       <div class="workspace-header">
         <h3 class="workspace-title">
           {workspace.title}
+          {#if workspace.author}
+            <span class="workspace-author-inline"> - {workspace.author}</span>
+          {/if}
           {#if isCurrent}
             <span class="current-badge" aria-label={$t('Currently open')}>{$t('Current')}</span>
           {/if}
@@ -99,31 +97,20 @@
       </div>
 
       <div class="workspace-meta">
-        <span class="workspace-author">{workspace.author || $t('Unknown Author')}</span>
-        <span class="meta-separator">•</span>
         <span class="workspace-language">{workspace.language}</span>
         <span class="meta-separator">•</span>
         <span class="workspace-stats">
           {workspace.fileCount}
           {$t('files')} • {formatFileSize(workspace.totalSize)}
+          {#if workspace.extensionIds && workspace.extensionIds.length > 0}
+            • {workspace.extensionIds.join(', ')}
+          {/if}
         </span>
       </div>
     </div>
   </div>
 
   <div class="workspace-actions">
-    {#if isCurrent}
-      <button
-        type="button"
-        class="package-button"
-        onclick={handlePackageRequest}
-        aria-label={$t('Package EPUB: {title}', { title: workspace.title })}
-        title={$t('Package EPUB')}
-      >
-        <span aria-hidden="true">📦</span>
-        <span class="package-text">{$t('Package EPUB')}</span>
-      </button>
-    {/if}
     <button
       type="button"
       class="delete-button"
@@ -259,10 +246,9 @@
     overflow: hidden;
   }
 
-  .workspace-author {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .workspace-author-inline {
+    color: var(--color-text-secondary);
+    font-weight: 400;
   }
 
   .meta-separator {
@@ -315,38 +301,6 @@
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
-  .package-button {
-    min-width: auto;
-    min-height: 44px;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-success);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-success);
-    color: var(--color-surface);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-1);
-  }
-
-  .package-button:hover {
-    background-color: var(--color-success-hover);
-    border-color: var(--color-success-hover);
-  }
-
-  .package-button:focus-visible {
-    outline: none;
-    border-color: var(--color-success);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
-  }
-
-  .package-text {
-    white-space: nowrap;
-  }
 
   /* Mobile adjustments */
   @media (max-width: 640px) {

@@ -603,7 +603,6 @@
     background: var(--color-bg-secondary);
     cursor: pointer;
     font-size: var(--text-sm);
-    transition: all var(--duration-fast) ease;
   }
 
   .view-toggle:hover {
