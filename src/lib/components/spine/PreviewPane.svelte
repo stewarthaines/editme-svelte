@@ -41,18 +41,129 @@
 
   // Preview configuration
   const DEVICE_PRESETS = [
-    { id: 'desktop', name: 'Desktop', width: '100%', height: '100%', icon: '🖥️' },
-    { id: 'iphone', name: 'iPhone', width: '375px', height: '667px', icon: '📱' },
-    { id: 'iphone-plus', name: 'iPhone Plus', width: '414px', height: '736px', icon: '📱' },
-    { id: 'iphone-14-pro-max', name: 'iPhone 14 Pro Max', width: '430px', height: '932px', icon: '📱' },
-    { id: 'galaxy-s23', name: 'Galaxy S23', width: '360px', height: '800px', icon: '📱' },
-    { id: 'pixel-7', name: 'Pixel 7', width: '393px', height: '851px', icon: '📱' },
-    { id: 'ipad', name: 'iPad', width: '768px', height: '1024px', icon: '📱' },
-    { id: 'ipad-air', name: 'iPad Air', width: '820px', height: '1180px', icon: '📱' },
-    { id: 'galaxy-tab-s9', name: 'Galaxy Tab S9', width: '800px', height: '1280px', icon: '📱' },
-    { id: 'kindle', name: 'Kindle', width: '600px', height: '800px', icon: '📚' },
-    { id: 'kobo-clara-2e', name: 'Kobo Clara 2E', width: '758px', height: '1024px', icon: '📚' },
+    {
+      id: 'desktop',
+      name: 'Fill',
+      width: '100%',
+      height: '100%',
+      icon: '🖥️',
+      category: 'responsive',
+    },
+    {
+      id: 'galaxy-s23',
+      name: 'Pocket',
+      width: '360px',
+      height: '800px',
+      icon: '📱',
+      category: 'commute',
+    },
+    {
+      id: 'iphone',
+      name: 'Standard',
+      width: '375px',
+      height: '667px',
+      icon: '📱',
+      category: 'commute',
+    },
+    {
+      id: 'pixel-7',
+      name: 'Large',
+      width: '393px',
+      height: '851px',
+      icon: '📱',
+      category: 'commute',
+    },
+    {
+      id: 'iphone-plus',
+      name: 'Plus',
+      width: '414px',
+      height: '736px',
+      icon: '📱',
+      category: 'commute',
+    },
+    { id: 'ipad', name: 'Compact', width: '768px', height: '1024px', icon: '📱', category: 'home' },
+    {
+      id: 'galaxy-tab-s9',
+      name: 'Large',
+      width: '800px',
+      height: '1280px',
+      icon: '📱',
+      category: 'home',
+    },
+    {
+      id: 'ipad-air',
+      name: 'Extra Large',
+      width: '820px',
+      height: '1180px',
+      icon: '📱',
+      category: 'home',
+    },
+    {
+      id: 'kindle',
+      name: 'Standard',
+      width: '600px',
+      height: '800px',
+      icon: '📚',
+      category: 'travel',
+    },
+    {
+      id: 'kobo-clara-2e',
+      name: 'Large',
+      width: '758px',
+      height: '1024px',
+      icon: '📚',
+      category: 'travel',
+    },
   ] as const;
+
+  // Category labels for dropdown groups
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'responsive':
+        // i18n: Device category for responsive preview that fills available space
+        return $t('Responsive');
+      case 'commute':
+        // i18n: Device category for mobile phone reading while traveling or commuting
+        return $t('Commute (phone)');
+      case 'home':
+        // i18n: Device category for tablet reading in comfortable home settings
+        return $t('Home (tablet)');
+      case 'travel':
+        // i18n: Device category for e-reader devices designed for portable reading
+        return $t('Travel (e-ink)');
+      default:
+        return category;
+    }
+  };
+
+  // Device size labels
+  const getDeviceLabel = (device: (typeof DEVICE_PRESETS)[number]) => {
+    switch (device.name) {
+      case 'Fill':
+        // i18n: Responsive view that fills all available preview space
+        return $t('Fill');
+      case 'Pocket':
+        // i18n: Device size for smallest mobile phones that fit in pocket
+        return $t('Pocket');
+      case 'Standard':
+        // i18n: Device size for typical/common mobile phone or e-reader screen
+        return $t('Standard');
+      case 'Large':
+        // i18n: Device size for larger mobile phones or e-readers
+        return $t('Large');
+      case 'Plus':
+        // i18n: Device size for extra large mobile phones
+        return $t('Plus');
+      case 'Compact':
+        // i18n: Device size for smaller tablet screens
+        return $t('Compact');
+      case 'Extra Large':
+        // i18n: Device size for largest tablet screens
+        return $t('Extra Large');
+      default:
+        return device.name;
+    }
+  };
 
   // Component state
   let selectedDevice = $state('desktop');
@@ -69,6 +180,20 @@
 
   // Reactive state
   const lastUpdateTime = writable<number>(Date.now());
+
+  // Group devices by category for dropdown
+  const groupedDevices = $derived.by(() => {
+    const groups: Record<string, (typeof DEVICE_PRESETS)[number][]> = {};
+
+    for (const device of DEVICE_PRESETS) {
+      if (!groups[device.category]) {
+        groups[device.category] = [];
+      }
+      groups[device.category].push(device);
+    }
+
+    return groups;
+  });
 
   // Update iframe content when XHTML changes
   $effect(() => {
@@ -227,7 +352,7 @@
       // Swap width and height for landscape
       return { width: originalHeight, height: originalWidth };
     }
-    
+
     return { width: originalWidth, height: originalHeight };
   }
 
@@ -303,20 +428,20 @@
 
     if (device && previewContainer) {
       const wrapper = previewContainer.parentElement;
-      
+
       if (device.id === 'desktop') {
         // Desktop: fill available space
         previewContainer.style.width = '100%';
         previewContainer.style.height = '100%';
         previewContainer.style.maxWidth = 'none';
         previewContainer.style.maxHeight = 'none';
-        
+
         // Wrapper fills available space for desktop
         if (wrapper) {
           wrapper.style.width = '100%';
           wrapper.style.height = '100%';
         }
-        
+
         deviceScale = 1;
       } else {
         // Calculate scale for container transform
@@ -324,19 +449,19 @@
           if (previewContainer) {
             const scale = calculateOptimalScale(device);
             const { width: deviceWidth, height: deviceHeight } = getDeviceDimensions(device);
-            
+
             // Set container to device dimensions (accounting for orientation)
             previewContainer.style.width = deviceWidth + 'px';
             previewContainer.style.height = deviceHeight + 'px';
             previewContainer.style.maxWidth = deviceWidth + 'px';
             previewContainer.style.maxHeight = deviceHeight + 'px';
-            
+
             // Set wrapper to scaled dimensions for proper flex centering
             if (wrapper) {
               wrapper.style.width = Math.round(deviceWidth * scale) + 'px';
               wrapper.style.height = Math.round(deviceHeight * scale) + 'px';
             }
-            
+
             deviceScale = scale;
           }
         }, 0);
@@ -361,7 +486,7 @@
       setTimeout(() => {
         console.log('🔄 updatePreviewContent called');
         updatePreviewContent(xhtmlContent);
-        
+
         // Re-apply device dimensions and scaling after toggling back to preview
         handleDeviceChange(selectedDevice);
       }, 0);
@@ -613,22 +738,27 @@
           title="Toggle orientation"
           aria-label="Toggle device orientation"
         >
-          {deviceOrientation === 'portrait' ? '▯' : '▭'}
+          {deviceOrientation === 'portrait' ? '▭' : '▯'}
         </button>
       {/if}
 
       <!-- Device selector -->
+      <!-- i18n: Accessibility label for device size dropdown menu -->
       <select
         class="device-selector"
         bind:value={selectedDevice}
         onchange={e => handleDeviceChange((e.target as HTMLSelectElement).value)}
-        aria-label="Select device preset"
+        aria-label={$t('Select device preset')}
       >
-        {#each DEVICE_PRESETS as device}
-          <option value={device.id}>
-            {device.icon}
-            {device.name}
-          </option>
+        {#each Object.entries(groupedDevices) as [category, devices]}
+          <optgroup label={getCategoryLabel(category)}>
+            {#each devices as device}
+              <option value={device.id}>
+                {device.icon}
+                {getDeviceLabel(device)}
+              </option>
+            {/each}
+          </optgroup>
         {/each}
       </select>
     </div>
@@ -671,36 +801,36 @@
             style:transform-origin="top left"
             bind:this={previewContainer}
           >
-          {#if transformError}
-            <div class="preview-error">
-              <div class="error-content">
-                <h3>Transform Error</h3>
-                <p><strong>Stage:</strong> {transformError.stage}</p>
-                <p><strong>Message:</strong> {transformError.message}</p>
-                {#if transformError.stack}
-                  <details>
-                    <summary>Stack Trace</summary>
-                    <pre class="error-stack">{transformError.stack}</pre>
-                  </details>
-                {/if}
+            {#if transformError}
+              <div class="preview-error">
+                <div class="error-content">
+                  <h3>Transform Error</h3>
+                  <p><strong>Stage:</strong> {transformError.stage}</p>
+                  <p><strong>Message:</strong> {transformError.message}</p>
+                  {#if transformError.stack}
+                    <details>
+                      <summary>Stack Trace</summary>
+                      <pre class="error-stack">{transformError.stack}</pre>
+                    </details>
+                  {/if}
+                </div>
               </div>
-            </div>
-          {:else if xhtmlContent}
-            <iframe
-              bind:this={previewIframe}
-              class="preview-iframe"
-              title="XHTML Preview"
-              onload={handleIframeLoad}
-            ></iframe>
-          {:else}
-            <div class="preview-empty">
-              <div class="empty-content">
-                <span class="empty-icon" aria-hidden="true">📝</span>
-                <h3>No Content</h3>
-                <p>Start typing in the editor to see your XHTML preview here.</p>
+            {:else if xhtmlContent}
+              <iframe
+                bind:this={previewIframe}
+                class="preview-iframe"
+                title="XHTML Preview"
+                onload={handleIframeLoad}
+              ></iframe>
+            {:else}
+              <div class="preview-empty">
+                <div class="empty-content">
+                  <span class="empty-icon" aria-hidden="true">📝</span>
+                  <h3>No Content</h3>
+                  <p>Start typing in the editor to see your XHTML preview here.</p>
+                </div>
               </div>
-            </div>
-          {/if}
+            {/if}
           </div>
         </div>
       </div>
@@ -749,7 +879,6 @@
     font-weight: var(--font-medium);
     color: var(--color-text-primary);
   }
-
 
   .preview-controls {
     display: flex;
