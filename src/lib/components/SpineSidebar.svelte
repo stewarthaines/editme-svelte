@@ -14,12 +14,15 @@
   export let selectedItemId: string | null = null;
   export let isExpanded = true;
   export let onWorkspaceUpdate: ((workspace: WorkspaceState) => void) | null = null;
+  export let onPackageRequested: ((workspaceId: string) => Promise<void>) | null = null;
 
   // State
   let spineItems: SpineItemWithSource[] = [];
   let isLoading = true;
   let error: string | null = null;
   let isReordering = false;
+  let isPackaging = false;
+
 
   // Reactive state - use prop instead of store
   $: sidebarExpanded = isExpanded;
@@ -237,6 +240,25 @@
       isReordering = false;
     }
   }
+
+  // Handle EPUB packaging request
+  async function handlePackageEPUB() {
+    if (!workspace || !onPackageRequested) return;
+
+    try {
+      isPackaging = true;
+      await onPackageRequested(workspace.id);
+    } catch (err) {
+      console.error('Failed to package EPUB:', err);
+      alert(
+        $t('Failed to package EPUB: {error}', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+        })
+      );
+    } finally {
+      isPackaging = false;
+    }
+  }
 </script>
 
 <div class="spine-sidebar">
@@ -291,6 +313,24 @@
   {:else}
     <div class="empty-state">
       <p>{$t('No project selected')}</p>
+    </div>
+  {/if}
+
+  <!-- Package EPUB button at bottom -->
+  {#if workspace}
+    <div class="package-epub-section">
+      <button
+        class="package-epub-button"
+        onclick={handlePackageEPUB}
+        disabled={isPackaging}
+        title={$t('Package EPUB')}
+      >
+        {#if isPackaging}
+          {$t('Packaging...')}
+        {:else}
+          {$t('Package EPUB')}
+        {/if}
+      </button>
     </div>
   {/if}
 </div>
@@ -385,5 +425,42 @@
 
   .spine-list::-webkit-scrollbar-thumb:hover {
     background: var(--color-text-tertiary);
+  }
+
+  /* Package EPUB button styling */
+  .package-epub-section {
+    padding: var(--space-3);
+    border-top: 1px solid var(--color-border-default);
+    margin-top: auto;
+  }
+
+  .package-epub-button {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-button-primary-bg);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-button-primary-bg);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    min-height: 36px;
+  }
+
+  .package-epub-button:hover:not(:disabled) {
+    background-color: var(--color-button-primary-bg-hover);
+    border-color: var(--color-button-primary-bg-hover);
+  }
+
+  .package-epub-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .package-epub-button:focus-visible {
+    outline: none;
+    border-color: var(--color-button-primary-bg);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 </style>

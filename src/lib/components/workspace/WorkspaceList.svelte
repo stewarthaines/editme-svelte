@@ -27,13 +27,8 @@
     );
   });
 
-  // Sort workspaces: current first, then by last modified
+  // Sort workspaces by last modified (most recent first)
   $: sortedWorkspaces = [...filteredWorkspaces].sort((a, b) => {
-    // Current workspace always first
-    if (a.id === currentWorkspaceId) return -1;
-    if (b.id === currentWorkspaceId) return 1;
-
-    // Then by last modified (most recent first)
     return b.lastModified.getTime() - a.lastModified.getTime();
   });
 

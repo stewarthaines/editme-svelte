@@ -263,6 +263,9 @@ export class OPFUtils {
     const typeElements = doc.getElementsByTagNameNS(DC_NS, 'type');
     const formatElements = doc.getElementsByTagNameNS(DC_NS, 'format');
     
+    // Parse dcterms:modified meta element (EPUB 3 specific)
+    const modifiedElements = doc.querySelectorAll('meta[property="dcterms:modified"]');
+    
 
     // Convert NodeLists to arrays
     const creators = Array.from(creatorElements)
@@ -294,6 +297,7 @@ export class OPFUtils {
       coverage: coverageElements.length > 0 ? coverageElements[0].textContent?.trim() : undefined,
       type: typeElements.length > 0 ? typeElements[0].textContent?.trim() : undefined,
       format: formatElements.length > 0 ? formatElements[0].textContent?.trim() : undefined,
+      modifiedDate: modifiedElements.length > 0 ? modifiedElements[0].textContent?.trim() : undefined,
     };
   }
 
@@ -460,6 +464,7 @@ export class OPFUtils {
     if (metadata.format) {
       xml += `\n    <dc:format>${escapeXML(metadata.format)}</dc:format>`;
     }
+    
     if (metadata.modifiedDate) {
       xml += `\n    <meta property="dcterms:modified">${escapeXML(metadata.modifiedDate)}</meta>`;
     }

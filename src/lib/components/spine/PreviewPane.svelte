@@ -26,7 +26,7 @@
     transformWarnings = [],
     executionTime = 0,
     spineItemId,
-    onPreviewClick = null
+    onPreviewClick = null,
   }: {
     xhtmlContent?: string;
     isTransforming?: boolean;
@@ -34,7 +34,9 @@
     transformWarnings?: string[];
     executionTime?: number;
     spineItemId: string;
-    onPreviewClick?: ((detail: { text: string; documentPosition: number; elementType: string }) => void) | null;
+    onPreviewClick?:
+      | ((detail: { text: string; documentPosition: number; elementType: string }) => void)
+      | null;
   } = $props();
 
   // Preview configuration
@@ -51,7 +53,10 @@
   let showSource = $state(false);
   let previewIframe: HTMLIFrameElement | undefined = $state();
   let previewContainer: HTMLDivElement | undefined = $state();
-  let pendingScrollRestore: { anchor: { element: Element | null; id: string | null; offset: number } | null; fallbackScrollTop: number } | null = $state(null);
+  let pendingScrollRestore: {
+    anchor: { element: Element | null; id: string | null; offset: number } | null;
+    fallbackScrollTop: number;
+  } | null = $state(null);
 
   // Reactive state
   const lastUpdateTime = writable<number>(Date.now());
@@ -64,16 +69,18 @@
   /**
    * Find a scroll anchor element that can be used to restore scroll position
    */
-  function findScrollAnchor(iframeDoc: Document): { element: Element | null; id: string | null; offset: number } | null {
+  function findScrollAnchor(
+    iframeDoc: Document
+  ): { element: Element | null; id: string | null; offset: number } | null {
     try {
       const viewport = iframeDoc.documentElement;
       const scrollTop = viewport.scrollTop || iframeDoc.body.scrollTop;
-      
+
       // Find element at current scroll position (center of viewport)
       const centerX = viewport.clientWidth / 2;
       const checkY = Math.min(100, viewport.clientHeight / 4); // Look near top of viewport
       const elementAtScroll = iframeDoc.elementFromPoint(centerX, checkY);
-      
+
       if (!elementAtScroll || elementAtScroll === iframeDoc.body || elementAtScroll === viewport) {
         return { element: null, id: null, offset: scrollTop };
       }
@@ -93,7 +100,7 @@
       const tagName = elementAtScroll.tagName.toLowerCase();
       const siblings = Array.from(iframeDoc.querySelectorAll(tagName));
       const index = siblings.indexOf(elementAtScroll);
-      
+
       if (index >= 0) {
         const elementRect = elementAtScroll.getBoundingClientRect();
         const offset = scrollTop - (elementRect.top + scrollTop - checkY);
@@ -110,7 +117,11 @@
   /**
    * Restore scroll position using anchor element or fallback to pixel position
    */
-  function restoreScrollPosition(iframeDoc: Document, anchor: { element: Element | null; id: string | null; offset: number } | null, fallbackScrollTop: number): void {
+  function restoreScrollPosition(
+    iframeDoc: Document,
+    anchor: { element: Element | null; id: string | null; offset: number } | null,
+    fallbackScrollTop: number
+  ): void {
     if (!anchor) {
       // Simple fallback to pixel position
       iframeDoc.documentElement.scrollTop = fallbackScrollTop;
@@ -140,10 +151,11 @@
       if (targetElement) {
         // Scroll to element with offset
         targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-        
+
         // Apply additional offset if needed
         if (anchor.offset !== 0) {
-          const currentScroll = iframeDoc.documentElement.scrollTop || (iframeDoc.body?.scrollTop || 0);
+          const currentScroll =
+            iframeDoc.documentElement.scrollTop || iframeDoc.body?.scrollTop || 0;
           const newScroll = Math.max(0, currentScroll + anchor.offset);
           iframeDoc.documentElement.scrollTop = newScroll;
           if (iframeDoc.body) {
@@ -178,7 +190,7 @@
       if (!iframeDoc) return;
 
       // Save scroll position and find anchor before updating
-      const scrollTop = iframeDoc.documentElement.scrollTop || (iframeDoc.body?.scrollTop || 0);
+      const scrollTop = iframeDoc.documentElement.scrollTop || iframeDoc.body?.scrollTop || 0;
       const scrollAnchor = scrollTop > 0 ? findScrollAnchor(iframeDoc) : null;
 
       // Store scroll restoration data for when the content loads
@@ -221,12 +233,23 @@
    * Toggle source view
    */
   function toggleSourceView(): void {
+    console.log('🔄 CLICK EVENT FIRED! toggleSourceView() called');
+    console.log('🔄 Current showSource state:', showSource);
+
+    const oldState = showSource;
     showSource = !showSource;
+
+    console.log('🔄 State toggled from', oldState, 'to', showSource);
+
     if (!showSource) {
+      console.log('🔄 About to call updatePreviewContent');
       setTimeout(() => {
+        console.log('🔄 updatePreviewContent called');
         updatePreviewContent(xhtmlContent);
       }, 0);
     }
+
+    console.log('🔄 toggleSourceView completed');
   }
 
   /**
@@ -255,21 +278,17 @@
 
     try {
       // Create a tree walker to traverse all text nodes before the target element
-      const walker = iframeDoc.createTreeWalker(
-        iframeDoc.body,
-        NodeFilter.SHOW_TEXT,
-        null
-      );
+      const walker = iframeDoc.createTreeWalker(iframeDoc.body, NodeFilter.SHOW_TEXT, null);
 
       let position = 0;
       let node: Node | null;
-      
+
       while ((node = walker.nextNode())) {
         // Stop if we've reached our target element
         if (element.contains(node)) {
           break;
         }
-        position += (node.textContent?.length || 0);
+        position += node.textContent?.length || 0;
       }
 
       return position;
@@ -289,7 +308,8 @@
     if (!target) return;
 
     // Find the best text-containing element
-    const textElement = target.closest('p, h1, h2, h3, h4, h5, h6, div, span, li, blockquote, td, th') || target;
+    const textElement =
+      target.closest('p, h1, h2, h3, h4, h5, h6, div, span, li, blockquote, td, th') || target;
     const clickedText = textElement.textContent?.trim();
 
     // Skip if no meaningful text content (increased minimum length)
@@ -305,7 +325,7 @@
       onPreviewClick({
         text: clickedText,
         documentPosition,
-        elementType
+        elementType,
       });
     } catch (error) {
       console.warn('Failed to handle preview click:', error);
@@ -352,7 +372,7 @@
       }
 
       /* Visual feedback on hover */
-      p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, 
+      p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover,
       div:hover, span:hover, li:hover, blockquote:hover, td:hover, th:hover {
         background-color: rgba(59, 130, 246, 0.1);
         outline: 1px solid rgba(59, 130, 246, 0.3);
@@ -368,15 +388,19 @@
   function handleIframeLoad(): void {
     if (previewIframe?.contentDocument) {
       const iframeDoc = previewIframe.contentDocument;
-      
+
       // Set up interactivity first
       setupIframeInteractivity(iframeDoc);
-      
+
       // Restore scroll position if we have pending data
       if (pendingScrollRestore) {
         // Use requestAnimationFrame to ensure DOM is fully ready
         requestAnimationFrame(() => {
-          restoreScrollPosition(iframeDoc, pendingScrollRestore!.anchor, pendingScrollRestore!.fallbackScrollTop);
+          restoreScrollPosition(
+            iframeDoc,
+            pendingScrollRestore!.anchor,
+            pendingScrollRestore!.fallbackScrollTop
+          );
           // Clear the pending data
           pendingScrollRestore = null;
         });
@@ -421,7 +445,16 @@
   <!-- Header with controls -->
   <div class="preview-header">
     <div class="preview-title">
-      <span class="preview-icon" aria-hidden="true">👁️</span>
+      <!-- View toggle -->
+      <button
+        class="view-toggle"
+        class:active={showSource}
+        onclick={toggleSourceView}
+        title="Toggle source view"
+      >
+        {showSource ? '👁️' : '📄'}
+      </button>
+
       <span>Preview</span>
       {#if executionTime > 0}
         <span class="preview-timing">({formatExecutionTime(executionTime)})</span>
@@ -443,18 +476,6 @@
           </option>
         {/each}
       </select>
-
-      <!-- View toggle -->
-      <button
-        type="button"
-        class="view-toggle"
-        class:active={showSource}
-        onclick={toggleSourceView}
-        title="Toggle source view"
-        aria-pressed={showSource}
-      >
-        {showSource ? '👁️' : '📄'}
-      </button>
     </div>
   </div>
 
@@ -481,7 +502,8 @@
     {#if showSource}
       <!-- Source view -->
       <div class="source-view">
-        <pre class="source-code" dir="ltr">{xhtmlContent || '<!-- No content generated yet -->'}</pre>
+        <pre class="source-code" dir="ltr">{xhtmlContent ||
+            '<!-- No content generated yet -->'}</pre>
       </div>
     {:else}
       <!-- Live preview -->
@@ -677,7 +699,7 @@
     color: var(--color-text-primary);
     background: var(--color-bg-primary);
     white-space: pre-wrap;
-    word-break: break-all;
+    /* word-break: break-all; */
   }
 
   .preview-viewport {

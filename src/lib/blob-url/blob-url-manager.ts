@@ -100,7 +100,7 @@ export class BlobURLManager {
           const textContent = await this.fileStorage.readTextFile(this.activeWorkspaceId, resolvedPath);
           const processedCSS = await this.processCSSFontURLs(textContent);
           const uint8Array = new TextEncoder().encode(processedCSS);
-          content = uint8Array.buffer;
+          content = uint8Array.buffer as ArrayBuffer;
         } else {
           // Non-CSS files: read as binary
           content = await this.fileStorage.readFile(this.activeWorkspaceId, resolvedPath);

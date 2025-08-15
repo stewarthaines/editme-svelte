@@ -272,6 +272,12 @@
     dispatch('itemCreate', { mode: 'create-text' });
   };
 
+  const handleEditItemClick = () => {
+    if (selectedItem && selectedItemType === 'manifest') {
+      dispatch('itemEdit', { item: selectedItem });
+    }
+  };
+
   const handleDragOver = (event: DragEvent) => {
     event.preventDefault();
     dragActive = true;
@@ -338,6 +344,15 @@
 
     <!-- Action buttons -->
     <div class="action-buttons">
+      <button
+        type="button"
+        class="action-button secondary"
+        onclick={handleEditItemClick}
+        disabled={!selectedItem || selectedItemType !== 'manifest'}
+      >
+        ✏️ {$t('Edit Item')}
+      </button>
+
       <button
         type="button"
         class="action-button primary"

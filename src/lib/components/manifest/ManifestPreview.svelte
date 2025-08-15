@@ -2,7 +2,10 @@
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { t } from '../../i18n';
   import type { ManifestItem, SourceItem, ContentPreview } from '../../manifest/types';
-  import type { WorkspaceService, WorkspaceState } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceService,
+    WorkspaceState,
+  } from '../../services/workspace/workspace.service.js';
 
   export let selectedItem: ManifestItem | SourceItem | any | null = null;
   export let selectedItemType: 'manifest' | 'source' | 'opf' | null = null;
@@ -78,10 +81,10 @@
       if (selectedItemType === 'manifest') {
         const manifestItem = selectedItem as ManifestItem;
         // For now, create a simplified preview since we don't have getContentPreview in WorkspaceService yet
-        const filePath = manifestItem.href.startsWith(workspace.pathInfo.basePath + '/') ? 
-          manifestItem.href : 
-          `${workspace.pathInfo.basePath}/${manifestItem.href}`;
-        
+        const filePath = manifestItem.href.startsWith(workspace.pathInfo.basePath + '/')
+          ? manifestItem.href
+          : `${workspace.pathInfo.basePath}/${manifestItem.href}`;
+
         try {
           let content;
           try {
@@ -90,14 +93,14 @@
             // Try original href if constructed path fails
             content = await workspaceService.readFile(workspace.id, manifestItem.href);
           }
-          
+
           const isText = isTextMediaType(manifestItem.mediaType);
           const isImage = isImageMediaType(manifestItem.mediaType);
-          
+
           let textContent: string | undefined;
           let previewUrl: string | undefined;
           let contentType: string;
-          
+
           if (isText) {
             const decoder = new TextDecoder('utf-8');
             textContent = decoder.decode(content);
@@ -111,7 +114,7 @@
           } else {
             contentType = 'binary';
           }
-          
+
           contentPreview = {
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,
@@ -131,7 +134,7 @@
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,
             contentType: 'binary',
-            error: 'Failed to load content'
+            error: 'Failed to load content',
           };
         }
       } else if (selectedItemType === 'source') {
@@ -140,13 +143,13 @@
         try {
           const content = await workspaceService.readFile(workspace.id, sourceItem.path);
           const isText = isTextMediaType(sourceItem.mediaType || 'text/plain');
-          
+
           let textContent: string | undefined;
           if (isText) {
             const decoder = new TextDecoder('utf-8');
             textContent = decoder.decode(content);
           }
-          
+
           contentPreview = {
             itemId: sourceItem.path,
             mediaType: sourceItem.mediaType || 'text/plain',
@@ -165,17 +168,20 @@
             itemId: sourceItem.path,
             mediaType: sourceItem.mediaType || 'text/plain',
             contentType: 'text',
-            error: 'Failed to load SOURCE file content'
+            error: 'Failed to load SOURCE file content',
           };
         }
       } else if (selectedItemType === 'opf') {
         // Handle OPF file - read the content.opf file directly
         const opfItem = selectedItem as any;
         try {
-          const content = await workspaceService.readFile(workspace.id, workspace.pathInfo.rootfilePath);
+          const content = await workspaceService.readFile(
+            workspace.id,
+            workspace.pathInfo.rootfilePath
+          );
           const decoder = new TextDecoder('utf-8');
           const textContent = decoder.decode(content);
-          
+
           contentPreview = {
             itemId: opfItem.name,
             mediaType: 'application/xml',
@@ -192,7 +198,7 @@
             itemId: opfItem.name,
             mediaType: 'application/xml',
             contentType: 'text',
-            error: 'Failed to load content.opf file'
+            error: 'Failed to load content.opf file',
           };
         }
       }
@@ -204,7 +210,7 @@
     }
   };
 
-  const _handleEditClick = () => {
+  const handleEditClick = () => {
     if (selectedItem && selectedItemType === 'manifest') {
       dispatch('itemEdit', { item: selectedItem });
     }
@@ -283,29 +289,12 @@
     <div class="preview-content">
       <!-- Header with item info and actions -->
       <div class="preview-header">
-        <div class="preview-info">
-          <h2 class="preview-title">
-            {selectedItemType === 'manifest'
-              ? (selectedItem as ManifestItem).id
-              : (selectedItem as SourceItem).name}
-          </h2>
-          <div class="preview-metadata">
-            <span class="item-type">
-              {selectedItemType === 'manifest' ? $t('Manifest Item') : $t('SOURCE Item')}
-            </span>
-            <span class="item-path">
-              {selectedItemType === 'manifest'
-                ? (selectedItem as ManifestItem).href
-                : (selectedItem as SourceItem).path}
-            </span>
-          </div>
-        </div>
         <!-- Action buttons moved to header -->
         <div class="preview-actions">
           {#if selectedItemType === 'manifest'}
-            <!-- <button type="button" class="action-button edit-button" on:click={handleEditClick}>
+            <button type="button" class="action-button edit-button" on:click={handleEditClick}>
               {$t('Edit')}
-            </button> -->
+            </button>
           {/if}
           <button
             type="button"
@@ -336,10 +325,11 @@
             </div>
           {:else if contentPreview.contentType === 'text' && contentPreview.textContent}
             <div class="text-preview">
-              <pre 
-                class="text-content" 
-                dir={shouldUseLtrDirection(contentPreview.mediaType) ? 'ltr' : undefined}
-              >{contentPreview.textContent}</pre>
+              <pre
+                class="text-content"
+                dir={shouldUseLtrDirection(contentPreview.mediaType)
+                  ? 'ltr'
+                  : undefined}>{contentPreview.textContent}</pre>
             </div>
           {:else if contentPreview.contentType === 'image' && contentPreview.previewUrl}
             <div class="image-preview">
@@ -372,63 +362,7 @@
               <p class="binary-info">{$t('Use the download button to access the file')}</p>
             </div>
           {/if}
-
-          <!-- Content metadata -->
-          {#if contentPreview.metadata}
-            <div class="metadata-section">
-              <h3>{$t('Content Details')}</h3>
-              <dl class="metadata-list">
-                {#if contentPreview.metadata.characterCount}
-                  <dt>{$t('Characters')}</dt>
-                  <dd>{contentPreview.metadata.characterCount.toLocaleString()}</dd>
-                {/if}
-                {#if contentPreview.metadata.lineCount}
-                  <dt>{$t('Lines')}</dt>
-                  <dd>{contentPreview.metadata.lineCount.toLocaleString()}</dd>
-                {/if}
-                {#if contentPreview.metadata.wordCount}
-                  <dt>{$t('Words')}</dt>
-                  <dd>{contentPreview.metadata.wordCount.toLocaleString()}</dd>
-                {/if}
-                {#if contentPreview.metadata.width && contentPreview.metadata.height}
-                  <dt>{$t('Dimensions')}</dt>
-                  <dd>{contentPreview.metadata.width} × {contentPreview.metadata.height}</dd>
-                {/if}
-                {#if contentPreview.metadata.duration}
-                  <dt>{$t('Duration')}</dt>
-                  <dd>
-                    {Math.floor(contentPreview.metadata.duration / 60)}:{(
-                      contentPreview.metadata.duration % 60
-                    )
-                      .toString()
-                      .padStart(2, '0')}
-                  </dd>
-                {/if}
-              </dl>
-            </div>
-          {/if}
         {/if}
-
-        <!-- File metadata -->
-        <div class="file-metadata">
-          <h3>{$t('File Information')}</h3>
-          <dl class="metadata-list">
-            <dt>{$t('Size')}</dt>
-            <dd>{formatFileSize(selectedItem.size)}</dd>
-            <dt>{$t('Modified')}</dt>
-            <dd>{formatDate(selectedItem.modified)}</dd>
-            {#if selectedItemType === 'manifest' && (selectedItem as ManifestItem).properties && ((selectedItem as ManifestItem).properties?.length ?? 0) > 0}
-              <dt>{$t('Properties')}</dt>
-              <dd>
-                <div class="properties-list">
-                  {#each (selectedItem as ManifestItem).properties || [] as property}
-                    <span class="property-tag">{property}</span>
-                  {/each}
-                </div>
-              </dd>
-            {/if}
-          </dl>
-        </div>
       </div>
     </div>
   {/if}
@@ -516,44 +450,13 @@
     gap: 1rem;
   }
 
-  .preview-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .preview-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 0.5rem 0;
-    word-break: break-word;
-  }
-
-  .preview-metadata {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .item-type {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .item-path {
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    word-break: break-all;
-  }
 
   .preview-body {
     flex: 1;
     overflow-y: auto;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .content-header {
@@ -582,7 +485,7 @@
   }
 
   .text-preview {
-    margin-bottom: 1rem;
+    flex: 1;
   }
 
   .text-content {
@@ -593,7 +496,6 @@
     font-family: var(--font-mono);
     font-size: 0.8125rem;
     line-height: 1.4;
-    max-height: 400px;
     overflow: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -638,50 +540,6 @@
     margin-top: 0.5rem;
   }
 
-  .metadata-section,
-  .file-metadata {
-    margin-bottom: 1rem;
-  }
-
-  .metadata-section h3,
-  .file-metadata h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 0.5rem 0;
-  }
-
-  .metadata-list {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .metadata-list dt {
-    color: var(--color-text-secondary);
-    font-weight: 500;
-  }
-
-  .metadata-list dd {
-    margin: 0;
-    color: var(--color-text-primary);
-  }
-
-  .properties-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-
-  .property-tag {
-    background-color: var(--color-primary-subtle);
-    color: var(--color-primary);
-    padding: 0.125rem 0.375rem;
-    border-radius: var(--radius-xs);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
 
   .preview-actions {
     flex-shrink: 0;
@@ -714,6 +572,11 @@
   .download-button:hover {
     color: var(--color-interactive-secondary);
     border-color: var(--color-interactive-secondary);
+  }
+
+  .edit-button:hover {
+    color: var(--color-interactive-primary);
+    border-color: var(--color-interactive-primary);
   }
 
   .delete-button:hover {
