@@ -4,6 +4,7 @@
   import ManifestTable from './ManifestTable.svelte';
   import ManifestItemEditor from './ManifestItemEditor.svelte';
   import { ManifestUtils } from '../../manifest/utils.js';
+  import { generateEPUBPath } from '../../epub/opf-utils.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
   import type { WorkspaceService, WorkspaceState } from '../../services/workspace/workspace.service.js';
 
@@ -164,10 +165,12 @@
   const handleFileUpload = async (event: { detail: { files: File[] } }) => {
     if (!workspace) return;
 
-    try {
-      const files = event.detail.files;
+    const files = event.detail.files;
+    const successfulFiles: string[] = [];
+    const failedFiles: { name: string; error: string }[] = [];
 
-      for (const file of files) {        
+    for (const file of files) {
+      try {
         // Create manifest item with reliable media type detection
         const browserType = file.type;
         const filenameType = ManifestUtils.detectMediaType(file.name);
@@ -179,27 +182,52 @@
         const reliableMediaType = (isGeneric || isFontFile) ? filenameType : browserType;
         
         const manifestItem = {
-          href: file.name,
+          href: generateEPUBPath(file.name, reliableMediaType),
           mediaType: reliableMediaType
         };
         
+        // Step 1: Add to manifest (may fail on duplicate ID)
         workspace = await workspaceService.addManifestItem(workspace, manifestItem);
         
-        // Write file content based on type
-        const filePath = `${workspace.pathInfo.basePath}/${file.name}`;
+        // Step 2: Write file content (only if manifest update succeeded)
+        const filePath = `${workspace.pathInfo.basePath}/${manifestItem.href}`;
         if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
           const text = await file.text();
           await workspaceService.writeFile(workspace.id, filePath, text);
         } else {
-          // Handle binary files (images, etc.)
+          // Handle binary files (images, fonts, etc.)
           const arrayBuffer = await file.arrayBuffer();
           await workspaceService.writeBinaryFile(workspace.id, filePath, arrayBuffer);
         }
+        
+        // Both operations succeeded
+        successfulFiles.push(file.name);
+      } catch (fileError) {
+        // Log specific file upload failure
+        console.warn(`Failed to upload ${file.name}:`, fileError);
+        failedFiles.push({
+          name: file.name,
+          error: fileError instanceof Error ? fileError.message : 'Unknown error'
+        });
       }
+    }
 
-      await loadManifest(); // Refresh the manifest
-    } catch {
-      error = $t('Failed to upload files');
+    // Refresh the manifest to show successfully uploaded files
+    await loadManifest();
+
+    // Provide user feedback about upload results
+    if (failedFiles.length === 0) {
+      // All files succeeded
+      console.log(`Successfully uploaded ${successfulFiles.length} files:`, successfulFiles);
+    } else if (successfulFiles.length === 0) {
+      // All files failed
+      error = $t('Failed to upload all files');
+      console.error('Upload failures:', failedFiles);
+    } else {
+      // Partial success
+      console.log(`Uploaded ${successfulFiles.length} files successfully:`, successfulFiles);
+      console.warn(`Failed to upload ${failedFiles.length} files:`, failedFiles);
+      error = $t('Some files failed to upload - see console for details');
     }
   };
 

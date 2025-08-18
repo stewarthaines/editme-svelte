@@ -587,10 +587,10 @@
     const style = iframeDoc.createElement('style');
     style.textContent = `
       body {
-        margin: 0;
-        padding: 1rem;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        line-height: 1.6;
+        /* margin: 0; */
+        /* padding: 0; */
+        /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; */
+        /* line-height: 1.6; */
       }
 
       /* Ensure images are responsive */
@@ -617,7 +617,7 @@
       /* Visual feedback on hover */
       p:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover,
       div:hover, span:hover, li:hover, blockquote:hover, td:hover, th:hover {
-        background-color: rgba(59, 130, 246, 0.1);
+        /* background-color: rgba(59, 130, 246, 0.1); */
         outline: 1px solid rgba(59, 130, 246, 0.3);
         outline-offset: 1px;
       }

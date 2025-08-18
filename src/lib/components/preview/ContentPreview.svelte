@@ -11,7 +11,14 @@
   export { className as class };
 
   // Types
-  type DeviceSize = 'responsive' | 'old-iphone' | 'recent-iphone' | 'large-iphone' | 'small-tablet' | 'medium-tablet' | 'large-tablet';
+  type DeviceSize =
+    | 'responsive'
+    | 'old-iphone'
+    | 'recent-iphone'
+    | 'large-iphone'
+    | 'small-tablet'
+    | 'medium-tablet'
+    | 'large-tablet';
   type FontFamily = 'default' | 'serif' | 'sans-serif' | 'monospace';
 
   // Device specifications
@@ -21,7 +28,7 @@
     'large-iphone': { width: 430, height: 932, fontSize: 18, margin: 16, lineHeight: 1.4 },
     'small-tablet': { width: 744, height: 1133, fontSize: 20, margin: 20, lineHeight: 1.5 },
     'medium-tablet': { width: 820, height: 1180, fontSize: 22, margin: 24, lineHeight: 1.5 },
-    'large-tablet': { width: 1024, height: 1366, fontSize: 24, margin: 28, lineHeight: 1.5 }
+    'large-tablet': { width: 1024, height: 1366, fontSize: 24, margin: 28, lineHeight: 1.5 },
   };
 
   // Component elements
@@ -33,15 +40,16 @@
   const FONT_FAMILIES = {
     default: '',
     serif: 'Georgia, "Times New Roman", Times, serif !important',
-    'sans-serif': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important',
-    monospace: '"Courier New", Courier, "Monaco", "Menlo", monospace !important'
+    'sans-serif':
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important',
+    monospace: '"Courier New", Courier, "Monaco", "Menlo", monospace !important',
   };
 
   function getDeviceDimensions(deviceType: DeviceSize, orientation: 'portrait' | 'landscape') {
     if (deviceType === 'responsive') {
       return null; // Responsive mode doesn't use fixed dimensions
     }
-    
+
     const spec = DEVICE_SPECS[deviceType];
     if (orientation === 'landscape') {
       return { width: spec.height, height: spec.width };
@@ -53,14 +61,14 @@
     if (deviceType === 'responsive') {
       return '';
     }
-    
+
     const spec = DEVICE_SPECS[deviceType];
     const adjustedFontSize = spec.fontSize + fontSizeAdjustment;
-    
-    return `body { 
-      font-size: ${adjustedFontSize}px; 
-      margin: ${spec.margin}px; 
-      line-height: ${spec.lineHeight}; 
+
+    return `body {
+      font-size: ${adjustedFontSize}px;
+      margin: ${spec.margin}px;
+      line-height: ${spec.lineHeight};
     }`;
   }
 
@@ -68,11 +76,16 @@
     if (fontFamily === 'default') {
       return '';
     }
-    
+
     return `body { font-family: ${FONT_FAMILIES[fontFamily]}; }`;
   }
 
-  function injectDeviceStyles(iframe: HTMLIFrameElement | null, deviceType: DeviceSize, fontFamily: FontFamily, fontSizeAdjustment: number) {
+  function injectDeviceStyles(
+    iframe: HTMLIFrameElement | null,
+    deviceType: DeviceSize,
+    fontFamily: FontFamily,
+    fontSizeAdjustment: number
+  ) {
     if (!iframe) return;
     const iframeDoc = iframe.contentDocument;
     if (!iframeDoc) return;
@@ -86,7 +99,7 @@
     // Build CSS
     let css = '';
     css += getDeviceBaseCSS(deviceType, fontSizeAdjustment);
-    css += getFontFamilyCSS(fontFamily);
+    // css += getFontFamilyCSS(fontFamily);
 
     if (css) {
       const styleElement = iframeDoc.createElement('style');
@@ -103,7 +116,10 @@
     }
   }
 
-  function calculateScaleFactor(containerRect: { width: number; height: number }, deviceDimensions: {width: number, height: number}): number {
+  function calculateScaleFactor(
+    containerRect: { width: number; height: number },
+    deviceDimensions: { width: number; height: number }
+  ): number {
     const scaleX = containerRect.width / deviceDimensions.width;
     const scaleY = containerRect.height / deviceDimensions.height;
     return Math.min(scaleX, scaleY);
@@ -113,7 +129,7 @@
     if (!containerElement || !wrapperElement || !iframeElement) return;
 
     const dimensions = getDeviceDimensions(deviceSize, orientation);
-    
+
     if (!dimensions) {
       // Responsive mode
       wrapperElement.style.transform = '';
@@ -162,7 +178,7 @@
 
   onMount(() => {
     updateLayout();
-    
+
     // Handle container resize
     let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined') {
@@ -170,30 +186,23 @@
         updateLayout();
       });
     }
-    
+
     if (containerElement && resizeObserver) {
       resizeObserver.observe(containerElement);
     }
-    
+
     return () => {
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
     };
   });
-
 </script>
 
-<div 
-  class="content-preview {className}" 
-  bind:this={containerElement}
->
-  <div 
-    class="content-preview__container"
-    bind:this={wrapperElement}
-  >
+<div class="content-preview {className}" bind:this={containerElement}>
+  <div class="content-preview__container" bind:this={wrapperElement}>
     <div class="content-preview__letterbox">
-      <iframe 
+      <iframe
         class="content-preview__iframe"
         bind:this={iframeElement}
         srcdoc={content}

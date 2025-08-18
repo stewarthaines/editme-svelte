@@ -222,11 +222,69 @@
     }
   };
 
-  const handleDownloadClick = () => {
+  const handleDownloadClick = async () => {
     if (!selectedItem || !workspaceService || !workspace) return;
 
-    // TODO: Implement proper download functionality
-    // Would need to get file content and create blob URL for download
+    try {
+      let content: ArrayBuffer;
+      let filename: string;
+      let mimeType: string;
+
+      if (selectedItemType === 'manifest') {
+        const manifestItem = selectedItem as ManifestItem;
+        
+        // Resolve file path using same logic as loadContentPreview
+        const filePath = manifestItem.href.startsWith(workspace.pathInfo.basePath + '/')
+          ? manifestItem.href
+          : `${workspace.pathInfo.basePath}/${manifestItem.href}`;
+
+        try {
+          content = await workspaceService.readFile(workspace.id, filePath);
+        } catch {
+          // Try original href if constructed path fails
+          content = await workspaceService.readFile(workspace.id, manifestItem.href);
+        }
+
+        // Extract filename from href (remove directory prefix)
+        filename = manifestItem.href.split('/').pop() || manifestItem.id;
+        mimeType = manifestItem.mediaType;
+        
+      } else if (selectedItemType === 'source') {
+        const sourceItem = selectedItem as SourceItem;
+        content = await workspaceService.readFile(workspace.id, sourceItem.path);
+        filename = sourceItem.name || sourceItem.path.split('/').pop() || 'source-file';
+        mimeType = sourceItem.mediaType || 'application/octet-stream';
+        
+      } else if (selectedItemType === 'opf') {
+        const opfItem = selectedItem as any;
+        content = await workspaceService.readFile(workspace.id, workspace.pathInfo.rootfilePath);
+        filename = 'content.opf';
+        mimeType = 'application/xml';
+      } else {
+        return;
+      }
+
+      // Create blob and download link
+      const blob = new Blob([content], { type: mimeType });
+      const downloadUrl = URL.createObjectURL(blob);
+      
+      // Create temporary download link and trigger download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download = filename;
+      downloadLink.style.display = 'none';
+      
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Clean up blob URL
+      URL.revokeObjectURL(downloadUrl);
+      
+    } catch (err) {
+      console.error('Download failed:', err);
+      // Could dispatch an error event or show a toast notification here
+    }
   };
 
   const formatFileSize = (bytes: number | undefined) => {
