@@ -19,6 +19,7 @@ export interface LayoutStore extends Writable<LayoutState> {
 }
 
 export type SidebarSection =
+  | 'about'
   | 'workspace'
   | 'metadata'
   | 'manifest'
@@ -36,7 +37,7 @@ const STORAGE_KEYS = {
 const DEFAULT_STATE: LayoutState = {
   sidebar: {
     isExpanded: true,
-    activeSection: 'workspace',
+    activeSection: 'about',
   },
   isInitialized: false,
 };
@@ -134,6 +135,7 @@ function createLayoutStore(): LayoutStore {
 // Type guard for sidebar sections
 function isValidSidebarSection(value: string): value is SidebarSection {
   const validSections: SidebarSection[] = [
+    'about',
     'workspace',
     'metadata',
     'manifest',

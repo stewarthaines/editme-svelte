@@ -21,9 +21,9 @@ const MAX_HISTORY_SIZE = 20;
 
 // Default navigation state
 const DEFAULT_STATE: NavigationState = {
-  currentView: 'workspace',
+  currentView: 'about',
   previousView: null,
-  viewHistory: ['workspace'],
+  viewHistory: ['about'],
   viewData: {},
   isTransitioning: false,
   canNavigateBack: false,
@@ -32,6 +32,7 @@ const DEFAULT_STATE: NavigationState = {
 
 // Valid view types for validation
 const VALID_VIEW_TYPES: ViewType[] = [
+  'about',
   'workspace',
   'metadata',
   'manifest',

@@ -14,6 +14,7 @@
     icon: string;
     label: string;
   }> = [
+    { id: 'about', icon: 'ℹ️', label: $t('About') },
     { id: 'workspace', icon: '🏠', label: $t('Projects') },
     { id: 'metadata', icon: '📄', label: $t('Metadata') },
     { id: 'manifest', icon: '📋', label: $t('Manifest') },
@@ -28,8 +29,8 @@
   }
 
   function setSidebarSection(section: SidebarSection) {
-    // Only allow navigation if workspace exists or it's workspace/settings section
-    if (!hasWorkspace && section !== 'workspace' && section !== 'settings') {
+    // Only allow navigation if workspace exists or it's workspace/settings/about section
+    if (!hasWorkspace && section !== 'about' && section !== 'workspace' && section !== 'settings') {
       return;
     }
     layoutStore.setSidebarSection(section);
@@ -37,7 +38,7 @@
 
   function isSectionDisabled(sectionId: string): boolean {
     // Disable content-related sections when no workspace exists
-    return !hasWorkspace && sectionId !== 'workspace' && sectionId !== 'settings';
+    return !hasWorkspace && sectionId !== 'about' && sectionId !== 'workspace' && sectionId !== 'settings';
   }
 
   function handleAppendItem() {
@@ -138,6 +139,7 @@
 
     <!-- Content slots for different sections -->
     <div class="section-content">
+      <slot name="sidebar-about" />
       <slot name="sidebar-workspace" />
       <slot name="sidebar-metadata" />
       <slot name="sidebar-manifest" />

@@ -8,6 +8,7 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { visualizer } from "rollup-plugin-visualizer";
 import analyzer from "rollup-plugin-analyzer";
 import checker from "vite-plugin-checker";
+import packageJson from "./package.json";
 
 const dirname =
   typeof __dirname !== "undefined"
@@ -34,6 +35,8 @@ export default defineConfig({
   define: {
     // Exclude development-only code from production builds
     __DEV__: process.env.NODE_ENV !== 'production',
+    // Inject package.json version at build time
+    __VERSION__: JSON.stringify(packageJson.version),
   },
   plugins: [
     // TypeScript checking during development - this will catch API mismatches!

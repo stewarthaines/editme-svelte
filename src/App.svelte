@@ -3,6 +3,8 @@
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
   import type { ViewType } from './lib/navigation/types';
+  import AboutView from './lib/navigation/views/AboutView.svelte';
+  import ThirdPartyView from './lib/navigation/views/ThirdPartyView.svelte';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
   import MetadataEditor from './lib/components/metadata/MetadataEditor.svelte';
   import PlaceholderView from './lib/navigation/views/PlaceholderView.svelte';
@@ -504,7 +506,9 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
 
     <svelte:fragment slot="left-content">
       <!-- Main content area - switches based on current view -->
-      {#if currentView === 'workspace' && initialized}
+      {#if currentView === 'about'}
+        <AboutView />
+      {:else if currentView === 'workspace' && initialized}
         <WorkspaceView
           onListWorkspaces={() => appState?.listWorkspaces() ?? Promise.resolve([])}
           onCreateWorkspace={data =>
@@ -612,7 +616,9 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     </svelte:fragment>
 
     <svelte:fragment slot="right-content">
-      {#if currentView === 'manifest' && initialized && currentWorkspaceState}
+      {#if currentView === 'about'}
+        <ThirdPartyView />
+      {:else if currentView === 'manifest' && initialized && currentWorkspaceState}
         <ManifestPreview
           selectedItem={selectedManifestItem}
           selectedItemType={selectedManifestItemType}

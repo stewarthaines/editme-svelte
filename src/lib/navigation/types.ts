@@ -2,6 +2,7 @@ import type { Writable } from 'svelte/store';
 
 // Available views in the application
 export type ViewType =
+  | 'about' // About information and licenses
   | 'workspace' // Workspace selection and management
   | 'metadata' // EPUB metadata editing
   | 'manifest' // File listing and management
@@ -59,6 +60,10 @@ export interface ViewComponent {
 }
 
 // View-specific data types for type safety
+export interface AboutViewData {
+  // No specific data needed for About view
+}
+
 export interface ManifestViewData {
   selectedItems: string[];
   sortOrder: 'name' | 'type' | 'modified';

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-20T00:07:44.844Z\n"
-"PO-Revision-Date: 2025-08-20T00:07:45.049Z\n"
+"POT-Creation-Date: 2025-08-20T01:07:42.740Z\n"
+"PO-Revision-Date: 2025-08-20T01:07:42.881Z\n"
 "Language: ja\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -14,6 +14,50 @@ msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte:44
 msgid "1 day ago"
+msgstr ""
+
+#: src/lib/Sidebar.svelte:17
+msgid "About"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:34
+msgid "about.attribution.content"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:23
+msgid "about.description.content"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:22
+msgid "about.description.title"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:38
+msgid "about.license.title"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:17
+msgid "about.subtitle"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte:57
+msgid "about.thirdparty.intro"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte:79
+msgid "about.thirdparty.license"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte:56
+msgid "about.thirdparty.title"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:18
+msgid "about.version"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte:31
+msgid "about.website.link"
 msgstr ""
 
 #: src/lib/components/metadata/MetadataEditor.svelte:243
@@ -57,10 +101,10 @@ msgstr "🇯🇵 Advanced configurations"
 msgid "All your work is saved automatically"
 msgstr "🇯🇵 All your work is saved automatically"
 
-#: src/lib/Sidebar.svelte:111
 #: src/lib/Sidebar.svelte:112
-#: src/lib/Sidebar.svelte:125
+#: src/lib/Sidebar.svelte:113
 #: src/lib/Sidebar.svelte:126
+#: src/lib/Sidebar.svelte:127
 msgid "Append Item"
 msgstr "🇯🇵 Append Item"
 
@@ -68,7 +112,7 @@ msgstr "🇯🇵 Append Item"
 msgid "Application preferences"
 msgstr "🇯🇵 Application preferences"
 
-#: src/App.svelte:177
+#: src/App.svelte:179
 #: src/lib/components/manifest/ManifestContainer.svelte:119
 msgid "Are you sure you want to delete this item?"
 msgstr ""
@@ -176,11 +220,11 @@ msgstr ""
 msgid "Complex Interactive"
 msgstr ""
 
-#: src/App.svelte:538
+#: src/App.svelte:542
 msgid "Configure publication metadata and details"
 msgstr "🇯🇵 Configure publication metadata and details"
 
-#: src/App.svelte:652
+#: src/App.svelte:658
 msgid "Content preview will appear here based on the current view"
 msgstr ""
 
@@ -235,7 +279,7 @@ msgstr "🇯🇵 Current"
 msgid "Current Settings:"
 msgstr ""
 
-#: src/App.svelte:653
+#: src/App.svelte:659
 msgid "Current view"
 msgstr "🇯🇵 Current view"
 
@@ -350,7 +394,7 @@ msgstr "🇯🇵 Enter spatial or temporal coverage"
 msgid "Enter the initial content for this text file…"
 msgstr ""
 
-#: src/App.svelte:537
+#: src/App.svelte:541
 msgid "EPUB Metadata"
 msgstr "🇯🇵 EPUB Metadata"
 
@@ -419,7 +463,7 @@ msgstr ""
 msgid "File listing and management"
 msgstr "🇯🇵 File listing and management"
 
-#: src/App.svelte:553
+#: src/App.svelte:557
 msgid "File Manifest"
 msgstr "🇯🇵 File Manifest"
 
@@ -474,7 +518,7 @@ msgstr "🇯🇵 Future"
 msgid "Generate"
 msgstr "🇯🇵 Generate"
 
-#: src/App.svelte:629
+#: src/App.svelte:635
 msgid "Generating navigation from chapters..."
 msgstr ""
 
@@ -607,10 +651,10 @@ msgstr ""
 msgid "Loading preview…"
 msgstr ""
 
-#: src/App.svelte:481
-#: src/App.svelte:500
-#: src/App.svelte:570
-#: src/App.svelte:589
+#: src/App.svelte:483
+#: src/App.svelte:502
+#: src/App.svelte:574
+#: src/App.svelte:593
 msgid "Loading project…"
 msgstr ""
 
@@ -626,7 +670,7 @@ msgstr "🇯🇵 Loading spine item..."
 msgid "Loading spine items…"
 msgstr ""
 
-#: src/lib/Sidebar.svelte:81
+#: src/lib/Sidebar.svelte:82
 msgid "Main navigation"
 msgstr "🇯🇵 Main navigation"
 
@@ -634,11 +678,11 @@ msgstr "🇯🇵 Main navigation"
 msgid "Malformed XHTML"
 msgstr ""
 
-#: src/App.svelte:554
+#: src/App.svelte:558
 msgid "Manage EPUB files and resources"
 msgstr "🇯🇵 Manage EPUB files and resources"
 
-#: src/lib/Sidebar.svelte:19
+#: src/lib/Sidebar.svelte:20
 msgid "Manifest"
 msgstr ""
 
@@ -651,7 +695,7 @@ msgstr "🇯🇵 Manifest actions"
 msgid "Media Type"
 msgstr "🇯🇵 Media Type"
 
-#: src/lib/Sidebar.svelte:18
+#: src/lib/Sidebar.svelte:19
 msgid "Metadata"
 msgstr ""
 
@@ -675,7 +719,7 @@ msgstr ""
 msgid "Monospace"
 msgstr ""
 
-#: src/lib/Sidebar.svelte:20
+#: src/lib/Sidebar.svelte:21
 msgid "Navigation"
 msgstr ""
 
@@ -691,7 +735,7 @@ msgstr "🇯🇵 Navigation Demo"
 msgid "Navigation link management"
 msgstr "🇯🇵 Navigation link management"
 
-#: src/App.svelte:628
+#: src/App.svelte:634
 msgid "Navigation Preview"
 msgstr ""
 
@@ -707,7 +751,7 @@ msgstr "🇯🇵 No items match your filter"
 msgid "No manifest items found"
 msgstr "🇯🇵 No manifest items found"
 
-#: src/App.svelte:485
+#: src/App.svelte:487
 #: src/lib/components/SpineSidebar.svelte:315
 msgid "No project selected"
 msgstr ""
@@ -809,7 +853,7 @@ msgstr "🇯🇵 Preview Error"
 msgid "Preview file contents"
 msgstr "🇯🇵 Preview file contents"
 
-#: src/App.svelte:651
+#: src/App.svelte:657
 msgid "Preview Pane"
 msgstr "🇯🇵 Preview Pane"
 
@@ -817,7 +861,7 @@ msgstr "🇯🇵 Preview Pane"
 msgid "Project has errors"
 msgstr ""
 
-#: src/lib/Sidebar.svelte:17
+#: src/lib/Sidebar.svelte:18
 #: src/lib/components/workspace/WorkspaceList.svelte:61
 msgid "Projects"
 msgstr ""
@@ -972,7 +1016,7 @@ msgstr ""
 msgid "Select a spine item from the sidebar to start editing"
 msgstr ""
 
-#: src/App.svelte:646
+#: src/App.svelte:652
 msgid "Select a spine item to see the preview here"
 msgstr ""
 
@@ -1017,7 +1061,7 @@ msgstr ""
 msgid "Set to today"
 msgstr "🇯🇵 Set to today"
 
-#: src/lib/Sidebar.svelte:24
+#: src/lib/Sidebar.svelte:25
 msgid "Settings"
 msgstr ""
 
@@ -1057,13 +1101,13 @@ msgstr ""
 msgid "Spine item management"
 msgstr "🇯🇵 Spine item management"
 
-#: src/App.svelte:588
-#: src/lib/Sidebar.svelte:105
-#: src/lib/Sidebar.svelte:119
+#: src/App.svelte:592
+#: src/lib/Sidebar.svelte:106
+#: src/lib/Sidebar.svelte:120
 msgid "Spine Items"
 msgstr "🇯🇵 Spine Items"
 
-#: src/App.svelte:645
+#: src/App.svelte:651
 msgid "Spine Preview"
 msgstr ""
 
@@ -1092,7 +1136,7 @@ msgstr "🇯🇵 Subject or keyword"
 msgid "Subjects"
 msgstr "🇯🇵 Subjects"
 
-#: src/App.svelte:569
+#: src/App.svelte:573
 msgid "Table of Contents"
 msgstr "🇯🇵 Table of Contents"
 
@@ -1124,7 +1168,7 @@ msgstr "🇯🇵 Today"
 msgid "Toggle Empty State"
 msgstr ""
 
-#: src/lib/Sidebar.svelte:63
+#: src/lib/Sidebar.svelte:64
 msgid "Toggle sidebar"
 msgstr "🇯🇵 Toggle sidebar"
 
@@ -1141,7 +1185,7 @@ msgstr "🇯🇵 Try adjusting your search terms"
 msgid "Unique identifier for this item"
 msgstr "🇯🇵 Unique identifier for this item"
 
-#: src/App.svelte:608
+#: src/App.svelte:612
 msgid "Unknown View"
 msgstr "🇯🇵 Unknown View"
 
@@ -1154,7 +1198,7 @@ msgstr "🇯🇵 Upload File"
 msgid "Use the download button to access the file"
 msgstr "🇯🇵 Use the download button to access the file"
 
-#: src/App.svelte:609
+#: src/App.svelte:613
 msgid "View type"
 msgstr "🇯🇵 View type"
 
