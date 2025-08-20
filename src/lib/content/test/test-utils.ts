@@ -36,7 +36,7 @@ export function createMockEPUBMetadata() {
 export function expectLocalizedContent(
   actual: any,
   locale: string,
-  expectedChapterCount: number = 4
+  expectedChapterCount: number = 1
 ): void {
   expect(actual).toEqual({
     locale,
@@ -64,7 +64,7 @@ export function expectLocalizedContent(
 /**
  * Assertion helpers for DemoChapter arrays
  */
-export function expectDemoChapters(actual: any[], expectedCount: number = 4): void {
+export function expectDemoChapters(actual: any[], expectedCount: number = 1): void {
   expect(actual).toHaveLength(expectedCount);
 
   actual.forEach(chapter => {

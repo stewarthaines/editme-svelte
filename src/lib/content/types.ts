@@ -55,14 +55,8 @@ export type SampleContentKey =
   | 'sample.book.description'
   | 'sample.author.name'
   | 'sample.publisher.name'
-  | 'sample.prologue.title'
-  | 'sample.prologue.content'
   | 'sample.chapter1.title'
-  | 'sample.chapter1.content'
-  | 'sample.chapter2.title'
-  | 'sample.chapter2.content'
-  | 'sample.appendix.title'
-  | 'sample.appendix.content';
+  | 'sample.chapter1.content';
 
 /**
  * Error Classes

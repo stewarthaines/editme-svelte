@@ -29,14 +29,8 @@ const REQUIRED_SAMPLE_KEYS: SampleContentKey[] = [
   'sample.book.description',
   'sample.author.name',
   'sample.publisher.name',
-  'sample.prologue.title',
-  'sample.prologue.content',
   'sample.chapter1.title',
   'sample.chapter1.content',
-  'sample.chapter2.title',
-  'sample.chapter2.content',
-  'sample.appendix.title',
-  'sample.appendix.content',
 ];
 
 /**
@@ -176,14 +170,8 @@ export class SampleContentGenerator {
 
     // Check for missing chapter translations
     const chapterKeys: SampleContentKey[] = [
-      'sample.prologue.title',
-      'sample.prologue.content',
       'sample.chapter1.title',
       'sample.chapter1.content',
-      'sample.chapter2.title',
-      'sample.chapter2.content',
-      'sample.appendix.title',
-      'sample.appendix.content',
     ];
 
     const missingKeys: string[] = [];
@@ -199,31 +187,10 @@ export class SampleContentGenerator {
 
     return [
       {
-        id: 'prologue',
-        title: this.translate(locale, 'sample.prologue.title'),
-        content: this.translate(locale, 'sample.prologue.content'),
-        linear: true,
-        mediaType: 'application/xhtml+xml',
-      },
-      {
         id: 'chapter1',
         title: this.translate(locale, 'sample.chapter1.title'),
         content: this.translate(locale, 'sample.chapter1.content'),
         linear: true,
-        mediaType: 'application/xhtml+xml',
-      },
-      {
-        id: 'chapter2',
-        title: this.translate(locale, 'sample.chapter2.title'),
-        content: this.translate(locale, 'sample.chapter2.content'),
-        linear: true,
-        mediaType: 'application/xhtml+xml',
-      },
-      {
-        id: 'appendix',
-        title: this.translate(locale, 'sample.appendix.title'),
-        content: this.translate(locale, 'sample.appendix.content'),
-        linear: false,
         mediaType: 'application/xhtml+xml',
       },
     ];

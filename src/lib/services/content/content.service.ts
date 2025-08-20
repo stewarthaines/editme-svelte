@@ -11,6 +11,7 @@ import type { TranslationFunction } from '../../i18n/types.js';
 import type { EPUBMetadata } from '../../epub/opf-utils.js';
 import { generateEPUBTimestamp } from '../../epub/opf-utils.js';
 import { JavaScriptValidator } from '../../validation/javascript-validator.js';
+import { SampleContentGenerator } from '../../content/sample-content-generator.js';
 import pageCSS from '../../../assets/universal/page.css?raw';
 import transformTextJS from '../../../assets/universal/transformText.js?raw';
 import transformDomJS from '../../../assets/universal/transformDom.js?raw';
@@ -496,25 +497,10 @@ ${navEntriesHtml}
    * Generate localized chapter content
    */
   async generateLocalizedChapters(locale: string): Promise<DemoChapter[]> {
-    // Generate sample chapters based on locale
-    const chapters: DemoChapter[] = [
-      {
-        id: 'chapter1',
-        title: this.i18nSystem.translate('content.chapter1') || 'Chapter 1',
-        content: this.generateSampleChapterContent(locale, 1),
-        linear: true,
-        mediaType: 'application/xhtml+xml',
-      },
-      {
-        id: 'chapter2',
-        title: this.i18nSystem.translate('content.chapter2') || 'Chapter 2',
-        content: this.generateSampleChapterContent(locale, 2),
-        linear: true,
-        mediaType: 'application/xhtml+xml',
-      },
-    ];
-
-    return chapters;
+    // Delegate to the more comprehensive SampleContentGenerator
+    const catalogs = this.i18nSystem.getCatalogs();
+    const generator = new SampleContentGenerator(catalogs);
+    return generator.generateLocalizedChapters(locale);
   }
 
   // Private helper methods

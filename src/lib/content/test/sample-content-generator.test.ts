@@ -38,14 +38,8 @@ describe('SampleContentGenerator', () => {
           'sample.book.description': 'A comprehensive guide to EPUB creation',
           'sample.author.name': 'EDITME Editorial Team',
           'sample.publisher.name': 'EDITME Publishing',
-          'sample.prologue.title': 'Welcome to Active EPUB',
-          'sample.prologue.content': 'This document demonstrates the power of **Active EPUB** technology. Unlike traditional EPUB files, Active EPUBs contain their own editor, making them self-editable.\n\n## What is an Active EPUB?\n\nAn Active EPUB is a standard EPUB file that includes:\n- All the regular EPUB content (text, images, styles)\n- The EDITME.html editor application\n- SOURCE files containing the original plain text sources\n- Transform scripts for converting text to XHTML\n\nThis allows readers to not only read the book but also edit and republish it using nothing more than a web browser.\n\n*Experience the future of publishing with Active EPUB technology.*',
           'sample.chapter1.title': 'Getting Started',
-          'sample.chapter1.content': 'This chapter will guide you through the basics of creating and editing EPUB files using the EDITME editor.\n\n## Basic Structure\n\nEvery EPUB file contains:\n1. **Metadata** - Information about the book (title, author, language, etc.)\n2. **Manifest** - List of all files in the EPUB\n3. **Spine** - Reading order of content files\n4. **Content** - The actual chapters and resources\n\n## Your First Edit\n\nTo make your first edit:\n1. Select a chapter from the spine\n2. Modify the text in the editor\n3. See live preview updates\n4. Save your changes\n\nThe editor automatically handles the conversion from plain text to properly formatted XHTML.\n\n> **Tip**: Use markdown-style formatting for rich text features like *italics*, **bold**, and [links](http://example.com).',
-          'sample.chapter2.title': 'Advanced Features',
-          'sample.chapter2.content': 'Once you\'re comfortable with basic editing, explore these advanced features:\n\n## Custom Transforms\n\nTransform scripts convert your plain text into XHTML. You can:\n- Modify existing transform logic\n- Add new formatting rules\n- Include external libraries (like Markdown processors)\n\n## Styling and Themes\n\nCustomize the appearance of your EPUB:\n- Edit CSS files in the manifest\n- Add custom fonts and images\n- Create responsive layouts for different devices\n\n## Multi-language Support\n\nThe editor supports creating EPUBs in multiple languages:\n- **Latin scripts**: English, German, French, Spanish\n- **Right-to-left**: Arabic, Hebrew\n- **Complex scripts**: Japanese, Chinese, Georgian\n\nEach locale includes culturally appropriate content and proper text direction handling.\n\n## Extension System\n\nExtend functionality with:\n- Custom transform scripts\n- Additional formatting processors\n- Third-party libraries\n\nThe modular design allows for unlimited customization while maintaining EPUB compatibility.',
-          'sample.appendix.title': 'Technical Reference',
-          'sample.appendix.content': '## File Structure\n\nActive EPUBs follow this enhanced structure:\n\n```\nyour-book.epub\n├── mimetype\n├── META-INF/\n│   ├── container.xml\n│   └── com.apple.ibooks.display-options.xml\n├── OEBPS/\n│   ├── content.opf          # Package document\n│   ├── toc.xhtml           # Table of contents\n│   ├── chapter1.xhtml      # Content files\n│   ├── chapter2.xhtml\n│   ├── styles.css          # Stylesheets\n│   ├── cover.jpg           # Images\n│   ├── SOURCE.zip          # Editor source files\n│   └── EDITME.html         # Editor application\n└── EXTRACT_EDITOR.txt      # Extraction instructions\n```\n\n## Technical Details\n\n- **EPUB Version**: 3.2\n- **Reading Systems**: Compatible with all major EPUB readers\n- **Editor Requirements**: Modern browser with JavaScript enabled\n- **Source Format**: Plain text with markdown-style formatting\n- **Transform Engine**: Custom JavaScript with extensible plugin system\n\n## API Reference\n\nThe editor exposes these key APIs:\n- `EditorAPI.loadWorkspace()` - Load EPUB for editing\n- `EditorAPI.saveChanges()` - Save modifications\n- `EditorAPI.exportEPUB()` - Generate final EPUB file\n- `TransformAPI.addProcessor()` - Add custom formatting\n\nFor complete API documentation, see the embedded help system.',
+          'sample.chapter1.content': '# This is a Heading 1\n\nA heading 1 (H1) is the main title of a document, created with a single hash mark.\n\n## This is a Heading 2\n\nA heading 2 (H2) is a section heading, created with two hash marks.\n\n**This text is bold** - Bold text adds strong emphasis and is created by wrapping text in double asterisks.\n\n*This text is emphasized* - Emphasized text (usually italic) adds mild emphasis and is created by wrapping text in single asterisks.',
         },
         headers: {}
       },
@@ -56,14 +50,8 @@ describe('SampleContentGenerator', () => {
           'sample.book.description': 'Un guide complet pour la création EPUB',
           'sample.author.name': 'Équipe éditoriale EDITME',
           'sample.publisher.name': 'Éditions EDITME',
-          'sample.prologue.title': 'Bienvenue dans Active EPUB',
-          'sample.prologue.content': 'Ce document démontre la puissance de la technologie **Active EPUB**.',
           'sample.chapter1.title': 'Premiers pas',
-          'sample.chapter1.content': 'Ce chapitre vous guidera à travers les bases.',
-          'sample.chapter2.title': 'Fonctionnalités avancées',
-          'sample.chapter2.content': 'Une fois à l\'aise avec l\'édition de base.',
-          'sample.appendix.title': 'Référence technique',
-          'sample.appendix.content': 'Structure des fichiers Active EPUB.',
+          'sample.chapter1.content': '# Ceci est un titre 1\n\nUn titre 1 (H1) est le titre principal d\'un document, créé avec un seul dièse.\n\n## Ceci est un titre 2\n\nUn titre 2 (H2) est un titre de section, créé avec deux dièses.\n\n**Ce texte est en gras** - Le texte en gras ajoute une forte emphase et est créé en encadrant le texte de doubles astérisques.\n\n*Ce texte est mis en emphase* - Le texte mis en emphase (généralement italique) ajoute une emphase légère et est créé en encadrant le texte d\'astérisques simples.',
         },
         headers: {}
       },
@@ -74,14 +62,8 @@ describe('SampleContentGenerator', () => {
           'sample.book.description': 'Ein umfassender Leitfaden zur EPUB-Erstellung',
           'sample.author.name': 'EDITME Redaktionsteam',
           'sample.publisher.name': 'EDITME Publikationen',
-          'sample.prologue.title': 'Willkommen zu Active EPUB',
-          'sample.prologue.content': 'Dieses Dokument demonstriert die Macht der **Active EPUB** Technologie.',
           'sample.chapter1.title': 'Erste Schritte',
-          'sample.chapter1.content': 'Dieses Kapitel führt Sie durch die Grundlagen.',
-          'sample.chapter2.title': 'Erweiterte Funktionen',
-          'sample.chapter2.content': 'Sobald Sie mit der grundlegenden Bearbeitung vertraut sind.',
-          'sample.appendix.title': 'Technische Referenz',
-          'sample.appendix.content': 'Active EPUBs folgen dieser erweiterten Struktur.',
+          'sample.chapter1.content': '# Das ist eine Überschrift 1\n\nEine Überschrift 1 (H1) ist der Haupttitel eines Dokuments, erstellt mit einem einzigen Rautezeichen.\n\n## Das ist eine Überschrift 2\n\nEine Überschrift 2 (H2) ist eine Abschnittsüberschrift, erstellt mit zwei Rautezeichen.\n\n**Dieser Text ist fett** - Fetter Text fügt starke Betonung hinzu und wird erstellt, indem Text in doppelte Sternchen eingeschlossen wird.\n\n*Dieser Text ist hervorgehoben* - Hervorgehobener Text (normalerweise kursiv) fügt leichte Betonung hinzu und wird erstellt, indem Text in einfache Sternchen eingeschlossen wird.',
         },
         headers: {}
       },
@@ -92,14 +74,8 @@ describe('SampleContentGenerator', () => {
           'sample.book.description': 'دليل شامل لإنشاء EPUB',
           'sample.author.name': 'فريق تحرير EDITME',
           'sample.publisher.name': 'منشورات EDITME',
-          'sample.prologue.title': 'مرحباً بكم في Active EPUB',
-          'sample.prologue.content': 'تُظهر هذه الوثيقة قوة تقنية **Active EPUB**.',
           'sample.chapter1.title': 'البداية',
-          'sample.chapter1.content': 'سيرشدك هذا الفصل عبر الأساسيات.',
-          'sample.chapter2.title': 'الميزات المتقدمة',
-          'sample.chapter2.content': 'بمجرد أن تصبح مرتاحاً مع التحرير الأساسي.',
-          'sample.appendix.title': 'المرجع التقني',
-          'sample.appendix.content': 'تتبع Active EPUBs هذا الهيكل المحسن.',
+          'sample.chapter1.content': '# هذا عنوان 1\n\nالعنوان 1 (H1) هو العنوان الرئيسي للوثيقة، يُنشأ بعلامة مربع واحدة.\n\n## هذا عنوان 2\n\nالعنوان 2 (H2) هو عنوان قسم، يُنشأ بعلامتي مربع.\n\n**هذا النص غامق** - النص الغامق يضيف تأكيداً قوياً ويُنشأ بوضع النص بين نجمتين مزدوجتين.\n\n*هذا النص مؤكد* - النص المؤكد (عادة مائل) يضيف تأكيداً خفيفاً ويُنشأ بوضع النص بين نجمتين مفردتين.',
         },
         headers: {}
       }
@@ -127,32 +103,26 @@ describe('SampleContentGenerator', () => {
         const result = await generator.generateLocalizedContent('en');
 
         // Verify structure matches LocalizedSampleContent interface
-        expectLocalizedContent(result, 'en', 4);
+        expectLocalizedContent(result, 'en', 1);
 
         // Verify specific content
         expect(result.locale).toBe('en');
         expect(result.isRTL).toBe(false);
         expect(result.pageProgressionDirection).toBe('ltr');
         expect(result.metadata.title).toBe('Introduction to EPUB');
-        expect(result.chapters).toHaveLength(4);
+        expect(result.chapters).toHaveLength(1);
 
         // Verify chapters are in correct order
-        expect(result.chapters[0].id).toBe('prologue');
-        expect(result.chapters[1].id).toBe('chapter1');
-        expect(result.chapters[2].id).toBe('chapter2');
-        expect(result.chapters[3].id).toBe('appendix');
+        expect(result.chapters[0].id).toBe('chapter1');
 
         // Verify linear property
-        expect(result.chapters[0].linear).toBe(true);
-        expect(result.chapters[1].linear).toBe(true);
-        expect(result.chapters[2].linear).toBe(true);
-        expect(result.chapters[3].linear).toBe(false); // appendix is non-linear
+        expect(result.chapters[0].linear).toBe(true); // appendix is non-linear
       });
 
       it('should generate complete German content', async () => {
         const result = await generator.generateLocalizedContent('de');
 
-        expectLocalizedContent(result, 'de', 4);
+        expectLocalizedContent(result, 'de', 1);
         expect(result.locale).toBe('de');
         expect(result.isRTL).toBe(false);
         expect(result.pageProgressionDirection).toBe('ltr');
@@ -163,7 +133,7 @@ describe('SampleContentGenerator', () => {
       it('should generate complete Arabic content with RTL support', async () => {
         const result = await generator.generateLocalizedContent('ar');
 
-        expectLocalizedContent(result, 'ar', 4);
+        expectLocalizedContent(result, 'ar', 1);
         expect(result.locale).toBe('ar');
         expect(result.isRTL).toBe(true);
         expect(result.pageProgressionDirection).toBe('rtl');
@@ -213,14 +183,8 @@ describe('SampleContentGenerator', () => {
               'sample.book.description': 'Valid description',
               'sample.author.name': 'Valid author',
               'sample.publisher.name': 'Valid publisher',
-              'sample.prologue.title': 'Valid title',
-              'sample.prologue.content': 'Valid content',
               'sample.chapter1.title': 'Valid title',
               'sample.chapter1.content': 'Valid content',
-              'sample.chapter2.title': 'Valid title',
-              'sample.chapter2.content': 'Valid content',
-              'sample.appendix.title': 'Valid title',
-              'sample.appendix.content': 'Valid content',
             },
             headers: {}
           }
@@ -311,47 +275,33 @@ describe('SampleContentGenerator', () => {
       it('should generate chapters for English', async () => {
         const result = await generator.generateLocalizedChapters('en');
 
-        expectDemoChapters(result, 4);
+        expectDemoChapters(result, 1);
 
         // Verify first chapter structure
         expect(result[0]).toEqual({
-          id: 'prologue',
-          title: 'Welcome to Active EPUB',
+          id: 'chapter1',
+          title: 'Getting Started',
           content: expect.stringContaining(
-            'This document demonstrates the power of **Active EPUB** technology'
+            '# This is a Heading 1'
           ),
           linear: true,
           mediaType: 'application/xhtml+xml',
         });
 
-        // Verify appendix is non-linear
-        expect(result[3]).toEqual({
-          id: 'appendix',
-          title: 'Technical Reference',
-          content: expect.stringContaining('Active EPUBs follow this enhanced structure'),
-          linear: false,
-          mediaType: 'application/xhtml+xml',
-        });
       });
 
       it('should generate chapters for German', async () => {
         const result = await generator.generateLocalizedChapters('de');
 
-        expectDemoChapters(result, 4);
-        expect(result[0].title).toBe('Willkommen zu Active EPUB');
-        expect(result[1].title).toBe('Erste Schritte');
-        expect(result[2].title).toBe('Erweiterte Funktionen');
-        expect(result[3].title).toBe('Technische Referenz');
+        expectDemoChapters(result, 1);
+        expect(result[0].title).toBe('Erste Schritte');
       });
 
       it('should generate chapters for Arabic', async () => {
         const result = await generator.generateLocalizedChapters('ar');
 
-        expectDemoChapters(result, 4);
-        expect(result[0].title).toBe('مرحباً بكم في Active EPUB');
-        expect(result[1].title).toBe('البداية');
-        expect(result[2].title).toBe('الميزات المتقدمة');
-        expect(result[3].title).toBe('المرجع التقني');
+        expectDemoChapters(result, 1);
+        expect(result[0].title).toBe('البداية');
       });
 
       it('should set correct mediaType for all chapters', async () => {
@@ -365,7 +315,7 @@ describe('SampleContentGenerator', () => {
       it('should preserve chapter order', async () => {
         const result = await generator.generateLocalizedChapters('en');
 
-        const expectedOrder = ['prologue', 'chapter1', 'chapter2', 'appendix'];
+        const expectedOrder = ['chapter1'];
         const actualOrder = result.map((chapter: DemoChapter) => chapter.id);
 
         expect(actualOrder).toEqual(expectedOrder);
@@ -490,11 +440,7 @@ describe('SampleContentGenerator', () => {
               'sample.book.description': 'Test Description',
               'sample.author.name': 'Test Author',
               'sample.publisher.name': 'Test Publisher',
-              'sample.prologue.title': 'Test Prologue',
-              'sample.prologue.content': 'Test Content',
-              'sample.chapter1.title': 'Test Chapter 1',
-              'sample.chapter1.content': 'Test Content',
-              // Missing chapter2 and appendix keys
+              // Missing chapter1 keys
             },
             headers: {}
           }
@@ -508,10 +454,8 @@ describe('SampleContentGenerator', () => {
           'incomplete',
           false,
           [
-            'sample.chapter2.title',
-            'sample.chapter2.content',
-            'sample.appendix.title',
-            'sample.appendix.content',
+            'sample.chapter1.title',
+            'sample.chapter1.content',
           ],
           []
         );
@@ -527,14 +471,8 @@ describe('SampleContentGenerator', () => {
               'sample.book.description': 'Test Description',
               'sample.author.name': 'Test Author',
               'sample.publisher.name': 'Test Publisher',
-              'sample.prologue.title': 'Test Prologue',
-              'sample.prologue.content': '   ',  // Empty (whitespace only)
               'sample.chapter1.title': 'Test Chapter 1',
               'sample.chapter1.content': 'Test Content',
-              'sample.chapter2.title': 'Test Chapter 2',
-              'sample.chapter2.content': 'Test Content',
-              'sample.appendix.title': 'Test Appendix',
-              'sample.appendix.content': 'Test Content',
             },
             headers: {}
           }
@@ -548,7 +486,7 @@ describe('SampleContentGenerator', () => {
           'empty',
           false,
           [],
-          ['sample.book.title', 'sample.prologue.content']
+          ['sample.book.title']
         );
       });
 
@@ -562,11 +500,7 @@ describe('SampleContentGenerator', () => {
               'sample.book.description': 'Test Description',
               'sample.author.name': 'Test Author',
               'sample.publisher.name': 'Test Publisher',
-              'sample.prologue.title': 'Test Prologue',
-              'sample.prologue.content': 'Test Content',
-              'sample.chapter1.title': 'Test Chapter 1',
-              'sample.chapter1.content': 'Test Content',
-              // Missing chapter2 and appendix keys
+              // Missing chapter1 keys
             },
             headers: {}
           }
@@ -579,10 +513,8 @@ describe('SampleContentGenerator', () => {
         expect(result.missingKeys.length + result.emptyKeys.length).toBeGreaterThan(0);
         expect(result.emptyKeys).toContain('sample.book.title');
         expect(result.missingKeys).toEqual(expect.arrayContaining([
-          'sample.chapter2.title',
-          'sample.chapter2.content',
-          'sample.appendix.title',
-          'sample.appendix.content'
+          'sample.chapter1.title',
+          'sample.chapter1.content'
         ]));
       });
     });
@@ -627,7 +559,7 @@ describe('SampleContentGenerator', () => {
         // All should succeed for supported locales
         expect(content.locale).toBe(locale);
         expect(metadata.language).toBe(locale);
-        expect(chapters.length).toBe(4);
+        expect(chapters.length).toBe(1);
         expect(validation.isValid).toBe(true);
       }
     });
@@ -728,14 +660,8 @@ describe('SampleContentGenerator', () => {
             'sample.book.description': 'Valid description',
             'sample.author.name': 'Valid author',
             'sample.publisher.name': 'Valid publisher',
-            'sample.prologue.title': 'Valid title',
-            'sample.prologue.content': 'Valid content',
             'sample.chapter1.title': 'Valid title',
             'sample.chapter1.content': 'Valid content',
-            'sample.chapter2.title': 'Valid title',
-            'sample.chapter2.content': 'Valid content',
-            'sample.appendix.title': 'Valid title',
-            'sample.appendix.content': 'Valid content',
           },
           headers: {}
         }
