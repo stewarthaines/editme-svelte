@@ -211,6 +211,49 @@ export class ExtensionManager {
     }
   }
 
+  /**
+   * Gets the license text for an extension
+   *
+   * @param workspaceId - Target workspace identifier
+   * @param extensionName - Extension name
+   * @returns Promise resolving to license text, or empty string if no license exists
+   */
+  async getExtensionLicense(workspaceId: string, extensionName: string): Promise<string> {
+    try {
+      const licensePath = `SOURCE/extensions/${extensionName}/LICENSE.txt`;
+      const content = await this.fileStorage.readFile(workspaceId, licensePath);
+      
+      // Convert ArrayBuffer to text
+      const decoder = new TextDecoder();
+      return decoder.decode(content);
+    } catch {
+      // File doesn't exist, return empty string
+      return '';
+    }
+  }
+
+  /**
+   * Saves license text for an extension
+   *
+   * @param workspaceId - Target workspace identifier
+   * @param extensionName - Extension name
+   * @param licenseText - License text to save
+   * @returns Promise that resolves when license is saved
+   */
+  async saveExtensionLicense(workspaceId: string, extensionName: string, licenseText: string): Promise<void> {
+    // Check that extension exists
+    const existingExtensions = await this.listWorkspaceExtensions(workspaceId);
+    if (!existingExtensions.some(ext => ext.name === extensionName)) {
+      throw new Error(`Extension '${extensionName}' does not exist in workspace`);
+    }
+
+    const licensePath = `SOURCE/extensions/${extensionName}/LICENSE.txt`;
+    const encoder = new TextEncoder();
+    const content = encoder.encode(licenseText);
+    
+    await this.fileStorage.writeFile(workspaceId, licensePath, content.buffer as ArrayBuffer);
+  }
+
   // Cache Management Methods
 
   /**

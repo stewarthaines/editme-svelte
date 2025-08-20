@@ -7,6 +7,7 @@
 
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
   import type { TransformEngine } from '../../infrastructure/transform-engine.js';
+  import ExtensionItem from '../../components/extensions/ExtensionItem.svelte';
 
   interface Props {
     settingsService: SettingsService;
@@ -212,16 +213,15 @@
         {:else}
           <ul class="extensions-list">
             {#each extensions as extension}
-              <li class="extension-item">
-                <span class="extension-name">{extension.name}</span>
-                <button
-                  type="button"
-                  onclick={() => handleExtensionRemoval(extension.name)}
-                  disabled={extensionsLoading}
-                >
-                  Remove
-                </button>
-              </li>
+              {#if workspaceId}
+                <ExtensionItem
+                  {extension}
+                  workspaceId={workspaceId}
+                  {isAdvancedMode}
+                  {extensionManager}
+                  onRemove={() => handleExtensionRemoval(extension.name)}
+                />
+              {/if}
             {/each}
           </ul>
         {/if}
@@ -268,7 +268,7 @@
     margin: 0 auto;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .settings-content {
       grid-template-columns: 1fr;
     }
@@ -343,41 +343,6 @@
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-
-  .extension-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
-    background: var(--bg-primary, #fff);
-  }
-
-  .extension-name {
-    font-weight: 500;
-    color: var(--text-primary, #333);
-  }
-
-  .extension-item button {
-    background: var(--error-bg, #dc3545);
-    color: white;
-    border: none;
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-
-  .extension-item button:hover:not(:disabled) {
-    background: var(--error-hover, #c82333);
-  }
-
-  .extension-item button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   /* Loading state */
