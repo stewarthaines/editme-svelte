@@ -211,6 +211,7 @@ export class TransformPipeline {
           script.content,
           script.filename,
           currentDocument,
+          {},
           {
             timeoutMs: scripts.settings.transform_pipeline?.timeout_ms || 2000,
             globals: extensionLibraries,

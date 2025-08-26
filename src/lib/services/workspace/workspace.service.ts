@@ -459,8 +459,23 @@ export class WorkspaceService {
     updatedManifest[itemIndex] = {
       ...updatedManifest[itemIndex],
       ...updates,
-      id: itemId, // Preserve ID
     };
+
+    // Check if ID is being changed and update spine references
+    let updatedSpine = workspace.opf.spine;
+    if (updates.id && updates.id !== itemId) {
+      // Validate new ID doesn't already exist
+      if (workspace.opf.manifest.some((item, idx) => idx !== itemIndex && item.id === updates.id)) {
+        throw new ValidationError(`Manifest item with ID '${updates.id}' already exists`);
+      }
+
+      // Update all spine items that reference the old ID
+      updatedSpine = workspace.opf.spine.map(spineItem => 
+        spineItem.idref === itemId 
+          ? { ...spineItem, idref: updates.id! }
+          : spineItem
+      );
+    }
 
     // Create updated workspace
     let updatedWorkspace: WorkspaceState = {
@@ -468,6 +483,7 @@ export class WorkspaceService {
       opf: {
         ...workspace.opf,
         manifest: updatedManifest,
+        spine: updatedSpine,
         metadata: {
           ...workspace.opf.metadata,
           modifiedDate: generateEPUBTimestamp(),
@@ -864,6 +880,13 @@ export class WorkspaceService {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Rename a file in the workspace
+   */
+  async renameFile(workspaceId: string, oldPath: string, newPath: string): Promise<void> {
+    await this.fileStorage.renameFile(workspaceId, oldPath, newPath);
   }
 
   /**

@@ -274,4 +274,139 @@ export class SpineService {
 </body>
 </html>`;
   }
+
+  /**
+   * Delete a chapter with coordinated removal from manifest, spine, and files
+   */
+  async deleteChapter(workspace: WorkspaceState, chapterId: string): Promise<{ updatedWorkspace: WorkspaceState }> {
+    try {
+      // Find the chapter in the spine
+      const chapterIndex = workspace.opf.spine.findIndex(item => item.idref === chapterId);
+      if (chapterIndex === -1) {
+        throw new SpineServiceError('Chapter not found in spine', 'CHAPTER_NOT_FOUND', workspace.id);
+      }
+
+      // Find the manifest item
+      const manifestIndex = workspace.opf.manifest.findIndex(item => item.id === chapterId);
+      if (manifestIndex === -1) {
+        throw new SpineServiceError('Chapter not found in manifest', 'MANIFEST_ITEM_NOT_FOUND', workspace.id);
+      }
+
+      const manifestItem = workspace.opf.manifest[manifestIndex];
+
+      // Create updated workspace state
+      const updatedWorkspace: WorkspaceState = {
+        ...workspace,
+        opf: {
+          ...workspace.opf,
+          spine: workspace.opf.spine.filter(item => item.idref !== chapterId),
+          manifest: workspace.opf.manifest.filter(item => item.id !== chapterId)
+        }
+      };
+
+      // Save updated workspace (this will update the OPF automatically)
+      await this.workspaceService.saveWorkspace(updatedWorkspace);
+
+      // Delete associated files using the file storage API directly
+      try {
+        // Delete XHTML file
+        const xhtmlPath = manifestItem.href.startsWith(workspace.pathInfo.basePath) 
+          ? manifestItem.href 
+          : `${workspace.pathInfo.basePath}/${manifestItem.href}`;
+        const fileStorage = (this.workspaceService as any).fileStorage;
+        await fileStorage.deleteFile(updatedWorkspace.id, xhtmlPath);
+      } catch (error) {
+        console.warn('Failed to delete XHTML file:', error);
+      }
+
+      try {
+        // Delete source text file
+        const sourcePath = `SOURCE/text/${chapterId}.txt`;
+        const fileStorage = (this.workspaceService as any).fileStorage;
+        await fileStorage.deleteFile(updatedWorkspace.id, sourcePath);
+      } catch (error) {
+        console.warn('Failed to delete source file:', error);
+      }
+
+      return { updatedWorkspace };
+    } catch (error) {
+      if (error instanceof SpineServiceError) {
+        throw error;
+      }
+      throw new SpineServiceError(
+        `Failed to delete chapter: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'DELETE_ERROR',
+        workspace.id
+      );
+    }
+  }
+
+  /**
+   * Rename a chapter ID with coordinated updates across manifest, spine, and files
+   */
+  async renameChapterId(
+    workspace: WorkspaceState,
+    oldId: string,
+    newId: string
+  ): Promise<{ updatedWorkspace: WorkspaceState }> {
+    try {
+      // Validate new ID format (XML NCName)
+      if (!/^[a-zA-Z_][a-zA-Z0-9_.-]*$/.test(newId)) {
+        throw new SpineServiceError(
+          'Invalid ID format. ID must start with a letter or underscore and contain only letters, numbers, hyphens, periods, and underscores.',
+          'INVALID_ID_FORMAT',
+          workspace.id
+        );
+      }
+
+      // Check for duplicate
+      if (workspace.opf.manifest.some(item => item.id === newId)) {
+        throw new SpineServiceError(
+          `ID '${newId}' already exists`,
+          'DUPLICATE_ID',
+          workspace.id
+        );
+      }
+
+      // Get the manifest item
+      const manifestItem = workspace.opf.manifest.find(item => item.id === oldId);
+      if (!manifestItem) {
+        throw new SpineServiceError(
+          `Item with ID '${oldId}' not found`,
+          'ITEM_NOT_FOUND',
+          workspace.id
+        );
+      }
+
+      // Calculate new href (replace oldId with newId in the path)
+      const newHref = manifestItem.href.replace(oldId, newId);
+
+      // Update manifest item (ID and href) - this also updates spine references
+      let updatedWorkspace = await this.workspaceService.updateManifestItem(
+        workspace,
+        oldId,
+        { id: newId, href: newHref }
+      );
+
+      // Rename source text file if it exists
+      const oldSourcePath = `SOURCE/text/${oldId}.txt`;
+      const newSourcePath = `SOURCE/text/${newId}.txt`;
+
+      if (await this.workspaceService.fileExists(workspace.id, oldSourcePath)) {
+        await this.workspaceService.renameFile(
+          workspace.id,
+          oldSourcePath,
+          newSourcePath
+        );
+      }
+
+      return { updatedWorkspace };
+    } catch (error) {
+      throw new SpineServiceError(
+        `Failed to rename chapter ID: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'RENAME_ERROR',
+        workspace.id
+      );
+    }
+  }
 }

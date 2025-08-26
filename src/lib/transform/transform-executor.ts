@@ -9,6 +9,7 @@ import { TransformError } from './transform-error.js';
 
 export interface TransformContext {
   manifestItems?: Record<string, any>;
+  idref?: string;
 }
 
 export interface ExecutionOptions {
@@ -53,7 +54,7 @@ export class TransformExecutor {
         const result = this.executeFunctionInSandbox(
           scriptContent,
           'transformText',
-          [plainText, context],
+          [plainText, context.idref],
           sandboxedGlobals,
           scriptName
         );
@@ -74,6 +75,7 @@ export class TransformExecutor {
     scriptContent: string,
     scriptName: string,
     document: Document,
+    context: TransformContext,
     options: ExecutionOptions = {}
   ): Promise<Document> {
     const timeoutMs = options.timeoutMs || TransformExecutor.DEFAULT_TIMEOUT_MS;
@@ -100,7 +102,7 @@ export class TransformExecutor {
         const result = this.executeFunctionInSandbox(
           scriptContent,
           'transformDOM',
-          [clonedDoc],
+          [clonedDoc, context.idref],
           sandboxedGlobals,
           scriptName
         );

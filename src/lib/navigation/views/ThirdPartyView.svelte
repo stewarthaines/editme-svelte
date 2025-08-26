@@ -15,9 +15,10 @@
       name: 'paneforge',
       version: '^1.0.0',
       license: 'MIT',
-      url: 'https://github.com/huntabyte/paneforge',
+      url: 'https://github.com/svecosystem/paneforge',
       description: 'Headless pane management for Svelte',
-      copyright: 'Copyright (c) 2023 Huntabyte',
+      copyright:
+        'Copyright (c) 2024 Hunter Johnston <https://github.com/huntabyte> Copyright (c) 2023 Brian Vaughn <https://github.com/bvaughn>',
     },
     {
       name: 'ndesmic/zip',
@@ -80,7 +81,6 @@ SOFTWARE.`;
         <pre class="license-text">{MIT_LICENSE_TEXT}</pre>
       </div>
     </section>
-
   </div>
 </div>
 
@@ -121,7 +121,6 @@ SOFTWARE.`;
   .libraries-section {
     margin-bottom: var(--space-6);
   }
-
 
   .external-link {
     color: var(--color-text-link);

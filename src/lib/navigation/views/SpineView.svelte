@@ -499,7 +499,7 @@
         // First time creation - initialize workspace-scoped preview manager
         previewManager = createSpinePreviewManager(
           workspace.id,
-          selectedItemId,
+          selectedItem.idref,
           fileStorage,
           extensionManager,
           blobURLManager,
@@ -520,7 +520,7 @@
       } else {
 
         // Existing preview manager - switch spine context
-        await previewManager.switchToSpineItem(selectedItemId, selectedItem);
+        await previewManager.switchToSpineItem(selectedItem.idref, selectedItem);
       }
 
       // Update current content reference

@@ -189,7 +189,8 @@ export class SpinePreviewManager {
       // Step 2: Execute transform pipeline
       const transformResult = await this.transformPipeline.executeTransform(
         this.currentContent.text,
-        this.config.transformTimeout
+        this.config.transformTimeout,
+        this.spineItemId
       );
 
       if (!transformResult.success) {
@@ -429,9 +430,7 @@ export class SpinePreviewManager {
 ${stylesheetLinks}
 ${scriptTags}
 </head>
-<body>
 ${transformedContent}
-</body>
 </html>`;
   }
 

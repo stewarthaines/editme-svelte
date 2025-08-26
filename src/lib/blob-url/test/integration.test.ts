@@ -457,7 +457,7 @@ describe('Blob URL Manager Integration', () => {
       const epub3Assets = [
         'Text/chapter01.xhtml',
         'Text/chapter02.xhtml',
-        'Text/nav.xhtml',
+        'nav.xhtml',
         'Styles/stylesheet.css',
         'Images/cover.jpg',
         'Images/logo.png',

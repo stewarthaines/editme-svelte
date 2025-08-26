@@ -65,12 +65,12 @@ export class TransformEngine {
   /**
    * Execute transform on plain text
    */
-  async executeTransform(plainText: string, timeout = 3000): Promise<TransformResult> {
+  async executeTransform(plainText: string, timeout = 3000, idref?: string): Promise<TransformResult> {
     if (!this.iframe) {
       throw new Error('Transform engine not initialized');
     }
 
-    return await this.sendMessage('EXECUTE_TRANSFORM', { plainText, timeout });
+    return await this.sendMessage('EXECUTE_TRANSFORM', { plainText, timeout, idref });
   }
 
   /**

@@ -451,7 +451,7 @@ describe('WorkspaceService Contract Tests', () => {
       const workspace = await service.createWorkspace({ title: 'Test', language: 'en', identifier: 'test' });
       const workspaceWithNav = await service.addManifestItem(workspace, {
         id: 'nav',
-        href: 'Text/nav.xhtml',
+        href: 'nav.xhtml',
         mediaType: 'application/xhtml+xml',
         properties: ['nav']
       });
@@ -474,7 +474,7 @@ describe('WorkspaceService Contract Tests', () => {
       const workspace = await service.createWorkspace({ title: 'Test', language: 'en', identifier: 'test' });
       const workspaceWithNav = await service.addManifestItem(workspace, {
         id: 'nav',
-        href: 'Text/nav.xhtml',
+        href: 'nav.xhtml',
         mediaType: 'application/xhtml+xml',
         properties: ['nav']
       });

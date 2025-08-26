@@ -212,7 +212,7 @@ export class ContentService {
           ),
         },
         {
-          path: 'OEBPS/Text/nav.xhtml',
+          path: 'OEBPS/nav.xhtml',
           content: navContent,
         },
       ];
@@ -226,7 +226,7 @@ export class ContentService {
         },
         {
           id: 'nav',
-          href: 'Text/nav.xhtml',
+          href: 'nav.xhtml',
           mediaType: 'application/xhtml+xml',
           properties: ['nav'],
         },
@@ -292,16 +292,17 @@ ${chapterLinks}
   /**
    * Transform plain text content to XHTML using transform pipeline
    */
-  async transformContent(sourceText: string, context?: TransformContext): Promise<TransformResult> {
+  async transformContent(sourceText: string, context?: TransformContext, idref?: string): Promise<TransformResult> {
     const startTime = Date.now();
     const warnings: string[] = [];
 
     try {
+      const contextWithIdref = { ...context, idref };
       const xhtml = await this.transformExecutor.executeTextTransform(
         transformTextJS,
         'transformText.js',
         sourceText,
-        context || {},
+        contextWithIdref,
         { timeoutMs: 5000 }
       );
 

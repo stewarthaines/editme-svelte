@@ -9,7 +9,7 @@
 
 /**
  * Generate EPUB-compliant timestamp without decimal seconds
- * 
+ *
  * EPUB validation requires dcterms:modified format without decimal seconds
  * @returns ISO 8601 timestamp without milliseconds (e.g., "2023-12-07T14:30:45Z")
  */
@@ -238,21 +238,24 @@ export class OPFUtils {
     }
 
     // Extract optional fields with fallback for namespace parsing issues
-    let creatorElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'creator');
+    let creatorElements: HTMLCollectionOf<Element> | NodeListOf<Element> =
+      doc.getElementsByTagNameNS(DC_NS, 'creator');
     if (creatorElements.length === 0) {
       creatorElements = doc.querySelectorAll('dc\\:creator, creator');
     }
-    
-    let contributorElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'contributor');
+
+    let contributorElements: HTMLCollectionOf<Element> | NodeListOf<Element> =
+      doc.getElementsByTagNameNS(DC_NS, 'contributor');
     if (contributorElements.length === 0) {
       contributorElements = doc.querySelectorAll('dc\\:contributor, contributor');
     }
-    
-    let subjectElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(DC_NS, 'subject');
+
+    let subjectElements: HTMLCollectionOf<Element> | NodeListOf<Element> =
+      doc.getElementsByTagNameNS(DC_NS, 'subject');
     if (subjectElements.length === 0) {
       subjectElements = doc.querySelectorAll('dc\\:subject, subject');
     }
-    
+
     const publisherElements = doc.getElementsByTagNameNS(DC_NS, 'publisher');
     const dateElements = doc.getElementsByTagNameNS(DC_NS, 'date');
     const descriptionElements = doc.getElementsByTagNameNS(DC_NS, 'description');
@@ -262,16 +265,15 @@ export class OPFUtils {
     const coverageElements = doc.getElementsByTagNameNS(DC_NS, 'coverage');
     const typeElements = doc.getElementsByTagNameNS(DC_NS, 'type');
     const formatElements = doc.getElementsByTagNameNS(DC_NS, 'format');
-    
+
     // Parse dcterms:modified meta element (EPUB 3 specific)
     const modifiedElements = doc.querySelectorAll('meta[property="dcterms:modified"]');
-    
 
     // Convert NodeLists to arrays
     const creators = Array.from(creatorElements)
       .map(el => el.textContent?.trim())
       .filter(Boolean) as string[];
-    
+
     const contributors = Array.from(contributorElements)
       .map(el => el.textContent?.trim())
       .filter(Boolean) as string[];
@@ -297,7 +299,8 @@ export class OPFUtils {
       coverage: coverageElements.length > 0 ? coverageElements[0].textContent?.trim() : undefined,
       type: typeElements.length > 0 ? typeElements[0].textContent?.trim() : undefined,
       format: formatElements.length > 0 ? formatElements[0].textContent?.trim() : undefined,
-      modifiedDate: modifiedElements.length > 0 ? modifiedElements[0].textContent?.trim() : undefined,
+      modifiedDate:
+        modifiedElements.length > 0 ? modifiedElements[0].textContent?.trim() : undefined,
     };
   }
 
@@ -415,8 +418,8 @@ export class OPFUtils {
     const uniqueId = manifest.find(item => item.id === 'uuid')?.id || 'uuid';
 
     let xml = `<?xml version="1.0" encoding="utf-8"?>
-<package version="${version}" xmlns="http://www.idpf.org/2007/opf" unique-identifier="${uniqueId}">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+<package version="${version}" xmlns="http://www.idpf.org/2007/opf" unique-identifier="${uniqueId}" prefix="ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ibooks="http://vocabulary.itunes.apple.com/rdf/ibooks/vocabularies/2012/01/ibooks-specific">
     <dc:title>${escapeXML(metadata.title)}</dc:title>
     <dc:language>${escapeXML(metadata.language)}</dc:language>
     <dc:identifier id="${uniqueId}">${escapeXML(metadata.identifier)}</dc:identifier>`;
@@ -464,10 +467,12 @@ export class OPFUtils {
     if (metadata.format) {
       xml += `\n    <dc:format>${escapeXML(metadata.format)}</dc:format>`;
     }
-    
+
     if (metadata.modifiedDate) {
       xml += `\n    <meta property="dcterms:modified">${escapeXML(metadata.modifiedDate)}</meta>`;
     }
+
+    xml += '\n    <meta property="ibooks:specified-fonts">true</meta>';
 
     xml += `\n  </metadata>
   <manifest>`;
@@ -621,39 +626,39 @@ export const EPUB_DIRECTORY_MAP: DirectoryMapping = {
   // Text content
   'application/xhtml+xml': 'Text/',
   'text/html': 'Text/',
-  
-  // Stylesheets  
+
+  // Stylesheets
   'text/css': 'Styles/',
-  
+
   // Scripts
   'text/javascript': 'Scripts/',
   'application/javascript': 'Scripts/',
-  
+
   // Images
   'image/jpeg': 'Images/',
-  'image/png': 'Images/', 
+  'image/png': 'Images/',
   'image/gif': 'Images/',
   'image/svg+xml': 'Images/',
   'image/webp': 'Images/',
-  
+
   // Audio
   'audio/mpeg': 'Audio/',
   'audio/ogg': 'Audio/',
   'audio/wav': 'Audio/',
   'audio/mp4': 'Audio/',
-  
+
   // Video
   'video/mp4': 'Video/',
   'video/webm': 'Video/',
   'video/ogg': 'Video/',
-  
+
   // Fonts
   'font/ttf': 'Fonts/',
   'font/otf': 'Fonts/',
   'font/woff': 'Fonts/',
   'font/woff2': 'Fonts/',
   'application/font-woff': 'Fonts/',
-  
+
   // Documents
   'application/pdf': 'Misc/',
   'text/plain': 'Text/',
@@ -667,7 +672,7 @@ export const EPUB_DIRECTORY_MAP: DirectoryMapping = {
 export function getDirectoryFromMediaType(mediaType: string): string {
   // Normalize media type (remove charset, etc.)
   const normalizedType = mediaType.split(';')[0].trim().toLowerCase();
-  
+
   // Return mapped directory or default (root relative to OPF)
   return EPUB_DIRECTORY_MAP[normalizedType] || '';
 }
