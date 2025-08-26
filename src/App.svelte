@@ -16,7 +16,6 @@
   import OutlineView from './lib/components/outline/OutlineView.svelte';
   import ContentPreview from './lib/components/preview/ContentPreview.svelte';
   import PreviewPane from './lib/components/spine/PreviewPane.svelte';
-  import WorkspaceHeader from './lib/components/workspace/WorkspaceHeader.svelte';
   import { layoutStore } from './lib/stores/layout';
   import { t } from './lib/i18n';
   import { EnhancedAppState } from './lib/app-state-enhanced.svelte.js';
@@ -477,7 +476,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     <p>Initializing application...</p>
   </div>
 {:else}
-  <LayoutManager hasWorkspace={!!currentWorkspaceId}>
+  <LayoutManager hasWorkspace={!!currentWorkspaceId} currentWorkspace={currentWorkspaceState} {extensionManager}>
     <svelte:fragment slot="sidebar-spine">
       {#if !initialized}
         <div class="placeholder-content">
@@ -496,7 +495,6 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
           onWorkspaceUpdate={updatedWorkspace => {
             if (appState) appState.workspace = updatedWorkspace;
           }}
-          onPackageRequested={handlePackageRequest}
         />
       {:else}
         <div class="placeholder-content">
@@ -505,16 +503,17 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
       {/if}
     </svelte:fragment>
 
-    <svelte:fragment slot="left-header">
-      {#if currentWorkspaceState && 
-           currentView !== 'about' && 
-           currentView !== 'workspace' && 
-           currentView !== 'metadata' &&
-           extensionManager}
-        <WorkspaceHeader 
-          workspace={currentWorkspaceState}
-          {extensionManager}
-        />
+    <svelte:fragment slot="sidebar-footer">
+      {#if currentWorkspaceState}
+        <div class="package-epub-section">
+          <button
+            class="package-epub-button"
+            onclick={() => handlePackageRequest(currentWorkspaceState.id)}
+            title={$t('Package EPUB')}
+          >
+            {$t('Package EPUB')}
+          </button>
+        </div>
       {/if}
     </svelte:fragment>
 
@@ -750,5 +749,41 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     background: var(--color-bg-secondary);
     border-radius: 4px;
     font-size: 0.75rem !important;
+  }
+
+  /* Package EPUB button styling */
+  .package-epub-section {
+    padding: var(--space-3);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .package-epub-button {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-button-primary-bg);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-button-primary-bg);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    min-height: 36px;
+  }
+
+  .package-epub-button:hover:not(:disabled) {
+    background-color: var(--color-button-primary-bg-hover);
+    border-color: var(--color-button-primary-bg-hover);
+  }
+
+  .package-epub-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .package-epub-button:focus-visible {
+    outline: none;
+    border-color: var(--color-button-primary-bg);
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 </style>

@@ -4,41 +4,71 @@
   import ThemeToggle from './ThemeToggle.svelte';
 
   // Props
-  export let isExpanded = true;
-  export let activeSection: SidebarSection = 'workspace';
-  export let hasWorkspace = false;
+  interface Props {
+    isExpanded?: boolean;
+    activeSection?: SidebarSection;
+    hasWorkspace?: boolean;
+    currentWorkspace?: any;
+    extensionManager?: any;
+  }
+
+  let {
+    isExpanded = true,
+    activeSection = 'workspace',
+    hasWorkspace = false,
+    currentWorkspace = null,
+    extensionManager = null,
+  }: Props = $props();
+
+  // Extension state
+  let extensions = $state<any[]>([]);
+  let extensionsLoading = $state(false);
+
+  // Load extensions when workspace changes
+  $effect(() => {
+    if (currentWorkspace?.id && extensionManager) {
+      extensionsLoading = true;
+      extensionManager
+        .listWorkspaceExtensions(currentWorkspace.id)
+        .then((exts: any[]) => {
+          extensions = exts;
+          extensionsLoading = false;
+        })
+        .catch(() => {
+          extensions = [];
+          extensionsLoading = false;
+        });
+    } else {
+      extensions = [];
+      extensionsLoading = false;
+    }
+  });
 
   // Main navigation sections (clickable)
   const MAIN_SECTIONS: Array<{
-    id: Exclude<SidebarSection, 'spine' | 'settings'>;
+    id: Exclude<SidebarSection, 'spine'>;
     icon: string;
     label: string;
+    requiresWorkspace?: boolean;
   }> = [
     { id: 'about', icon: 'ℹ️', label: $t('About') },
     { id: 'workspace', icon: '🏠', label: $t('Projects') },
-    { id: 'metadata', icon: '📄', label: $t('Metadata') },
-    { id: 'manifest', icon: '📋', label: $t('Manifest') },
-    { id: 'navigation', icon: '📖', label: $t('Navigation') },
+    { id: 'settings', icon: '⚙️', label: $t('Settings') },
+    { id: 'metadata', icon: '📄', label: $t('Metadata'), requiresWorkspace: true },
+    { id: 'manifest', icon: '📋', label: $t('Manifest'), requiresWorkspace: true },
+    { id: 'navigation', icon: '📖', label: $t('Navigation'), requiresWorkspace: true },
   ] as const;
-
-  // Settings section (separate for footer)
-  const SETTINGS_SECTION = { id: 'settings' as const, icon: '⚙️', label: $t('Settings') };
 
   function toggleSidebar() {
     layoutStore.toggleSidebar();
   }
 
   function setSidebarSection(section: SidebarSection) {
-    // Only allow navigation if workspace exists or it's workspace/settings/about section
-    if (!hasWorkspace && section !== 'about' && section !== 'workspace' && section !== 'settings') {
-      return;
-    }
     layoutStore.setSidebarSection(section);
   }
 
-  function isSectionDisabled(sectionId: string): boolean {
-    // Disable content-related sections when no workspace exists
-    return !hasWorkspace && sectionId !== 'about' && sectionId !== 'workspace' && sectionId !== 'settings';
+  function shouldShowSection(section: { requiresWorkspace?: boolean }): boolean {
+    return !section.requiresWorkspace || hasWorkspace;
   }
 
   function handleAppendItem() {
@@ -80,12 +110,57 @@
 
   <div class="sidebar-main">
     <nav class="sidebar-nav" aria-label={$t('Main navigation')}>
-      {#each MAIN_SECTIONS as section}
+      <!-- Non-workspace sections first -->
+      {#each MAIN_SECTIONS.filter(section => !section.requiresWorkspace) as section}
+        {#if section.id === 'settings'}
+          <!-- Workspace title section before Settings -->
+          {#if hasWorkspace && currentWorkspace}
+            <div class="workspace-title-section">
+              {#if isExpanded}
+                <div class="workspace-title-header">
+                  <h3
+                    class="workspace-title"
+                    title={currentWorkspace.opf?.metadata?.title || 'Untitled Project'}
+                  >
+                    {currentWorkspace.opf?.metadata?.title || 'Untitled Project'}
+                  </h3>
+                  {#if extensions.length > 0 || extensionsLoading}
+                    <span class="workspace-extensions">
+                      {#if extensionsLoading}
+                        Loading...
+                      {:else}
+                        {extensions.map(ext => ext.name).join(', ')}
+                      {/if}
+                    </span>
+                  {/if}
+                </div>
+              {:else}
+                <div class="workspace-title-header compact">
+                  <div
+                    class="workspace-title-compact"
+                    title={currentWorkspace.opf?.metadata?.title || 'Untitled Project'}
+                  >
+                    {(currentWorkspace.opf?.metadata?.title || 'Untitled Project')
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                  {#if extensions.length > 0 && !extensionsLoading}
+                    <div
+                      class="extensions-indicator"
+                      title={extensions.map(ext => ext.name).join(', ')}
+                    >
+                      •{extensions.length}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+          {/if}
+        {/if}
+
         <button
           class="sidebar-section"
           class:active={activeSection === section.id}
-          class:disabled={isSectionDisabled(section.id)}
-          disabled={isSectionDisabled(section.id)}
           onclick={() => setSidebarSection(section.id)}
           aria-current={activeSection === section.id ? 'page' : undefined}
           title={$t(section.label)}
@@ -100,35 +175,54 @@
         </button>
       {/each}
 
-      <!-- Spine Items section header (non-clickable) -->
-      {#if isExpanded}
-        <div class="spine-section-header" class:disabled={!hasWorkspace}>
-          <span class="section-label">{$t('Spine Items')}</span>
+      <!-- Workspace-specific sections (only show if workspace exists) -->
+      {#each MAIN_SECTIONS.filter(section => section.requiresWorkspace) as section}
+        {#if shouldShowSection(section)}
           <button
-            class="append-button-nav"
-            class:disabled={!hasWorkspace}
-            disabled={!hasWorkspace}
-            onclick={handleAppendItem}
-            aria-label={$t('Append Item')}
-            title={$t('Append Item')}
+            class="sidebar-section"
+            class:active={activeSection === section.id}
+            onclick={() => setSidebarSection(section.id)}
+            aria-current={activeSection === section.id ? 'page' : undefined}
+            title={$t(section.label)}
           >
-            <span class="append-icon">+</span>
+            <span class="section-label">
+              {#if isExpanded}
+                {$t(section.label)}
+              {:else}
+                {generateCompactLabel($t(section.label))}
+              {/if}
+            </span>
           </button>
-        </div>
-      {:else}
-        <div class="spine-section-header compact" class:disabled={!hasWorkspace}>
-          <span class="section-label">{generateCompactLabel($t('Spine Items'))}</span>
-          <button
-            class="append-button-nav compact"
-            class:disabled={!hasWorkspace}
-            disabled={!hasWorkspace}
-            onclick={handleAppendItem}
-            aria-label={$t('Append Item')}
-            title={$t('Append Item')}
-          >
-            <span class="append-icon">+</span>
-          </button>
-        </div>
+        {/if}
+      {/each}
+
+      <!-- Chapters section header (non-clickable) -->
+      {#if hasWorkspace}
+        {#if isExpanded}
+          <div class="spine-section-header">
+            <span class="section-label">{$t('Chapters')}</span>
+            <button
+              class="append-button-nav"
+              onclick={handleAppendItem}
+              aria-label={$t('Append Item')}
+              title={$t('Append Item')}
+            >
+              <span class="append-icon">+</span>
+            </button>
+          </div>
+        {:else}
+          <div class="spine-section-header compact">
+            <span class="section-label">{generateCompactLabel($t('Chapters'))}</span>
+            <button
+              class="append-button-nav compact"
+              onclick={handleAppendItem}
+              aria-label={$t('Append Item')}
+              title={$t('Append Item')}
+            >
+              <span class="append-icon">+</span>
+            </button>
+          </div>
+        {/if}
       {/if}
     </nav>
 
@@ -149,21 +243,7 @@
   </div>
 
   <div class="sidebar-footer">
-    <button
-      class="sidebar-section"
-      class:active={activeSection === SETTINGS_SECTION.id}
-      onclick={() => setSidebarSection(SETTINGS_SECTION.id)}
-      aria-current={activeSection === SETTINGS_SECTION.id ? 'page' : undefined}
-      title={$t(SETTINGS_SECTION.label)}
-    >
-      <span class="section-label">
-        {#if isExpanded}
-          {$t(SETTINGS_SECTION.label)}
-        {:else}
-          {generateCompactLabel($t(SETTINGS_SECTION.label))}
-        {/if}
-      </span>
-    </button>
+    <slot name="sidebar-footer" />
   </div>
 </aside>
 
@@ -450,38 +530,93 @@
   }
 
   /* Disabled state styling */
-  .sidebar-section:disabled,
-  .sidebar-section.disabled {
+  .sidebar-section:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     color: var(--color-text-disabled, var(--color-text-tertiary));
   }
 
-  .sidebar-section:disabled:hover,
-  .sidebar-section.disabled:hover {
+  .sidebar-section:disabled:hover {
     text-decoration: none;
     background: transparent;
   }
 
-  .spine-section-header.disabled {
-    opacity: 0.5;
-  }
-
-  .spine-section-header.disabled .section-label {
-    color: var(--color-text-disabled, var(--color-text-tertiary));
-  }
-
-  .append-button-nav:disabled,
-  .append-button-nav.disabled {
+  .append-button-nav:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     background: var(--color-bg-primary);
     color: var(--color-text-disabled, var(--color-text-tertiary));
   }
 
-  .append-button-nav:disabled:hover,
-  .append-button-nav.disabled:hover {
+  .append-button-nav:disabled:hover {
     background: var(--color-bg-primary);
     color: var(--color-text-disabled, var(--color-text-tertiary));
+  }
+
+  /* Workspace title section */
+  .workspace-title-section {
+    border-top: 1px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
+    background: var(--color-bg-tertiary);
+    margin-block: var(--space-2);
+  }
+
+  .workspace-title-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+    padding-inline: var(--space-2);
+    min-block-size: var(--touch-target-min);
+    overflow: hidden;
+  }
+
+  .workspace-title-header.compact {
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-block: var(--space-2);
+  }
+
+  .workspace-title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .workspace-title-compact {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-text-primary);
+    text-align: center;
+  }
+
+  .separator {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+    font-weight: bold;
+  }
+
+  .workspace-extensions {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .extensions-indicator {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-block-start: var(--space-1);
   }
 </style>

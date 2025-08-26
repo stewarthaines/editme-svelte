@@ -6,6 +6,8 @@
 
   // Props
   export let hasWorkspace: boolean = false;
+  export let currentWorkspace: any = null;
+  export let extensionManager: any = null;
 
   // Subscribe to layout store
   $: ({ sidebar } = $layoutStore);
@@ -18,7 +20,7 @@
 </script>
 
 <div class="app-layout" style="grid-template-columns: {sidebarWidth} 1fr">
-  <Sidebar isExpanded={sidebar.isExpanded} activeSection={sidebar.activeSection} {hasWorkspace}>
+  <Sidebar isExpanded={sidebar.isExpanded} activeSection={sidebar.activeSection} {hasWorkspace} {currentWorkspace} {extensionManager}>
     <svelte:fragment slot="sidebar-workspace">
       <slot name="sidebar-workspace" />
     </svelte:fragment>
@@ -42,44 +44,33 @@
     <svelte:fragment slot="sidebar-settings">
       <slot name="sidebar-settings" />
     </svelte:fragment>
+
+    <svelte:fragment slot="sidebar-footer">
+      <slot name="sidebar-footer" />
+    </svelte:fragment>
   </Sidebar>
 
   <div class="main-content">
     {#if showPreviewPane}
       <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
         <Pane defaultSize={50} minSize={25}>
-          <div class="pane-container">
-            <div class="pane-header">
-              <slot name="left-header" />
-            </div>
-            <div class="pane-content">
-              <slot name="left-content" />
-            </div>
+          <div class="pane-content">
+            <slot name="left-content" />
           </div>
         </Pane>
 
         <PaneResizer />
 
         <Pane defaultSize={50} minSize={20}>
-          <div class="pane-container">
-            <div class="pane-header">
-              <slot name="right-header" />
-            </div>
-            <div class="pane-content">
-              <slot name="right-content" />
-            </div>
+          <div class="pane-content">
+            <slot name="right-content" />
           </div>
         </Pane>
       </PaneGroup>
     {:else}
       <!-- Single pane mode for workspace and settings views -->
       <div class="single-pane-container">
-        <div class="pane-header">
-          <slot name="left-header" />
-        </div>
-        <div class="pane-content">
-          <slot name="left-content" />
-        </div>
+        <slot name="left-content" />
       </div>
     {/if}
   </div>
@@ -99,33 +90,17 @@
     overflow: hidden;
   }
 
-  .pane-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .pane-header {
-    flex-shrink: 0;
-    border-block-end: 1px solid var(--color-border-default); /* Using logical properties and design tokens */
-    background: var(--color-bg-secondary);
-    min-block-size: 40px; /* Using logical properties */
-    display: flex;
-    align-items: center;
-    padding-inline: var(--space-4); /* Using logical properties and spacing tokens */
-    padding-block: 0;
-  }
-
   .pane-content {
     flex: 1;
     overflow: auto;
     background: var(--color-bg-primary); /* Using design tokens */
+    height: 100%;
   }
 
   .single-pane-container {
-    display: flex;
-    flex-direction: column;
     height: 100%;
+    overflow: auto;
+    background: var(--color-bg-primary);
   }
 
   /* PaneForge resizer styling - using logical properties */
@@ -152,8 +127,8 @@
 
   /* High contrast mode support */
   @media (prefers-contrast: high) {
-    .pane-header {
-      border-block-end: 2px solid var(--color-forced-border);
+    .main-content {
+      border-inline-start: 2px solid var(--color-forced-border);
     }
   }
 </style>
