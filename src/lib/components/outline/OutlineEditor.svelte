@@ -5,7 +5,8 @@
 
   // Props interface matching API specification
   export let editorStore: TextEditorStore;
-  export let placeholder: string = 'Navigation content will be auto-generated from your chapters...';
+  export let placeholder: string =
+    'Navigation content will be auto-generated from your chapters...';
 
   // Event dispatcher with typed events
   const dispatch = createEventDispatcher<{
@@ -24,19 +25,19 @@
 
   function handleTextareaInput(event: Event) {
     const target = event.target as HTMLTextAreaElement;
-    
+
     // Clear existing timer
     clearTimeout(debounceTimer);
-    
+
     // Debounce content updates (300ms per API specification)
     debounceTimer = setTimeout(() => {
       editorStore.updateContent(target.value);
-      
+
       // Emit lightweight event without content duplication
       dispatch('contentChanged', {
         editorId: 'outline-nav',
         timestamp: Date.now(),
-        isEmpty: target.value.trim() === ''
+        isEmpty: target.value.trim() === '',
       });
     }, 300);
   }
@@ -59,10 +60,10 @@
     spellcheck="false"
     aria-multiline="true"
   ></textarea>
-  
+
   <!-- Hidden help text for screen readers -->
   <div id="editor-help" class="sr-only">
-    Enter navigation content in plain text. Leave empty to auto-generate from chapter titles.
-    Press Ctrl+Enter (Cmd+Enter on Mac) to save navigation content.
+    Enter navigation content in plain text. Leave empty to auto-generate from chapter titles. Press
+    Ctrl+Enter (Cmd+Enter on Mac) to save navigation content.
   </div>
 </div>

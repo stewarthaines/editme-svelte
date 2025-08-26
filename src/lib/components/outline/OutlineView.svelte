@@ -185,8 +185,31 @@
       const navXHTMLPath = 'OEBPS/nav.xhtml';
       await workspaceService.writeFile(workspace.id, navXHTMLPath, navigationDoc.xhtmlContent);
       
-      // TODO: Update OPF manifest with navigation metadata
-      // This would require OPF manager integration
+      // Update OPF manifest with navigation metadata
+      const navItem = workspace.opf.manifest.find(item => 
+        item.id === 'nav' || item.properties?.includes('nav')
+      );
+      
+      if (!navItem) {
+        // Add nav to manifest
+        workspace = await workspaceService.addManifestItem(workspace, {
+          id: 'nav',
+          href: 'nav.xhtml',
+          mediaType: 'application/xhtml+xml',
+          properties: ['nav']
+        });
+      } else if (navItem.href !== 'nav.xhtml') {
+        // Update existing nav item to correct location
+        workspace = await workspaceService.updateManifestItem(
+          workspace,
+          navItem.id,
+          {
+            href: 'nav.xhtml',
+            mediaType: 'application/xhtml+xml',
+            properties: ['nav']
+          }
+        );
+      }
       
     } catch (error) {
       console.error('Failed to save navigation content:', error);
@@ -266,6 +289,9 @@
       
       // Load navigation content (triggers auto-generation if no nav.txt exists)
       await loadNavigationContent();
+      
+      // Save navigation content to ensure nav.xhtml is up-to-date
+      await saveNavigationContent();
     } catch (error) {
       console.error('Failed to initialize OutlineView:', error);
       dispatch('error', {

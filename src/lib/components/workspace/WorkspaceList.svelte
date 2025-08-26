@@ -100,17 +100,16 @@
       </div>
     {:else if workspaces.length === 0}
       <div class="empty-state">
-        <div class="empty-icon" aria-hidden="true">📚</div>
-        <h4 class="empty-title">{$t('No projects yet')}</h4>
-        <p class="empty-description">
-          {$t('Get started by creating your first EPUB')}
-        </p>
         <div class="empty-tips">
           <h5 class="tips-title">{$t('Quick Start Tips:')}</h5>
           <ul class="tips-list">
-            <li>{$t('Create New: Start with a template or blank project')}</li>
-            <li>{$t('Import EPUB: Convert existing .epub files to edit')}</li>
-            <li>{$t('All your work is saved automatically')}</li>
+            <li>{$t('Create New: Start with a minimal project')}</li>
+            <li>{$t('Load EPUB: Load .epub file from the filesystem')}</li>
+            <li>
+              {@html $t('Download: Start with a sample from {link}', {
+                link: `<a target="_blank" href="https://stewarthaines.com/epub">${$t('SEED.html home page')}</a>`,
+              })}
+            </li>
           </ul>
         </div>
       </div>
@@ -165,7 +164,6 @@
     flex-direction: column;
     gap: var(--space-3);
   }
-
 
   .search-container {
     display: flex;

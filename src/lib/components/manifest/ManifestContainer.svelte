@@ -175,11 +175,12 @@
         const browserType = file.type;
         const filenameType = ManifestUtils.detectMediaType(file.name);
         
-        // For font files, always use filename detection (browsers are unreliable)
+        // For font files and JavaScript files, always use filename detection (browsers are unreliable)
         // For other files, prefer browser detection unless it's generic
         const isGeneric = !browserType || browserType === 'application/octet-stream';
         const isFontFile = filenameType.startsWith('font/');
-        const reliableMediaType = (isGeneric || isFontFile) ? filenameType : browserType;
+        const isJavaScriptFile = filenameType === 'application/javascript' || filenameType === 'text/javascript';
+        const reliableMediaType = (isGeneric || isFontFile || isJavaScriptFile) ? filenameType : browserType;
         
         const manifestItem = {
           href: generateEPUBPath(file.name, reliableMediaType),

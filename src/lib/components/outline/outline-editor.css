@@ -63,12 +63,12 @@
 }
 
 /* Dark theme adjustments */
-[data-theme="dark"] .outline-editor__textarea {
+[data-theme='dark'] .outline-editor__textarea {
   background-color: var(--color-surface-elevated);
   border-color: var(--color-border-subtle);
 }
 
-[data-theme="dark"] .outline-editor__textarea:focus {
+[data-theme='dark'] .outline-editor__textarea:focus {
   border-color: var(--color-border-focus);
 }
 

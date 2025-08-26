@@ -50,7 +50,7 @@
       <span class="button-icon" aria-hidden="true">📁</span>
       <div class="button-content">
         <span class="button-title">{$t('Load EPUB')}</span>
-        <span class="button-subtitle">{$t('Import file')}</span>
+        <span class="button-subtitle">{$t('Edit existing file')}</span>
       </div>
     </button>
     <!--

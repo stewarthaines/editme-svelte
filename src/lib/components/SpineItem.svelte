@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { SpineItemWithSource } from '../spine/types';
+  import { t } from '$lib/i18n';
 
   // Props
   export let item: SpineItemWithSource;
@@ -15,6 +16,8 @@
   export let onSelect: () => void;
   export let onMoveUp: () => Promise<void>;
   export let onMoveDown: () => Promise<void>;
+  export let onRenameId: () => Promise<void>;
+  export let onDelete: () => Promise<void>;
 
   function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -119,11 +122,39 @@
   <span class="chapter-id">{displayLabel}</span>
 
   {#if showMoveButtons}
-    <div class="move-buttons" aria-label="Reorder controls">
+    <div class="move-buttons" aria-label="Item controls">
       <button
         class="move-button"
-        onclick={(e) => { e.stopPropagation(); onMoveUp(); }}
-        onkeydown={(e) => { e.stopPropagation(); handleMoveUpKeyboard(e); }}
+        onclick={e => {
+          e.stopPropagation();
+          onRenameId();
+        }}
+        aria-label={$t('Rename {item}', { item: item.id })}
+        title={$t('Rename {item}', { item: item.id })}
+      >
+        ✎
+      </button>
+      <button
+        class="move-button delete-button"
+        onclick={e => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        aria-label={$t('Delete chapter {name}', { name: item.id })}
+        title={$t('Delete chapter {name}', { name: item.id })}
+      >
+        ✕
+      </button>
+      <button
+        class="move-button"
+        onclick={e => {
+          e.stopPropagation();
+          onMoveUp();
+        }}
+        onkeydown={e => {
+          e.stopPropagation();
+          handleMoveUpKeyboard(e);
+        }}
         disabled={isFirstItem}
         aria-label={`Move ${item.id} up`}
         title={`Move ${item.id} up`}
@@ -132,8 +163,14 @@
       </button>
       <button
         class="move-button"
-        onclick={(e) => { e.stopPropagation(); onMoveDown(); }}
-        onkeydown={(e) => { e.stopPropagation(); handleMoveDownKeyboard(e); }}
+        onclick={e => {
+          e.stopPropagation();
+          onMoveDown();
+        }}
+        onkeydown={e => {
+          e.stopPropagation();
+          handleMoveDownKeyboard(e);
+        }}
         disabled={isLastItem}
         aria-label={`Move ${item.id} down`}
         title={`Move ${item.id} down`}
@@ -272,6 +309,11 @@
     opacity: 0.5;
     cursor: not-allowed;
     color: var(--color-text-tertiary);
+  }
+
+  .delete-button:hover:not(:disabled) {
+    background: var(--color-danger);
+    color: var(--color-bg-primary);
   }
 
   /* High contrast mode */

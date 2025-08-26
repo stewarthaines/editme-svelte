@@ -102,13 +102,13 @@
       // Determine reliable media type once
       const browserType = selectedFile.type;
       const filenameType = ManifestUtils.detectMediaType(selectedFile.name);
-      
+
       // For font files, always use filename detection (browsers are unreliable)
       // For other files, prefer browser detection unless it's generic
       const isGeneric = !browserType || browserType === 'application/octet-stream';
       const isFontFile = filenameType.startsWith('font/');
-      const reliableMediaType = (isGeneric || isFontFile) ? filenameType : browserType;
-      
+      const reliableMediaType = isGeneric || isFontFile ? filenameType : browserType;
+
       if (!formData.href) {
         formData.href = generateEPUBPath(selectedFile.name, reliableMediaType);
       }
@@ -117,7 +117,6 @@
       }
     }
   };
-
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
@@ -308,17 +307,17 @@
           <fieldset class="checkbox-fieldset">
             <legend class="form-label">{$t('EPUB Properties')}</legend>
             <div class="checkbox-group">
-            {#each epubProperties as property}
-              <label class="checkbox-label">
-                <input
-                  type="checkbox"
-                  class="checkbox-input"
-                  checked={formData.properties?.includes(property.value) || false}
-                  on:change={e => handlePropertyChange(property.value, e.currentTarget.checked)}
-                />
-                {property.label}
-              </label>
-            {/each}
+              {#each epubProperties as property}
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    class="checkbox-input"
+                    checked={formData.properties?.includes(property.value) || false}
+                    on:change={e => handlePropertyChange(property.value, e.currentTarget.checked)}
+                  />
+                  {property.label}
+                </label>
+              {/each}
             </div>
           </fieldset>
         </div>
@@ -333,7 +332,7 @@
               class="form-textarea"
               bind:value={textContent}
               placeholder={$t('Enter the initial content for this text file…')}
-              rows="10"
+              rows="3"
             ></textarea>
             <p class="field-help">
               {$t('You can edit the content later in the main editor')}

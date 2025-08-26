@@ -259,6 +259,83 @@
       isPackaging = false;
     }
   }
+
+  // Handle delete item request
+  async function handleDeleteItem(itemId: string) {
+    if (!workspace) return;
+
+    const confirmed = window.confirm(
+      $t('Are you sure you want to delete chapter \'{name}\'? This will permanently delete the chapter and its source file.', { name: itemId })
+    );
+
+    if (!confirmed) return;
+
+    try {
+      isLoading = true;
+      const result = await spineService.deleteChapter(workspace, itemId);
+
+      // Update workspace state
+      workspace = result.updatedWorkspace;
+      if (onWorkspaceUpdate) {
+        onWorkspaceUpdate(workspace);
+      }
+
+      // If deleted item was selected, clear selection by dispatching event
+      if (selectedItemId === itemId) {
+        const event = new CustomEvent('select-spine-item', {
+          detail: { itemId: null },
+          bubbles: true,
+        });
+        window.dispatchEvent(event);
+      }
+
+      // Reload spine items with updated workspace
+      spineItems = await spineService.loadSpineItems(workspace);
+    } catch (error) {
+      console.error('Failed to delete chapter:', error);
+      // Could add error notification here
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  // Handle rename ID request
+  async function handleRenameId(itemId: string) {
+    if (!workspace) return;
+
+    const newId = window.prompt(
+      $t('Enter new ID for {item}:', { item: itemId }),
+      itemId
+    );
+
+    if (!newId || newId === itemId) return;
+
+    try {
+      isLoading = true;
+      const result = await spineService.renameChapterId(workspace, itemId, newId);
+
+      // Update workspace state
+      workspace = result.updatedWorkspace;
+      if (onWorkspaceUpdate) {
+        onWorkspaceUpdate(workspace);
+      }
+
+      // Reload spine items with updated workspace
+      await loadSpineItems();
+
+      // Update selection to new ID
+      handleSelectItem(newId);
+    } catch (err) {
+      console.error('Failed to rename chapter ID:', err);
+      alert(
+        $t('Failed to rename chapter ID: {error}', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+        })
+      );
+    } finally {
+      isLoading = false;
+    }
+  }
 </script>
 
 <div class="spine-sidebar">
@@ -295,6 +372,8 @@
             onSelect={() => handleSelectItem(item.id)}
             onMoveUp={async () => await handleMoveUp(index)}
             onMoveDown={async () => await handleMoveDown(index)}
+            onRenameId={async () => await handleRenameId(item.id)}
+            onDelete={async () => await handleDeleteItem(item.id)}
             dragHandleProps={{
               draggable: true,
               'data-drag-handle': true,
