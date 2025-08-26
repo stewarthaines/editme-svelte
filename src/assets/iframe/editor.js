@@ -249,7 +249,7 @@ class TransformExecutionEngine {
    * Execute the complete transform pipeline
    */
   async executeTransform(request, messageId) {
-    const { plainText, timeout = 3000 } = request;
+    const { plainText, timeout = 3000, idref } = request;
     const startTime = performance.now();
 
     try {
@@ -267,7 +267,7 @@ class TransformExecutionEngine {
       // Step 1: Execute text transform
       let html = plainText;
       if (this.textTransformScript.trim()) {
-        html = await this.executeTextTransformWithTimeout(plainText, timeout);
+        html = await this.executeTextTransformWithTimeout(plainText, timeout, idref);
 
         if (this.debugMode) {
           this.debugLog('Text transform completed', {
@@ -279,7 +279,7 @@ class TransformExecutionEngine {
 
       // Step 2: Execute DOM transforms in sequence
       if (this.domTransformScripts.length > 0) {
-        html = await this.executeDOMTransformsWithTimeout(html, timeout);
+        html = await this.executeDOMTransformsWithTimeout(html, timeout, idref);
 
         if (this.debugMode) {
           this.debugLog('DOM transforms completed', {
@@ -324,8 +324,9 @@ class TransformExecutionEngine {
    * Execute text transform with timeout protection
    * @param {any} plainText
    * @param {any} timeout
+   * @param {any} idref
    */
-  executeTextTransformWithTimeout(plainText, timeout) {
+  executeTextTransformWithTimeout(plainText, timeout, idref) {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         const error = new Error(`Text transform execution timed out after ${timeout}ms`);
@@ -334,7 +335,7 @@ class TransformExecutionEngine {
       }, timeout);
 
       try {
-        const result = this.executeTextTransformSync(plainText);
+        const result = this.executeTextTransformSync(plainText, idref);
         clearTimeout(timeoutId);
         resolve(result);
       } catch (error) {
@@ -348,8 +349,9 @@ class TransformExecutionEngine {
   /**
    * Execute text transform synchronously
    * @param {any} plainText
+   * @param {any} idref
    */
-  executeTextTransformSync(plainText) {
+  executeTextTransformSync(plainText, idref) {
     // Create sandboxed execution environment
     const globals = this.createSafeExecutionEnvironment();
     const globalNames = Object.keys(globals);
@@ -370,8 +372,8 @@ class TransformExecutionEngine {
     const scriptFunction = new Function('return ' + wrappedScript)();
     const transformFunction = scriptFunction(...globalValues);
 
-    // Execute transform with input text
-    const result = transformFunction(plainText);
+    // Execute transform with input text and idref
+    const result = transformFunction(plainText, idref);
 
     // Ensure result is a string
     return typeof result === 'string' ? result : String(result);
@@ -381,8 +383,9 @@ class TransformExecutionEngine {
    * Execute DOM transforms with timeout protection
    * @param {any} html
    * @param {any} timeout
+   * @param {any} idref
    */
-  executeDOMTransformsWithTimeout(html, timeout) {
+  executeDOMTransformsWithTimeout(html, timeout, idref) {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         const error = new Error(`DOM transform execution timed out after ${timeout}ms`);
@@ -391,7 +394,7 @@ class TransformExecutionEngine {
       }, timeout);
 
       try {
-        const result = this.executeDOMTransformsSync(html);
+        const result = this.executeDOMTransformsSync(html, idref);
         clearTimeout(timeoutId);
         resolve(result);
       } catch (error) {
@@ -405,8 +408,9 @@ class TransformExecutionEngine {
   /**
    * Execute DOM transforms synchronously with direct live DOM when layout is needed
    * @param {any} html
+   * @param {any} idref
    */
-  executeDOMTransformsSync(html) {
+  executeDOMTransformsSync(html, idref) {
     // Check if any transform scripts need layout calculations
     const needsLayout = this.checkIfLayoutNeeded();
 
@@ -421,10 +425,10 @@ class TransformExecutionEngine {
 
     if (needsLayout) {
       // Use live DOM approach for layout-dependent transforms
-      return this.executeDOMTransformsWithLiveDOM(html);
+      return this.executeDOMTransformsWithLiveDOM(html, idref);
     } else {
       // Use standard parsed document approach for simple transforms
-      return this.executeDOMTransformsWithParsedDOM(html);
+      return this.executeDOMTransformsWithParsedDOM(html, idref);
     }
   }
 
@@ -439,7 +443,7 @@ class TransformExecutionEngine {
   /**
    * Execute DOM transforms using live DOM for layout calculations
    */
-  executeDOMTransformsWithLiveDOM(html) {
+  executeDOMTransformsWithLiveDOM(html, idref) {
     const tempContainer = this.createLiveDOMContainer();
 
     try {
@@ -468,15 +472,26 @@ class TransformExecutionEngine {
         try {
           // Pass the live container as a document-like object
           const mockDocument = this.createMockDocument(tempContainer);
-          this.executeSingleDOMTransform(mockDocument, this.domTransformScripts[i], i);
+          this.executeSingleDOMTransform(mockDocument, this.domTransformScripts[i], i, idref);
         } catch (error) {
           if (error instanceof Error) error.stage = `dom-transform-${i}`;
           throw error;
         }
       }
 
-      // Return the transformed HTML from live DOM
-      return tempContainer.innerHTML;
+      // Return the transformed HTML from live DOM (including body element and attributes)
+      // Create a body element with the container's attributes and content
+      const serializer = new XMLSerializer();
+      const bodyElement = document.createElement('body');
+      
+      // Copy all attributes from container to body
+      for (let i = 0; i < tempContainer.attributes.length; i++) {
+        const attr = tempContainer.attributes[i];
+        bodyElement.setAttribute(attr.name, attr.value);
+      }
+      bodyElement.innerHTML = tempContainer.innerHTML;
+      
+      return serializer.serializeToString(bodyElement);
     } finally {
       this.cleanupTempAttachment(tempContainer);
     }
@@ -485,7 +500,7 @@ class TransformExecutionEngine {
   /**
    * Execute DOM transforms using parsed DOM (traditional approach)
    */
-  executeDOMTransformsWithParsedDOM(html) {
+  executeDOMTransformsWithParsedDOM(html, idref) {
     // Parse HTML to DOM document
     const parser = new DOMParser();
     let document = parser.parseFromString(
@@ -496,17 +511,17 @@ class TransformExecutionEngine {
     // Execute each DOM transform in sequence
     for (let i = 0; i < this.domTransformScripts.length; i++) {
       try {
-        document = this.executeSingleDOMTransform(document, this.domTransformScripts[i], i);
+        document = this.executeSingleDOMTransform(document, this.domTransformScripts[i], i, idref);
       } catch (error) {
         if (error instanceof Error) error.stage = `dom-transform-${i}`;
         throw error;
       }
     }
 
-    // Return transformed HTML content with XHTML compliance
+    // Return transformed HTML content with XHTML compliance (including body element and attributes)
     const serializer = new XMLSerializer();
     const fullBodySerialization = serializer.serializeToString(document.body);
-    return fullBodySerialization.replace(/^<body[^>]*>|<\/body>$/g, '');
+    return fullBodySerialization;
   }
 
   /**
@@ -603,8 +618,9 @@ class TransformExecutionEngine {
    * @param {any} document
    * @param {any} script
    * @param {any} index
+   * @param {any} idref
    */
-  executeSingleDOMTransform(document, script, index) {
+  executeSingleDOMTransform(document, script, index, idref) {
     // Create sandboxed execution environment
     const globals = this.createSafeExecutionEnvironment();
     const globalNames = Object.keys(globals);
@@ -625,8 +641,8 @@ class TransformExecutionEngine {
     const scriptFunction = new Function('return ' + wrappedScript)();
     const transformFunction = scriptFunction(...globalValues);
 
-    // Execute transform with document
-    const result = transformFunction(document);
+    // Execute transform with document and idref
+    const result = transformFunction(document, idref);
 
     // Ensure result is a Document, return original if not
     return result instanceof Document ? result : document;

@@ -31,7 +31,6 @@ body {
     'Noto Sans',
     'Liberation Sans',
     sans-serif;
-  font-display: swap; /* Better loading performance */
 
   /* Enhanced typography for reading contexts */
   font-size: 1.125rem; /* Slightly larger base for better readability */

@@ -1,9 +1,9 @@
 /**
  * Transform DOM by adding IDs to H2 headings for navigation
  * @param {Document} htmlDocument - HTML document to transform
- * @returns {Document} Transformed document with H2 IDs
+ * @param {string|undefined} idref - Spine item idref for context-aware transforms
  */
-function transformDOM(htmlDocument) {
+function transformDOM(htmlDocument, idref) {
   try {
     // Find all H2 elements in the document
     const h2Elements = htmlDocument.querySelectorAll('h2');
@@ -40,10 +40,7 @@ function transformDOM(htmlDocument) {
       // Set the ID attribute
       h2.setAttribute('id', finalId);
     });
-
-    return htmlDocument;
   } catch (error) {
     console.error('DOM transform error:', error);
-    return htmlDocument;
   }
 }

@@ -1,11 +1,12 @@
 /**
- * Convert simple markdown to well-formed XHTML
- * @param {string} markdown - Markdown text
+ * Convert simple text to well-formed XHTML
+ * @param {string} text - plain text
+ * @param {string|undefined} idref - Spine item idref for context-aware transforms
  * @returns {string} Valid XHTML output
  */
-function transformText(markdown) {
+function transformText(text, idref) {
   // Split content into blocks (separated by double newlines)
-  const blocks = markdown.split(/\n\s*\n/).filter(block => block.trim());
+  const blocks = text.split(/\n\s*\n/).filter(block => block.trim());
   const htmlBlocks = [];
 
   for (const block of blocks) {
