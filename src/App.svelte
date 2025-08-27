@@ -664,8 +664,8 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
       {:else if currentView === 'metadata' && initialized && currentWorkspaceState}
         <OPFPreview
           workspace={currentWorkspaceState}
-          {workspaceService}
           focusedField={focusedMetadataField}
+          isAdvancedMode={appState?.isAdvancedMode ?? false}
         />
       {:else if currentView === 'manifest' && initialized && currentWorkspaceState}
         <ManifestPreview

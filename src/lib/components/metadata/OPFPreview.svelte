@@ -2,15 +2,17 @@
   import { t } from '../../i18n';
   import { xmlHighlighter } from '../../utils/xml-highlighter.js';
   import { OPFUtils } from '../../epub/opf-utils.js';
+  import SimpleMetadataView from './SimpleMetadataView.svelte';
   import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
   import type { EPUBMetadata } from '../../epub/opf-utils.js';
 
   interface Props {
     workspace: WorkspaceState;
     focusedField?: keyof EPUBMetadata | null;
+    isAdvancedMode?: boolean;
   }
 
-  let { workspace, focusedField = null }: Props = $props();
+  let { workspace, focusedField = null, isAdvancedMode = false }: Props = $props();
 
   let highlightedContent = $state<string>('');
   let error = $state<string | null>(null);
@@ -55,31 +57,35 @@
   };
 </script>
 
-<div class="opf-preview">
-  <div class="preview-header">
-    <span class="content-type-icon">📄</span>
-    <span class="file-name">content.opf</span>
-  </div>
+{#if isAdvancedMode}
+  <div class="opf-preview">
+    <div class="preview-header">
+      <span class="content-type-icon">📄</span>
+      <span class="file-name">content.opf</span>
+    </div>
 
-  {#if error}
-    <div class="error-state">
-      <p class="error-message">{error}</p>
-      <button type="button" class="retry-button" onclick={updateHighlighting}>
-        {$t('Retry')}
-      </button>
-    </div>
-  {:else if highlightedContent}
-    <div class="preview-body">
-      <div class="text-preview">
-        <pre class="text-content highlighted-xml" dir="ltr">{@html highlightedContent}</pre>
+    {#if error}
+      <div class="error-state">
+        <p class="error-message">{error}</p>
+        <button type="button" class="retry-button" onclick={updateHighlighting}>
+          {$t('Retry')}
+        </button>
       </div>
-    </div>
-  {:else}
-    <div class="no-content">
-      <p>{$t('No content available')}</p>
-    </div>
-  {/if}
-</div>
+    {:else if highlightedContent}
+      <div class="preview-body">
+        <div class="text-preview">
+          <pre class="text-content highlighted-xml" dir="ltr">{@html highlightedContent}</pre>
+        </div>
+      </div>
+    {:else}
+      <div class="no-content">
+        <p>{$t('No content available')}</p>
+      </div>
+    {/if}
+  </div>
+{:else}
+  <SimpleMetadataView {workspace} {focusedField} />
+{/if}
 
 <style>
   .opf-preview {
