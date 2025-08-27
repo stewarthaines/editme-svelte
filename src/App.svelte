@@ -137,6 +137,23 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
     navigationPreviewContent = event.detail.xhtml;
   };
 
+  // Handle navigation anchor clicks
+  function handleNavigationClick(chapterId: string) {
+    // Find manifest item by matching href
+    const manifestItem = currentWorkspaceState?.opf?.manifest?.find(item => 
+      item.href?.includes(`${chapterId}.xhtml`)
+    );
+    
+    if (manifestItem) {
+      // Use the exact same event flow as SpineSidebar
+      const event = new CustomEvent('select-spine-item', {
+        detail: { itemId: manifestItem.id },
+        bubbles: true
+      });
+      window.dispatchEvent(event);
+    }
+  }
+
   // Handle spine preview update
   const handleSpinePreviewUpdate = (
     event: CustomEvent<{
@@ -641,7 +658,7 @@ import { ExtensionManager } from './lib/extensions/extension-manager.js';
         />
       {:else if currentView === 'navigation'}
         {#if navigationPreviewContent}
-          <ContentPreview content={navigationPreviewContent} />
+          <ContentPreview content={navigationPreviewContent} onNavigate={handleNavigationClick} />
         {:else}
           <div class="placeholder-content">
             <h3>{$t('Navigation Preview')}</h3>

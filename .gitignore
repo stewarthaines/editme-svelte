@@ -28,6 +28,7 @@ package-lock.json
 
 # Generated screenshots
 __screenshots__/
+.playwright-mcp/
 
 # Storybook
 *storybook.log

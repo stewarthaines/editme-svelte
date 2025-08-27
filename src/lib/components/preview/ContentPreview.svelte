@@ -7,6 +7,7 @@
   export let orientation: 'portrait' | 'landscape' = 'portrait';
   export let fontSizeAdjustment: number = 0;
   export let fontFamily: FontFamily = 'default';
+  export let onNavigate: ((chapterId: string) => void) | undefined = undefined;
   let className: string = '';
   export { className as class };
 
@@ -91,9 +92,11 @@
     if (!iframeDoc) return;
 
     // Remove any existing injected styles
-    const existingStyle = iframeDoc.head.querySelector('.device-injected-styles');
-    if (existingStyle) {
-      existingStyle.remove();
+    if (iframeDoc.head) {
+      const existingStyle = iframeDoc.head.querySelector('.device-injected-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
     }
 
     // Build CSS
@@ -107,11 +110,13 @@
       styleElement.textContent = css;
 
       // Insert as first style element to allow XHTML CSS to override
-      const firstStyleOrLink = iframeDoc.head.querySelector('style, link[rel="stylesheet"]');
-      if (firstStyleOrLink) {
-        iframeDoc.head.insertBefore(styleElement, firstStyleOrLink);
-      } else {
-        iframeDoc.head.appendChild(styleElement);
+      if (iframeDoc.head) {
+        const firstStyleOrLink = iframeDoc.head.querySelector('style, link[rel="stylesheet"]');
+        if (firstStyleOrLink) {
+          iframeDoc.head.insertBefore(styleElement, firstStyleOrLink);
+        } else {
+          iframeDoc.head.appendChild(styleElement);
+        }
       }
     }
   }
@@ -158,6 +163,25 @@
   function handleIframeLoad() {
     if (iframeElement) {
       injectDeviceStyles(iframeElement, deviceSize, fontFamily, fontSizeAdjustment);
+      
+      // Add click handler for navigation
+      if (onNavigate && iframeElement.contentDocument) {
+        iframeElement.contentDocument.addEventListener('click', (e) => {
+          const target = e.target as HTMLAnchorElement;
+          if (target.tagName === 'A' && target.href) {
+            const href = target.getAttribute('href');
+            if (href && href.includes('.xhtml')) {
+              e.preventDefault();
+              // Extract chapter ID from Text/chapter1.xhtml
+              const match = href.match(/([^/]+)\.xhtml$/);
+              if (match) {
+                const chapterId = match[1];
+                onNavigate(chapterId);
+              }
+            }
+          }
+        });
+      }
     }
   }
 

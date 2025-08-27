@@ -290,8 +290,8 @@
       // Load navigation content (triggers auto-generation if no nav.txt exists)
       await loadNavigationContent();
       
-      // Save navigation content to ensure nav.xhtml is up-to-date
-      await saveNavigationContent();
+      // Don't save during initialization - reactive statement handles auto-generation
+      // User can save manually when needed (Ctrl+Enter or save button)
     } catch (error) {
       console.error('Failed to initialize OutlineView:', error);
       dispatch('error', {
