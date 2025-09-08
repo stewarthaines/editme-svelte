@@ -436,6 +436,11 @@
 
         // Initialize app state (FileStorageAPI already initialized above)
         await appState.initialize();
+
+        // Check hash after appState is fully ready
+        if (window.location.hash) {
+          handleHashChange();
+        }
       } catch (error) {
         console.error('Failed to initialize app:', error);
         transformEngineError = error instanceof Error ? error.message : 'Initialization failed';
@@ -459,7 +464,7 @@
     };
 
     // Handle hashchange events for remote EPUB imports
-    const handleHashChange = () => {
+    function handleHashChange() {
       const fragment = window.location.hash.slice(1); // Remove #
 
       if (fragment.startsWith('http')) {
@@ -473,12 +478,8 @@
           alert('Invalid URL in hash fragment');
         }
       }
-    };
-
-    // Check hash on initial load
-    if (window.location.hash) {
-      handleHashChange();
     }
+
 
     window.addEventListener('select-spine-item', handleSelectSpineItem);
     window.addEventListener('clear-spine-selection', handleClearSpineSelection);
