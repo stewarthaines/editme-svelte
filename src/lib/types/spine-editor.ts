@@ -1,6 +1,6 @@
 /**
  * Spine Item Text Editor Type Definitions
- * 
+ *
  * TypeScript interfaces and types for the spine item text editor
  * implementation following the pragmatic, spike-inspired architecture.
  */
@@ -33,7 +33,15 @@ export interface TransformScripts {
  * Transform error with stage and location information
  */
 export interface TransformError {
-  stage: 'text' | 'dom' | 'execution' | 'timeout' | 'communication' | 'script-loading' | 'extension-loading' | string;
+  stage:
+    | 'text'
+    | 'dom'
+    | 'execution'
+    | 'timeout'
+    | 'communication'
+    | 'script-loading'
+    | 'extension-loading'
+    | string;
   message: string;
   scriptName?: string;
   line?: number;
@@ -49,28 +57,34 @@ export interface ChapterMetadata {
   language: string;
   stylesheets: string[];
   scripts: string[];
+  fixed_layout: boolean;
 }
 
 /**
  * Message protocol for iframe communication - Parent to Iframe
  */
 export interface EditorMessage {
-  type: 'SET_TRANSFORM_SCRIPTS' | 'SET_EXTENSION_GLOBALS' | 'EXECUTE_TRANSFORM' | 'SET_DEBUG_MODE' | 'PING';
+  type:
+    | 'SET_TRANSFORM_SCRIPTS'
+    | 'SET_EXTENSION_GLOBALS'
+    | 'EXECUTE_TRANSFORM'
+    | 'SET_DEBUG_MODE'
+    | 'PING';
   payload: {
     // For SET_TRANSFORM_SCRIPTS
     textTransform?: string;
     domTransforms?: string[];
-    
+
     // For SET_EXTENSION_GLOBALS
     globals?: Record<string, any>;
-    
+
     // For EXECUTE_TRANSFORM
     plainText?: string;
     timeout?: number;
-    
+
     // For SET_DEBUG_MODE
     enabled?: boolean;
-    
+
     // For PING
     data?: any;
   };
@@ -85,7 +99,7 @@ export interface EditorResponse {
   payload?: {
     // For TRANSFORM_RESULT (via messageId)
     result?: TransformResult;
-    
+
     // For errors
     message?: string;
     filename?: string;
@@ -139,10 +153,10 @@ export interface CurrentContent {
  * Workspace file paths for spine item editing
  */
 export interface SpineItemPaths {
-  textContent: string;      // SOURCE/text/{spineItemId}.txt
-  stylesheet: string;       // OEBPS/Styles/{spineItemId}.css
-  javascript: string;       // OEBPS/Scripts/{spineItemId}.js
-  xhtmlOutput: string;      // OEBPS/Text/{spineItemId}.xhtml
+  textContent: string; // SOURCE/text/{spineItemId}.txt
+  stylesheet: string; // OEBPS/Styles/{spineItemId}.css
+  javascript: string; // OEBPS/Scripts/{spineItemId}.js
+  xhtmlOutput: string; // OEBPS/Text/{spineItemId}.xhtml
 }
 
 /**
@@ -328,13 +342,15 @@ export type DeepPartial<T> = {
 /**
  * Utility type for error handling
  */
-export type Result<T, E = TransformError> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: E;
-};
+export type Result<T, E = TransformError> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: E;
+    };
 
 /**
  * Spine item editor events

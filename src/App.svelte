@@ -480,7 +480,6 @@
       }
     }
 
-
     window.addEventListener('select-spine-item', handleSelectSpineItem);
     window.addEventListener('clear-spine-selection', handleClearSpineSelection);
     window.addEventListener('hashchange', handleHashChange);
@@ -716,6 +715,7 @@
             executionTime={spinePreviewData.executionTime}
             spineItemId={spinePreviewData.spineItemId}
             onPreviewClick={handlePreviewClick}
+            onNavigate={handleNavigationClick}
           />
         {:else}
           <div class="placeholder-content">

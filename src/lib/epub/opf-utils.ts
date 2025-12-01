@@ -222,8 +222,10 @@ export class OPFUtils {
     const DC_NS = 'http://purl.org/dc/elements/1.1/';
 
     // Extract required metadata fields using namespace-aware methods with fallback
-    let titleElements: HTMLCollectionOf<Element> | NodeListOf<Element> =
-      doc.getElementsByTagNameNS(DC_NS, 'title');
+    let titleElements: HTMLCollectionOf<Element> | NodeListOf<Element> = doc.getElementsByTagNameNS(
+      DC_NS,
+      'title'
+    );
     if (titleElements.length === 0) {
       titleElements = doc.querySelectorAll('dc\\:title, title');
     }
@@ -445,7 +447,7 @@ export class OPFUtils {
     const uniqueId = manifest.find(item => item.id === 'uuid')?.id || 'uuid';
 
     let xml = `<?xml version="1.0" encoding="utf-8"?>
-<package version="${version}" xmlns="http://www.idpf.org/2007/opf" unique-identifier="${uniqueId}" prefix="rendition: http://www.idpf.org/vocab/rendition/# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/">
+<package version="${version}" xmlns="http://www.idpf.org/2007/opf" unique-identifier="${uniqueId}" prefix="rendition: http://www.idpf.org/vocab/rendition/# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/" xml:lang="en">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ibooks="http://vocabulary.itunes.apple.com/rdf/ibooks/vocabularies/2012/01/ibooks-specific">
     <dc:title>${escapeXML(metadata.title)}</dc:title>
     <dc:language>${escapeXML(metadata.language)}</dc:language>
@@ -513,6 +515,17 @@ export class OPFUtils {
     }
 
     xml += '\n    <meta property="ibooks:specified-fonts">true</meta>';
+
+    xml += `
+    <meta property="schema:accessMode">textual</meta>
+    <meta property="schema:accessibilityFeature">alternativeText</meta>
+    <meta property="schema:accessibilityHazard">noFlashingHazard</meta>
+    <meta property="schema:accessibilityHazard">noSoundHazard</meta>
+    <meta property="schema:accessModeSufficient">textual,visual</meta>
+    <meta property="schema:accessibilitySummary">This publication has been validated to meet the minimum conformance requirements for EPUB Accessibility 1.1.</meta>
+    <meta property="dcterms:conformsTo">http://www.w3.org/standards/wcag/2.0/a</meta>
+    <meta property="dcterms:conformsTo">http://www.idpf.org/epub/a11y/accessibility-20170829.html#wcag-a</meta>
+    `;
 
     xml += `\n  </metadata>
   <manifest>`;

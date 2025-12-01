@@ -29,7 +29,7 @@ export const navigationContent = [
   '    </ol>',
   '  </nav>',
   '</body>',
-  '</html>'
+  '</html>',
 ].join('\n');
 
 export const chapterContent = [
@@ -52,7 +52,7 @@ export const chapterContent = [
   '  <p>"What could that be?" they wondered aloud, quickening their pace toward the unknown. Little did they know that this simple curiosity would lead to the most extraordinary adventure of their lifetime.</p>',
   '  <p>The forest grew denser as they approached, but the mysterious light continued to beckon. With each step, the anticipation grew stronger, and the sense that something magical was about to happen filled the air.</p>',
   '</body>',
-  '</html>'
+  '</html>',
 ].join('\n');
 
 export const complexContent = [
@@ -97,27 +97,27 @@ export const complexContent = [
   '  ',
   '  <script>',
   '    function changeText() {',
-  '      document.getElementById(\'output\').innerHTML = \'Text changed at \' + new Date().toLocaleTimeString() + \'!\';',
+  "      document.getElementById('output').innerHTML = 'Text changed at ' + new Date().toLocaleTimeString() + '!';",
   '    }',
   '    ',
   '    function addColor() {',
-  '      const colors = [\'#ff6b6b\', \'#4ecdc4\', \'#45b7d1\', \'#f9ca24\', \'#a55eea\', \'#26de81\'];',
+  "      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#26de81'];",
   '      const randomColor = colors[Math.floor(Math.random() * colors.length)];',
-  '      document.getElementById(\'output\').style.background = randomColor;',
-  '      document.getElementById(\'output\').innerHTML = \'Background color changed!\';',
+  "      document.getElementById('output').style.background = randomColor;",
+  "      document.getElementById('output').innerHTML = 'Background color changed!';",
   '    }',
   '    ',
   '    function selectColor(color) {',
-  '      document.getElementById(\'output\').innerHTML = \'You selected: \' + color;',
+  "      document.getElementById('output').innerHTML = 'You selected: ' + color;",
   '    }',
   '    ',
   '    function animate() {',
-  '      document.querySelector(\'h1\').style.animation = \'fadeIn 1s ease-in\';',
-  '      document.getElementById(\'output\').innerHTML = \'Animation triggered!\';',
+  "      document.querySelector('h1').style.animation = 'fadeIn 1s ease-in';",
+  "      document.getElementById('output').innerHTML = 'Animation triggered!';",
   '    }',
   '  </script>',
   '</body>',
-  '</html>'
+  '</html>',
 ].join('\n');
 
 export const malformedContent = [
@@ -147,5 +147,5 @@ export const malformedContent = [
   '    <p>Content after malformed script tag.</p>',
   '  </div>',
   '</body>',
-  '<!-- Missing closing html tag -->'
+  '<!-- Missing closing html tag -->',
 ].join('\n');

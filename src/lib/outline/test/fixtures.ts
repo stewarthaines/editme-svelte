@@ -1,13 +1,18 @@
 /**
  * Test fixtures for OutlineGenerator testing
- * 
+ *
  * Provides factory functions for creating consistent test data including
  * mock spine items, XHTML content, and expected navigation structures.
  * Uses factory pattern to prevent test pollution.
  */
 
 import type { SpineItemWithSource } from '../../spine/types.js';
-import type { NavigationDocument, NavigationMetadata, GenerationOptions, ProcessingOptions } from '../index.js';
+import type {
+  NavigationDocument,
+  NavigationMetadata,
+  GenerationOptions,
+  ProcessingOptions,
+} from '../index.js';
 
 /**
  * Create mock spine items with various configurations
@@ -25,7 +30,7 @@ export function createMockSpineItems(): SpineItemWithSource[] {
     },
     {
       idref: 'chapter2',
-      id: 'chapter2', 
+      id: 'chapter2',
       href: 'chapter2.xhtml',
       mediaType: 'application/xhtml+xml',
       linear: true,
@@ -35,7 +40,7 @@ export function createMockSpineItems(): SpineItemWithSource[] {
     {
       idref: 'chapter3',
       id: 'chapter3',
-      href: 'chapter3.xhtml', 
+      href: 'chapter3.xhtml',
       mediaType: 'application/xhtml+xml',
       linear: true,
       properties: [],
@@ -53,7 +58,7 @@ export function createSpineItemsWithoutTitles(): SpineItemWithSource[] {
       idref: 'untitled1',
       id: 'untitled1',
       href: 'untitled1.xhtml',
-      mediaType: 'application/xhtml+xml', 
+      mediaType: 'application/xhtml+xml',
       linear: true,
       properties: [],
       hasSourceFile: false,
@@ -63,7 +68,7 @@ export function createSpineItemsWithoutTitles(): SpineItemWithSource[] {
       id: 'untitled2',
       href: 'untitled2.xhtml',
       mediaType: 'application/xhtml+xml',
-      linear: true, 
+      linear: true,
       properties: [],
       hasSourceFile: false,
     },
@@ -87,7 +92,7 @@ export function createMixedSpineItems(): SpineItemWithSource[] {
     {
       idref: 'ch1',
       id: 'ch1',
-      href: 'chapter-001.xhtml', 
+      href: 'chapter-001.xhtml',
       mediaType: 'application/xhtml+xml',
       linear: true,
       properties: [],
@@ -97,7 +102,7 @@ export function createMixedSpineItems(): SpineItemWithSource[] {
       idref: 'appendix',
       id: 'appendix',
       href: 'appendix.xhtml',
-      mediaType: 'application/xhtml+xml', 
+      mediaType: 'application/xhtml+xml',
       linear: false,
       properties: [],
       hasSourceFile: true,
@@ -213,11 +218,13 @@ export function createMalformedXHTML(): string {
 /**
  * Create expected navigation XHTML structure
  */
-export function createExpectedNavigationXHTML(items: Array<{href: string, title: string}>): string {
-  const listItems = items.map(item => 
-    `      <li><a href="${item.href}">${item.title}</a></li>`
-  ).join('\n');
-  
+export function createExpectedNavigationXHTML(
+  items: Array<{ href: string; title: string }>
+): string {
+  const listItems = items
+    .map(item => `      <li><a href="${item.href}">${item.title}</a></li>`)
+    .join('\n');
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
@@ -226,7 +233,7 @@ export function createExpectedNavigationXHTML(items: Array<{href: string, title:
   <meta charset="UTF-8"/>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     <h1>Table of Contents</h1>
     <ol>
 ${listItems}
@@ -298,7 +305,7 @@ export function createMockTransformedNavContent(): string {
   <meta charset="UTF-8"/>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     <h1>Navigation</h1>
     <ol>
       <li><a href="chapter1.xhtml">Chapter 1: The Beginning</a></li>
@@ -387,8 +394,8 @@ export function expectValidEPUBStructure(xhtml: string): void {
   if (!xhtml.includes('epub:type="toc"')) {
     throw new Error('Missing epub:type="toc"');
   }
-  if (!xhtml.includes('role="navigation"')) {
-    throw new Error('Missing role="navigation"');
+  if (!xhtml.includes('role="doc-toc"')) {
+    throw new Error('Missing role="doc-toc"');
   }
 }
 
@@ -400,7 +407,9 @@ export function expectValidNavigationMetadata(metadata: NavigationMetadata): voi
     throw new Error(`Expected metadata.href to be 'nav.xhtml', got '${metadata.href}'`);
   }
   if (metadata.mediaType !== 'application/xhtml+xml') {
-    throw new Error(`Expected mediaType to be 'application/xhtml+xml', got '${metadata.mediaType}'`);
+    throw new Error(
+      `Expected mediaType to be 'application/xhtml+xml', got '${metadata.mediaType}'`
+    );
   }
   if (!Array.isArray(metadata.properties) || !metadata.properties.includes('nav')) {
     throw new Error('Expected properties to include "nav"');

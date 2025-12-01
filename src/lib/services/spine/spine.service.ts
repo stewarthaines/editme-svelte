@@ -1,6 +1,6 @@
 /**
  * SpineService - Clean Service Architecture Implementation
- * 
+ *
  * Manages EPUB spine items (chapters) with high-level operations for component usage.
  * Operates on cached WorkspaceState from AppState to avoid redundant loads.
  * Built on WorkspaceService for atomic operations and proper validation.
@@ -22,7 +22,11 @@ export interface ChapterCreationOptions {
 
 // Service error types
 export class SpineServiceError extends Error {
-  constructor(message: string, public code: string, public workspaceId?: string) {
+  constructor(
+    message: string,
+    public code: string,
+    public workspaceId?: string
+  ) {
     super(message);
     this.name = 'SpineServiceError';
   }
@@ -32,9 +36,7 @@ export class SpineServiceError extends Error {
  * SpineService - Single responsibility for EPUB spine management
  */
 export class SpineService {
-  constructor(
-    private workspaceService: WorkspaceService
-  ) {}
+  constructor(private workspaceService: WorkspaceService) {}
 
   /**
    * Load spine items with source file information from cached workspace state
@@ -55,15 +57,15 @@ export class SpineService {
           // Spine item properties
           idref: manifestItem.id,
           linear: spineItem.linear ?? true,
-          
-          // Manifest item properties  
+
+          // Manifest item properties
           id: manifestItem.id,
           href: manifestItem.href,
           mediaType: manifestItem.mediaType,
-          
+
           // Source file association
           sourcePath: hasSourceFile ? sourceFilePath : undefined,
-          hasSourceFile
+          hasSourceFile,
         });
       }
 
@@ -80,7 +82,10 @@ export class SpineService {
   /**
    * Add a new chapter to workspace state
    */
-  async addChapter(workspace: WorkspaceState, options: ChapterCreationOptions): Promise<{ updatedWorkspace: WorkspaceState; newChapter: SpineItemWithSource }> {
+  async addChapter(
+    workspace: WorkspaceState,
+    options: ChapterCreationOptions
+  ): Promise<{ updatedWorkspace: WorkspaceState; newChapter: SpineItemWithSource }> {
     try {
       // Generate unique ID for the chapter
       const chapterId = this.generateUniqueChapterId(workspace);
@@ -90,7 +95,7 @@ export class SpineService {
       const manifestItem: ManifestItem = {
         id: chapterId,
         href,
-        mediaType: 'application/xhtml+xml'
+        mediaType: 'application/xhtml+xml',
       };
 
       // Add to manifest
@@ -99,11 +104,15 @@ export class SpineService {
       // Create spine item
       const spineItem: SpineItem = {
         idref: chapterId,
-        linear: options.linear ?? true
+        linear: options.linear ?? true,
       };
 
       // Add to spine
-      updatedWorkspace = await this.workspaceService.addSpineItem(updatedWorkspace, spineItem, options.insertIndex);
+      updatedWorkspace = await this.workspaceService.addSpineItem(
+        updatedWorkspace,
+        spineItem,
+        options.insertIndex
+      );
 
       // Create XHTML file
       const xhtmlContent = this.generateChapterXHTML(options.title);
@@ -112,7 +121,7 @@ export class SpineService {
       // Create source file if requested
       let hasSourceFile = false;
       let sourceFilePath: string | undefined;
-      
+
       if (options.createSourceFile) {
         sourceFilePath = `SOURCE/text/${chapterId}.txt`;
         const sourceContent = `# ${options.title}\n\nYour chapter content goes here...`;
@@ -124,15 +133,15 @@ export class SpineService {
         // Spine item properties
         idref: chapterId,
         linear: options.linear ?? true,
-        
-        // Manifest item properties  
+
+        // Manifest item properties
         id: chapterId,
         href,
         mediaType: 'application/xhtml+xml',
-        
+
         // Source file association
         sourcePath: hasSourceFile ? sourceFilePath : undefined,
-        hasSourceFile
+        hasSourceFile,
       };
 
       return { updatedWorkspace, newChapter };
@@ -148,24 +157,33 @@ export class SpineService {
   /**
    * Move chapter up in spine order
    */
-  async moveChapterUp(workspace: WorkspaceState, chapterIndex: number): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
+  async moveChapterUp(
+    workspace: WorkspaceState,
+    chapterIndex: number
+  ): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
     try {
       if (chapterIndex <= 0) {
         throw new SpineServiceError('Cannot move first chapter up', 'INVALID_MOVE', workspace.id);
       }
 
       const spineItems = await this.loadSpineItems(workspace);
-      
+
       if (chapterIndex >= spineItems.length) {
         throw new SpineServiceError('Invalid chapter index', 'INVALID_INDEX', workspace.id);
       }
 
       // Create new order by swapping items
       const newOrder = [...spineItems];
-      [newOrder[chapterIndex - 1], newOrder[chapterIndex]] = [newOrder[chapterIndex], newOrder[chapterIndex - 1]];
+      [newOrder[chapterIndex - 1], newOrder[chapterIndex]] = [
+        newOrder[chapterIndex],
+        newOrder[chapterIndex - 1],
+      ];
 
       // Update spine order
-      const updatedWorkspace = await this.workspaceService.updateSpineOrder(workspace, newOrder.map(item => item.id));
+      const updatedWorkspace = await this.workspaceService.updateSpineOrder(
+        workspace,
+        newOrder.map(item => item.id)
+      );
 
       return { updatedWorkspace, newOrder };
     } catch (error) {
@@ -183,20 +201,29 @@ export class SpineService {
   /**
    * Move chapter down in spine order
    */
-  async moveChapterDown(workspace: WorkspaceState, chapterIndex: number): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
+  async moveChapterDown(
+    workspace: WorkspaceState,
+    chapterIndex: number
+  ): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
     try {
       const spineItems = await this.loadSpineItems(workspace);
-      
+
       if (chapterIndex < 0 || chapterIndex >= spineItems.length - 1) {
         throw new SpineServiceError('Cannot move last chapter down', 'INVALID_MOVE', workspace.id);
       }
 
       // Create new order by swapping items
       const newOrder = [...spineItems];
-      [newOrder[chapterIndex], newOrder[chapterIndex + 1]] = [newOrder[chapterIndex + 1], newOrder[chapterIndex]];
+      [newOrder[chapterIndex], newOrder[chapterIndex + 1]] = [
+        newOrder[chapterIndex + 1],
+        newOrder[chapterIndex],
+      ];
 
       // Update spine order
-      const updatedWorkspace = await this.workspaceService.updateSpineOrder(workspace, newOrder.map(item => item.id));
+      const updatedWorkspace = await this.workspaceService.updateSpineOrder(
+        workspace,
+        newOrder.map(item => item.id)
+      );
 
       return { updatedWorkspace, newOrder };
     } catch (error) {
@@ -214,11 +241,20 @@ export class SpineService {
   /**
    * Reorder spine items by moving an item from one index to another
    */
-  async reorderItems(workspace: WorkspaceState, fromIndex: number, toIndex: number): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
+  async reorderItems(
+    workspace: WorkspaceState,
+    fromIndex: number,
+    toIndex: number
+  ): Promise<{ updatedWorkspace: WorkspaceState; newOrder: SpineItemWithSource[] }> {
     try {
       const spineItems = await this.loadSpineItems(workspace);
-      
-      if (fromIndex < 0 || fromIndex >= spineItems.length || toIndex < 0 || toIndex >= spineItems.length) {
+
+      if (
+        fromIndex < 0 ||
+        fromIndex >= spineItems.length ||
+        toIndex < 0 ||
+        toIndex >= spineItems.length
+      ) {
         throw new SpineServiceError('Invalid reorder indices', 'INVALID_INDEX', workspace.id);
       }
 
@@ -228,7 +264,10 @@ export class SpineService {
       newOrder.splice(toIndex, 0, movedItem);
 
       // Update spine order using WorkspaceService
-      const updatedWorkspace = await this.workspaceService.updateSpineOrder(workspace, newOrder.map(item => item.id));
+      const updatedWorkspace = await this.workspaceService.updateSpineOrder(
+        workspace,
+        newOrder.map(item => item.id)
+      );
 
       return { updatedWorkspace, newOrder };
     } catch (error) {
@@ -249,19 +288,19 @@ export class SpineService {
     const existingIds = new Set(workspace.opf.manifest.map(item => item.id));
     let counter = 1;
     let id = `chapter${counter.toString().padStart(2, '0')}`;
-    
+
     while (existingIds.has(id)) {
       counter++;
       id = `chapter${counter.toString().padStart(2, '0')}`;
     }
-    
+
     return id;
   }
 
   private generateChapterXHTML(title: string): string {
     return `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
     <title>${title}</title>
     <link rel="stylesheet" type="text/css" href="../Styles/styles.css"/>
@@ -278,18 +317,29 @@ export class SpineService {
   /**
    * Delete a chapter with coordinated removal from manifest, spine, and files
    */
-  async deleteChapter(workspace: WorkspaceState, chapterId: string): Promise<{ updatedWorkspace: WorkspaceState }> {
+  async deleteChapter(
+    workspace: WorkspaceState,
+    chapterId: string
+  ): Promise<{ updatedWorkspace: WorkspaceState }> {
     try {
       // Find the chapter in the spine
       const chapterIndex = workspace.opf.spine.findIndex(item => item.idref === chapterId);
       if (chapterIndex === -1) {
-        throw new SpineServiceError('Chapter not found in spine', 'CHAPTER_NOT_FOUND', workspace.id);
+        throw new SpineServiceError(
+          'Chapter not found in spine',
+          'CHAPTER_NOT_FOUND',
+          workspace.id
+        );
       }
 
       // Find the manifest item
       const manifestIndex = workspace.opf.manifest.findIndex(item => item.id === chapterId);
       if (manifestIndex === -1) {
-        throw new SpineServiceError('Chapter not found in manifest', 'MANIFEST_ITEM_NOT_FOUND', workspace.id);
+        throw new SpineServiceError(
+          'Chapter not found in manifest',
+          'MANIFEST_ITEM_NOT_FOUND',
+          workspace.id
+        );
       }
 
       const manifestItem = workspace.opf.manifest[manifestIndex];
@@ -300,8 +350,8 @@ export class SpineService {
         opf: {
           ...workspace.opf,
           spine: workspace.opf.spine.filter(item => item.idref !== chapterId),
-          manifest: workspace.opf.manifest.filter(item => item.id !== chapterId)
-        }
+          manifest: workspace.opf.manifest.filter(item => item.id !== chapterId),
+        },
       };
 
       // Save updated workspace (this will update the OPF automatically)
@@ -310,8 +360,8 @@ export class SpineService {
       // Delete associated files using the file storage API directly
       try {
         // Delete XHTML file
-        const xhtmlPath = manifestItem.href.startsWith(workspace.pathInfo.basePath) 
-          ? manifestItem.href 
+        const xhtmlPath = manifestItem.href.startsWith(workspace.pathInfo.basePath)
+          ? manifestItem.href
           : `${workspace.pathInfo.basePath}/${manifestItem.href}`;
         const fileStorage = (this.workspaceService as any).fileStorage;
         await fileStorage.deleteFile(updatedWorkspace.id, xhtmlPath);
@@ -361,11 +411,7 @@ export class SpineService {
 
       // Check for duplicate
       if (workspace.opf.manifest.some(item => item.id === newId)) {
-        throw new SpineServiceError(
-          `ID '${newId}' already exists`,
-          'DUPLICATE_ID',
-          workspace.id
-        );
+        throw new SpineServiceError(`ID '${newId}' already exists`, 'DUPLICATE_ID', workspace.id);
       }
 
       // Get the manifest item
@@ -382,22 +428,17 @@ export class SpineService {
       const newHref = manifestItem.href.replace(oldId, newId);
 
       // Update manifest item (ID and href) - this also updates spine references
-      let updatedWorkspace = await this.workspaceService.updateManifestItem(
-        workspace,
-        oldId,
-        { id: newId, href: newHref }
-      );
+      let updatedWorkspace = await this.workspaceService.updateManifestItem(workspace, oldId, {
+        id: newId,
+        href: newHref,
+      });
 
       // Rename source text file if it exists
       const oldSourcePath = `SOURCE/text/${oldId}.txt`;
       const newSourcePath = `SOURCE/text/${newId}.txt`;
 
       if (await this.workspaceService.fileExists(workspace.id, oldSourcePath)) {
-        await this.workspaceService.renameFile(
-          workspace.id,
-          oldSourcePath,
-          newSourcePath
-        );
+        await this.workspaceService.renameFile(workspace.id, oldSourcePath, newSourcePath);
       }
 
       return { updatedWorkspace };

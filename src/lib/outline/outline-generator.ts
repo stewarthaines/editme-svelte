@@ -220,13 +220,13 @@ export class OutlineGenerator {
 
     xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
   <title>${this.escapeXML(documentTitle)}</title>
   <meta charset="UTF-8"/>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     ${xhtmlContent}
   </nav>
 </body>
@@ -335,13 +335,13 @@ export class OutlineGenerator {
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
   <title>${this.escapeXML(documentTitle)}</title>
   <meta charset="UTF-8"/>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation"${navClass}>
+  <nav epub:type="toc" role="doc-toc"${navClass}>
     <h1>${this.escapeXML(documentTitle)}</h1>
     <ol${listClass}>
 ${listItems}

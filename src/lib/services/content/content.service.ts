@@ -279,7 +279,7 @@ export class ContentService {
   <title>${this.escapeHtml(navTitle)}</title>
 </head>
 <body>
-  <nav epub:type="toc" id="toc">
+  <nav epub:type="toc" id="doc-toc">
     <h1>${this.escapeHtml(tocTitle)}</h1>
     <ol>
 ${chapterLinks}
@@ -292,7 +292,11 @@ ${chapterLinks}
   /**
    * Transform plain text content to XHTML using transform pipeline
    */
-  async transformContent(sourceText: string, context?: TransformContext, idref?: string): Promise<TransformResult> {
+  async transformContent(
+    sourceText: string,
+    context?: TransformContext,
+    idref?: string
+  ): Promise<TransformResult> {
     const startTime = Date.now();
     const warnings: string[] = [];
 
@@ -357,12 +361,12 @@ ${chapterLinks}
     const navTitle = this.i18nSystem.translate('navigation.tableOfContents');
     const xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
   <title>${this.escapeHtml(navTitle)}</title>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     <h1>${this.escapeHtml(navTitle)}</h1>
     <ol>
 ${navEntries}
@@ -393,12 +397,12 @@ ${navEntries}
       // Handle empty navigation
       const xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
   <title>${this.escapeHtml(navTitle)}</title>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     <h1>${this.escapeHtml(navTitle)}</h1>
     <ol></ol>
   </nav>
@@ -425,12 +429,12 @@ ${navEntries}
 
     const xhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en">
 <head>
   <title>${this.escapeHtml(navTitle)}</title>
 </head>
 <body>
-  <nav epub:type="toc" role="navigation">
+  <nav epub:type="toc" role="doc-toc">
     <h1>${this.escapeHtml(navTitle)}</h1>
     <ol>
 ${navEntriesHtml}

@@ -1,0 +1,150 @@
+<p>This is a preview of all the sample EPUB files from the SEED.html app page</p>
+
+<p>
+  Presenting them here like this is a bit out of context. You're supposed to read them in the
+  <a href="https://stewarthaines.com/epub">SEED.html app</a> but it's a bit lower-commitment to read
+  them here.
+</p>
+
+<p>Click the <code>Edit EPUB</code> button below the content to edit the sample in the browser</p>
+
+<select id="opds-select"></select>
+
+<div
+  id="book-container"
+  style="height: 600px; width: 100%; border: 1px solid grey; margin: 1em 0"
+></div>
+
+<div class="reader-controls">
+  <button onclick="prevPage()">‹</button>
+  <button onclick="nextPage()">›</button>
+  <a id="download-link" href="#" download>
+    <button>Download EPUB</button>
+  </a>
+  <a id="edit-link" href="#">
+    <button>Edit EPUB in SEED.html</button>
+  </a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+<script src="https://unpkg.com/epubjs/dist/epub.min.js"></script>
+
+<script>
+  var opds_url = 'https://stewarthaines.com/epub/feed.opds.xml';
+  const opdsList = document.querySelector('#opds-list');
+  const selectElement = document.querySelector('#opds-select');
+  const bookContainer = document.querySelector('#book-container');
+  const download = document.querySelector('#download-link');
+  const edit = document.querySelector('#edit-link');
+  let currentBook = null; // Variable to hold the current book instance
+  var rendition = null;
+  fetch(opds_url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text(); // Get the response as plain text
+    })
+    .then(xmlText => {
+      // Parse the XML text into a DOM object
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+
+      // Now you can work with the XML data
+      // console.log(xmlDoc);
+      const entries = xmlDoc.querySelectorAll('entry');
+
+      // Add a default, non-selectable option
+      const defaultOption = document.createElement('option');
+      defaultOption.textContent = 'Select a Book...';
+      defaultOption.value = '';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      selectElement.appendChild(defaultOption);
+
+      Array.from(entries)
+        .reverse()
+        .forEach(entry => {
+          const title = entry.querySelector('title').textContent;
+          const downloadLink = entry
+            .querySelector('link[type="application/epub+zip"]')
+            .getAttribute('href');
+
+          const option = document.createElement('option');
+          option.textContent = title;
+          option.value = downloadLink; // Set the download link as the option's value
+          selectElement.appendChild(option);
+        });
+
+      // Add a change event listener to the select element
+      selectElement.addEventListener('change', event => {
+        const selectedLink = event.target.value;
+
+        if (selectedLink) {
+          // If a book is already loaded, destroy it
+          if (currentBook) {
+            currentBook.destroy();
+            bookContainer.innerHTML = '';
+          }
+
+          // Load the new book
+          const url = 'https://stewarthaines.com/epub/' + decodeURIComponent(selectedLink);
+          currentBook = ePub(url);
+          rendition = currentBook.renderTo(bookContainer, {
+            allowScriptedContent: true,
+            width: '100%',
+            height: '100%',
+          });
+          rendition.display();
+          download.setAttribute('href', url);
+          download.setAttribute('download', getFilenameFromPath(decodeURIComponent(selectedLink)));
+          edit.setAttribute(
+            'href',
+            'https://stewarthaines.com/epub/SEED.html#' + encodeURIComponent(url)
+          );
+        }
+      });
+
+      //   allowScriptedContent: true,
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
+
+  // Ensure the URL is correctly encoded for the web
+  // var url_encoded = encodeURIComponent(
+  //   'https://stewarthaines.com/epub/samples/designers/Responsive Music Notation - Stewart Haines - 2025-08-06.epub'
+  // );
+  // var book = ePub(
+  //   'https://stewarthaines.com/epub/samples/designers/Responsive%20Music%20Notation%20-%20Stewart%20Haines%20-%202025-08-06.epub'
+  // );
+
+  // Render the book into the container div
+  // var rendition = book.renderTo('book-container', {
+  //   allowScriptedContent: true,
+  //   width: '100%',
+  //   height: '100%',
+  // });
+
+  // Display the book. This is the crucial step that was missing.
+  // rendition.display();
+  function getFilenameFromPath(filePath) {
+    // const parts = decodeURIComponent(filePath).split('/');
+    const parts = filePath.split('/');
+    return parts[parts.length - 1];
+  }
+
+  function nextPage() {
+    rendition.next();
+  }
+
+  function prevPage() {
+    rendition.prev();
+  }
+
+  function spread(spread) {
+    rendition.setManager('default');
+    rendition.setFlow('paginated');
+    rendition.setSpread(spread);
+  }
+</script>

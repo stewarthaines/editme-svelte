@@ -270,19 +270,22 @@ export class SpinePreviewManager {
     try {
       // Load workspace to get proper path info and manifest
       const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-      
+
       // Find the current spine item in manifest
       const manifestItem = workspace.opf.manifest.find(item => item.id === this.spineItemId);
       if (!manifestItem) {
         console.warn(`Manifest item not found for spine item: ${this.spineItemId}`);
         return;
       }
-      
+
       // Use existing path resolution logic
-      const spineItemPath = this.resolveManifestPath(manifestItem.href, workspace.pathInfo.basePath);
-      
+      const spineItemPath = this.resolveManifestPath(
+        manifestItem.href,
+        workspace.pathInfo.basePath
+      );
+
       await this.workspaceService.writeFile(this.workspaceId, spineItemPath, xhtml);
-      
+
       // Analyze XHTML for SVG content and update manifest properties
       await this.updateSVGProperty(xhtml, workspace, manifestItem);
     } catch (error) {
@@ -309,7 +312,7 @@ export class SpinePreviewManager {
       // Use DOMParser for robust HTML parsing (following codebase preferences)
       const parser = new DOMParser();
       const doc = parser.parseFromString(xhtml, 'text/html');
-      
+
       // Check for any <svg> elements in the document
       const svgElements = doc.querySelectorAll('svg');
       return svgElements.length > 0;
@@ -323,8 +326,8 @@ export class SpinePreviewManager {
    * Update SVG property on manifest item based on XHTML content
    */
   private async updateSVGProperty(
-    xhtml: string, 
-    workspace: WorkspaceState, 
+    xhtml: string,
+    workspace: WorkspaceState,
     manifestItem: ManifestItem
   ): Promise<void> {
     try {
@@ -332,22 +335,22 @@ export class SpinePreviewManager {
       if (manifestItem.mediaType !== 'application/xhtml+xml') {
         return;
       }
-      
+
       const hasSVG = this.detectInlineSVG(xhtml);
       const currentProperties = manifestItem.properties || [];
       const hasSVGProperty = currentProperties.includes('svg');
-      
+
       // Update property if state changed
       if (hasSVG && !hasSVGProperty) {
         // Add svg property
         await this.workspaceService.updateManifestItem(workspace, this.spineItemId, {
-          properties: [...currentProperties, 'svg']
+          properties: [...currentProperties, 'svg'],
         });
       } else if (!hasSVG && hasSVGProperty) {
         // Remove svg property
         const filteredProperties = currentProperties.filter(p => p !== 'svg');
         await this.workspaceService.updateManifestItem(workspace, this.spineItemId, {
-          properties: filteredProperties.length > 0 ? filteredProperties : undefined
+          properties: filteredProperties.length > 0 ? filteredProperties : undefined,
         });
       }
     } catch (error) {
@@ -361,6 +364,7 @@ export class SpinePreviewManager {
   private async generateChapterMetadata(): Promise<ChapterMetadata> {
     // Title: use spine item ID
     const title = this.spineItemId;
+    let fixed_layout = false;
 
     // Language: get from workspace EPUB metadata (fallback to 'en')
     let language = 'en';
@@ -376,7 +380,9 @@ export class SpinePreviewManager {
     const scripts: string[] = [];
     try {
       const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-      
+
+      fixed_layout = workspace.opf.metadata.renditionLayout == 'pre-paginated';
+
       // Stylesheets: filter CSS files from manifest
       workspace.opf.manifest
         .filter(item => item.mediaType === 'text/css')
@@ -386,9 +392,9 @@ export class SpinePreviewManager {
 
       // Scripts: filter JS files from manifest
       workspace.opf.manifest
-        .filter(item => 
-          item.mediaType === 'text/javascript' || 
-          item.mediaType === 'application/javascript'
+        .filter(
+          item =>
+            item.mediaType === 'text/javascript' || item.mediaType === 'application/javascript'
         )
         .forEach(item => {
           scripts.push(item.href); // Use manifest href directly - already relative to OPF
@@ -402,6 +408,7 @@ export class SpinePreviewManager {
       language,
       stylesheets,
       scripts,
+      fixed_layout,
     };
   }
 
@@ -422,6 +429,10 @@ export class SpinePreviewManager {
       )
       .join('\n');
 
+    const viewport = metadata.fixed_layout
+      ? '<meta name="viewport" content="width=320, height=460, initial-scale=1.0" />'
+      : '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
+
     return `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="${this.escapeHtml(metadata.language)}" lang="${this.escapeHtml(metadata.language)}">
@@ -429,6 +440,7 @@ export class SpinePreviewManager {
   <title>${this.escapeHtml(metadata.title)}</title>
 ${stylesheetLinks}
 ${scriptTags}
+${viewport}
 </head>
 ${transformedContent}
 </html>`;

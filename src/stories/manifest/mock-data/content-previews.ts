@@ -1,6 +1,6 @@
 /**
  * Mock content previews for Storybook demonstrations
- * 
+ *
  * Provides realistic preview content for different media types
  * to demonstrate the preview functionality in manifest stories.
  */
@@ -20,16 +20,16 @@ const sampleXhtmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <body>
     <section epub:type="chapter">
         <h1>Chapter 1: The Beginning</h1>
-        
+
         <p>This is the opening chapter of our story, where we introduce the main characters and set the scene for the adventure that follows.</p>
-        
+
         <p>The morning sun cast long shadows across the meadow as Sarah stepped out of her cottage. She had been preparing for this day for weeks, gathering supplies and studying the ancient maps her grandmother had left her.</p>
-        
+
         <blockquote>
             <p>"The journey of a thousand miles begins with a single step."</p>
             <cite>— Ancient Proverb</cite>
         </blockquote>
-        
+
         <p>With determination in her heart and her backpack securely fastened, Sarah began walking toward the mysterious forest that had called to her in her dreams.</p>
     </section>
 </body>
@@ -113,7 +113,10 @@ const sampleNavContent = `<?xml version="1.0" encoding="UTF-8"?>
 const mockContentMap: Record<string, string> = {
   'OEBPS/nav.xhtml': sampleNavContent,
   'OEBPS/chapter1.xhtml': sampleXhtmlContent,
-  'OEBPS/chapter2.xhtml': sampleXhtmlContent.replace('Chapter 1: The Beginning', 'Chapter 2: The Journey Starts'),
+  'OEBPS/chapter2.xhtml': sampleXhtmlContent.replace(
+    'Chapter 1: The Beginning',
+    'Chapter 2: The Journey Starts'
+  ),
   'OEBPS/styles/main.css': sampleCssContent,
   'SOURCE/text/chapter1.txt': `# Chapter 1: The Beginning
 
@@ -130,13 +133,13 @@ function transformText(content) {
     // Convert markdown-style headers
     content = content.replace(/^# (.+)$/gm, '<h1>$1</h1>');
     content = content.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    
+
     // Convert blockquotes
     content = content.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
-    
+
     // Convert paragraphs
     content = content.replace(/^([^<>]+)$/gm, '<p>$1</p>');
-    
+
     return content;
 }
 
@@ -146,9 +149,13 @@ module.exports = { transformText };`,
 /**
  * Create mock content preview for a given item
  */
-export function createMockContentPreview(itemId: string, href: string, mediaType: string): ContentPreview {
+export function createMockContentPreview(
+  itemId: string,
+  href: string,
+  mediaType: string
+): ContentPreview {
   const contentType = getContentTypeFromMediaType(mediaType);
-  
+
   const preview: ContentPreview = {
     itemId,
     mediaType,
@@ -208,7 +215,9 @@ export function getAvailableMockContent(): string[] {
 /**
  * Helper function to determine content type from media type
  */
-function getContentTypeFromMediaType(mediaType: string): 'text' | 'image' | 'audio' | 'video' | 'binary' {
+function getContentTypeFromMediaType(
+  mediaType: string
+): 'text' | 'image' | 'audio' | 'video' | 'binary' {
   if (mediaType.startsWith('text/') || mediaType.includes('xml') || mediaType.includes('css')) {
     return 'text';
   }
@@ -244,16 +253,16 @@ function createMockImageUrl(href: string): string {
   canvas.width = 400;
   canvas.height = 300;
   const ctx = canvas.getContext('2d');
-  
+
   if (ctx) {
     // Create a gradient background
     const gradient = ctx.createLinearGradient(0, 0, 400, 300);
     gradient.addColorStop(0, '#3498db');
     gradient.addColorStop(1, '#2c3e50');
-    
+
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 400, 300);
-    
+
     // Add text overlay
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial';
@@ -262,7 +271,7 @@ function createMockImageUrl(href: string): string {
     ctx.font = '14px Arial';
     ctx.fillText(href, 200, 170);
   }
-  
+
   return canvas.toDataURL();
 }
 
@@ -275,7 +284,7 @@ function createMockAudioUrl(href: string): string {
 }
 
 /**
- * Create mock video URL (placeholder) 
+ * Create mock video URL (placeholder)
  */
 function createMockVideoUrl(href: string): string {
   // Return a data URL for a small video file

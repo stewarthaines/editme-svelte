@@ -26,6 +26,7 @@
     transformWarnings = [],
     executionTime = 0,
     spineItemId,
+    onNavigate = undefined,
     onPreviewClick = null,
   }: {
     xhtmlContent?: string;
@@ -34,6 +35,7 @@
     transformWarnings?: string[];
     executionTime?: number;
     spineItemId: string;
+    onNavigate: ((chapterId: string) => void) | undefined;
     onPreviewClick?:
       | ((detail: { text: string; documentPosition: number; elementType: string }) => void)
       | null;
@@ -634,6 +636,24 @@
 
       // Set up interactivity first
       setupIframeInteractivity(iframeDoc);
+
+      if (onNavigate && previewIframe.contentDocument) {
+        previewIframe.contentDocument.addEventListener('click', e => {
+          const target = e.target as HTMLAnchorElement;
+          if (target.tagName === 'A' && target.href) {
+            const href = target.getAttribute('href');
+            if (href && href.includes('.xhtml')) {
+              e.preventDefault();
+              // Extract chapter ID from Text/chapter1.xhtml
+              const match = href.match(/([^/]+)\.xhtml(#.*)?$/);
+              if (match) {
+                const chapterId = match[1];
+                onNavigate(chapterId);
+              }
+            }
+          }
+        });
+      }
 
       // Restore scroll position if we have pending data
       if (pendingScrollRestore) {
