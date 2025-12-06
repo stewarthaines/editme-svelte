@@ -30,6 +30,7 @@ npm run build
 ```
 
 This creates a single `EDITME.html` file in the `dist/` directory with:
+
 - All JavaScript and CSS inlined
 - Assets encoded as data URLs
 - Optimized and minified code
@@ -47,6 +48,7 @@ npm run preview
 ### Build Output
 
 The build produces:
+
 - `dist/EDITME.html` - Single file application (~2-3MB)
 - All external dependencies bundled
 - No additional files required
@@ -73,7 +75,7 @@ server {
     ssl_certificate_key /path/to/key.pem;
 
     root /var/www/editme;
-    
+
     location / {
         try_files $uri /EDITME.html;
     }
@@ -81,7 +83,7 @@ server {
     # Ensure proper MIME type
     location ~ \.html$ {
         add_header Content-Type "text/html; charset=utf-8";
-        
+
         # Security headers
         add_header X-Frame-Options "SAMEORIGIN";
         add_header X-Content-Type-Options "nosniff";
@@ -158,6 +160,7 @@ Enable GitHub Pages in repository settings.
 ### Preparing for Download
 
 1. **Build with Download Features**
+
    ```bash
    npm run build
    ```
@@ -186,14 +189,12 @@ To use:
 
 Works offline after first use.
 See README.txt for full user guide.
-
-License: Freeware for personal use
-(c) 2025 Stewart Haines
 ```
 
 ### Self-Download Feature
 
 The application includes a self-download feature:
+
 - Users can download their own copy from the web version
 - Accessed via File → Download Editor
 - Includes current version with all updates
@@ -205,6 +206,7 @@ The application includes a self-download feature:
 To embed EDITME.html in an EPUB:
 
 1. **Prepare the EPUB Structure**
+
    ```
    EPUB/
    ├── mimetype
@@ -217,19 +219,21 @@ To embed EDITME.html in an EPUB:
    ```
 
 2. **Add to Manifest** (in content.opf)
+
    ```xml
-   <item id="editme" 
-         href="EDITME.html" 
-         media-type="text/html" 
+   <item id="editme"
+         href="EDITME.html"
+         media-type="text/html"
          properties="scripted"/>
    ```
 
 3. **Include Extraction Instructions**
-   
+
    Create `OEBPS/EXTRACT_EDITOR.txt`:
+
    ```text
    To extract the EDITME.html editor:
-   
+
    1. Rename this .epub file to .zip
    2. Extract the ZIP file
    3. Find OEBPS/EDITME.html
@@ -253,8 +257,8 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 
 async function embedEditor(epubPath, editorPath) {
-    // Implementation for automated embedding
-    // See EPUB_EMBEDDING.md for details
+  // Implementation for automated embedding
+  // See EPUB_EMBEDDING.md for details
 }
 ```
 
@@ -263,6 +267,7 @@ async function embedEditor(epubPath, editorPath) {
 ### Version Tracking
 
 1. **Update Version in package.json**
+
    ```json
    {
      "version": "1.2.3"
@@ -270,6 +275,7 @@ async function embedEditor(epubPath, editorPath) {
    ```
 
 2. **Build with Version**
+
    ```bash
    npm run build
    ```
@@ -282,11 +288,13 @@ async function embedEditor(epubPath, editorPath) {
 ### Update Strategy
 
 For web deployment:
+
 1. Deploy new version to server
 2. Users get update on next visit
 3. Cache busting handled by build
 
 For standalone/embedded:
+
 - Users must manually download updates
 - Include version check feature
 - Provide update notifications
@@ -304,7 +312,7 @@ For standalone/embedded:
 For web deployment, configure CSP headers:
 
 ```
-Content-Security-Policy: 
+Content-Security-Policy:
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval';
     style-src 'self' 'unsafe-inline';
@@ -318,6 +326,7 @@ Note: `unsafe-eval` required for transform scripts.
 ### CORS Configuration
 
 If serving from CDN:
+
 ```
 Access-Control-Allow-Origin: https://yourdomain.com
 Access-Control-Allow-Methods: GET, HEAD
@@ -340,6 +349,7 @@ Access-Control-Allow-Methods: GET, HEAD
 ### Error Tracking
 
 Consider client-side error tracking:
+
 - Sentry for error monitoring
 - Custom error reporting endpoint
 - Privacy-respecting analytics
@@ -353,6 +363,7 @@ Consider client-side error tracking:
 ### Usage Analytics (Optional)
 
 If implementing analytics:
+
 - Respect user privacy
 - Make it opt-in
 - Document data collection

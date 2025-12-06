@@ -44,13 +44,13 @@ The application has been modernized to use Svelte 5's runes-based reactivity sys
 
 ### Distribution Model
 
-**EDITME is distributed as freeware for personal use** with three deployment methods:
+**SEED.html is distributed as MIT licensed open source** with three deployment methods:
 
 1. **Web Application** - Hosted version accessible via browser
 2. **Standalone HTML** - Single file download for offline use
 3. **Active EPUB** - Embedded within EPUB files for self-editing capability
 
-The build process creates a single `EDITME.html` file (~2-3MB) with all assets inlined, suitable for all distribution methods. See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment details.
+The build process creates a single `index.html` file (~2-3MB) with all assets inlined, suitable for all distribution methods. See [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment details.
 
 ## Technical Architecture
 
@@ -108,7 +108,7 @@ mimetype
 META-INF/content.opf
 OEBPS/ (standard EPUB content)
 ├── SOURCE.zip (editor source files - extracted to SOURCE/ during editing)
-└── EDITME.html (editor app - to be extracted by the user to edit the EPUB file)
+└── SEED.html (editor app - to be extracted by the user to edit the EPUB file)
 ```
 
 **Note**: The `SOURCE.zip` file contains all editor-specific files (settings, plain text sources, transform scripts, extensions) and is extracted to a `SOURCE/` directory in the workspace during editing.

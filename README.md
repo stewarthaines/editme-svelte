@@ -108,7 +108,7 @@ The build creates a single `index.html` file in the `dist/` directory with all a
 
 (c) 2025 Stewart Haines
 
-This software open source under the terms of the MIT license. See [LICENSE.txt](./LICENSE.txt) for full terms.
+This software is open source under the terms of the MIT license. See [LICENSE.txt](./LICENSE.txt) for full terms.
 
 ## Support
 

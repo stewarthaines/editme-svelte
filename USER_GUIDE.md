@@ -259,5 +259,3 @@ To backup:
 - **User Forum**: [coming soon]
 - **Documentation**: Check other guides in project
 - **Bug Reports**: [contact coming soon]
-
-Remember: EDITME.html is freeware for personal use. Commercial use requires a license.

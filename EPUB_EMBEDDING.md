@@ -5,7 +5,7 @@ This guide explains how to create Active EPUBs by embedding EDITME.html within E
 ## Table of Contents
 
 1. [Active EPUB Format](#active-epub-format)
-3. [Extraction Instructions](#extraction-instructions)
+2. [Extraction Instructions](#extraction-instructions)
 
 ## Active EPUB Format
 
@@ -84,10 +84,4 @@ SYSTEM REQUIREMENTS
 - Chrome/Edge 119+, Firefox 119+, or Safari 17+
 - No installation required
 - All editing happens in your browser
-
-LICENSE
--------
-EDITME.html is freeware for personal use.
-Commercial use requires a separate license.
-(c) 2025 Stewart Haines
 ```
