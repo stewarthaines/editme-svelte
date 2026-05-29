@@ -8,7 +8,10 @@
   import { EPUBPackager } from '../../epub/EPUBPackager.js';
 
   // Service layer types for return values
-  import type { WorkspaceInfo } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceInfo,
+    WorkspaceRowDetails,
+  } from '../../services/workspace/workspace.service.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -16,6 +19,7 @@
     onCreateWorkspace,
     onDeleteWorkspace,
     onLoadWorkspace,
+    onLoadWorkspaceDetails,
     onEpubImportRequested,
     onWorkspaceChange = null,
     onWorkspaceOpened,
@@ -28,6 +32,7 @@
     onCreateWorkspace: (data: { title: string; language: string }) => Promise<string>;
     onDeleteWorkspace: (id: string) => Promise<void>;
     onLoadWorkspace: (id: string) => Promise<void>;
+    onLoadWorkspaceDetails: (id: string) => Promise<WorkspaceRowDetails>;
     onEpubImportRequested: (file?: File, sourceUrl?: string) => Promise<void>;
     onWorkspaceChange?: ((workspaceId: string | null) => void) | null;
     onWorkspaceOpened?: (workspaceId: string) => void;
@@ -396,6 +401,7 @@
     <WorkspaceList
       {workspaces}
       {currentWorkspaceId}
+      {onLoadWorkspaceDetails}
       isLoading={loading || isPackaging}
       on:workspaceSelected={handleWorkspaceSelect}
       on:workspaceDeleted={handleWorkspaceDelete}

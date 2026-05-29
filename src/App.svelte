@@ -580,6 +580,8 @@
             appState?.createWorkspace(data.title, data.language) ?? Promise.resolve('')}
           onDeleteWorkspace={id => appState?.deleteWorkspace(id) ?? Promise.resolve()}
           onLoadWorkspace={id => appState?.loadWorkspace(id) ?? Promise.resolve()}
+          onLoadWorkspaceDetails={id =>
+            appState?.getWorkspaceRowDetails(id) ?? Promise.resolve({ fileCount: 0 })}
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
           onNavigationRequested={view => {

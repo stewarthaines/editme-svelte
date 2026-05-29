@@ -74,18 +74,24 @@ describe('WorkspaceService.listWorkspaces (parallel, metadata-only)', () => {
     expect(list.map(w => w.id).sort()).toEqual(['ws-a', 'ws-b']);
   });
 
-  it('maps metadata-only fields (title, author, language, fileCount)', async () => {
+  it('maps metadata-only fields (title, author, language)', async () => {
     const list = await service.listWorkspaces();
 
     const a = list.find(w => w.id === 'ws-a')!;
     expect(a.title).toBe('Book A');
     expect(a.author).toBe('Alice');
     expect(a.language).toBe('en');
-    // container.xml + content.opf + ch1.xhtml
-    expect(a.fileCount).toBe(3);
+    // fileCount is loaded lazily per row, not in the fast list path
+    expect(a.fileCount).toBeUndefined();
 
     const b = list.find(w => w.id === 'ws-b')!;
     expect(b.author).toBeUndefined();
+  });
+
+  it('getWorkspaceRowDetails returns the lazily-loaded fileCount', async () => {
+    const details = await service.getWorkspaceRowDetails('ws-a');
+    // container.xml + content.opf + ch1.xhtml
+    expect(details.fileCount).toBe(3);
   });
 
   it('excludes reserved workspaces (publish, locales)', async () => {

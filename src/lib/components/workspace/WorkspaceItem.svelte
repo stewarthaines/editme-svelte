@@ -1,7 +1,10 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { t } from '../../i18n';
-  import type { WorkspaceInfo } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceInfo,
+    WorkspaceRowDetails,
+  } from '../../services/workspace/workspace.service.js';
 
   const dispatch = createEventDispatcher<{
     selected: { workspaceId: string };
@@ -11,6 +14,25 @@
   export let workspace: WorkspaceInfo;
   export let isCurrent = false;
   export let hasError = false;
+  export let onLoadWorkspaceDetails: ((id: string) => Promise<WorkspaceRowDetails>) | undefined =
+    undefined;
+
+  // Per-row details (file count, extensions) are loaded lazily after the list
+  // renders, so the Projects view appears instantly. Prefer eager values if a
+  // caller already populated them on the workspace object.
+  let details: WorkspaceRowDetails | null =
+    workspace.fileCount !== undefined
+      ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds }
+      : null;
+
+  onMount(async () => {
+    if (details || !onLoadWorkspaceDetails) return;
+    try {
+      details = await onLoadWorkspaceDetails(workspace.id);
+    } catch {
+      // Row details are non-critical; leave them unshown on failure.
+    }
+  });
 
   const handleSelect = () => {
     dispatch('selected', { workspaceId: workspace.id });
@@ -47,15 +69,6 @@
     } else {
       return $t('{count}w ago', { count: Math.floor(days / 7) });
     }
-  };
-
-  // Format file size
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 </script>
 
@@ -100,13 +113,14 @@
         <span class="workspace-language">{workspace.language}</span>
         <span class="meta-separator">•</span>
         <span class="workspace-stats">
-          {workspace.fileCount}
-          {$t('files')}
-          {#if workspace.totalSize > 0}
-            • {formatFileSize(workspace.totalSize)}
-          {/if}
-          {#if workspace.extensionIds && workspace.extensionIds.length > 0}
-            • {workspace.extensionIds.join(', ')}
+          {#if details}
+            {details.fileCount}
+            {$t('files')}
+            {#if details.extensionIds && details.extensionIds.length > 0}
+              • {details.extensionIds.join(', ')}
+            {/if}
+          {:else}
+            <span class="stats-loading">…</span>
           {/if}
         </span>
       </div>

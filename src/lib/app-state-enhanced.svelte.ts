@@ -319,6 +319,14 @@ export class EnhancedAppState {
     }
   }
 
+  /**
+   * Load the per-row details (file count, extensions) for a single workspace.
+   * Used by the Projects list to fill in each row after the fast initial render.
+   */
+  async getWorkspaceRowDetails(id: string) {
+    return this.workspaceService.getWorkspaceRowDetails(id);
+  }
+
   async createWorkspace(title: string, language: string = 'en'): Promise<string> {
     try {
       this.isLoading = true;

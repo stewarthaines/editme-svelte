@@ -2,7 +2,10 @@
   import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import WorkspaceItem from './WorkspaceItem.svelte';
-  import type { WorkspaceInfo } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceInfo,
+    WorkspaceRowDetails,
+  } from '../../services/workspace/workspace.service.js';
 
   const dispatch = createEventDispatcher<{
     workspaceSelected: { workspaceId: string };
@@ -13,6 +16,8 @@
   export let workspaces: WorkspaceInfo[] = [];
   export let currentWorkspaceId: string | null = null;
   export let isLoading = false;
+  export let onLoadWorkspaceDetails: ((id: string) => Promise<WorkspaceRowDetails>) | undefined =
+    undefined;
 
   let searchQuery = '';
 
@@ -129,6 +134,7 @@
         {#each sortedWorkspaces as workspace (workspace.id)}
           <WorkspaceItem
             {workspace}
+            {onLoadWorkspaceDetails}
             isCurrent={workspace.id === currentWorkspaceId}
             hasError={workspace.hasError || false}
             on:selected={handleWorkspaceSelect}

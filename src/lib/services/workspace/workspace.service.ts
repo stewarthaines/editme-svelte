@@ -30,11 +30,19 @@ export interface WorkspaceInfo {
   title: string;
   language: string;
   lastModified: Date;
-  fileCount: number;
-  totalSize: number;
+  /** Loaded lazily per row via getWorkspaceRowDetails — absent in the fast list path. */
+  fileCount?: number;
+  totalSize?: number;
   author?: string;
   hasError?: boolean;
   epubVersion: string;
+  /** Loaded lazily per row via getWorkspaceRowDetails. */
+  extensionIds?: string[];
+}
+
+/** Per-row details loaded lazily after the Projects list renders. */
+export interface WorkspaceRowDetails {
+  fileCount: number;
   extensionIds?: string[];
 }
 
@@ -615,16 +623,16 @@ export class WorkspaceService {
   }
 
   /**
-   * Build the summary info for a single workspace shown in the Projects list.
-   * Parses only the OPF metadata block (title/author/language) — not the full
-   * manifest/spine/guide — so listing many workspaces stays cheap.
+   * Build the fast summary info for a single workspace shown in the Projects
+   * list: title/author/language/lastModified only. Parses just the OPF metadata
+   * block (not the full manifest/spine/guide) and avoids the expensive
+   * per-workspace directory scans (file count, extensions) — those are loaded
+   * lazily per row via getWorkspaceRowDetails so the list renders fast.
    */
   async getWorkspaceInfo(id: string): Promise<WorkspaceInfo> {
     const pathInfo = await this.getWorkspacePathInfo(id);
     const opfContent = await this.fileStorage.readTextFile(id, pathInfo.rootfilePath);
     const metadata = OPFUtils.parseOPFMetadataFromString(opfContent);
-
-    const files = await this.fileStorage.listFiles(id);
 
     // Get OPF file modification time for the workspace last-modified timestamp.
     let lastModified: Date;
@@ -635,7 +643,25 @@ export class WorkspaceService {
       lastModified = metadata.modifiedDate ? new Date(metadata.modifiedDate) : new Date();
     }
 
-    // Extensions are optional — don't fail the workspace if they can't be loaded.
+    return {
+      id,
+      title: metadata.title,
+      language: metadata.language,
+      lastModified,
+      author: metadata.creator?.[0] || undefined,
+      hasError: false,
+      epubVersion: '3.0',
+    };
+  }
+
+  /**
+   * Load the per-row details that are too expensive for the fast list path:
+   * file count (directory scan) and extension ids. Called lazily once a row
+   * is rendered.
+   */
+  async getWorkspaceRowDetails(id: string): Promise<WorkspaceRowDetails> {
+    const files = await this.fileStorage.listFiles(id);
+
     let extensionIds: string[] | undefined;
     try {
       const extensions = await this.extensionManager.listWorkspaceExtensions(id);
@@ -643,21 +669,10 @@ export class WorkspaceService {
         extensionIds = extensions.map(ext => ext.name);
       }
     } catch {
-      // ignore
+      // Extensions are optional — don't fail the row if they can't be loaded.
     }
 
-    return {
-      id,
-      title: metadata.title,
-      language: metadata.language,
-      lastModified,
-      fileCount: files.length,
-      totalSize: 0, // expensive to compute; intentionally omitted
-      author: metadata.creator?.[0] || undefined,
-      hasError: false,
-      epubVersion: '3.0',
-      extensionIds,
-    };
+    return { fileCount: files.length, extensionIds };
   }
 
   /**
