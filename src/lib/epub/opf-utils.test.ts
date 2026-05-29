@@ -204,6 +204,42 @@ describe('OPFUtils', () => {
     });
   });
 
+  describe('parseOPFMetadataFromString', () => {
+    it('parses an OPF string and surfaces missing-required errors (delegates to parseOPFMetadata)', () => {
+      const opfContent = `<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="uuid">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:language>en</dc:language>
+    <dc:identifier id="uuid">test-book-123</dc:identifier>
+  </metadata>
+</package>`;
+
+      expect(() => OPFUtils.parseOPFMetadataFromString(opfContent)).toThrow(
+        'Missing required dc:title in OPF metadata'
+      );
+    });
+
+    // Skip: positive metadata extraction relies on getElementsByTagNameNS, which
+    // does not work correctly in happy-dom (see parseOPFMetadata skips above).
+    // Verified in the browser via Storybook.
+    it.skip('extracts title/language/creator from a valid OPF string', () => {
+      const opfContent = `<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="uuid">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>Test Book</dc:title>
+    <dc:language>en</dc:language>
+    <dc:identifier id="uuid">test-book-123</dc:identifier>
+    <dc:creator>Test Author</dc:creator>
+  </metadata>
+</package>`;
+
+      const metadata = OPFUtils.parseOPFMetadataFromString(opfContent);
+      expect(metadata.title).toBe('Test Book');
+      expect(metadata.language).toBe('en');
+      expect(metadata.creator).toEqual(['Test Author']);
+    });
+  });
+
   describe('parseOPFDocument', () => {
     // Skip: requires getElementsByTagNameNS which doesn't work correctly in happy-dom
     // XML namespace parsing has incomplete support for complex namespace scenarios

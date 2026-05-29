@@ -334,6 +334,16 @@ export class OPFUtils {
   }
 
   /**
+   * Parse only the metadata block from an OPF string, skipping the manifest,
+   * spine, and guide. Cheaper than parseOPFDocument for list views that only
+   * need title/author/language.
+   */
+  static parseOPFMetadataFromString(opfContent: string): EPUBMetadata {
+    const doc = new DOMParser().parseFromString(opfContent, 'application/xml');
+    return this.parseOPFMetadata(doc);
+  }
+
+  /**
    * Parses complete OPF document structure using DOMParser
    */
   static parseOPFDocument(opfContent: string): OPFDocument {

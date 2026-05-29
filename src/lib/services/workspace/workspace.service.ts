@@ -111,6 +111,7 @@ export class ValidationError extends WorkspaceServiceError {
 // Import OPF utilities for internal use
 import { OPFUtils } from '../../epub/opf-utils.js';
 import { ExtensionManager } from '../../extensions/extension-manager.js';
+import { RESERVED_WORKSPACE_IDS } from '../../workspace/types.js';
 
 /**
  * WorkspaceService - Single responsibility for workspace lifecycle and EPUB structure
@@ -599,57 +600,64 @@ export class WorkspaceService {
    */
   async listWorkspaces(): Promise<WorkspaceInfo[]> {
     const workspaceIds = await this.fileStorage.listWorkspaces();
-    const workspaces: WorkspaceInfo[] = [];
 
-    for (const id of workspaceIds) {
-      try {
-        const workspace = await this.loadWorkspace(id);
-        const files = await this.fileStorage.listFiles(id);
-        // Note: totalSize calculation removed for performance - was too expensive
-        const totalSize = 0;
+    // Skip reserved workspaces (e.g. 'locales', 'publish') — they are not user
+    // projects and have no OPF to parse.
+    const visibleIds = workspaceIds.filter(id => !RESERVED_WORKSPACE_IDS.has(id));
 
-        // Get OPF file modification time for workspace last modified timestamp
-        let lastModified: Date;
-        try {
-          const opfFileInfo = await this.fileStorage.getFileInfo(id, workspace.pathInfo.rootfilePath);
-          lastModified = opfFileInfo.lastModified;
-        } catch (_error) {
-          // Fallback to metadata timestamp or current date if file info unavailable
-          lastModified = workspace.opf.metadata.modifiedDate
-            ? new Date(workspace.opf.metadata.modifiedDate)
-            : new Date();
-        }
+    // Parse all workspaces in parallel; a corrupted workspace resolves to null
+    // (one bad workspace must not abort the whole list) and is filtered out.
+    const results = await Promise.all(
+      visibleIds.map(id => this.getWorkspaceInfo(id).catch(() => null))
+    );
 
-        // Get extension IDs for workspace
-        let extensionIds: string[] | undefined;
-        try {
-          const extensions = await this.extensionManager.listWorkspaceExtensions(id);
-          if (extensions.length > 0) {
-            extensionIds = extensions.map(ext => ext.name);
-          }
-        } catch {
-          // Extensions are optional, don't fail if they can't be loaded
-        }
+    return results.filter((info): info is WorkspaceInfo => info !== null);
+  }
 
-        workspaces.push({
-          id,
-          title: workspace.opf.metadata.title,
-          language: workspace.opf.metadata.language,
-          lastModified,
-          fileCount: files.length,
-          totalSize,
-          author: workspace.opf.metadata.creator?.[0] || undefined,
-          hasError: false,
-          epubVersion: '3.0',
-          extensionIds,
-        });
-      } catch (_error) {
-        // Skip corrupted workspaces
-        continue;
-      }
+  /**
+   * Build the summary info for a single workspace shown in the Projects list.
+   * Parses only the OPF metadata block (title/author/language) — not the full
+   * manifest/spine/guide — so listing many workspaces stays cheap.
+   */
+  async getWorkspaceInfo(id: string): Promise<WorkspaceInfo> {
+    const pathInfo = await this.getWorkspacePathInfo(id);
+    const opfContent = await this.fileStorage.readTextFile(id, pathInfo.rootfilePath);
+    const metadata = OPFUtils.parseOPFMetadataFromString(opfContent);
+
+    const files = await this.fileStorage.listFiles(id);
+
+    // Get OPF file modification time for the workspace last-modified timestamp.
+    let lastModified: Date;
+    try {
+      const opfFileInfo = await this.fileStorage.getFileInfo(id, pathInfo.rootfilePath);
+      lastModified = opfFileInfo.lastModified;
+    } catch (_error) {
+      lastModified = metadata.modifiedDate ? new Date(metadata.modifiedDate) : new Date();
     }
 
-    return workspaces;
+    // Extensions are optional — don't fail the workspace if they can't be loaded.
+    let extensionIds: string[] | undefined;
+    try {
+      const extensions = await this.extensionManager.listWorkspaceExtensions(id);
+      if (extensions.length > 0) {
+        extensionIds = extensions.map(ext => ext.name);
+      }
+    } catch {
+      // ignore
+    }
+
+    return {
+      id,
+      title: metadata.title,
+      language: metadata.language,
+      lastModified,
+      fileCount: files.length,
+      totalSize: 0, // expensive to compute; intentionally omitted
+      author: metadata.creator?.[0] || undefined,
+      hasError: false,
+      epubVersion: '3.0',
+      extensionIds,
+    };
   }
 
   /**
