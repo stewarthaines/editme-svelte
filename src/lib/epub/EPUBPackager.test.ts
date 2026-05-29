@@ -116,6 +116,22 @@ describe('EPUBPackager', () => {
       expect(result.processingTime).toBeGreaterThan(0);
     });
 
+    it('should persist the packaged epub to the publish output directory', async () => {
+      const result = await packager.packageEPUB(mockWorkspaceId);
+
+      expect(result.success).toBe(true);
+      expect(result.filename).toBeDefined();
+
+      // The packaged epub is written to the shared, reserved 'publish' workspace
+      // under its generated filename, so the Publish view (and later the plugin)
+      // can list and act on it.
+      expect(mockStorage.writeFile).toHaveBeenCalledWith(
+        'publish',
+        result.filename,
+        expect.any(ArrayBuffer)
+      );
+    });
+
     it('should handle empty workspace', async () => {
       mockStorage.listFiles.mockResolvedValue([]);
 

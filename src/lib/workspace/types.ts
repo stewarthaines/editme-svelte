@@ -9,9 +9,15 @@ import type { EPUBMetadata, ManifestItem, OPFDocument, SpineItem } from '../epub
 // Re-export types for convenience
 export type { ManifestItem, OPFDocument, SpineItem };
 
+// Shared output directory for packaged epubs, modelled as a reserved workspace.
+// Packaging writes finished .epub files here; the Publish view (and the publish
+// plugin, via a directory handle) reads them. Lives at /workspaces/publish/.
+export const PUBLISH_WORKSPACE_ID = 'publish';
+
 // Reserved workspace IDs that should be excluded from user workspace lists
 export const RESERVED_WORKSPACE_IDS = new Set([
   'locales', // Used internally by the i18n system
+  PUBLISH_WORKSPACE_ID, // Shared output directory for packaged epubs
 ]);
 
 // Core workspace types

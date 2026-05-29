@@ -10,6 +10,7 @@ import { FileStorageAPI } from '../storage/index.js';
 import { OPFUtils, type EPUBMetadata } from './opf-utils.js';
 import { getMimeType } from '../utils/mime-types.js';
 import { SourceManager } from '../source/index.js';
+import { PUBLISH_WORKSPACE_ID } from '../workspace/types.js';
 
 export { type EPUBMetadata } from './opf-utils.js';
 
@@ -116,6 +117,10 @@ export class EPUBPackager {
 
       const blob = await zipWriter.buildBlob();
       const filename = this.generateFilename(metadata);
+
+      // Persist the packaged epub to the shared publish output directory so the
+      // Publish view (and the publish plugin) can list and act on it.
+      await this.fileStorage.writeFile(PUBLISH_WORKSPACE_ID, filename, await blob.arrayBuffer());
 
       options.progressCallback?.({
         phase: 'complete',
