@@ -28,7 +28,7 @@
     onfieldFocus,
     onarrayAdd,
     onarrayRemove,
-    ongenerateIdentifier
+    ongenerateIdentifier,
   }: Props = $props();
 
   // Removed reactive state tracking - work directly with metadata props
@@ -40,6 +40,7 @@
     { value: 'es', label: 'Español' },
     { value: 'fr', label: 'Français' },
     { value: 'it', label: 'Italiano' },
+    { value: 'pl', label: 'Polski' },
     { value: 'pt', label: 'Português' },
     { value: 'ja', label: '日本語' },
     { value: 'zh', label: '中文' },
