@@ -23,7 +23,7 @@
   let { workspace = $bindable(null), metadataService }: Props = $props();
 
   // Reactive state using Svelte 5 runes
-  let metadata = $derived(workspace?.opf.metadata ?? { title: '', language: '', identifier: '' });
+  let metadata = $derived(workspace?.opf.metadata ?? { title: '', language: [], identifier: '' });
   let validationErrors = $derived(metadataService.validateMetadata(metadata));
   let loading = $derived(!workspace);
   
@@ -128,10 +128,15 @@
     try {
       saving = true;
 
-      if (field === 'creator' || field === 'subject' || field === 'contributor') {
+      if (
+        field === 'creator' ||
+        field === 'subject' ||
+        field === 'contributor' ||
+        field === 'language'
+      ) {
         // Add new item using service
         workspace = await metadataService.addArrayItem(workspace, field);
-        
+
         // Notify that metadata has changed
         dispatch('metadataChanged', { field, value: workspace.opf.metadata[field as keyof EPUBMetadata] });
       }
@@ -152,7 +157,12 @@
     try {
       saving = true;
 
-      if (field === 'creator' || field === 'subject' || field === 'contributor') {
+      if (
+        field === 'creator' ||
+        field === 'subject' ||
+        field === 'contributor' ||
+        field === 'language'
+      ) {
         // Remove item using service
         workspace = await metadataService.removeArrayItem(workspace, field, index);
         

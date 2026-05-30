@@ -490,7 +490,7 @@ ${navEntriesHtml}
 
     return {
       title: sampleTitle || 'Sample Book',
-      language: locale,
+      language: [locale],
       identifier: `urn:uuid:sample-${Date.now()}`,
       creator: [{ name: sampleAuthor || 'Sample Author', roles: [] }],
       description: sampleDescription || 'A sample book for demonstration purposes',

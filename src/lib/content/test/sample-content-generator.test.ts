@@ -209,7 +209,7 @@ describe('SampleContentGenerator', () => {
 
         expectEPUBMetadata(result, 'en');
         expect(result.title).toBe('Introduction to EPUB');
-        expect(result.language).toBe('en');
+        expect(result.language).toEqual(['en']);
         expect(result.creator).toEqual([{ name: 'EDITME Editorial Team', roles: [] }]);
         expect(result.publisher).toBe('EDITME Publishing');
         expect(result.pageProgressionDirection).toBe('ltr');
@@ -220,7 +220,7 @@ describe('SampleContentGenerator', () => {
 
         expectEPUBMetadata(result, 'ar');
         expect(result.title).toBe('مقدمة إلى EPUB');
-        expect(result.language).toBe('ar');
+        expect(result.language).toEqual(['ar']);
         expect(result.creator).toEqual([{ name: 'فريق تحرير EDITME', roles: [] }]);
         expect(result.pageProgressionDirection).toBe('rtl');
       });
@@ -558,7 +558,7 @@ describe('SampleContentGenerator', () => {
 
         // All should succeed for supported locales
         expect(content.locale).toBe(locale);
-        expect(metadata.language).toBe(locale);
+        expect(metadata.language).toEqual([locale]);
         expect(chapters.length).toBe(1);
         expect(validation.isValid).toBe(true);
       }

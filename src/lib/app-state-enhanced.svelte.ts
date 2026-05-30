@@ -18,7 +18,7 @@ import type {
   WorkspaceInfo,
   ChapterContent,
 } from './services/workspace/workspace.service.js';
-import { creatorName } from './epub/opf-utils.js';
+import { creatorName, primaryLanguage } from './epub/opf-utils.js';
 import type {
   GlobalSettings,
   WorkspaceSettings,
@@ -146,7 +146,7 @@ export class EnhancedAppState {
     return {
       id: this.workspace.id,
       title: this.workspace.opf.metadata.title,
-      language: this.workspace.opf.metadata.language,
+      language: primaryLanguage(this.workspace.opf.metadata),
       lastModified: new Date(), // Could be enhanced with actual timestamp
       fileCount: this.workspace.opf.manifest.length,
       totalSize: 0, // Could be enhanced with actual size calculation
@@ -336,7 +336,7 @@ export class EnhancedAppState {
       // Step 1: Create empty workspace
       const workspace = await this.workspaceService.createWorkspace({
         title,
-        language,
+        language: [language],
         identifier: `urn:uuid:${crypto.randomUUID()}`,
       });
 

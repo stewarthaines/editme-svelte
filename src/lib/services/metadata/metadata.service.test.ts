@@ -52,11 +52,45 @@ describe('MetadataService creators', () => {
     const service = makeService();
     const results = service.validateMetadata({
       title: 'T',
-      language: 'en',
+      language: ['en'],
       identifier: 'id',
       creator: [{ name: '', roles: [] }],
     });
 
     expect(results.some(r => r.field === 'creator' && r.type === 'warning')).toBe(true);
+  });
+
+  it('addArrayItem appends an empty language tag', async () => {
+    const service = makeService();
+    const ws = makeWorkspace({ title: 'T', language: ['en'], identifier: 'id' });
+
+    const updated = await service.addArrayItem(ws, 'language');
+
+    expect(updated.opf.metadata.language).toEqual(['en', '']);
+  });
+
+  it('validateMetadata errors when no language is present', () => {
+    const service = makeService();
+    const results = service.validateMetadata({ title: 'T', language: [], identifier: 'id' });
+
+    expect(results.some(r => r.field === 'language' && r.type === 'error')).toBe(true);
+  });
+
+  it('validateMetadata errors on a malformed language tag but accepts BCP 47', () => {
+    const service = makeService();
+
+    const bad = service.validateMetadata({
+      title: 'T',
+      language: ['english'],
+      identifier: 'id',
+    });
+    expect(bad.some(r => r.field === 'language[0]' && r.type === 'error')).toBe(true);
+
+    const good = service.validateMetadata({
+      title: 'T',
+      language: ['en', 'zh-Hant', 'gsw'],
+      identifier: 'id',
+    });
+    expect(good.some(r => r.field?.startsWith('language') && r.type === 'error')).toBe(false);
   });
 });

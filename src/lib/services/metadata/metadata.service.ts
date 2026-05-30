@@ -7,6 +7,7 @@
 
 import type { EPUBMetadata, Creator } from '../../epub/opf-utils.js';
 import { creatorName } from '../../epub/opf-utils.js';
+import { isWellFormedLanguageTag } from '../../epub/bcp47.js';
 import type { WorkspaceService, WorkspaceState } from '../workspace/workspace.service.js';
 
 // Use existing ValidationResult from MetadataValidator for compatibility
@@ -107,15 +108,20 @@ export class MetadataService {
   /**
    * Add an item to an array field (creator, contributor, subject)
    */
-  async addArrayItem(workspace: WorkspaceState, field: 'creator' | 'contributor' | 'subject', value: string = ''): Promise<WorkspaceState> {
+  async addArrayItem(workspace: WorkspaceState, field: 'creator' | 'contributor' | 'subject' | 'language', value: string = ''): Promise<WorkspaceState> {
     try {
       const currentArray: any[] = (workspace.opf.metadata as any)[field] || [];
 
-      // Creators/contributors are structured (name + roles); subjects are strings.
-      const newItem: string | Creator =
-        field === 'subject'
-          ? value || this.getDefaultArrayValue(field)
-          : { name: value, roles: [] };
+      // Creators/contributors are structured (name + roles); language is an
+      // empty string the user fills in; subjects get a placeholder default.
+      let newItem: string | Creator;
+      if (field === 'creator' || field === 'contributor') {
+        newItem = { name: value, roles: [] };
+      } else if (field === 'language') {
+        newItem = value;
+      } else {
+        newItem = value || this.getDefaultArrayValue(field);
+      }
 
       const updates = {
         [field]: [...currentArray, newItem],
@@ -134,7 +140,7 @@ export class MetadataService {
   /**
    * Remove an item from an array field
    */
-  async removeArrayItem(workspace: WorkspaceState, field: 'creator' | 'contributor' | 'subject', index: number): Promise<WorkspaceState> {
+  async removeArrayItem(workspace: WorkspaceState, field: 'creator' | 'contributor' | 'subject' | 'language', index: number): Promise<WorkspaceState> {
     try {
       const currentArray = workspace.opf.metadata[field] || [];
       
@@ -174,10 +180,11 @@ export class MetadataService {
       });
     }
 
-    if (!metadata.language?.trim()) {
+    const languages = (metadata.language ?? []).filter(l => l.trim());
+    if (languages.length === 0) {
       results.push({
         field: 'language',
-        message: 'Language is required',
+        message: 'At least one language is required',
         type: 'error'
       });
     }
@@ -190,14 +197,16 @@ export class MetadataService {
       });
     }
 
-    // Language code validation
-    if (metadata.language && !/^[a-z]{2}(-[A-Z]{2})?$/.test(metadata.language)) {
-      results.push({
-        field: 'language',
-        message: 'Invalid language code format (use ISO 639-1, e.g., "en" or "en-US")',
-        type: 'warning'
-      });
-    }
+    // Language tag validation (BCP 47 well-formedness)
+    metadata.language?.forEach((tag, index) => {
+      if (tag.trim() && !isWellFormedLanguageTag(tag)) {
+        results.push({
+          field: `language[${index}]`,
+          message: `Invalid language tag "${tag}" (use a BCP 47 tag, e.g. "en", "en-US", "zh-Hant")`,
+          type: 'error'
+        });
+      }
+    });
 
     // Title length validation
     if (metadata.title && metadata.title.length > 200) {
@@ -237,16 +246,18 @@ export class MetadataService {
 
     // Validate language
     if (updates.language !== undefined) {
-      if (!updates.language.trim()) {
+      const tags = updates.language.filter(t => t.trim());
+      const badTag = tags.find(t => !isWellFormedLanguageTag(t));
+      if (tags.length === 0) {
         results.push({
           field: 'language',
-          message: 'Language cannot be empty',
+          message: 'At least one language is required',
           type: 'error'
         });
-      } else if (!/^[a-z]{2}(-[A-Z]{2})?$/.test(updates.language)) {
+      } else if (badTag) {
         results.push({
           field: 'language',
-          message: 'Invalid language code format',
+          message: `Invalid language tag "${badTag}"`,
           type: 'warning'
         });
       }

@@ -51,6 +51,16 @@ export function creatorNames(list?: (Creator | string)[]): string[] {
 }
 
 /**
+ * The primary (first) dc:language tag — the one most readers want (display,
+ * xml:lang, locale). Tolerant of legacy single-string data.
+ */
+export function primaryLanguage(meta?: { language?: string[] | string }): string {
+  const lang = meta?.language;
+  if (!lang) return '';
+  return typeof lang === 'string' ? lang : (lang[0] ?? '');
+}
+
+/**
  * Build Creator[] from dc:creator/dc:contributor elements, attaching MARC roles
  * via a refines lookup (id -> role codes). Pure and DOM-namespace-free so it can
  * be unit-tested without happy-dom's unreliable getElementsByTagNameNS.
@@ -72,7 +82,7 @@ export function parseCreatorList(
 export interface EPUBMetadata {
   // Required Dublin Core elements
   title: string;
-  language: string;
+  language: string[]; // BCP 47 tags; at least one required
   identifier: string;
 
   // Optional Dublin Core elements
@@ -113,6 +123,7 @@ export interface MetadataFieldTypes {
   creator: Creator[];
   contributor: Creator[];
   // Array fields
+  language: string[];
   subject: string[];
   accessMode: string[];
   accessModeSufficient: string[];
@@ -121,7 +132,6 @@ export interface MetadataFieldTypes {
 
   // Required string fields
   title: string;
-  language: string;
   identifier: string;
 
   // Optional string fields
@@ -376,7 +386,9 @@ export class OPFUtils {
 
     return {
       title: titleElements[0].textContent!.trim(),
-      language: languageElements[0].textContent!.trim(),
+      language: Array.from(languageElements)
+        .map(el => el.textContent?.trim())
+        .filter(Boolean) as string[],
       identifier: identifierElements[0].textContent!.trim(),
       creator: creators.length > 0 ? creators : undefined,
       contributor: contributors.length > 0 ? contributors : undefined,
@@ -524,11 +536,23 @@ export class OPFUtils {
     // Generate unique identifier
     const uniqueId = manifest.find(item => item.id === 'uuid')?.id || 'uuid';
 
+    // dc:language is multi-valued; tolerate legacy single-string data.
+    const languageTags = (
+      Array.isArray(metadata.language)
+        ? metadata.language
+        : metadata.language
+          ? [metadata.language as string]
+          : []
+    ).filter(Boolean);
+    const languageXML = languageTags
+      .map(tag => `<dc:language>${escapeXML(tag)}</dc:language>`)
+      .join('\n    ');
+
     let xml = `<?xml version="1.0" encoding="utf-8"?>
 <package version="${version}" xmlns="http://www.idpf.org/2007/opf" unique-identifier="${uniqueId}" prefix="rendition: http://www.idpf.org/vocab/rendition/# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/" xml:lang="en">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ibooks="http://vocabulary.itunes.apple.com/rdf/ibooks/vocabularies/2012/01/ibooks-specific">
     <dc:title>${escapeXML(metadata.title)}</dc:title>
-    <dc:language>${escapeXML(metadata.language)}</dc:language>
+    ${languageXML}
     <dc:identifier id="${uniqueId}">${escapeXML(metadata.identifier)}</dc:identifier>`;
 
     // Add optional metadata. Creators/contributors emit an id plus a

@@ -84,7 +84,7 @@ export function expectDemoChapters(actual: any[], expectedCount: number = 1): vo
 export function expectEPUBMetadata(actual: any, locale: string): void {
   expect(actual).toEqual({
     title: expect.any(String),
-    language: locale,
+    language: [locale],
     identifier: expect.stringMatching(/^sample-content-[a-z-]+-\d+$/),
     creator: expect.arrayContaining([expect.objectContaining({ name: expect.any(String) })]),
     publisher: expect.any(String),

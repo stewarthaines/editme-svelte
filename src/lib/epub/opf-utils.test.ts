@@ -6,6 +6,7 @@ import {
   creatorName,
   creatorNames,
   parseCreatorList,
+  primaryLanguage,
 } from './opf-utils.js';
 import type { OPFDocument } from './opf-utils.js';
 
@@ -112,7 +113,7 @@ function createTestOPFDocument(): OPFDocument {
     metadata: {
       title: 'Test EPUB',
       creator: [{ name: 'Test Author', roles: [] }],
-      language: 'en',
+      language: ['en'],
       identifier: 'test-123',
     },
     manifest: [
@@ -130,6 +131,32 @@ function createTestOPFDocument(): OPFDocument {
     ],
   };
 }
+
+describe('primaryLanguage', () => {
+  it('returns the first language tag', () => {
+    expect(primaryLanguage({ language: ['en', 'fr'] })).toBe('en');
+  });
+
+  it('tolerates legacy single-string data and empties', () => {
+    expect(primaryLanguage({ language: 'de' as any })).toBe('de');
+    expect(primaryLanguage({ language: [] })).toBe('');
+    expect(primaryLanguage(undefined)).toBe('');
+  });
+});
+
+describe('generateOPFXML - languages', () => {
+  function docWithLang(language: string[]): OPFDocument {
+    const base = createTestOPFDocument();
+    return { ...base, metadata: { ...base.metadata, language } };
+  }
+
+  it('emits one dc:language per tag', () => {
+    const xml = OPFUtils.generateOPFXML(docWithLang(['en', 'fr', 'gsw']));
+    expect(xml).toContain('<dc:language>en</dc:language>');
+    expect(xml).toContain('<dc:language>fr</dc:language>');
+    expect(xml).toContain('<dc:language>gsw</dc:language>');
+  });
+});
 
 describe('generateOPFXML - creator roles', () => {
   function docWith(metadata: Partial<OPFDocument['metadata']>): OPFDocument {

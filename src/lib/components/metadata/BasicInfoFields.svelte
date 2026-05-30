@@ -4,6 +4,7 @@
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
   import CreatorRoleEditor from './CreatorRoleEditor.svelte';
+  import LanguageEditor from './LanguageEditor.svelte';
   import type { EPUBMetadata } from '../../epub';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
   import { MetadataUtils, type EditableArrayField } from '../../epub/opf-utils';
@@ -21,7 +22,7 @@
   }
 
   let {
-    metadata = { title: '', language: '', identifier: '' },
+    metadata = { title: '', language: [], identifier: '' },
     validationErrors = [],
     saving = false,
     onfieldChange,
@@ -33,22 +34,6 @@
   }: Props = $props();
 
   // Removed reactive state tracking - work directly with metadata props
-
-  // Language options - simplified for now
-  const languageOptions = [
-    { value: 'en', label: 'English' },
-    { value: 'de', label: 'Deutsch' },
-    { value: 'es', label: 'Español' },
-    { value: 'fr', label: 'Français' },
-    { value: 'it', label: 'Italiano' },
-    { value: 'pl', label: 'Polski' },
-    { value: 'pt', label: 'Português' },
-    { value: 'ja', label: '日本語' },
-    { value: 'zh', label: '中文' },
-    { value: 'ar', label: 'العربية' },
-    { value: 'he', label: 'עברית' },
-    { value: 'ka', label: 'ქართული' },
-  ];
 
   // Rendition options
   const layoutOptions = [
@@ -114,17 +99,14 @@
           onfocus={() => handleFieldFocus('title')}
         />
 
-        <SelectMetadataField
-          id="language"
-          label={$t('Language')}
-          value={metadata.language || ''}
-          options={languageOptions}
-          placeholder={$t('Select language')}
-          required={true}
-          error={getFieldError('language')}
-          onchange={e => handleFieldChange('language', e.value)}
-          onblur={e => handleFieldSave('language', e.value)}
-          onfocus={() => handleFieldFocus('language')}
+        <LanguageEditor
+          languages={metadata.language ?? []}
+          {saving}
+          {getFieldError}
+          {onfieldSave}
+          {onarrayAdd}
+          {onarrayRemove}
+          {onfieldFocus}
         />
 
         <div class="identifier-field">

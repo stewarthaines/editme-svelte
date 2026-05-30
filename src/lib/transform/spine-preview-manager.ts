@@ -14,6 +14,7 @@
 
 import type { FileStorageAPI } from '../storage/index.js';
 import { convertManifestPathToXHTMLPath } from '../epub/path-utils.js';
+import { primaryLanguage } from '../epub/opf-utils.js';
 import type { ExtensionManager } from '../extensions/extension-manager.js';
 import type { SettingsService } from '../services/settings/settings.service.js';
 import type { WorkspaceService } from '../services/workspace/workspace.service.js';
@@ -370,7 +371,7 @@ export class SpinePreviewManager {
     let language = 'en';
     try {
       const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-      language = workspace?.opf?.metadata?.language || 'en';
+      language = primaryLanguage(workspace?.opf?.metadata) || 'en';
     } catch (error) {
       console.warn('Could not load workspace language, using default:', error);
     }

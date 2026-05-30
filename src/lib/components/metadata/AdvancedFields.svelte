@@ -20,7 +20,7 @@
   }
 
   let {
-    metadata = { title: '', language: '', identifier: '' },
+    metadata = { title: '', language: [], identifier: '' },
     validationErrors = [],
     saving = false,
     onfieldChange,

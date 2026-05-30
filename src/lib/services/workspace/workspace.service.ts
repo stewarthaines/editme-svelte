@@ -7,7 +7,7 @@
 
 import type { FileStorageAPI } from '../../storage/index.js';
 import type { EPUBMetadata, OPFDocument, ManifestItem, SpineItem } from '../../epub/opf-utils.js';
-import { generateEPUBTimestamp, creatorName } from '../../epub/opf-utils.js';
+import { generateEPUBTimestamp, creatorName, primaryLanguage } from '../../epub/opf-utils.js';
 import { isSourceFile, classifySourceFile } from '../../source/source-utils.js';
 import type { SourceItem } from '../../manifest/types.js';
 import { getBrowserLocale } from '../../i18n/locale-config.js';
@@ -142,7 +142,7 @@ export class WorkspaceService {
     const timestampedMetadata: EPUBMetadata = {
       ...metadata,
       // Auto-detect browser language if not provided
-      language: metadata.language || getBrowserLocale(),
+      language: metadata.language?.length ? metadata.language : [getBrowserLocale()],
       modifiedDate: generateEPUBTimestamp(),
     };
 
@@ -646,7 +646,7 @@ export class WorkspaceService {
     return {
       id,
       title: metadata.title,
-      language: metadata.language,
+      language: primaryLanguage(metadata),
       lastModified,
       author: creatorName(metadata.creator?.[0]) || undefined,
       hasError: false,
@@ -794,10 +794,9 @@ export class WorkspaceService {
       throw new ValidationError('Title cannot be empty');
     }
 
-    // Validate language code (basic validation)
-    if (updates.language !== undefined && !/^[a-z]{2}(-[A-Z]{2})?$/.test(updates.language)) {
-      throw new ValidationError('Invalid language code format');
-    }
+    // Language tags are NOT hard-validated here: the editor persists in-progress
+    // tags and surfaces malformed ones as inline errors (see MetadataService
+    // validateMetadata). Blocking the save would revert the user's input.
   }
 
   private addScriptedPropertiesToChapters(workspace: WorkspaceState): WorkspaceState {
