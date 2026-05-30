@@ -100,7 +100,7 @@
     </button>
 
     {#if isExpanded}
-      <h2 class="sidebar-title">SEED.html</h2>
+      <h2 class="sidebar-title">Simple EPUB Editor</h2>
       <div class="header-actions">
         <ThemeToggle size="small" showLabel={false} />
       </div>
