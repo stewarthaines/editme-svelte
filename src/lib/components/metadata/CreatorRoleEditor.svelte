@@ -1,7 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
   import TextMetadataField from './fields/TextMetadataField.svelte';
-  import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import type { Creator, EPUBMetadata, CreatorMetadataFields } from '../../epub/opf-utils';
   import { marcLabel, marcSelectOptions } from '../../epub/marc-relators';
 
@@ -79,6 +78,21 @@
             onblur={e => updateName(index, e.value)}
             onfocus={focus}
           />
+          <select
+            class="add-role-select"
+            aria-label={$t('Add role')}
+            title={$t('Add role')}
+            disabled={saving}
+            onchange={e => {
+              addRole(index, e.currentTarget.value);
+              e.currentTarget.value = '';
+            }}
+          >
+            <option value="">+</option>
+            {#each roleOptions as opt}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
+          </select>
           <button
             type="button"
             class="remove-button"
@@ -90,33 +104,24 @@
           </button>
         </div>
 
-        <div class="roles-row">
-          {#each creator.roles as role (role)}
-            <span class="role-chip">
-              {marcLabel(role)}
-              <button
-                type="button"
-                class="chip-remove"
-                onclick={() => removeRole(index, role)}
-                disabled={saving}
-                aria-label={$t('Remove role')}
-              >
-                ×
-              </button>
-            </span>
-          {/each}
-
-          <div class="add-role">
-            <SelectMetadataField
-              id="{field}-{index}-role"
-              value=""
-              options={roleOptions}
-              placeholder={$t('Add role…')}
-              disabled={saving}
-              onblur={e => addRole(index, e.value)}
-            />
+        {#if creator.roles.length > 0}
+          <div class="roles-row">
+            {#each creator.roles as role (role)}
+              <span class="role-chip">
+                {marcLabel(role)}
+                <button
+                  type="button"
+                  class="chip-remove"
+                  onclick={() => removeRole(index, role)}
+                  disabled={saving}
+                  aria-label={$t('Remove role')}
+                >
+                  ×
+                </button>
+              </span>
+            {/each}
           </div>
-        </div>
+        {/if}
       </div>
     {/each}
 
@@ -172,6 +177,37 @@
     color: white;
   }
 
+  /* Compact "add role" control, sized to match the remove (×) button so the two
+     sit as an even pair to the right of the name. Shows a centered "+". */
+  .add-role-select {
+    width: 2.5rem;
+    flex: none;
+    align-self: stretch;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    border-inline-start: 1px solid var(--color-border-default);
+    border-radius: 0;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    font-size: 1.25rem;
+    line-height: 1;
+    text-align: center;
+    text-align-last: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .add-role-select:hover:not(:disabled) {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  .add-role-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
   .roles-row {
     display: flex;
     flex-wrap: wrap;
@@ -203,14 +239,6 @@
 
   .chip-remove:hover:not(:disabled) {
     color: var(--color-error);
-  }
-
-  .add-role {
-    min-width: 12rem;
-  }
-
-  .add-role :global(.metadata-field) {
-    margin-block-end: 0;
   }
 
   .add-button {
