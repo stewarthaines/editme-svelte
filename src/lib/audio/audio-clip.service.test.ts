@@ -152,19 +152,33 @@ describe('AudioClipService API Contract Tests', () => {
     });
 
     test('loadAudioFile throws BLOB_URL_ERROR for blob creation failure', async () => {
-      // This test is now harder to simulate since BlobURLManager is internal
-      // We'll test the actual error path by using a file that will cause issues
+      // The file exists, but blob creation itself fails. The service distinguishes
+      // this from a missing file by the underlying "Blob creation failed" message.
+      await mockFileStorage.writeFile(
+        'test-workspace',
+        'OEBPS/Audio/chapter1.mp3',
+        new ArrayBuffer(1000)
+      );
 
-      // CONTRACT: MUST throw AudioClipServiceError with BLOB_URL_ERROR code
-      await expect(
-        service.loadAudioFile('test-workspace', 'Audio/chapter1.mp3')
-      ).rejects.toThrow(AudioClipServiceError);
+      const originalCreateObjectURL = global.URL.createObjectURL;
+      global.URL.createObjectURL = vi.fn(() => {
+        throw new Error('Blob creation failed');
+      });
 
       try {
-        await service.loadAudioFile('test-workspace', 'Audio/chapter1.mp3');
-      } catch (error: any) {
-        expect(error.code).toBe('BLOB_URL_ERROR');
-        expect(error.message).toContain('Blob creation failed');
+        // CONTRACT: MUST throw AudioClipServiceError with BLOB_URL_ERROR code
+        await expect(
+          service.loadAudioFile('test-workspace', 'Audio/chapter1.mp3')
+        ).rejects.toThrow(AudioClipServiceError);
+
+        try {
+          await service.loadAudioFile('test-workspace', 'Audio/chapter1.mp3');
+        } catch (error: any) {
+          expect(error.code).toBe('BLOB_URL_ERROR');
+          expect(error.message).toContain('Blob creation failed');
+        }
+      } finally {
+        global.URL.createObjectURL = originalCreateObjectURL;
       }
     });
   });

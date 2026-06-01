@@ -14,6 +14,7 @@ const mockFileStorage = {
   supportsDirectBlobURLs: vi.fn(),
   getFile: vi.fn(),
   readFile: vi.fn(),
+  readTextFile: vi.fn(),
   writeFile: vi.fn(),
   deleteFile: vi.fn(),
 };
@@ -49,6 +50,7 @@ describe('BlobURLManager', () => {
 
     // Default mock return values
     mockFileStorage.supportsDirectBlobURLs.mockReturnValue(true);
+    mockFileStorage.readTextFile.mockResolvedValue('/* mock css */');
     mockCreateObjectURL.mockReturnValue('blob:null/test-blob-url');
 
     // Create fresh manager instance
@@ -151,12 +153,12 @@ describe('BlobURLManager', () => {
     });
 
     it('should resolve manifest href to full workspace path', async () => {
-      const mockFile = new File(['css content'], 'main.css');
-      mockFileStorage.getFile.mockResolvedValue(mockFile);
+      // CSS is read via readTextFile (not getFile) so font URLs can be processed.
+      mockFileStorage.readTextFile.mockResolvedValue('/* css content */');
 
       await manager.createBlobURL('styles/main.css');
 
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -210,6 +212,7 @@ describe('BlobURLManager', () => {
         // Reset for next test
         vi.clearAllMocks();
         mockFileStorage.supportsDirectBlobURLs.mockReturnValue(true);
+        mockFileStorage.readTextFile.mockResolvedValue('/* mock css */');
         mockCreateObjectURL.mockReturnValue('blob:null/test');
       }
     });

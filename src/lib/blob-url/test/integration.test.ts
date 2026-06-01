@@ -14,6 +14,7 @@ const mockFileStorage = {
   supportsDirectBlobURLs: vi.fn(),
   getFile: vi.fn(),
   readFile: vi.fn(),
+  readTextFile: vi.fn(),
   writeFile: vi.fn(),
   deleteFile: vi.fn(),
 };
@@ -39,6 +40,9 @@ describe('Blob URL Manager Integration', () => {
       () => `blob:null/${Math.random().toString(36).substr(2, 9)}`
     );
     global.URL.revokeObjectURL = vi.fn();
+
+    // CSS files are read as text (for font-URL processing) via readTextFile.
+    mockFileStorage.readTextFile.mockResolvedValue('/* mock css */');
 
     // Note: Using happy-dom's native DOMParser which works well
     // Custom handling for malformed content can be done in specific tests if needed
@@ -67,7 +71,8 @@ describe('Blob URL Manager Integration', () => {
 
       await manager.createBlobURL('styles/main.css');
 
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      // CSS is read via readTextFile (not getFile) so font URLs can be processed.
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'workspace-123',
         'OEBPS/styles/main.css'
       );
@@ -92,8 +97,8 @@ describe('Blob URL Manager Integration', () => {
         }, // OPF in root
         {
           basePath: 'book/src',
-          href: 'assets/style.css',
-          expected: 'book/src/assets/style.css',
+          href: 'assets/cover.png',
+          expected: 'book/src/assets/cover.png',
         },
       ];
 
@@ -205,7 +210,8 @@ describe('Blob URL Manager Integration', () => {
 
       expect(result).toContain('Processed Title');
       expect(result).toContain('Generated Content');
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      // CSS via readTextFile; binary image via getFile.
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -263,12 +269,12 @@ describe('Blob URL Manager Integration', () => {
       manager = new BlobURLManager(config);
       manager.setActiveWorkspace('test-workspace');
 
-      const mockContent = new TextEncoder().encode('CSS content');
-      mockFileStorage.readFile.mockResolvedValue(mockContent.buffer);
+      // CSS is read as text (for font-URL processing), even on the IndexedDB backend.
+      mockFileStorage.readTextFile.mockResolvedValue('CSS content');
 
       const blobURL = await manager.createBlobURL('styles/main.css');
 
-      expect(mockFileStorage.readFile).toHaveBeenCalledWith(
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );

@@ -30,6 +30,26 @@ function createMockTransformExecutor(): jest.Mocked<TransformExecutor> {
   } as any;
 }
 
+// Minimal sample-content catalogs consumed by SampleContentGenerator (via
+// getCatalogs). Each locale must carry the required sample.* keys; chapter
+// content is markdown (starts with "# ").
+function sampleMessages(label: string): Record<string, string> {
+  return {
+    'sample.book.title': `${label} Sample Book`,
+    'sample.book.description': `${label} description`,
+    'sample.author.name': `${label} Author`,
+    'sample.publisher.name': `${label} Publisher`,
+    'sample.chapter1.title': `${label} Chapter 1`,
+    'sample.chapter1.content': `# ${label} Chapter 1\n\nSample content.`,
+  };
+}
+
+const mockSampleCatalogs: Record<string, { locale: string; messages: Record<string, string>; headers: Record<string, string> }> = {
+  en: { locale: 'en', messages: sampleMessages('English'), headers: {} },
+  fr: { locale: 'fr', messages: sampleMessages('French'), headers: {} },
+  ar: { locale: 'ar', messages: sampleMessages('Arabic'), headers: {} },
+};
+
 function createMockI18nSystem() {
   const mockTranslate: TranslationFunction = vi.fn().mockImplementation((key, params = {}) => {
     const translations: Record<string, string> = {
@@ -54,7 +74,7 @@ function createMockI18nSystem() {
 
   return {
     translate: mockTranslate,
-    getCatalogs: vi.fn().mockReturnValue({}),
+    getCatalogs: vi.fn().mockReturnValue(mockSampleCatalogs),
     isInitialized: vi.fn().mockReturnValue(true),
     getCurrentLocale: vi.fn().mockReturnValue('en'),
   };
@@ -120,7 +140,7 @@ describe('ContentService Contract Tests', () => {
       
       // CONTRACT: MUST return EPUB-compliant navigation
       expect(result.xhtmlContent).toContain('epub:type="toc"');
-      expect(result.xhtmlContent).toContain('role="navigation"');
+      expect(result.xhtmlContent).toContain('role="doc-toc"');
       expect(result.xhtmlContent).toContain('<a href="Text/chapter1.xhtml">Chapter 1: The Beginning</a>');
       expect(result.xhtmlContent).toContain('<a href="Text/chapter2.xhtml">Chapter 2: The Middle</a>');
       expect(result.metadata.properties).toEqual(['nav']);
@@ -202,7 +222,7 @@ describe('ContentService Contract Tests', () => {
       // CONTRACT: MUST return complete localized content
       expect(result.locale).toBe('fr');
       expect(result.metadata.title).toBeDefined();
-      expect(result.metadata.language).toBe('fr');
+      expect(result.metadata.language).toEqual(['fr']);
       expect(result.chapters.length).toBeGreaterThan(0);
       expect(result.chapters[0].content).toContain('# '); // Markdown content
       expect(result.isRTL).toBe(false); // French is LTR
@@ -241,7 +261,7 @@ describe('ContentService Contract Tests', () => {
       
       // CONTRACT: MUST return EPUB-compliant navigation from user content
       expect(result.xhtmlContent).toContain('epub:type="toc"');
-      expect(result.xhtmlContent).toContain('role="navigation"');
+      expect(result.xhtmlContent).toContain('role="doc-toc"');
       expect(result.xhtmlContent).toContain('<a href="Text/chapter1.xhtml">Chapter 1: The Beginning</a>');
     });
     

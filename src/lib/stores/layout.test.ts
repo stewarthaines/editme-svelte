@@ -44,7 +44,7 @@ describe('Layout Store', () => {
       const state = get(layoutStore);
 
       expect(state.sidebar.isExpanded).toBe(true);
-      expect(state.sidebar.activeSection).toBe('workspace');
+      expect(state.sidebar.activeSection).toBe('about');
       expect(state.isInitialized).toBe(true);
     });
   });
@@ -55,7 +55,7 @@ describe('Layout Store', () => {
       const state = get(layoutStore);
 
       expect(state.sidebar.isExpanded).toBe(true);
-      expect(state.sidebar.activeSection).toBe('workspace');
+      expect(state.sidebar.activeSection).toBe('about');
       expect(state.isInitialized).toBe(true);
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('editme_sidebar_expanded');
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith('editme_sidebar_section');
@@ -250,7 +250,7 @@ describe('Layout Store', () => {
 
       const state = get(layoutStore);
       expect(state.sidebar.isExpanded).toBe(true); // Default fallback
-      expect(state.sidebar.activeSection).toBe('workspace'); // Default fallback
+      expect(state.sidebar.activeSection).toBe('about'); // Default fallback
       expect(console.warn).toHaveBeenCalledWith(
         'Failed to load sidebar expanded state:',
         expect.any(Error)
@@ -286,7 +286,7 @@ describe('Layout Store', () => {
       const state = get(layoutStore);
 
       expect(state.sidebar.isExpanded).toBe(true); // Default
-      expect(state.sidebar.activeSection).toBe('workspace'); // Default
+      expect(state.sidebar.activeSection).toBe('about'); // Default
     });
 
     it('should handle empty string localStorage values', () => {
@@ -296,7 +296,7 @@ describe('Layout Store', () => {
       const state = get(layoutStore);
 
       expect(state.sidebar.isExpanded).toBe(true); // Default
-      expect(state.sidebar.activeSection).toBe('workspace'); // Default
+      expect(state.sidebar.activeSection).toBe('about'); // Default
     });
   });
 });

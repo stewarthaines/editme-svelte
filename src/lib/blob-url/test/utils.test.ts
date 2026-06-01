@@ -13,6 +13,7 @@ const mockFileStorage = {
   supportsDirectBlobURLs: vi.fn(() => true),
   getFile: vi.fn(),
   readFile: vi.fn(),
+  readTextFile: vi.fn(),
   writeFile: vi.fn(),
   deleteFile: vi.fn(),
 };
@@ -31,6 +32,9 @@ describe('Blob URL Manager Utilities', () => {
     vi.clearAllMocks();
     global.URL.createObjectURL = vi.fn(() => 'blob:null/test-blob');
     global.URL.revokeObjectURL = vi.fn();
+
+    // CSS files are read as text (for font-URL processing) via readTextFile.
+    mockFileStorage.readTextFile.mockResolvedValue('/* mock css */');
 
     manager = new BlobURLManager(testConfig);
     manager.setActiveWorkspace('test-workspace');
@@ -51,8 +55,9 @@ describe('Blob URL Manager Utilities', () => {
         'OEBPS/images/cover.jpg'
       );
 
+      // CSS is read via readTextFile (not getFile) so font URLs can be processed.
       manager.createBlobURL('styles/main.css');
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -97,7 +102,7 @@ describe('Blob URL Manager Utilities', () => {
       const configs = [
         { basePath: 'content', href: 'images/test.jpg', expected: 'content/images/test.jpg' },
         { basePath: 'book', href: 'chapter1.xhtml', expected: 'book/chapter1.xhtml' },
-        { basePath: 'src/main', href: 'styles/theme.css', expected: 'src/main/styles/theme.css' },
+        { basePath: 'src/main', href: 'styles/theme.png', expected: 'src/main/styles/theme.png' },
       ];
 
       configs.forEach(({ basePath, href, expected }) => {

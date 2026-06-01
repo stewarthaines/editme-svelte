@@ -228,6 +228,7 @@ describe('SettingsService Contract Tests', () => {
         text_transform: 'SOURCE/scripts/custom.js',
         dom_transforms: ['SOURCE/scripts/cleanup.js'],
         spine_basename: 'section',
+        audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
         cover: {
           template: 'modern',
           background_color: '#ffffff',
@@ -257,7 +258,8 @@ describe('SettingsService Contract Tests', () => {
       expect(result).toEqual({
         text_transform: 'SOURCE/scripts/transformText.js',
         dom_transforms: ['SOURCE/scripts/transformDom.js'],
-        spine_basename: 'chapter'
+        spine_basename: 'chapter',
+        audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}'
       });
     });
     

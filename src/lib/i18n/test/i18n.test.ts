@@ -212,7 +212,10 @@ describe('i18n runtime system', () => {
 
       await initI18n();
 
-      expect(globalThis.document?.documentElement.dir).toBe('rtl');
+      expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
+        'data-dir',
+        'rtl'
+      );
       expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
         'data-locale',
         'ar'
@@ -226,7 +229,10 @@ describe('i18n runtime system', () => {
 
       await initI18n();
 
-      expect(globalThis.document?.documentElement.dir).toBe('ltr');
+      expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
+        'data-dir',
+        'ltr'
+      );
       expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
         'data-locale',
         'de'
@@ -256,7 +262,10 @@ describe('i18n runtime system', () => {
 
       expect(get(currentLocale)).toBe('ar');
       expect(get(documentDirection)).toBe('rtl');
-      expect(globalThis.document?.documentElement.dir).toBe('rtl');
+      expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
+        'data-dir',
+        'rtl'
+      );
     });
 
     it('should store locale preference', async () => {

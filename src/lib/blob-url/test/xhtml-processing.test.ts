@@ -177,6 +177,7 @@ const mockFileStorage = {
   supportsDirectBlobURLs: vi.fn(() => true),
   getFile: vi.fn(),
   readFile: vi.fn(),
+  readTextFile: vi.fn(),
   writeFile: vi.fn(),
   deleteFile: vi.fn(),
 };
@@ -215,6 +216,8 @@ describe('XHTML Processing', () => {
 
     // Setup successful file reads by default
     mockFileStorage.getFile.mockResolvedValue(new File(['content'], 'test.file'));
+    // CSS files are read as text (for font-URL processing) via readTextFile.
+    mockFileStorage.readTextFile.mockResolvedValue('/* mock css */');
   });
 
   afterEach(() => {
@@ -259,7 +262,8 @@ describe('XHTML Processing', () => {
 
       await manager.processXHTMLForPreview(xhtml);
 
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      // CSS is read via readTextFile; other assets via getFile.
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -422,8 +426,8 @@ describe('XHTML Processing', () => {
 
       await manager.processXHTMLForPreview(xhtml);
 
-      // Should only process relative URLs
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      // Should only process relative URLs (CSS via readTextFile)
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -469,7 +473,8 @@ describe('XHTML Processing', () => {
 
       await rootManager.processXHTMLForPreview(xhtml);
 
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith('test-workspace', 'styles/main.css');
+      // CSS is read via readTextFile.
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith('test-workspace', 'styles/main.css');
     });
   });
 
@@ -488,6 +493,8 @@ describe('XHTML Processing', () => {
 
     it('should handle missing CSS/JS files - preserve URL and warn', async () => {
       mockFileStorage.getFile.mockRejectedValue(new Error('File not found'));
+      // CSS is read via readTextFile, so a missing stylesheet fails there.
+      mockFileStorage.readTextFile.mockRejectedValue(new Error('File not found'));
 
       const xhtml = `
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -537,8 +544,8 @@ describe('XHTML Processing', () => {
         'Missing image: OEBPS/missing.jpg (referenced by <img> element)'
       );
 
-      // Should have processed CSS successfully
-      expect(mockFileStorage.getFile).toHaveBeenCalledWith(
+      // Should have processed CSS successfully (CSS is read via readTextFile)
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
         'test-workspace',
         'OEBPS/styles/main.css'
       );
@@ -631,9 +638,13 @@ describe('XHTML Processing', () => {
 
       await manager.processXHTMLForPreview(xhtml);
 
-      // Should process all relative asset references
+      // CSS is read via readTextFile; all other relative assets via getFile.
+      expect(mockFileStorage.readTextFile).toHaveBeenCalledWith(
+        'test-workspace',
+        'OEBPS/styles/main.css'
+      );
+
       const expectedCalls = [
-        'OEBPS/styles/main.css',
         'OEBPS/scripts/reader.js',
         'OEBPS/images/cover.jpg',
         'OEBPS/media/intro.mp4',
