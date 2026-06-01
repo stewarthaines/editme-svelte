@@ -198,7 +198,6 @@
       {deviceSize}
       {orientation}
       {fontSizeAdjustment}
-      {fontFamily}
       class="demo-preview"
     />
   </div>

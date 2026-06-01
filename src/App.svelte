@@ -108,14 +108,12 @@
     isTransforming: boolean;
     transformError: any;
     transformWarnings: string[];
-    executionTime: number;
     spineItemId: string | null;
   }>({
     xhtmlContent: '',
     isTransforming: false,
     transformError: null,
     transformWarnings: [],
-    executionTime: 0,
     spineItemId: null,
   });
 
@@ -185,7 +183,6 @@
       isTransforming: boolean;
       transformError: any;
       transformWarnings: string[];
-      executionTime: number;
       spineItemId: string;
     }>
   ) => {
@@ -194,7 +191,6 @@
       isTransforming: event.detail.isTransforming,
       transformError: event.detail.transformError,
       transformWarnings: event.detail.transformWarnings,
-      executionTime: event.detail.executionTime,
       spineItemId: event.detail.spineItemId,
     };
   };

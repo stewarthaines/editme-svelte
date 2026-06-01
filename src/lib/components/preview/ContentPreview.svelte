@@ -6,7 +6,6 @@
   export let deviceSize: DeviceSize = 'responsive';
   export let orientation: 'portrait' | 'landscape' = 'portrait';
   export let fontSizeAdjustment: number = 0;
-  export let fontFamily: FontFamily = 'default';
   export let onNavigate: ((chapterId: string) => void) | undefined = undefined;
   let className: string = '';
   export { className as class };
@@ -20,7 +19,6 @@
     | 'small-tablet'
     | 'medium-tablet'
     | 'large-tablet';
-  type FontFamily = 'default' | 'serif' | 'sans-serif' | 'monospace';
 
   // Device specifications
   const DEVICE_SPECS = {
@@ -69,7 +67,6 @@
   function injectDeviceStyles(
     iframe: HTMLIFrameElement | null,
     deviceType: DeviceSize,
-    fontFamily: FontFamily,
     fontSizeAdjustment: number
   ) {
     if (!iframe) return;
@@ -146,7 +143,7 @@
 
   function handleIframeLoad() {
     if (iframeElement) {
-      injectDeviceStyles(iframeElement, deviceSize, fontFamily, fontSizeAdjustment);
+      injectDeviceStyles(iframeElement, deviceSize, fontSizeAdjustment);
 
       // Add click handler for navigation
       if (onNavigate && iframeElement.contentDocument) {
@@ -181,7 +178,7 @@
 
   $: if (iframeElement) {
     // Re-inject styles when font settings change
-    injectDeviceStyles(iframeElement, deviceSize, fontFamily, fontSizeAdjustment);
+    injectDeviceStyles(iframeElement, deviceSize, fontSizeAdjustment);
   }
 
   onMount(() => {
