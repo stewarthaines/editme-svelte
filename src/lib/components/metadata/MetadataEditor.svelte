@@ -4,6 +4,7 @@
   import MetadataTabBar from './MetadataTabBar.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
   import AdvancedFields from './AdvancedFields.svelte';
+  import AccessibilityFields from './AccessibilityFields.svelte';
   import type { EPUBMetadata } from '../../epub';
 
   // Service layer imports
@@ -255,14 +256,15 @@
             </p>
           </div>
         {:else if activeTab === 'accessibility'}
-          <div class="placeholder-panel">
-            <p>{$t('Coming Soon')}</p>
-            <p class="placeholder-description">
-              {$t('Accessibility')} - {$t(
-                'Accessibility features, hazards, and certification information'
-              )}
-            </p>
-          </div>
+          <AccessibilityFields
+            {metadata}
+            {validationErrors}
+            {saving}
+            {advancedMode}
+            onfieldChange={handleFieldChange}
+            onfieldSave={handleFieldSave}
+            onfieldFocus={handleFieldFocus}
+          />
         {/if}
       </div>
     {/if}
