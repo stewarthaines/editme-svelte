@@ -898,6 +898,35 @@ describe('OPFUtils', () => {
     });
   });
 
+  describe('Collections (belongs-to-collection)', () => {
+    it('emits each collection with collection-type and group-position refinements', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.collections = [
+        { name: 'The Chronicles', type: 'series', position: '2' },
+        { name: '2024 Box Set', type: 'set' },
+      ];
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with collections');
+
+      expect(xml).toContain('<meta property="belongs-to-collection" id="collection1">The Chronicles</meta>');
+      expect(xml).toContain('<meta refines="#collection1" property="collection-type">series</meta>');
+      expect(xml).toContain('<meta refines="#collection1" property="group-position">2</meta>');
+      expect(xml).toContain('<meta property="belongs-to-collection" id="collection2">2024 Box Set</meta>');
+      expect(xml).toContain('<meta refines="#collection2" property="collection-type">set</meta>');
+      expect(xml).not.toContain('refines="#collection2" property="group-position"');
+    });
+
+    it('emits nothing when no collections are declared', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.collections = undefined;
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+
+      expect(xml).not.toContain('belongs-to-collection');
+    });
+  });
+
   describe('Accessibility metadata', () => {
     it('emits only declared accessibility metadata (no fabricated claims)', () => {
       const testDoc = createTestOPFDocument();

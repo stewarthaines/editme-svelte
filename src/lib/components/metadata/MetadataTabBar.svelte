@@ -11,7 +11,6 @@
   export let tabs = [
     { id: 'basic', label: $t('metadata.tab.basic') },
     { id: 'advanced', label: $t('metadata.tab.advanced') },
-    { id: 'publication', label: $t('metadata.tab.publication') },
     { id: 'accessibility', label: $t('metadata.tab.accessibility') },
   ];
 
@@ -37,15 +36,7 @@
           'type',
           'format',
           'contributor',
-        ];
-      case 'publication':
-        return [
-          'series',
-          'seriesPosition',
-          'epubVersion',
-          'uniqueIdentifierScheme',
-          'primaryCreatorFileAs',
-          'creatorRoles',
+          'collections',
         ];
       case 'accessibility':
         return [

@@ -37,7 +37,6 @@
   let tabs = $derived([
     { id: 'basic', label: $t('Basic Info') },
     { id: 'advanced', label: $t('Advanced') },
-    { id: 'publication', label: $t('Publication Details') },
     { id: 'accessibility', label: $t('Accessibility') },
   ]);
 
@@ -58,15 +57,7 @@
           'type',
           'format',
           'contributor',
-        ];
-      case 'publication':
-        return [
-          'series',
-          'seriesPosition',
-          'epubVersion',
-          'uniqueIdentifierScheme',
-          'primaryCreatorFileAs',
-          'creatorRoles',
+          'collections',
         ];
       case 'accessibility':
         return [
@@ -246,15 +237,6 @@
             onarrayAdd={handleArrayAdd}
             onarrayRemove={handleArrayRemove}
           />
-        {:else if activeTab === 'publication'}
-          <div class="placeholder-panel">
-            <p>{$t('Coming Soon')}</p>
-            <p class="placeholder-description">
-              {$t('Publication Details')} - {$t(
-                'Series information, EPUB version, and publication-specific metadata'
-              )}
-            </p>
-          </div>
         {:else if activeTab === 'accessibility'}
           <AccessibilityFields
             {metadata}
@@ -331,25 +313,4 @@
     box-shadow: 0 0 0 2px var(--color-focus-ring);
   }
 
-  .placeholder-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 2rem;
-    text-align: center;
-    color: var(--color-text-secondary);
-  }
-
-  .placeholder-panel p:first-child {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-block-end: 0.5rem;
-  }
-
-  .placeholder-description {
-    font-size: 0.875rem;
-    opacity: 0.8;
-  }
 </style>

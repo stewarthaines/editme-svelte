@@ -4,6 +4,7 @@
   import DateMetadataField from './fields/DateMetadataField.svelte';
   import CreatorRoleEditor from './CreatorRoleEditor.svelte';
   import SubjectEditor from './SubjectEditor.svelte';
+  import CollectionsEditor from './CollectionsEditor.svelte';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
   import type { EPUBMetadata } from '../../epub';
   import { type EditableArrayField } from '../../epub/opf-utils';
@@ -40,6 +41,7 @@
   const showCoverage = $derived(advancedMode || !!metadata.coverage?.trim());
   const showFormat = $derived(advancedMode || !!metadata.format?.trim());
   const showAdditionalInfo = $derived(showSource || showRelation || showCoverage || showFormat);
+  const showCollections = $derived(advancedMode || (metadata.collections?.length ?? 0) > 0);
 
   const getFieldError = (fieldName: string) => {
     const error = validationErrors.find(err => err.field === fieldName);
@@ -108,6 +110,19 @@
           onfocus={() => handleFieldFocus('type')}
         />
       </fieldset>
+
+      {#if showCollections}
+        <fieldset class="field-group">
+          <legend class="group-title" tabindex="-1">{$t('Collections')}</legend>
+          <CollectionsEditor
+            collections={metadata.collections}
+            {saving}
+            {getFieldError}
+            {onfieldSave}
+            {onfieldFocus}
+          />
+        </fieldset>
+      {/if}
 
       {#if showAdditionalInfo}
         <fieldset class="field-group">

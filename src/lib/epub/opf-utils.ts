@@ -67,6 +67,18 @@ export interface SubjectEntry {
   term?: string;
 }
 
+/**
+ * A collection this publication belongs to (belongs-to-collection). `type` is
+ * the collection-type (typically "series" or "set") and `position` is the
+ * group-position within that collection.
+ */
+export interface CollectionEntry {
+  name: string;
+  type?: string;
+  position?: string;
+  id?: string;
+}
+
 /** Normalize a creator value, tolerating legacy bare-string data. */
 export function toCreator(value: Creator | string): Creator {
   if (typeof value === 'string') return { name: value, roles: [] };
@@ -163,6 +175,8 @@ export interface EPUBMetadata {
   coverage?: string;
   type?: string;
   format?: string;
+  // Collections this publication belongs to (belongs-to-collection)
+  collections?: CollectionEntry[];
 
   // EPUB-specific metadata
   modifiedDate?: string;
@@ -540,6 +554,19 @@ export class OPFUtils {
       ?.getAttribute('href')
       ?.trim();
 
+    const collections: CollectionEntry[] = Array.from(
+      doc.querySelectorAll('meta[property="belongs-to-collection"]')
+    )
+      .map(el => {
+        const id = el.getAttribute('id');
+        return {
+          name: el.textContent?.trim() ?? '',
+          type: refineValue(id, 'collection-type'),
+          position: refineValue(id, 'group-position'),
+        };
+      })
+      .filter(c => c.name);
+
     return {
       title: primaryTitle.value || titleElements[0].textContent!.trim(),
       titleFileAs: primaryTitle.fileAs || undefined,
@@ -564,6 +591,7 @@ export class OPFUtils {
       coverage: coverageElements.length > 0 ? coverageElements[0].textContent?.trim() : undefined,
       type: typeElements.length > 0 ? typeElements[0].textContent?.trim() : undefined,
       format: formatElements.length > 0 ? formatElements[0].textContent?.trim() : undefined,
+      collections: collections.length > 0 ? collections : undefined,
       modifiedDate:
         modifiedElements.length > 0 ? modifiedElements[0].textContent?.trim() : undefined,
       renditionLayout: layoutMeta?.textContent?.trim() || undefined,
@@ -844,6 +872,21 @@ export class OPFUtils {
     }
     if (metadata.format) {
       xml += `\n    <dc:format>${escapeXML(metadata.format)}</dc:format>`;
+    }
+
+    // Collections (belongs-to-collection) with collection-type / group-position
+    // refinements. Each named collection gets an id when present.
+    let collectionIdCounter = 0;
+    for (const collection of metadata.collections ?? []) {
+      if (!collection.name?.trim()) continue;
+      const id = `collection${++collectionIdCounter}`;
+      xml += `\n    <meta property="belongs-to-collection" id="${id}">${escapeXML(collection.name.trim())}</meta>`;
+      if (collection.type?.trim()) {
+        xml += refinementMeta(id, 'collection-type', collection.type.trim());
+      }
+      if (collection.position?.trim()) {
+        xml += refinementMeta(id, 'group-position', collection.position.trim());
+      }
     }
 
     if (metadata.modifiedDate) {
