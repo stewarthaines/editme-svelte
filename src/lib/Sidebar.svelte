@@ -592,12 +592,6 @@
     text-align: center;
   }
 
-  .separator {
-    color: var(--color-text-tertiary);
-    flex-shrink: 0;
-    font-weight: bold;
-  }
-
   .workspace-extensions {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
