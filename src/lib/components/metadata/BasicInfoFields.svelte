@@ -210,6 +210,20 @@
           onblur={e => handleFieldSave('renditionSpread', e.value)}
           onfocus={() => handleFieldFocus('renditionSpread')}
         />
+
+        <!-- Viewport only applies to fixed-layout publications (rendition:viewport). -->
+        {#if (metadata.renditionLayout || 'reflowable') === 'pre-paginated'}
+          <TextMetadataField
+            id="renditionViewport"
+            label={$t('Viewport')}
+            value={metadata.renditionViewport || ''}
+            placeholder={$t('width=1200, height=1600')}
+            error={getFieldError('renditionViewport')}
+            onchange={e => handleFieldChange('renditionViewport', e.value)}
+            onblur={e => handleFieldSave('renditionViewport', e.value)}
+            onfocus={() => handleFieldFocus('renditionViewport')}
+          />
+        {/if}
       </fieldset>
     </div>
   </div>
