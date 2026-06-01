@@ -8,6 +8,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import type { FileStorageAPI } from '../../storage/index.js';
 import type { EPUBMetadata, ManifestItem, SpineItem } from '../../epub/opf-utils.js';
+import { OPFUtils } from '../../epub/opf-utils.js';
 import { WorkspaceService } from './workspace.service.js';
 
 // Test utilities and mocks
@@ -562,6 +563,47 @@ describe('WorkspaceService Contract Tests', () => {
         workspace.id,
         'OEBPS/Scripts/app.js'
       );
+    });
+  });
+
+  describe('Contract: Manifest/asset consistency', () => {
+    test('an added asset survives a later metadata edit and content.opf re-serialization', async () => {
+      // Reproduces the desync class: an asset is registered, then an unrelated
+      // edit re-serializes content.opf. As long as the edit builds on the
+      // workspace returned by addManifestItem, the asset must persist.
+      const workspace = await service.createWorkspace({ title: 'Test', language: 'en', identifier: 'test' });
+
+      const withAsset = await service.addManifestItem(workspace, {
+        href: 'Audio/clip.mp3',
+        mediaType: 'audio/mpeg',
+      });
+      expect(withAsset.opf.manifest.some(i => i.href === 'Audio/clip.mp3')).toBe(true);
+
+      // A subsequent metadata edit must build on the returned workspace.
+      const afterEdit = await service.updateMetadata(withAsset, { title: 'Renamed' });
+
+      // The asset entry must still be present, in state and in the OPF written to disk.
+      expect(afterEdit.opf.manifest.some(i => i.href === 'Audio/clip.mp3')).toBe(true);
+      expect(OPFUtils.generateOPFXML(afterEdit.opf)).toContain('Audio/clip.mp3');
+    });
+
+    test('removeManifestItem persists the manifest change before deleting the file', async () => {
+      // Ordering guard: the OPF must be saved first so a delete failure can
+      // never leave content.opf listing an item whose file is already gone.
+      const workspace = await service.createWorkspace({ title: 'Test', language: 'en', identifier: 'test' });
+      const withAsset = await service.addManifestItem(workspace, {
+        id: 'clip',
+        href: 'Audio/clip.mp3',
+        mediaType: 'audio/mpeg',
+      });
+
+      const writeCallsBefore = mockFileStorage.writeTextFile.mock.calls.length;
+      const afterRemove = await service.removeManifestItem(withAsset, 'clip');
+
+      // Manifest entry gone from state, OPF re-saved, and file deleted.
+      expect(afterRemove.opf.manifest.some(i => i.id === 'clip')).toBe(false);
+      expect(mockFileStorage.writeTextFile.mock.calls.length).toBeGreaterThan(writeCallsBefore);
+      expect(mockFileStorage.deleteFile).toHaveBeenCalledWith(workspace.id, 'OEBPS/Audio/clip.mp3');
     });
   });
 });

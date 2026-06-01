@@ -14,11 +14,13 @@
     workspaceService,
     advancedMode = true,
     onItemSelect,
+    onWorkspaceUpdate,
   }: {
     workspace?: WorkspaceState | null;
     workspaceService: WorkspaceService;
     advancedMode?: boolean;
     onItemSelect?: (event: { item: ManifestItem | SourceItem | any; type: 'manifest' | 'source' | 'opf' }) => void;
+    onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
   } = $props();
 
   // Component state using runes
@@ -121,6 +123,8 @@
 
     try {
       workspace = await workspaceService.removeManifestItem(workspace, event.detail.itemId);
+      // Keep global app state in sync with the persisted content.opf.
+      onWorkspaceUpdate?.(workspace);
       await loadManifest(); // Refresh the manifest
 
       // Clear selection if deleted item was selected
@@ -144,18 +148,27 @@
       } else {
         // Create new item based on mode
         if (itemEditorMode === 'create-text') {
-          // Add manifest item first
+          // Add manifest item first (persists content.opf)
           workspace = await workspaceService.addManifestItem(workspace, item);
-          
-          // Write the file content  
-          const filePath = item.href.startsWith(workspace.pathInfo.basePath + '/') ? 
-            item.href : 
+          const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
+
+          // Write the file content; roll back the manifest entry if it fails
+          // so content.opf never references a file that isn't in storage.
+          const filePath = item.href.startsWith(workspace.pathInfo.basePath + '/') ?
+            item.href :
             `${workspace.pathInfo.basePath}/${item.href}`;
-          await workspaceService.writeFile(workspace.id, filePath, '');
+          try {
+            await workspaceService.writeFile(workspace.id, filePath, '');
+          } catch (writeError) {
+            workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
+            throw writeError;
+          }
         }
       }
 
       showItemEditor = false;
+      // Keep global app state in sync with the persisted content.opf.
+      onWorkspaceUpdate?.(workspace);
       await loadManifest(); // Refresh the manifest
     } catch {
       error = $t('Failed to save item');
@@ -186,21 +199,30 @@
           href: generateEPUBPath(file.name, reliableMediaType),
           mediaType: reliableMediaType
         };
-        
-        // Step 1: Add to manifest (may fail on duplicate ID)
+
+        // Step 1: Add to manifest (may fail on duplicate ID). This persists content.opf.
         workspace = await workspaceService.addManifestItem(workspace, manifestItem);
-        
-        // Step 2: Write file content (only if manifest update succeeded)
+        // addManifestItem appends the new entry, so it is the last one.
+        const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
+
+        // Step 2: Write the file content. If this fails, roll back the manifest
+        // entry so content.opf never references a file that isn't in storage.
         const filePath = `${workspace.pathInfo.basePath}/${manifestItem.href}`;
-        if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
-          const text = await file.text();
-          await workspaceService.writeFile(workspace.id, filePath, text);
-        } else {
-          // Handle binary files (images, fonts, etc.)
-          const arrayBuffer = await file.arrayBuffer();
-          await workspaceService.writeBinaryFile(workspace.id, filePath, arrayBuffer);
+        try {
+          if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
+            const text = await file.text();
+            await workspaceService.writeFile(workspace.id, filePath, text);
+          } else {
+            // Handle binary files (images, fonts, etc.)
+            const arrayBuffer = await file.arrayBuffer();
+            await workspaceService.writeBinaryFile(workspace.id, filePath, arrayBuffer);
+          }
+        } catch (writeError) {
+          // Undo the manifest entry we just added (also removes the absent file).
+          workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
+          throw writeError;
         }
-        
+
         // Both operations succeeded
         successfulFiles.push(file.name);
       } catch (fileError) {
@@ -211,6 +233,12 @@
           error: fileError instanceof Error ? fileError.message : 'Unknown error'
         });
       }
+    }
+
+    // Push the persisted workspace back to global app state so a later save
+    // can't overwrite content.opf with a stale copy that lacks these items.
+    if (successfulFiles.length > 0) {
+      onWorkspaceUpdate?.(workspace);
     }
 
     // Refresh the manifest to show successfully uploaded files

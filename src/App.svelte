@@ -624,6 +624,9 @@
             {workspaceService}
             advancedMode={appState.isAdvancedMode}
             onItemSelect={handleManifestItemSelect}
+            onWorkspaceUpdate={updatedWorkspace => {
+              if (appState) appState.workspace = updatedWorkspace;
+            }}
           />
         {:else}
           <PlaceholderView

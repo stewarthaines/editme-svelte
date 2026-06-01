@@ -391,15 +391,6 @@ export class WorkspaceService {
     const removedItem = workspace.opf.manifest[itemIndex];
     const removingJavaScript = removedItem.mediaType === 'text/javascript' || removedItem.mediaType === 'application/javascript';
 
-    // Delete the actual file using existing path resolution infrastructure
-    try {
-      const filePath = this.resolveManifestPath(removedItem.href, workspace.pathInfo.basePath);
-      await this.fileStorage.deleteFile(workspace.id, filePath);
-    } catch (error) {
-      // Log warning but don't fail if file doesn't exist
-      console.warn(`Failed to delete file for manifest item ${itemId}:`, error);
-    }
-
     // Create updated workspace without the item
     let updatedWorkspace: WorkspaceState = {
       ...workspace,
@@ -419,7 +410,21 @@ export class WorkspaceService {
       updatedWorkspace = this.addScriptedPropertiesToChapters(updatedWorkspace);
     }
 
-    return await this.saveWorkspace(updatedWorkspace);
+    // Persist the manifest change first, so a failure to delete the file can
+    // never leave content.opf still listing an item whose file is gone.
+    const savedWorkspace = await this.saveWorkspace(updatedWorkspace);
+
+    // Then delete the actual file using existing path resolution infrastructure.
+    try {
+      const filePath = this.resolveManifestPath(removedItem.href, workspace.pathInfo.basePath);
+      await this.fileStorage.deleteFile(workspace.id, filePath);
+    } catch (error) {
+      // Log warning but don't fail if file doesn't exist (e.g. rollback of an
+      // upload whose file write never completed).
+      console.warn(`Failed to delete file for manifest item ${itemId}:`, error);
+    }
+
+    return savedWorkspace;
   }
 
   /**
