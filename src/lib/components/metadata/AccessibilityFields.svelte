@@ -146,6 +146,7 @@
                       checked={setTokens(set).includes(mode.value)}
                       disabled={saving}
                       onchange={e => toggleInSet(index, mode.value, e.currentTarget.checked)}
+                      onfocus={() => focus('accessModeSufficient')}
                     />
                     <span>{mode.label}</span>
                   </label>
