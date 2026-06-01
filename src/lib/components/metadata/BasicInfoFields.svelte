@@ -6,6 +6,7 @@
   import ViewportField from './fields/ViewportField.svelte';
   import CreatorRoleEditor from './CreatorRoleEditor.svelte';
   import LanguageEditor from './LanguageEditor.svelte';
+  import TitleEditor from './TitleEditor.svelte';
   import type { EPUBMetadata } from '../../epub';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
   import { MetadataUtils, type EditableArrayField } from '../../epub/opf-utils';
@@ -96,16 +97,15 @@
       <fieldset class="field-group" tabindex="-1">
         <legend class="group-title" tabindex="-1">{$t('Essential Information')}</legend>
 
-        <TextMetadataField
-          id="title"
-          label={$t('Title')}
-          value={metadata.title || ''}
-          placeholder={$t('Enter book title')}
-          required={true}
-          error={getFieldError('title')}
-          onchange={e => handleFieldChange('title', e.value)}
-          onblur={e => handleFieldSave('title', e.value)}
-          onfocus={() => handleFieldFocus('title')}
+        <TitleEditor
+          title={metadata.title || ''}
+          titleFileAs={metadata.titleFileAs}
+          additionalTitles={metadata.additionalTitles}
+          {saving}
+          {getFieldError}
+          {onfieldChange}
+          {onfieldSave}
+          {onfieldFocus}
         />
 
         <LanguageEditor
