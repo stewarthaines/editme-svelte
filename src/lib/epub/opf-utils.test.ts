@@ -927,6 +927,23 @@ describe('OPFUtils', () => {
     });
   });
 
+  describe('Apple Books vendor metadata', () => {
+    it('emits ibooks:specified-fonts only when enabled', () => {
+      const testDoc = createTestOPFDocument();
+
+      testDoc.metadata.ibooksSpecifiedFonts = true;
+      expect(OPFUtils.generateOPFXML(testDoc)).toContain(
+        '<meta property="ibooks:specified-fonts">true</meta>'
+      );
+
+      testDoc.metadata.ibooksSpecifiedFonts = false;
+      expect(OPFUtils.generateOPFXML(testDoc)).not.toContain('ibooks:specified-fonts');
+
+      testDoc.metadata.ibooksSpecifiedFonts = undefined;
+      expect(OPFUtils.generateOPFXML(testDoc)).not.toContain('ibooks:specified-fonts');
+    });
+  });
+
   describe('Accessibility metadata', () => {
     it('emits only declared accessibility metadata (no fabricated claims)', () => {
       const testDoc = createTestOPFDocument();

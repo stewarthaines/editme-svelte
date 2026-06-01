@@ -59,6 +59,7 @@
           'format',
           'contributor',
           'collections',
+          'ibooksSpecifiedFonts',
         ];
       case 'accessibility':
         return [

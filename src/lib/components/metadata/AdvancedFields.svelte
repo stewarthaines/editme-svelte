@@ -42,6 +42,7 @@
   const showFormat = $derived(advancedMode || !!metadata.format?.trim());
   const showAdditionalInfo = $derived(showSource || showRelation || showCoverage || showFormat);
   const showCollections = $derived(advancedMode || (metadata.collections?.length ?? 0) > 0);
+  const showAppleBooks = $derived(advancedMode || !!metadata.ibooksSpecifiedFonts);
 
   const getFieldError = (fieldName: string) => {
     const error = validationErrors.find(err => err.field === fieldName);
@@ -168,6 +169,22 @@
           {/if}
         </fieldset>
       {/if}
+
+      {#if showAppleBooks}
+        <fieldset class="field-group">
+          <legend class="group-title" tabindex="-1">{$t('Apple Books')}</legend>
+          <label class="checkbox-row">
+            <input
+              type="checkbox"
+              checked={metadata.ibooksSpecifiedFonts ?? false}
+              disabled={saving}
+              onchange={e => handleFieldSave('ibooksSpecifiedFonts', e.currentTarget.checked)}
+              onfocus={() => handleFieldFocus('ibooksSpecifiedFonts')}
+            />
+            <span>{$t('Use the publication’s own fonts (do not re-style)')}</span>
+          </label>
+        </fieldset>
+      {/if}
     </div>
 
     <div class="column">
@@ -256,4 +273,17 @@
     color: var(--color-text-primary);
   }
 
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .checkbox-row input {
+    flex: none;
+    cursor: pointer;
+  }
 </style>

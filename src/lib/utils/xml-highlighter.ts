@@ -61,6 +61,7 @@ const PRIMARY_MAPPINGS: PrimaryMapping[] = [
   { field: 'accessibilityCertifiedBy', metaProperty: 'a11y:certifiedBy' },
   { field: 'accessibilityCertifierCredential', metaProperty: 'a11y:certifierCredential' },
   { field: 'accessibilityCertifierReport', linkRel: 'a11y:certifierReport' },
+  { field: 'ibooksSpecifiedFonts', metaProperty: 'ibooks:specified-fonts' },
 ];
 
 export interface HighlightingOptions {
