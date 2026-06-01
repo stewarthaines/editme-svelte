@@ -898,6 +898,48 @@ describe('OPFUtils', () => {
     });
   });
 
+  describe('Accessibility metadata', () => {
+    it('emits only declared accessibility metadata (no fabricated claims)', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.accessMode = undefined;
+      testDoc.metadata.accessibilityFeature = undefined;
+      testDoc.metadata.accessibilityHazard = undefined;
+      testDoc.metadata.accessibilitySummary = undefined;
+      testDoc.metadata.accessibilityConformance = undefined;
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+
+      expect(xml).not.toContain('schema:accessMode');
+      expect(xml).not.toContain('schema:accessibilityFeature');
+      expect(xml).not.toContain('dcterms:conformsTo');
+    });
+
+    it('emits the declared Schema.org and EPUB Accessibility 1.1 metadata', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.accessMode = ['textual', 'visual'];
+      testDoc.metadata.accessModeSufficient = ['textual', 'textual,visual'];
+      testDoc.metadata.accessibilityFeature = ['structuralNavigation', 'alternativeText'];
+      testDoc.metadata.accessibilityHazard = ['noFlashingHazard'];
+      testDoc.metadata.accessibilitySummary = 'Fully navigable with alt text.';
+      testDoc.metadata.accessibilityConformance = 'EPUB Accessibility 1.1 - WCAG 2.1 Level AA';
+      testDoc.metadata.accessibilityCertifiedBy = 'Acme Publishing';
+      testDoc.metadata.accessibilityCertifierReport = 'https://example.com/report';
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with accessibility metadata');
+
+      expect(xml).toContain('<meta property="schema:accessMode">textual</meta>');
+      expect(xml).toContain('<meta property="schema:accessMode">visual</meta>');
+      expect(xml).toContain('<meta property="schema:accessModeSufficient">textual,visual</meta>');
+      expect(xml).toContain('<meta property="schema:accessibilityFeature">structuralNavigation</meta>');
+      expect(xml).toContain('<meta property="schema:accessibilityHazard">noFlashingHazard</meta>');
+      expect(xml).toContain('<meta property="schema:accessibilitySummary">Fully navigable with alt text.</meta>');
+      expect(xml).toContain('<meta property="dcterms:conformsTo">EPUB Accessibility 1.1 - WCAG 2.1 Level AA</meta>');
+      expect(xml).toContain('<meta property="a11y:certifiedBy">Acme Publishing</meta>');
+      expect(xml).toContain('<link rel="a11y:certifierReport" href="https://example.com/report"/>');
+    });
+  });
+
   describe('Rendition Properties', () => {
     it('should include rendition properties in generated OPF when non-default', () => {
       const testDoc = createTestOPFDocument();

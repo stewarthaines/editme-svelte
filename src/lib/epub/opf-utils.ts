@@ -180,12 +180,20 @@ export interface EPUBMetadata {
   // scrolled-continuous | scrolled-doc.
   renditionFlow?: string;
 
-  // EPUB 3 accessibility metadata
+  // EPUB 3 accessibility metadata (Schema.org + EPUB Accessibility 1.1)
   accessMode?: string[];
-  accessModeSufficient?: string[];
+  accessModeSufficient?: string[]; // each value is a comma-separated set
   accessibilityFeature?: string[];
   accessibilityHazard?: string[];
+  accessibilityControl?: string[];
+  accessibilityAPI?: string[];
   accessibilitySummary?: string;
+  // dcterms:conformsTo, e.g. "EPUB Accessibility 1.1 - WCAG 2.1 Level AA"
+  accessibilityConformance?: string;
+  // EPUB Accessibility 1.1 certification (a11y: vocabulary)
+  accessibilityCertifiedBy?: string;
+  accessibilityCertifierCredential?: string;
+  accessibilityCertifierReport?: string; // URL; emitted as <link rel>
 }
 
 // Type mapping for strict field access
@@ -200,6 +208,8 @@ export interface MetadataFieldTypes {
   accessModeSufficient: string[];
   accessibilityFeature: string[];
   accessibilityHazard: string[];
+  accessibilityControl: string[];
+  accessibilityAPI: string[];
 
   // Required string fields
   title: string;
@@ -224,6 +234,10 @@ export interface MetadataFieldTypes {
   renditionViewport: string;
   renditionFlow: string;
   accessibilitySummary: string;
+  accessibilityConformance: string;
+  accessibilityCertifiedBy: string;
+  accessibilityCertifierCredential: string;
+  accessibilityCertifierReport: string;
 }
 
 // Extract field type categories
@@ -509,6 +523,23 @@ export class OPFUtils {
     const spineElement = doc.querySelector('spine');
     const pageProgression = spineElement?.getAttribute('page-progression-direction');
 
+    // Accessibility metadata (Schema.org + EPUB Accessibility 1.1).
+    const a11yValues = (property: string) =>
+      Array.from(doc.querySelectorAll(`meta[property="${property}"]`))
+        .map(el => el.textContent?.trim())
+        .filter(Boolean) as string[];
+    const a11yValue = (property: string) => a11yValues(property)[0];
+    const accessMode = a11yValues('schema:accessMode');
+    const accessModeSufficient = a11yValues('schema:accessModeSufficient');
+    const accessibilityFeature = a11yValues('schema:accessibilityFeature');
+    const accessibilityHazard = a11yValues('schema:accessibilityHazard');
+    const accessibilityControl = a11yValues('schema:accessibilityControl');
+    const accessibilityAPI = a11yValues('schema:accessibilityAPI');
+    const certifierReport = doc
+      .querySelector('link[rel="a11y:certifierReport"]')
+      ?.getAttribute('href')
+      ?.trim();
+
     return {
       title: primaryTitle.value || titleElements[0].textContent!.trim(),
       titleFileAs: primaryTitle.fileAs || undefined,
@@ -541,6 +572,17 @@ export class OPFUtils {
       renditionViewport: viewportMeta?.textContent?.trim() || undefined,
       renditionFlow: flowMeta?.textContent?.trim() || undefined,
       pageProgressionDirection: pageProgression || undefined,
+      accessMode: accessMode.length > 0 ? accessMode : undefined,
+      accessModeSufficient: accessModeSufficient.length > 0 ? accessModeSufficient : undefined,
+      accessibilityFeature: accessibilityFeature.length > 0 ? accessibilityFeature : undefined,
+      accessibilityHazard: accessibilityHazard.length > 0 ? accessibilityHazard : undefined,
+      accessibilityControl: accessibilityControl.length > 0 ? accessibilityControl : undefined,
+      accessibilityAPI: accessibilityAPI.length > 0 ? accessibilityAPI : undefined,
+      accessibilitySummary: a11yValue('schema:accessibilitySummary'),
+      accessibilityConformance: a11yValue('dcterms:conformsTo'),
+      accessibilityCertifiedBy: a11yValue('a11y:certifiedBy'),
+      accessibilityCertifierCredential: a11yValue('a11y:certifierCredential'),
+      accessibilityCertifierReport: certifierReport,
     };
   }
 
@@ -834,16 +876,37 @@ export class OPFUtils {
 
     xml += '\n    <meta property="ibooks:specified-fonts">true</meta>';
 
-    xml += `
-    <meta property="schema:accessMode">textual</meta>
-    <meta property="schema:accessibilityFeature">alternativeText</meta>
-    <meta property="schema:accessibilityHazard">noFlashingHazard</meta>
-    <meta property="schema:accessibilityHazard">noSoundHazard</meta>
-    <meta property="schema:accessModeSufficient">textual,visual</meta>
-    <meta property="schema:accessibilitySummary">This publication has been validated to meet the minimum conformance requirements for EPUB Accessibility 1.1.</meta>
-    <meta property="dcterms:conformsTo">http://www.w3.org/standards/wcag/2.0/a</meta>
-    <meta property="dcterms:conformsTo">http://www.idpf.org/epub/a11y/accessibility-20170829.html#wcag-a</meta>
-    `;
+    // Accessibility metadata (Schema.org discovery + EPUB Accessibility 1.1).
+    // Emit only what the author has declared — never fabricate conformance,
+    // feature, or hazard claims. schema:/dcterms:/a11y: are reserved prefixes.
+    const a11yMetas = (property: string, values?: string[]) => {
+      for (const value of values ?? []) {
+        if (value?.trim()) {
+          xml += `\n    <meta property="${property}">${escapeXML(value.trim())}</meta>`;
+        }
+      }
+    };
+    a11yMetas('schema:accessMode', metadata.accessMode);
+    a11yMetas('schema:accessModeSufficient', metadata.accessModeSufficient);
+    a11yMetas('schema:accessibilityFeature', metadata.accessibilityFeature);
+    a11yMetas('schema:accessibilityHazard', metadata.accessibilityHazard);
+    a11yMetas('schema:accessibilityControl', metadata.accessibilityControl);
+    a11yMetas('schema:accessibilityAPI', metadata.accessibilityAPI);
+    if (metadata.accessibilitySummary?.trim()) {
+      xml += `\n    <meta property="schema:accessibilitySummary">${escapeXML(metadata.accessibilitySummary.trim())}</meta>`;
+    }
+    if (metadata.accessibilityConformance?.trim()) {
+      xml += `\n    <meta property="dcterms:conformsTo">${escapeXML(metadata.accessibilityConformance.trim())}</meta>`;
+    }
+    if (metadata.accessibilityCertifiedBy?.trim()) {
+      xml += `\n    <meta property="a11y:certifiedBy">${escapeXML(metadata.accessibilityCertifiedBy.trim())}</meta>`;
+    }
+    if (metadata.accessibilityCertifierCredential?.trim()) {
+      xml += `\n    <meta property="a11y:certifierCredential">${escapeXML(metadata.accessibilityCertifierCredential.trim())}</meta>`;
+    }
+    if (metadata.accessibilityCertifierReport?.trim()) {
+      xml += `\n    <link rel="a11y:certifierReport" href="${escapeXML(metadata.accessibilityCertifierReport.trim())}"/>`;
+    }
 
     xml += `\n  </metadata>
   <manifest>`;
