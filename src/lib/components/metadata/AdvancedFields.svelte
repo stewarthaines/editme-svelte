@@ -32,6 +32,15 @@
     onarrayRemove
   }: Props = $props();
 
+  // The lesser-used Dublin Core fields are gated like other advanced refinements:
+  // each shows in advanced mode or when already populated, and the whole section
+  // collapses when none are set and advanced mode is off.
+  const showSource = $derived(advancedMode || !!metadata.source?.trim());
+  const showRelation = $derived(advancedMode || !!metadata.relation?.trim());
+  const showCoverage = $derived(advancedMode || !!metadata.coverage?.trim());
+  const showFormat = $derived(advancedMode || !!metadata.format?.trim());
+  const showAdditionalInfo = $derived(showSource || showRelation || showCoverage || showFormat);
+
   const getFieldError = (fieldName: string) => {
     const error = validationErrors.find(err => err.field === fieldName);
     return error ? error.message : '';
@@ -100,53 +109,63 @@
         />
       </fieldset>
 
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Additional Information')}</legend>
+      {#if showAdditionalInfo}
+        <fieldset class="field-group">
+          <legend class="group-title" tabindex="-1">{$t('Additional Information')}</legend>
 
-        <TextMetadataField
-          id="source"
-          label={$t('Source')}
-          value={metadata.source || ''}
-          placeholder={$t('Enter source information')}
-          error={getFieldError('source')}
-          onchange={e => handleFieldChange('source', e.value)}
-          onblur={e => handleFieldSave('source', e.value)}
-          onfocus={() => handleFieldFocus('source')}
-        />
+          {#if showSource}
+            <TextMetadataField
+              id="source"
+              label={$t('Source')}
+              value={metadata.source || ''}
+              placeholder={$t('Enter source information')}
+              error={getFieldError('source')}
+              onchange={e => handleFieldChange('source', e.value)}
+              onblur={e => handleFieldSave('source', e.value)}
+              onfocus={() => handleFieldFocus('source')}
+            />
+          {/if}
 
-        <TextMetadataField
-          id="relation"
-          label={$t('Relation')}
-          value={metadata.relation || ''}
-          placeholder={$t('Enter related work information')}
-          error={getFieldError('relation')}
-          onchange={e => handleFieldChange('relation', e.value)}
-          onblur={e => handleFieldSave('relation', e.value)}
-          onfocus={() => handleFieldFocus('relation')}
-        />
+          {#if showRelation}
+            <TextMetadataField
+              id="relation"
+              label={$t('Relation')}
+              value={metadata.relation || ''}
+              placeholder={$t('Enter related work information')}
+              error={getFieldError('relation')}
+              onchange={e => handleFieldChange('relation', e.value)}
+              onblur={e => handleFieldSave('relation', e.value)}
+              onfocus={() => handleFieldFocus('relation')}
+            />
+          {/if}
 
-        <TextMetadataField
-          id="coverage"
-          label={$t('Coverage')}
-          value={metadata.coverage || ''}
-          placeholder={$t('Enter spatial or temporal coverage')}
-          error={getFieldError('coverage')}
-          onchange={e => handleFieldChange('coverage', e.value)}
-          onblur={e => handleFieldSave('coverage', e.value)}
-          onfocus={() => handleFieldFocus('coverage')}
-        />
+          {#if showCoverage}
+            <TextMetadataField
+              id="coverage"
+              label={$t('Coverage')}
+              value={metadata.coverage || ''}
+              placeholder={$t('Enter spatial or temporal coverage')}
+              error={getFieldError('coverage')}
+              onchange={e => handleFieldChange('coverage', e.value)}
+              onblur={e => handleFieldSave('coverage', e.value)}
+              onfocus={() => handleFieldFocus('coverage')}
+            />
+          {/if}
 
-        <TextMetadataField
-          id="format"
-          label={$t('Format')}
-          value={metadata.format || ''}
-          placeholder={$t('Enter format information')}
-          error={getFieldError('format')}
-          onchange={e => handleFieldChange('format', e.value)}
-          onblur={e => handleFieldSave('format', e.value)}
-          onfocus={() => handleFieldFocus('format')}
-        />
-      </fieldset>
+          {#if showFormat}
+            <TextMetadataField
+              id="format"
+              label={$t('Format')}
+              value={metadata.format || ''}
+              placeholder={$t('Enter format information')}
+              error={getFieldError('format')}
+              onchange={e => handleFieldChange('format', e.value)}
+              onblur={e => handleFieldSave('format', e.value)}
+              onfocus={() => handleFieldFocus('format')}
+            />
+          {/if}
+        </fieldset>
+      {/if}
     </div>
 
     <div class="column">
