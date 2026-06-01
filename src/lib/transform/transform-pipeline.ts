@@ -53,9 +53,7 @@ export class TransformPipeline {
   async executeTransformPipeline(
     plainText: string,
     workspaceId: string,
-    p0: number,
     spineItemId: string,
-    p1: {},
     metadata: ChapterMetadata
   ): Promise<PipelineResult> {
     const startTime = Date.now();

@@ -12,6 +12,7 @@ export interface ChapterMetadata {
   language: string;
   stylesheets: string[];
   scripts: string[];
+  customHead?: string;
 }
 
 /**
@@ -28,12 +29,14 @@ export function generateXHTMLDocument(content: string, metadata: ChapterMetadata
     .map(src => `    <script type="text/javascript" src="${escapeHtml(convertManifestPathToXHTMLPath(src))}"></script>`)
     .join('\n');
 
+  const customHeadContent = metadata.customHead ? `    ${metadata.customHead}` : '';
+
   return `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="${escapeHtml(metadata.language)}" lang="${escapeHtml(metadata.language)}">
   <head>
     <title>${escapedTitle}</title>
-${stylesheetLinks}${stylesheetLinks ? '\n' : ''}${scriptTags}${scriptTags ? '\n' : ''}  </head>
+${stylesheetLinks}${stylesheetLinks ? '\n' : ''}${scriptTags}${scriptTags ? '\n' : ''}${customHeadContent}${customHeadContent ? '\n' : ''}  </head>
   <body>
     ${content}
   </body>
