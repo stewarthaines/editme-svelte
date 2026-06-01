@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import { t } from '../../i18n';
   import ManifestTable from './ManifestTable.svelte';
-  import ManifestItemEditor from './ManifestItemEditor.svelte';
   import { ManifestUtils } from '../../manifest/utils.js';
   import { generateEPUBPath } from '../../epub/opf-utils.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
@@ -31,8 +30,6 @@
   let validationErrors = $state<ValidationResult[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
-  let showItemEditor = $state(false);
-  let itemEditorMode = $state<'create-text' | 'create-file' | 'edit'>('create-text');
 
   const loadManifest = async () => {
     if (!workspace) return;
@@ -103,18 +100,6 @@
     });
   };
 
-  const handleItemCreate = (event: { detail: { mode: 'create-text' | 'create-file' } }) => {
-    itemEditorMode = event.detail.mode;
-    showItemEditor = true;
-  };
-
-  const handleItemEdit = (event: { detail: { item: ManifestItem } }) => {
-    selectedItem = event.detail.item;
-    selectedItemType = 'manifest';
-    itemEditorMode = 'edit';
-    showItemEditor = true;
-  };
-
   const handleItemDelete = async (event: { detail: { itemId: string } }) => {
     if (!workspace) return;
 
@@ -134,44 +119,6 @@
       }
     } catch {
       error = $t('Failed to delete item');
-    }
-  };
-
-  const handleItemSave = async (event: { detail: { item: ManifestItem } }) => {
-    if (!workspace) return;
-
-    try {
-      const { item } = event.detail;
-
-      if (itemEditorMode === 'edit' && selectedItem && 'id' in selectedItem) {
-        workspace = await workspaceService.updateManifestItem(workspace, selectedItem.id, item);
-      } else {
-        // Create new item based on mode
-        if (itemEditorMode === 'create-text') {
-          // Add manifest item first (persists content.opf)
-          workspace = await workspaceService.addManifestItem(workspace, item);
-          const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
-
-          // Write the file content; roll back the manifest entry if it fails
-          // so content.opf never references a file that isn't in storage.
-          const filePath = item.href.startsWith(workspace.pathInfo.basePath + '/') ?
-            item.href :
-            `${workspace.pathInfo.basePath}/${item.href}`;
-          try {
-            await workspaceService.writeFile(workspace.id, filePath, '');
-          } catch (writeError) {
-            workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
-            throw writeError;
-          }
-        }
-      }
-
-      showItemEditor = false;
-      // Keep global app state in sync with the persisted content.opf.
-      onWorkspaceUpdate?.(workspace);
-      await loadManifest(); // Refresh the manifest
-    } catch {
-      error = $t('Failed to save item');
     }
   };
 
@@ -260,10 +207,6 @@
     }
   };
 
-  const handleEditorClose = () => {
-    showItemEditor = false;
-  };
-
   // Load manifest when component mounts or dependencies change
   onMount(loadManifest);
 
@@ -323,20 +266,8 @@
     {selectedItem}
     {selectedItemType}
     on:itemSelect={handleItemSelection}
-    on:itemCreate={handleItemCreate}
-    on:itemEdit={handleItemEdit}
     on:itemDelete={handleItemDelete}
     on:fileUpload={handleFileUpload}
-  />
-{/if}
-
-{#if showItemEditor}
-  <ManifestItemEditor
-    {itemEditorMode}
-    item={itemEditorMode === 'edit' ? selectedItem : null}
-    {validationErrors}
-    on:save={handleItemSave}
-    on:close={handleEditorClose}
   />
 {/if}
 

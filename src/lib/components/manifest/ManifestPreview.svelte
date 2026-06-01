@@ -11,8 +11,118 @@
   export let selectedItemType: 'manifest' | 'source' | 'opf' | null = null;
   export let workspace: WorkspaceState | null = null;
   export let workspaceService: WorkspaceService | undefined = undefined;
+  // Propagate manifest edits to global app state (keeps content.opf, the table,
+  // and the in-memory workspace in lockstep).
+  export let onWorkspaceUpdate: ((workspace: WorkspaceState) => void) | undefined = undefined;
 
   const dispatch = createEventDispatcher();
+
+  // --- Inline manifest-item editing -------------------------------------------
+  const MEDIA_TYPES = [
+    { value: 'application/xhtml+xml', label: 'XHTML' },
+    { value: 'text/css', label: 'CSS' },
+    { value: 'text/javascript', label: 'JavaScript' },
+    { value: 'image/jpeg', label: 'JPEG Image' },
+    { value: 'image/png', label: 'PNG Image' },
+    { value: 'image/gif', label: 'GIF Image' },
+    { value: 'image/svg+xml', label: 'SVG Image' },
+    { value: 'audio/mpeg', label: 'MP3 Audio' },
+    { value: 'audio/mp4', label: 'MP4 Audio' },
+    { value: 'audio/ogg', label: 'OGG Audio' },
+    { value: 'video/mp4', label: 'MP4 Video' },
+    { value: 'video/webm', label: 'WebM Video' },
+    { value: 'font/woff', label: 'WOFF Font' },
+    { value: 'font/woff2', label: 'WOFF2 Font' },
+    { value: 'font/ttf', label: 'TrueType Font' },
+    { value: 'application/pdf', label: 'PDF' },
+  ];
+
+  const EPUB_PROPERTIES = [
+    { value: 'cover-image', label: 'Cover Image' },
+    { value: 'mathml', label: 'MathML' },
+    { value: 'nav', label: 'Navigation' },
+    { value: 'remote-resources', label: 'Remote Resources' },
+    { value: 'scripted', label: 'Scripted' },
+    { value: 'svg', label: 'SVG' },
+  ];
+
+  let liveItem: ManifestItem | null = null;
+  let editId = '';
+  let editHref = '';
+  let editMediaType = '';
+  let editProperties: string[] = [];
+  let editError: string | null = null;
+
+  // Only manifest items get the edit form; SOURCE files, SOURCE.zip contents
+  // and content.opf stay preview-only.
+  $: isManifestItem = selectedItemType === 'manifest' && !!selectedItem && 'id' in selectedItem;
+  // XHTML content documents (chapters, nav) are named via the spine/chapter
+  // system — their id and href are managed there, so they're read-only here.
+  $: identityLocked = isManifestItem && (selectedItem as ManifestItem).mediaType === 'application/xhtml+xml';
+
+  // Reseed the form whenever the selected item changes (not on our own edits).
+  $: if (isManifestItem) {
+    seedEditForm(selectedItem as ManifestItem);
+  } else {
+    liveItem = null;
+  }
+
+  function seedEditForm(item: ManifestItem) {
+    liveItem = item;
+    editId = item.id;
+    editHref = item.href;
+    editMediaType = item.mediaType;
+    editProperties = [...(item.properties ?? [])];
+    editError = null;
+  }
+
+  async function persistEdit(updates: Partial<ManifestItem>) {
+    if (!workspace || !workspaceService || !liveItem) return;
+    try {
+      const updated = await workspaceService.updateManifestItem(workspace, liveItem.id, updates);
+      // Track the live item by its (possibly new) id so further edits target it.
+      const newId = updates.id ?? liveItem.id;
+      liveItem = updated.opf.manifest.find(m => m.id === newId) ?? { ...liveItem, ...updates };
+      editError = null;
+      onWorkspaceUpdate?.(updated);
+    } catch (err) {
+      editError = err instanceof Error ? err.message : $t('Failed to update item');
+      // Revert the form to the last persisted values.
+      if (liveItem) seedEditForm(liveItem);
+    }
+  }
+
+  const commitId = () => {
+    if (!liveItem || identityLocked) return;
+    const value = editId.trim();
+    if (!value || value === liveItem.id) {
+      editId = liveItem.id;
+      return;
+    }
+    persistEdit({ id: value });
+  };
+
+  const commitHref = () => {
+    if (!liveItem || identityLocked) return;
+    const value = editHref.trim();
+    if (!value || value === liveItem.href) {
+      editHref = liveItem.href;
+      return;
+    }
+    persistEdit({ href: value });
+  };
+
+  const commitMediaType = () => {
+    if (!liveItem || !editMediaType || editMediaType === liveItem.mediaType) return;
+    persistEdit({ mediaType: editMediaType });
+  };
+
+  const toggleProperty = (value: string, checked: boolean) => {
+    editProperties = checked
+      ? [...editProperties, value]
+      : editProperties.filter(p => p !== value);
+    persistEdit({ properties: editProperties.length ? editProperties : undefined });
+  };
 
   let contentPreview: ContentPreview | null = null;
   let loading = false;
@@ -234,12 +344,6 @@
     }
   };
 
-  const handleEditClick = () => {
-    if (selectedItem && selectedItemType === 'manifest') {
-      dispatch('itemEdit', { item: selectedItem });
-    }
-  };
-
   const handleDeleteClick = () => {
     if (selectedItem && selectedItemType === 'manifest') {
       dispatch('itemDelete', { itemId: (selectedItem as ManifestItem).id });
@@ -350,11 +454,6 @@
       <div class="preview-header">
         <!-- Action buttons moved to header -->
         <div class="preview-actions">
-          {#if selectedItemType === 'manifest'}
-            <button type="button" class="action-button edit-button" on:click={handleEditClick}>
-              {$t('Edit')}
-            </button>
-          {/if}
           <button
             type="button"
             class="action-button download-button"
@@ -369,6 +468,80 @@
           {/if}
         </div>
       </div>
+
+      {#if isManifestItem}
+        <!-- Inline manifest-item editor (compact; saves on blur / toggle) -->
+        <div class="item-edit-form">
+          <div class="edit-field">
+            <label class="edit-label" for="manifest-edit-id">{$t('ID')}</label>
+            <input
+              id="manifest-edit-id"
+              class="edit-input"
+              type="text"
+              dir="ltr"
+              bind:value={editId}
+              on:blur={commitId}
+              readonly={identityLocked}
+              aria-readonly={identityLocked}
+            />
+          </div>
+
+          <div class="edit-field">
+            <label class="edit-label" for="manifest-edit-href">{$t('File Path')}</label>
+            <input
+              id="manifest-edit-href"
+              class="edit-input"
+              type="text"
+              dir="ltr"
+              bind:value={editHref}
+              on:blur={commitHref}
+              readonly={identityLocked}
+              aria-readonly={identityLocked}
+            />
+          </div>
+
+          {#if identityLocked}
+            <p class="edit-hint">{$t('ID and file path for chapters are managed in the spine sidebar.')}</p>
+          {/if}
+
+          <div class="edit-field">
+            <label class="edit-label" for="manifest-edit-mediatype">{$t('Media Type')}</label>
+            <select
+              id="manifest-edit-mediatype"
+              class="edit-input"
+              bind:value={editMediaType}
+              on:change={commitMediaType}
+            >
+              {#if !MEDIA_TYPES.some(m => m.value === editMediaType)}
+                <option value={editMediaType}>{editMediaType}</option>
+              {/if}
+              {#each MEDIA_TYPES as mediaType}
+                <option value={mediaType.value}>{mediaType.label}</option>
+              {/each}
+            </select>
+          </div>
+
+          <fieldset class="edit-properties">
+            <legend class="edit-label">{$t('EPUB Properties')}</legend>
+            <div class="edit-properties-grid">
+              {#each EPUB_PROPERTIES as property}
+                <label class="edit-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={editProperties.includes(property.value)}
+                    on:change={e => toggleProperty(property.value, e.currentTarget.checked)}
+                  />
+                  {property.label}
+                </label>
+              {/each}
+            </div>
+          </fieldset>
+
+          {#if editError}
+            <p class="edit-error" role="alert">{editError}</p>
+          {/if}
+        </div>
+      {/if}
 
       <!-- Content preview -->
       <div class="preview-body">
@@ -510,6 +683,86 @@
   }
 
 
+  .item-edit-form {
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .edit-field {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .edit-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+
+  .edit-input {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-size: 0.8125rem;
+  }
+
+  .edit-input:focus {
+    outline: none;
+    border-color: var(--color-focus-ring);
+    box-shadow: 0 0 0 2px var(--color-focus-ring);
+  }
+
+  .edit-input[readonly] {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    cursor: default;
+  }
+
+  .edit-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .edit-properties {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .edit-properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .edit-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .edit-error {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--color-error);
+  }
+
   .preview-body {
     flex: 1;
     overflow-y: auto;
@@ -631,11 +884,6 @@
   .download-button:hover {
     color: var(--color-interactive-secondary);
     border-color: var(--color-interactive-secondary);
-  }
-
-  .edit-button:hover {
-    color: var(--color-interactive-primary);
-    border-color: var(--color-interactive-primary);
   }
 
   .delete-button:hover {

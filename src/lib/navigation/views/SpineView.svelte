@@ -308,46 +308,37 @@
         },
       ];
 
-      // Add CSS files from manifest (if any exist)
-      try {
-        const cssFiles = await fileStorage.listFiles(workspace.id, 'OEBPS/Styles');
-        for (const cssFile of cssFiles) {
-          if (cssFile.endsWith('.css')) {
-            const fileName = cssFile.split('/').pop()?.replace('.css', '') || cssFile;
-            // Convert workspace path to manifest href: OEBPS/Styles/page.css -> Styles/page.css
-            const manifestHref = cssFile.startsWith('OEBPS/') ? cssFile.substring(6) : cssFile;
-            files.push({
-              value: `css-${fileName}`,
-              label: `CSS: ${fileName}`,
-              path: cssFile,
-              href: manifestHref,
-              type: 'css',
-            });
-          }
-        }
-      } catch {
-        // No CSS files yet, that's okay
-      }
+      // Add CSS and JavaScript files from the manifest. The manifest is the
+      // source of truth (it's what gets injected into the rendered/preview
+      // <head>), so a stylesheet renamed/relocated via the manifest editor still
+      // appears here and the dropdown always matches the head. Resolve each
+      // manifest href to its actual workspace path for content loading.
+      const resolveManifestHref = (href: string) =>
+        workspace.pathInfo.basePath ? `${workspace.pathInfo.basePath}/${href}` : href;
 
-      // Add JavaScript files from manifest (if any exist)
-      try {
-        const jsFiles = await fileStorage.listFiles(workspace.id, 'OEBPS/Scripts');
-        for (const jsFile of jsFiles) {
-          if (jsFile.endsWith('.js')) {
-            const fileName = jsFile.split('/').pop()?.replace('.js', '') || jsFile;
-            // Convert workspace path to manifest href: OEBPS/Scripts/responsive.js -> Scripts/responsive.js
-            const manifestHref = jsFile.startsWith('OEBPS/') ? jsFile.substring(6) : jsFile;
-            files.push({
-              value: `js-${fileName}`,
-              label: `JS: ${fileName}`,
-              path: jsFile,
-              href: manifestHref,
-              type: 'javascript',
-            });
-          }
+      for (const item of workspace.opf.manifest) {
+        if (item.mediaType === 'text/css') {
+          const fileName = item.href.split('/').pop()?.replace(/\.css$/, '') || item.href;
+          files.push({
+            value: `css-${fileName}`,
+            label: `CSS: ${fileName}`,
+            path: resolveManifestHref(item.href),
+            href: item.href,
+            type: 'css',
+          });
+        } else if (
+          item.mediaType === 'text/javascript' ||
+          item.mediaType === 'application/javascript'
+        ) {
+          const fileName = item.href.split('/').pop()?.replace(/\.js$/, '') || item.href;
+          files.push({
+            value: `js-${fileName}`,
+            label: `JS: ${fileName}`,
+            path: resolveManifestHref(item.href),
+            href: item.href,
+            type: 'javascript',
+          });
         }
-      } catch {
-        // No JS files yet, that's okay
       }
 
       // Add transform scripts from SOURCE/scripts/ (if any exist)

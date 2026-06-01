@@ -174,11 +174,6 @@
     }
   };
 
-  const _handleEditClick = (event: Event, item: ManifestItem) => {
-    event.stopPropagation();
-    dispatch('itemEdit', { item });
-  };
-
   const _handleDeleteClick = (event: Event, item: ManifestItem) => {
     event.stopPropagation();
     dispatch('itemDelete', { itemId: item.id });
@@ -246,16 +241,6 @@
     if (target.files && target.files.length > 0) {
       dispatch('fileUpload', { files: target.files });
       target.value = ''; // Clear the input
-    }
-  };
-
-  const handleCreateTextClick = () => {
-    dispatch('itemCreate', { mode: 'create-text' });
-  };
-
-  const handleEditItemClick = () => {
-    if (selectedItem && selectedItemType === 'manifest') {
-      dispatch('itemEdit', { item: selectedItem });
     }
   };
 
@@ -327,29 +312,11 @@
     <div class="action-buttons">
       <button
         type="button"
-        class="action-button secondary"
-        onclick={handleEditItemClick}
-        disabled={!selectedItem || selectedItemType !== 'manifest'}
-      >
-        ✏️ {$t('Edit Item')}
-      </button>
-
-      <button
-        type="button"
         class="action-button primary"
         onclick={handleLoadFileClick}
         disabled={loading}
       >
         📁 {$t('Load File')}
-      </button>
-
-      <button
-        type="button"
-        class="action-button secondary"
-        onclick={handleCreateTextClick}
-        disabled={loading}
-      >
-        📝 {$t('Create Text File')}
       </button>
     </div>
 
@@ -665,16 +632,6 @@
   .action-button.primary:hover:not(:disabled) {
     background-color: var(--color-interactive-primary-hover);
     border-color: var(--color-interactive-primary-hover);
-  }
-
-  .action-button.secondary {
-    background-color: var(--color-surface);
-    color: var(--color-text-primary);
-  }
-
-  .action-button.secondary:hover:not(:disabled) {
-    background-color: var(--color-interactive-secondary-hover);
-    border-color: var(--color-interactive-secondary-hover);
   }
 
   .action-button:focus {

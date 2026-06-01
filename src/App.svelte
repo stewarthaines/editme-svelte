@@ -717,6 +717,9 @@
           workspace={currentWorkspaceState}
           {workspaceService}
           on:itemDelete={handleManifestItemDelete}
+          onWorkspaceUpdate={updatedWorkspace => {
+            if (appState) appState.workspace = updatedWorkspace;
+          }}
         />
       {:else if currentView === 'navigation'}
         {#if navigationPreviewContent}

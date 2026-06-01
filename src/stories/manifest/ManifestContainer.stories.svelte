@@ -34,7 +34,7 @@ Complete manifest management interface demonstrating table-based item listing wi
 
 1. **View Items**: Browse manifest items in the sortable table
 2. **Select Items**: Click any row to select and preview content
-3. **Create Items**: Use "Load File" or "Create Text File" buttons
+3. **Add Items**: Use the "Load File" button (or drag and drop) to add assets
 4. **Filter Items**: Type in the search box to filter items by ID, href, or media type
 5. **Advanced Mode**: Toggle to see SOURCE/ directory items integrated with manifest
 6. **File Operations**: Edit, download, or delete items using action buttons
