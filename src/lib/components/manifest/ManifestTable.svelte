@@ -226,25 +226,6 @@
     return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   };
 
-  const formatDate = (date: Date | undefined) => {
-    if (!date) return '-';
-
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-
-    if (isToday) {
-      // For today, show only time
-      return new Intl.DateTimeFormat('en-US', {
-        timeStyle: 'short',
-      }).format(date);
-    } else {
-      // For other dates, show only date
-      return new Intl.DateTimeFormat('en-US', {
-        dateStyle: 'short',
-      }).format(date);
-    }
-  };
-
   const getSortIcon = (field: SortableFields) => {
     if (sortField !== field) return '↕';
     return sortDirection === 'asc' ? '↑' : '↓';

@@ -458,7 +458,7 @@ export class ExtensionManager {
         .replace(/\.\.\//g, '') // Remove ../ traversal
         .replace(/\.\.\\/g, '') // Remove ..\ traversal
         // oxlint-disable-next-line no-control-regex
-        .replace(/[<>:"/\\|?*\x00-\x1f]/g, '-') // Replace dangerous chars
+        .replace(/[<>:"/\\|?*\x00-\x1f]/g, '-') // eslint-disable-line no-control-regex -- strip control chars from filenames
         .replace(/^\.+/, '') // Remove leading dots
         .replace(/\.+$/, '') // Remove trailing dots
         .replace(/-+/g, '-') // Collapse multiple hyphens

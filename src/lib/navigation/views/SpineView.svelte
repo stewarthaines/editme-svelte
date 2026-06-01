@@ -36,7 +36,6 @@
     createTextEditorStore,
     clearAllTextEditorStores,
   } from '../../stores/text-editor-store.js';
-  import { getTextFilePath } from '../../source/source-utils.js';
   import type { TextEditorStore } from '../../stores/index.js';
 
   // Element reference for event binding
@@ -171,7 +170,7 @@
   $effect(() => {
     if (workspace?.id && (previousWorkspaceId === null || workspace.id !== previousWorkspaceId)) {
       // Clean up local stores
-      for (const [filePath, store] of fileContentStores) {
+      for (const store of fileContentStores.values()) {
         store.destroy();
       }
       fileContentStores.clear();
@@ -326,7 +325,7 @@
             });
           }
         }
-      } catch (err) {
+      } catch {
         // No CSS files yet, that's okay
       }
 
@@ -347,7 +346,7 @@
             });
           }
         }
-      } catch (err) {
+      } catch {
         // No JS files yet, that's okay
       }
 
@@ -366,7 +365,7 @@
             });
           }
         }
-      } catch (err) {
+      } catch {
         // No transform files yet, that's okay
       }
 
@@ -550,13 +549,6 @@
     }
   }
 
-  // Handle content changes from editor (text only - CSS/JS handled by auto-save)
-  function handleContentChange(type: ContentType, content: string) {
-    currentContent[type] = content;
-    if (previewManager) {
-      previewManager.updateContent(type, content);
-    }
-  }
 
   // Restore saved pane configuration or initialize with defaults
   async function restoreOrInitializePaneContent() {
@@ -830,7 +822,7 @@
             previewManager.forcePreviewUpdate();
           }
         }
-      } catch (err) {
+      } catch {
         // Auto-save failed, but continue
       } finally {
         autoSaveTimeouts.delete(filePath);
@@ -911,7 +903,7 @@
     pane: 1 | 2,
     paneConfig: { fileType: string; selectedFile?: string; content?: string }
   ) {
-    const { fileType, selectedFile, content } = paneConfig;
+    const { fileType, selectedFile } = paneConfig;
 
     // Find appropriate file for this pane
     let targetFile;
@@ -958,23 +950,6 @@
         console.error('❌ Pane restoration failed - could not create store for:', targetFile.path);
       }
     }
-  }
-
-  // Load file content into a specific pane with validation
-  async function loadFileIntoPane(pane: 1 | 2, filePath: string, fileType: string) {
-    // COMPLETELY DISABLED - all content must flow through proper store channels
-    console.error('🚫 loadFileIntoPane called but disabled! File:', filePath, 'Type:', fileType);
-    console.error('🚫 All content should flow through text/CSS/JS stores, not direct file loading');
-    throw new Error(
-      `loadFileIntoPane disabled - content must use proper stores for ${fileType} files`
-    );
-  }
-
-  // Validate that file content matches expected file type (debugging aid)
-  function validateContentTypeMatch(fileType: string, content: string, filePath: string): void {
-    if (!content) return; // Empty content is always valid
-
-    const lowerContent = content.toLowerCase().trim();
   }
 
   // Handle preview updates
@@ -1080,7 +1055,7 @@
     if (currentSpineItemLoadPromise) {
       try {
         await currentSpineItemLoadPromise;
-      } catch (err) {
+      } catch {
         // Previous load failed, proceed
       }
     }
@@ -1152,18 +1127,13 @@
   // Update only spine-specific content in panes (preserve global file selections)
   async function updateSpineSpecificContent() {
     // CRITICAL: Cancel all pending auto-saves to prevent race conditions
-    for (const [filePath, timeout] of autoSaveTimeouts) {
+    for (const timeout of autoSaveTimeouts.values()) {
       clearTimeout(timeout);
     }
     autoSaveTimeouts.clear();
 
-    // Save current state for data integrity verification
-    const oldPaneState = JSON.parse(JSON.stringify(paneState));
-
     // Update pane 1 if it contains spine-specific content
     if (paneState.pane1.fileType && isSpineSpecificFile(paneState.pane1.fileType)) {
-      const oldFilePath = paneState.pane1.filePath;
-      // const oldContent = paneState.pane1.content; // No longer used with store architecture
       const newFilePath = `SOURCE/text/${selectedItemId}.txt`;
 
       // Auto-save current content before switching (CRITICAL for data integrity)
@@ -1194,8 +1164,6 @@
 
     // Update pane 2 if it contains spine-specific content
     if (paneState.pane2.fileType && isSpineSpecificFile(paneState.pane2.fileType)) {
-      const oldFilePath = paneState.pane2.filePath;
-      // const oldContent = paneState.pane2.content; // No longer used with store architecture
       const newFilePath = `SOURCE/text/${selectedItemId}.txt`;
 
       // Auto-save is now handled by store subscriptions - no manual save needed
@@ -1237,7 +1205,7 @@
 
   onDestroy(() => {
     // Clean up file content stores
-    for (const [filePath, store] of fileContentStores) {
+    for (const store of fileContentStores.values()) {
       store.destroy(); // Remove from text-editor-store registry
     }
     fileContentStores.clear();

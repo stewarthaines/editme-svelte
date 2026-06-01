@@ -74,7 +74,7 @@ export class SpineTransformPipeline {
               this.workspaceId,
               `SOURCE/scripts/${settings.text_transform}`
             );
-          } catch (error) {
+          } catch {
             console.warn(`Failed to load text transform script: ${settings.text_transform}`);
           }
         }
@@ -88,7 +88,7 @@ export class SpineTransformPipeline {
                 `SOURCE/scripts/${scriptName}`
               );
               scripts.domTransforms.push(scriptContent);
-            } catch (error) {
+            } catch {
               console.warn(`Failed to load DOM transform script: ${scriptName}`);
             }
           }

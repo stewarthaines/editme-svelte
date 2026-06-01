@@ -38,13 +38,6 @@
   let iframeElement: HTMLIFrameElement;
 
   // Font family CSS mappings
-  const FONT_FAMILIES = {
-    default: '',
-    serif: 'Georgia, "Times New Roman", Times, serif !important',
-    'sans-serif':
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important',
-    monospace: '"Courier New", Courier, "Monaco", "Menlo", monospace !important',
-  };
 
   function getDeviceDimensions(deviceType: DeviceSize, orientation: 'portrait' | 'landscape') {
     if (deviceType === 'responsive') {
@@ -73,14 +66,6 @@
     }`;
   }
 
-  function getFontFamilyCSS(fontFamily: FontFamily): string {
-    if (fontFamily === 'default') {
-      return '';
-    }
-
-    return `body { font-family: ${FONT_FAMILIES[fontFamily]}; }`;
-  }
-
   function injectDeviceStyles(
     iframe: HTMLIFrameElement | null,
     deviceType: DeviceSize,
@@ -102,7 +87,6 @@
     // Build CSS
     let css = '';
     css += getDeviceBaseCSS(deviceType, fontSizeAdjustment);
-    // css += getFontFamilyCSS(fontFamily);
 
     if (css) {
       const styleElement = iframeDoc.createElement('style');

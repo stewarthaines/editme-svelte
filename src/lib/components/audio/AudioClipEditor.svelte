@@ -34,7 +34,7 @@
     workspace,
     audioClipService,
     workspaceService: _workspaceService,
-    settingsService,
+    settingsService: _settingsService,
     textContent = '',
     textareaSelection = null,
     onInsertClip,
@@ -210,7 +210,7 @@
     if (startSeconds >= 0 && endSeconds > startSeconds) {
       try {
         audioClipService.setClipRange(startSeconds, endSeconds);
-      } catch (err) {
+      } catch {
         // Ignore validation errors during input
       }
     }

@@ -99,7 +99,7 @@
           let content;
           try {
             content = await workspaceService.readFile(workspace.id, filePath);
-          } catch (err) {
+          } catch {
             // Try original href if constructed path fails
             content = await workspaceService.readFile(workspace.id, manifestItem.href);
           }
@@ -153,7 +153,7 @@
                 : undefined,
             },
           };
-        } catch (err) {
+        } catch {
           contentPreview = {
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,

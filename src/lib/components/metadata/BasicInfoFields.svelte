@@ -9,7 +9,7 @@
   import IdentifierEditor from './IdentifierEditor.svelte';
   import type { EPUBMetadata } from '../../epub';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
-  import { MetadataUtils, type EditableArrayField } from '../../epub/opf-utils';
+  import { type EditableArrayField } from '../../epub/opf-utils';
 
   interface Props {
     metadata?: EPUBMetadata;
@@ -173,7 +173,6 @@
           value={metadata.renditionLayout || 'reflowable'}
           options={layoutOptions}
           error={getFieldError('renditionLayout')}
-          onchange={e => handleFieldChange('renditionLayout', e.value)}
           onblur={e => handleFieldSave('renditionLayout', e.value)}
           onfocus={() => handleFieldFocus('renditionLayout')}
         />
@@ -184,7 +183,6 @@
           value={metadata.pageProgressionDirection || 'default'}
           options={progressionOptions}
           error={getFieldError('pageProgressionDirection')}
-          onchange={e => handleFieldChange('pageProgressionDirection', e.value)}
           onblur={e => handleFieldSave('pageProgressionDirection', e.value)}
           onfocus={() => handleFieldFocus('pageProgressionDirection')}
         />
@@ -195,7 +193,6 @@
           value={metadata.renditionOrientation || 'auto'}
           options={orientationOptions}
           error={getFieldError('renditionOrientation')}
-          onchange={e => handleFieldChange('renditionOrientation', e.value)}
           onblur={e => handleFieldSave('renditionOrientation', e.value)}
           onfocus={() => handleFieldFocus('renditionOrientation')}
         />
@@ -206,7 +203,6 @@
           value={metadata.renditionSpread || 'auto'}
           options={spreadOptions}
           error={getFieldError('renditionSpread')}
-          onchange={e => handleFieldChange('renditionSpread', e.value)}
           onblur={e => handleFieldSave('renditionSpread', e.value)}
           onfocus={() => handleFieldFocus('renditionSpread')}
         />
@@ -217,7 +213,6 @@
           value={metadata.renditionFlow || 'auto'}
           options={flowOptions}
           error={getFieldError('renditionFlow')}
-          onchange={e => handleFieldChange('renditionFlow', e.value)}
           onblur={e => handleFieldSave('renditionFlow', e.value)}
           onfocus={() => handleFieldFocus('renditionFlow')}
         />

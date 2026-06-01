@@ -13,7 +13,7 @@
 -->
 
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import type { TransformError } from '$lib/types/spine-editor.js';
   import { t } from '$lib/i18n';
@@ -24,8 +24,6 @@
     isTransforming = false,
     transformError = null,
     transformWarnings = [],
-    executionTime = 0,
-    spineItemId,
     onNavigate = undefined,
     onPreviewClick = null,
   }: {
@@ -33,8 +31,6 @@
     isTransforming?: boolean;
     transformError?: TransformError | null;
     transformWarnings?: string[];
-    executionTime?: number;
-    spineItemId: string;
     onNavigate: ((chapterId: string) => void) | undefined;
     onPreviewClick?:
       | ((detail: { text: string; documentPosition: number; elementType: string }) => void)
@@ -399,21 +395,6 @@
   }
 
   /**
-   * Update device scaling for current container and device
-   */
-  function updateDeviceScale(): void {
-    if (!previewContainer || selectedDevice === 'desktop') {
-      deviceScale = 1;
-      return;
-    }
-
-    const device = DEVICE_PRESETS.find(d => d.id === selectedDevice);
-    if (device) {
-      deviceScale = calculateOptimalScale(device);
-    }
-  }
-
-  /**
    * Toggle device orientation between portrait and landscape
    */
   function toggleOrientation(): void {
@@ -496,16 +477,6 @@
     }
 
     console.log('🔄 toggleSourceView completed');
-  }
-
-  /**
-   * Format execution time for display
-   */
-  function formatExecutionTime(ms: number): string {
-    if (ms < 1000) {
-      return `${ms}ms`;
-    }
-    return `${(ms / 1000).toFixed(1)}s`;
   }
 
   /**
@@ -670,33 +641,6 @@
         });
       }
     }
-  }
-
-  /**
-   * Copy XHTML source to clipboard
-   */
-  async function copySourceToClipboard(): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(xhtmlContent);
-      // Could add a toast notification here
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-    }
-  }
-
-  /**
-   * Download XHTML as file
-   */
-  function downloadXHTML(): void {
-    const blob = new Blob([xhtmlContent], { type: 'application/xhtml+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${spineItemId}.xhtml`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   }
 
   // Add resize listener to update scaling when viewport changes

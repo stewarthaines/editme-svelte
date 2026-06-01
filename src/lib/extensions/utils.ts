@@ -26,7 +26,7 @@ export function detectExtensionName(filename: string): string {
 
   // Remove version patterns like -13.0.1, @1.2.3, -1.2.3-beta but preserve simple -v2 style
   // Only remove if it's a complex version (has dots or multiple parts)
-  name = name.replace(/[-@](?:v?\d+[\.\-]\d+|\d+[\.\-]\d+)(?:[\.\-]\w+)*$/i, '');
+  name = name.replace(/[-@](?:v?\d+[.-]\d+|\d+[.-]\d+)(?:[.-]\w+)*$/i, '');
 
   // Normalize to safe directory name
   return normalizeExtensionName(name);

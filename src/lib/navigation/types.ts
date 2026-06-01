@@ -61,9 +61,8 @@ export interface ViewComponent {
 }
 
 // View-specific data types for type safety
-export interface AboutViewData {
-  // No specific data needed for About view
-}
+// The About view carries no data; modelled as an empty object.
+export type AboutViewData = Record<string, never>;
 
 export interface ManifestViewData {
   selectedItems: string[];

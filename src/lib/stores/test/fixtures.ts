@@ -275,7 +275,7 @@ export function createErrorScenarios() {
  * Creates a simple mock for testing subscription behavior
  */
 export function createSubscriptionMock() {
-  const subscribers = new Set<Function>();
+  const subscribers = new Set<(...args: unknown[]) => unknown>();
   
   return {
     subscribe: vi.fn((callback) => {

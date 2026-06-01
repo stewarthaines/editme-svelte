@@ -735,8 +735,6 @@
             isTransforming={spinePreviewData.isTransforming}
             transformError={spinePreviewData.transformError}
             transformWarnings={spinePreviewData.transformWarnings}
-            executionTime={spinePreviewData.executionTime}
-            spineItemId={spinePreviewData.spineItemId}
             onPreviewClick={handlePreviewClick}
             onNavigate={handleNavigationClick}
           />

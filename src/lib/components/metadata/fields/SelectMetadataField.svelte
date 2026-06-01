@@ -8,7 +8,6 @@
     label?: string;
     id?: string;
     placeholder?: string;
-    onchange?: (event: { value: string }) => void;
     onblur?: (event: { value: string }) => void;
     onfocus?: (event: { field: string }) => void;
   }
@@ -22,7 +21,6 @@
     label = '',
     id = '',
     placeholder = '',
-    onchange,
     onblur,
     onfocus
   }: Props = $props();
@@ -32,7 +30,6 @@
 
   const handleChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
-    // onchange?.({ value: target.value });
     onblur?.({ value: target.value });
   };
 

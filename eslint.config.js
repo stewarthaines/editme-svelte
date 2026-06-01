@@ -3,120 +3,58 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import svelte from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
+import globals from 'globals';
+
+// The `globals` package ships a browser key with stray whitespace
+// ("AudioWorkletGlobalScope "), which ESLint 9 rejects. Trim all keys.
+const trimGlobals = source =>
+  Object.fromEntries(Object.entries(source).map(([key, value]) => [key.trim(), value]));
+const browserGlobals = trimGlobals(globals.browser);
+const nodeGlobals = trimGlobals(globals.node);
+const jestGlobals = trimGlobals(globals.jest);
+
+// Rules shared by the TS/JS and Svelte passes. Errors block; the noisier
+// stylistic rules stay warnings so they can be ratcheted down over time.
+const sharedRules = {
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+  ],
+  '@typescript-eslint/no-explicit-any': 'warn',
+  '@typescript-eslint/no-empty-function': 'warn',
+  'no-console': 'warn',
+  '@typescript-eslint/prefer-as-const': 'warn',
+};
 
 export default [
   js.configs.recommended,
   {
-    files: ['**/*.{js,ts,mjs}'],
+    files: ['**/*.{js,ts,mjs,cjs}'],
     languageOptions: {
       parser: tsparser,
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        fetch: 'readonly',
-        URL: 'readonly',
-        Blob: 'readonly',
-        Worker: 'readonly',
-        TextEncoder: 'readonly',
-        TextDecoder: 'readonly',
-        DOMException: 'readonly',
-        DOMParser: 'readonly',
-        XMLSerializer: 'readonly',
-        Document: 'readonly',
-        Element: 'readonly',
-        Event: 'readonly',
-        CustomEvent: 'readonly',
-        KeyboardEvent: 'readonly',
-        DragEvent: 'readonly',
-        EventTarget: 'readonly',
-        HTMLElement: 'readonly',
-        HTMLInputElement: 'readonly',
-        HTMLButtonElement: 'readonly',
-        HTMLDivElement: 'readonly',
-        HTMLSelectElement: 'readonly',
-        HTMLTextAreaElement: 'readonly',
-        HTMLIFrameElement: 'readonly',
-        ResizeObserver: 'readonly',
-        DOMRect: 'readonly',
-        FocusEvent: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        Window: 'readonly',
-        ReadableStream: 'readonly',
-        WritableStream: 'readonly',
-        TransformStream: 'readonly',
-        CompressionStream: 'readonly',
-        DecompressionStream: 'readonly',
-        // File System Access API
-        FileSystemDirectoryHandle: 'readonly',
-        FileSystemFileHandle: 'readonly',
-        // IndexedDB
-        indexedDB: 'readonly',
-        IDBDatabase: 'readonly',
-        IDBTransaction: 'readonly',
-        IDBObjectStore: 'readonly',
-        IDBOpenDBRequest: 'readonly',
-        IDBTransactionMode: 'readonly',
-        IDBIndex: 'readonly',
-        IDBValidKey: 'readonly',
-        IDBKeyRange: 'readonly',
-        // Web Workers
-        self: 'readonly',
-        MessageEvent: 'readonly',
-        ErrorEvent: 'readonly',
-        // File API
-        File: 'readonly',
-        // Performance API
-        performance: 'readonly',
-        // Storage API
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        // Crypto API
-        crypto: 'readonly',
-        // Node.js globals  
-        process: 'readonly',
-        module: 'readonly',
-        // CSS DOM types
-        CSSRule: 'readonly',
-        CSSStyleSheet: 'readonly', 
-        CSSRuleList: 'readonly',
-        CSSImportRule: 'readonly',
-        CSSStyleRule: 'readonly',
-        CSSFontFaceRule: 'readonly',
-        CSSStyleDeclaration: 'readonly',
-        MediaList: 'readonly',
-        // Additional Web APIs
-        Response: 'readonly',
-        btoa: 'readonly',
-        ReadableStreamDefaultController: 'readonly',
-        queueMicrotask: 'readonly'
-      }
+        ...browserGlobals,
+        ...nodeGlobals,
+      },
     },
     plugins: {
-      '@typescript-eslint': tseslint
+      '@typescript-eslint': tseslint,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
-      // Allow unused vars that start with underscore
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      // Allow any type in some cases
-      '@typescript-eslint/no-explicit-any': 'warn',
-      // Allow empty functions
-      '@typescript-eslint/no-empty-function': 'warn',
-      // Allow console in development
-      'no-console': 'warn',
-      // Allow const assertions
-      '@typescript-eslint/prefer-as-const': 'warn'
-    }
+      ...sharedRules,
+    },
+  },
+  {
+    // TypeScript already reports undefined identifiers, and core `no-undef`
+    // false-positives on type-only names (NodeListOf, HTMLCollectionOf).
+    // `npm run check` (svelte-check/tsc) is the authority here.
+    files: ['**/*.ts'],
+    rules: {
+      'no-undef': 'off',
+    },
   },
   {
     files: ['**/*.svelte'],
@@ -125,97 +63,27 @@ export default [
       parserOptions: {
         parser: tsparser,
         ecmaVersion: 2022,
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        fetch: 'readonly',
-        URL: 'readonly',
-        Blob: 'readonly',
-        Worker: 'readonly',
-        TextEncoder: 'readonly',
-        TextDecoder: 'readonly',
-        DOMException: 'readonly',
-        DOMParser: 'readonly',
-        XMLSerializer: 'readonly',
-        Document: 'readonly',
-        Element: 'readonly',
-        Event: 'readonly',
-        CustomEvent: 'readonly',
-        KeyboardEvent: 'readonly',
-        DragEvent: 'readonly',
-        EventTarget: 'readonly',
-        HTMLElement: 'readonly',
-        HTMLInputElement: 'readonly',
-        HTMLButtonElement: 'readonly',
-        HTMLDivElement: 'readonly',
-        HTMLSelectElement: 'readonly',
-        HTMLTextAreaElement: 'readonly',
-        HTMLIFrameElement: 'readonly',
-        ResizeObserver: 'readonly',
-        DOMRect: 'readonly',
-        FocusEvent: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        Window: 'readonly',
-        ReadableStream: 'readonly',
-        WritableStream: 'readonly',
-        TransformStream: 'readonly',
-        CompressionStream: 'readonly',
-        DecompressionStream: 'readonly',
-        // File System Access API
-        FileSystemDirectoryHandle: 'readonly',
-        FileSystemFileHandle: 'readonly',
-        // IndexedDB
-        indexedDB: 'readonly',
-        IDBDatabase: 'readonly',
-        IDBTransaction: 'readonly',
-        IDBObjectStore: 'readonly',
-        IDBOpenDBRequest: 'readonly',
-        IDBTransactionMode: 'readonly',
-        IDBIndex: 'readonly',
-        IDBValidKey: 'readonly',
-        IDBKeyRange: 'readonly',
-        // Web Workers
-        self: 'readonly',
-        MessageEvent: 'readonly',
-        ErrorEvent: 'readonly',
-        // File API
-        File: 'readonly',
-        // Performance API
-        performance: 'readonly',
-        // Storage API
-        localStorage: 'readonly',
-        sessionStorage: 'readonly'
-      }
+        ...browserGlobals,
+      },
     },
     plugins: {
       svelte,
-      '@typescript-eslint': tseslint
+      '@typescript-eslint': tseslint,
     },
     rules: {
       ...svelte.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
-      // Svelte-specific adjustments
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      // Allow console.log in development
-      'no-console': 'warn',
-      // Allow const assertions
-      '@typescript-eslint/prefer-as-const': 'warn',
+      ...sharedRules,
+      // Components are TypeScript; tsc owns undefined-symbol checking.
+      'no-undef': 'off',
       // Allow unnecessary escape in regex for clarity
       'no-useless-escape': 'warn',
       // Allow case declarations
-      'no-case-declarations': 'warn'
-    }
+      'no-case-declarations': 'warn',
+    },
   },
   {
     files: ['src/stories/**/*.{js,ts,svelte}'],
@@ -227,64 +95,58 @@ export default [
       'no-case-declarations': 'off',
       'no-self-assign': 'off',
       'no-useless-escape': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
   {
-    files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}'],
+    // Test files and their support code (mocks, fixtures, test helpers).
+    files: [
+      '**/*.test.{js,ts}',
+      '**/*.spec.{js,ts}',
+      '**/test/**/*.{js,ts}',
+      '**/*.mock.{js,ts}',
+      '**/fixtures/**/*.{js,ts}',
+    ],
     languageOptions: {
       globals: {
-        // Test environment globals
+        ...browserGlobals,
+        ...jestGlobals,
+        // Vitest globals not covered by the `jest` set
+        vi: 'readonly',
         global: 'writable',
-        // Vitest globals
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        vi: 'readonly'
-      }
+      },
     },
     rules: {
       // More lenient rules for test files
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'no-console': 'off'
-    }
+      'no-console': 'off',
+    },
   },
   {
-    files: ['scripts/**/*.js', 'scripts/**/*.mjs', 'build-scripts/**/*.js'],
+    files: ['scripts/**/*.{js,mjs,cjs}', 'build-scripts/**/*.{js,cjs}'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
-        // Node.js globals
-        process: 'readonly',
-        console: 'readonly',
-        Buffer: 'readonly',
-        global: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        require: 'readonly',
-        module: 'readonly',
-        exports: 'readonly',
-        // Node.js modules
-        fs: 'readonly',
-        path: 'readonly',
-        crypto: 'readonly',
+        ...nodeGlobals,
         // Plus browser globals for Playwright
         setTimeout: 'readonly',
-        clearTimeout: 'readonly'
-      }
+        clearTimeout: 'readonly',
+      },
     },
     rules: {
       // More lenient for Node.js scripts
       'no-console': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
-      // Allow require in Node.js scripts
-      '@typescript-eslint/no-var-requires': 'off'
-    }
+      // Allow require()/module.exports in Node.js CommonJS scripts
+      '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+    },
   },
   {
     ignores: [
@@ -299,13 +161,18 @@ export default [
       '*.config.js',
       '*.config.ts',
       '.storybook/',
+      // Runtime-injected / vendored assets (eval'd in a sandbox or bundled
+      // third-party code) — not linted as app modules. Behaviour of the
+      // transform scripts is covered by the transform test suite instead.
+      'src/assets/**',
+      '**/*.min.js',
       // Ignore specific generated files
       '**/lcov-report/',
       '**/coverage-report/',
       '**/.nyc_output/',
       // Ignore auto-generated documentation
       '**/api-docs/',
-      '**/typedoc/'
-    ]
-  }
+      '**/typedoc/',
+    ],
+  },
 ];

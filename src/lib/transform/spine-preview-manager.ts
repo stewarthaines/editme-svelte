@@ -136,7 +136,7 @@ export class SpinePreviewManager {
           this.workspaceId,
           `SOURCE/text/${this.spineItemId}.txt`
         );
-      } catch (error) {
+      } catch {
         // File doesn't exist yet, start with empty content
         this.currentContent.text = '';
       }
@@ -410,7 +410,7 @@ export class SpinePreviewManager {
         .forEach(item => {
           scripts.push(item.href); // Use manifest href directly - already relative to OPF
         });
-    } catch (error) {
+    } catch {
       // No CSS/JS files found, that's okay
     }
 

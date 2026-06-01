@@ -9,7 +9,6 @@
   } from '../../services/workspace/workspace.service.js';
   import type { SpineService } from '../../services/spine/spine.service.js';
   import { OutlineGenerator } from '../../outline/outline-generator.js';
-  import type { TransformPipeline } from '$lib/transform';
   import { TransformEngine } from '$lib/infrastructure/transform-engine';
   import { SpineTransformPipeline } from '$lib/transform/spine-transform-pipeline';
   import type { FileStorageAPI } from '$lib/storage';
@@ -145,7 +144,9 @@
       const navPath = `${workspace.pathInfo.basePath}/nav.xhtml`;
       try {
         await workspaceService.removeManifestItem(workspace, navPath);
-      } catch {}
+      } catch {
+        // No existing nav item to remove — fine.
+      }
       await workspaceService.writeFile(workspace.id, navPath, navigationDoc.xhtmlContent);
       try {
         await workspaceService.addManifestItem(workspace, {
@@ -153,7 +154,9 @@
           id: 'nav',
           properties: ['nav'],
         });
-      } catch {}
+      } catch {
+        // Nav item already present in the manifest — fine.
+      }
     } catch (e) {
       console.error('Failed to process user content:', e);
     }
@@ -259,7 +262,7 @@
     }
   }
 
-  function handleEditorContentChanged(event: CustomEvent) {
+  function handleEditorContentChanged(_event: CustomEvent) {
     // The reactive statement above handles the actual processing
     // This just receives the lightweight event from OutlineEditor
   }

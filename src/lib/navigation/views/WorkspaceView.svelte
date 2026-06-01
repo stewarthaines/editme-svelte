@@ -44,7 +44,6 @@
 
   // Component state using $state()
   let workspaces = $state<WorkspaceInfo[]>([]);
-  let currentWorkspace = $state<WorkspaceInfo | null>(null);
   let loading = $state(false);
   let error = $state<string | null>(null);
   let hasUnsavedChanges = $state(false);
@@ -56,19 +55,9 @@
 
   // Service layer handles state directly - no reactive subscriptions needed
 
-  // Derived: Update currentWorkspace when prop changes
-  $effect(() => {
-    if (currentWorkspaceId && workspaces.length > 0) {
-      currentWorkspace = workspaces.find(w => w.id === currentWorkspaceId) || null;
-    } else {
-      currentWorkspace = null;
-    }
-  });
-
   // Helper to update workspace selection and notify parent
   const setCurrentWorkspace = async (workspaceId: string | null) => {
     if (workspaceId) {
-      currentWorkspace = workspaces.find(w => w.id === workspaceId) || null;
       localStorage.setItem('currentWorkspace', workspaceId);
       
       // Load workspace using callback
@@ -78,7 +67,6 @@
         console.error('Failed to load workspace:', error);
       }
     } else {
-      currentWorkspace = null;
       localStorage.removeItem('currentWorkspace');
     }
 
@@ -284,32 +272,6 @@
     }
   };
 
-  // Handle cleanup of orphaned workspaces (service layer handles errors gracefully)
-  const handleCleanupOrphaned = async () => {
-    // Service layer doesn't have explicit "error" workspaces like the old manager
-    // If needed, this could be implemented as a service method
-    alert($t('Cleanup functionality will be implemented in a future service update.'));
-  };
-
-  // Handle current workspace actions
-  const handleSwitchWorkspace = () => {
-    // Just scroll to workspace list for now
-    const workspaceListElement = document.querySelector('.workspace-list');
-    if (workspaceListElement) {
-      workspaceListElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleCloseWorkspace = async () => {
-    if (hasUnsavedChanges) {
-      const confirmed = confirm($t('You have unsaved project changes. Continue?'));
-      if (!confirmed) return;
-    }
-
-    await setCurrentWorkspace(null);
-    hasUnsavedChanges = false;
-  };
-
   // Navigation guard
   export async function canLeave(): Promise<boolean> {
     if (hasUnsavedChanges) {
@@ -319,7 +281,7 @@
   }
 
   // ViewComponent interface implementation
-  export function onViewEnter(data?: any): void {
+  export function onViewEnter(_data?: any): void {
     // Component is recreated on navigation, so onMount handles loading
     // No need to reload workspaces here
   }

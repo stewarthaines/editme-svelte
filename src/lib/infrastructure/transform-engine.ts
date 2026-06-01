@@ -12,7 +12,6 @@ import type { ExtensionManager } from '../extensions/extension-manager.js';
 import { FileStorageAPI } from '../storage/index.js';
 
 // Import iframe assets as raw text for blob URL creation
-import editorHtml from '../../assets/iframe/editor.html?raw';
 import editorCss from '../../assets/iframe/editor.css?raw';
 import editorJs from '../../assets/iframe/editor.js?raw';
 
@@ -160,7 +159,7 @@ export class TransformEngine {
    */
   cleanup(): void {
     // Clear all pending messages
-    for (const [id, pending] of this.pendingMessages) {
+    for (const pending of this.pendingMessages.values()) {
       clearTimeout(pending.timeout);
       pending.reject(new Error('Transform engine shutting down'));
     }

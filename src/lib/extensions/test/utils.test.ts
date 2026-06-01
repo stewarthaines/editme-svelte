@@ -354,6 +354,7 @@ describe('Extension Manager Utilities', () => {
         expect(result).toBe(testCase.expected);
         expect(result).not.toContain('../');
         expect(result).not.toContain('..\\');
+        // eslint-disable-next-line no-control-regex -- asserting control chars were stripped
         expect(result).not.toMatch(/[<>:"|?*\x00-\x1f]/);
       }
     });

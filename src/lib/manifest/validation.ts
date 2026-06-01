@@ -183,7 +183,7 @@ export class ManifestValidator {
     }
 
     // Validate MIME type format (type/subtype)
-    const mimeTypePattern = /^[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-\^_.+]*$/;
+    const mimeTypePattern = /^[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9!#$&\-^_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-^_.+]*$/;
     if (!mimeTypePattern.test(mediaType)) {
       return {
         field: 'mediaType',
