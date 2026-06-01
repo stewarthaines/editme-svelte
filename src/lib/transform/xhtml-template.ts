@@ -7,13 +7,11 @@
 
 import { convertManifestPathToXHTMLPath } from '../epub/path-utils.js';
 
-export interface ChapterMetadata {
-  title: string;
-  language: string;
-  stylesheets: string[];
-  scripts: string[];
-  customHead?: string;
-}
+// ChapterMetadata is defined once in ./types.js (the package's canonical types
+// module, re-exported by the barrel). Re-export it here so existing importers of
+// this module keep working without a second, drift-prone copy of the interface.
+import type { ChapterMetadata } from './types.js';
+export type { ChapterMetadata } from './types.js';
 
 /**
  * Generates XHTML documents with proper metadata and structure
