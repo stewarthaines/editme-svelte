@@ -78,6 +78,21 @@ describe('xmlHighlighter — new metadata focus', () => {
     expect(highlightedXML).not.toMatch(/metadata-value-focused[^>]*>Editor, Sam/);
   });
 
+  it('highlights the certifier-report <link> (a self-closing element with no text)', () => {
+    const xml =
+      `<?xml version="1.0"?><package><metadata xmlns:dc="http://purl.org/dc/elements/1.1/">` +
+      `<dc:title>A Book</dc:title>` +
+      `<link rel="a11y:certifierReport" href="https://example.com/report"/>` +
+      `</metadata></package>`;
+
+    const { highlightedXML } = xmlHighlighter.highlightOPFContent(xml, {
+      focusedField: 'accessibilityCertifierReport',
+    });
+    // The self-closing link tag is wrapped in the focused tag span (with the bar marker).
+    expect(highlightedXML).toMatch(/metadata-tag-focused metadata-line[^>]*>&lt;link/);
+    expect(highlightedXML).toContain('https://example.com/report');
+  });
+
   it('leaves unrelated fields unfocused', () => {
     const { highlightedXML } = xmlHighlighter.highlightOPFContent(SAMPLE_OPF, {
       focusedField: 'title',

@@ -21,6 +21,8 @@ interface PrimaryMapping {
   tag?: string;
   /** Standalone meta property, e.g. "rendition:layout" or "schema:accessMode". */
   metaProperty?: string;
+  /** rel of a <link> element, e.g. "a11y:certifierReport". */
+  linkRel?: string;
 }
 
 // Primary metadata elements only. Refinements (file-as, role, collection-type,
@@ -58,6 +60,7 @@ const PRIMARY_MAPPINGS: PrimaryMapping[] = [
   { field: 'accessibilityConformance', metaProperty: 'dcterms:conformsTo' },
   { field: 'accessibilityCertifiedBy', metaProperty: 'a11y:certifiedBy' },
   { field: 'accessibilityCertifierCredential', metaProperty: 'a11y:certifierCredential' },
+  { field: 'accessibilityCertifierReport', linkRel: 'a11y:certifierReport' },
 ];
 
 export interface HighlightingOptions {
@@ -146,6 +149,11 @@ export class XMLHighlighter {
       const byProp = PRIMARY_MAPPINGS.find(m => m.metaProperty && m.metaProperty === property);
       return byProp?.field ?? null;
     }
+    if (el.tagName === 'link') {
+      const rel = el.getAttribute('rel');
+      const byRel = PRIMARY_MAPPINGS.find(m => m.linkRel && m.linkRel === rel);
+      return byRel?.field ?? null;
+    }
     const byTag = PRIMARY_MAPPINGS.find(m => m.tag && m.tag === el.tagName);
     return byTag?.field ?? null;
   }
@@ -221,21 +229,23 @@ export class XMLHighlighter {
     ctx: RenderContext
   ): string {
     const value = (el.textContent ?? '').trim();
-
-    // Empty element → self-closing (e.g. manifest <item .../>).
-    if (!value) {
-      return `&lt;${tag}${attrs}/&gt;`;
-    }
-
+    const selfTag = `&lt;${tag}${attrs}/&gt;`;
     const openTag = `&lt;${tag}${attrs}&gt;`;
     const closeTag = `&lt;/${tag}&gt;`;
 
     if (structural) {
-      return `${openTag}${esc(value)}${closeTag}`;
+      return value ? `${openTag}${esc(value)}${closeTag}` : selfTag;
     }
 
     const level = ctx.levelFor(ctx.fieldFor(el));
     const tagClass = this.tagClassFor(level);
+
+    // Empty element with no text value (e.g. the certifier-report <link>):
+    // highlight the self-closing tag itself.
+    if (!value) {
+      return ctx.highlightTags ? `<span class="${tagClass} metadata-line">${selfTag}</span>` : selfTag;
+    }
+
     const valueClass = this.valueClassFor(level);
 
     let out = ctx.highlightTags

@@ -50,6 +50,7 @@
           'accessibilityConformance',
           'accessibilityCertifiedBy',
           'accessibilityCertifierCredential',
+          'accessibilityCertifierReport',
         ];
       default:
         return [];
