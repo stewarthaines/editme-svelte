@@ -818,6 +818,31 @@ describe('OPFUtils', () => {
     });
   });
 
+  describe('Identifier metadata', () => {
+    it('emits an identifier-type refinement for the unique identifier', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.identifier = 'urn:isbn:9780000000001';
+      testDoc.metadata.identifierType = '15';
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with identifier-type');
+
+      expect(xml).toMatch(/<meta refines="#[^"]+" property="identifier-type" scheme="onix:codelist5">15<\/meta>/);
+    });
+
+    it('emits additional identifiers with ids and their own types', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.identifier = 'urn:uuid:12345';
+      testDoc.metadata.additionalIdentifiers = [{ value: 'urn:isbn:9780000000001', type: '15' }];
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with additional identifier');
+
+      expect(xml).toContain('<dc:identifier id="id-1">urn:isbn:9780000000001</dc:identifier>');
+      expect(xml).toContain('<meta refines="#id-1" property="identifier-type" scheme="onix:codelist5">15</meta>');
+    });
+  });
+
   describe('Rendition Properties', () => {
     it('should include rendition properties in generated OPF when non-default', () => {
       const testDoc = createTestOPFDocument();

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { t } from '../../i18n';
-  import TextMetadataField from './fields/TextMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
   import ViewportField from './fields/ViewportField.svelte';
   import CreatorRoleEditor from './CreatorRoleEditor.svelte';
   import LanguageEditor from './LanguageEditor.svelte';
   import TitleEditor from './TitleEditor.svelte';
+  import IdentifierEditor from './IdentifierEditor.svelte';
   import type { EPUBMetadata } from '../../epub';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
   import { MetadataUtils, type EditableArrayField } from '../../epub/opf-utils';
@@ -85,10 +85,6 @@
   const handleFieldFocus = (field: keyof EPUBMetadata | null) => {
     onfieldFocus?.(new CustomEvent('fieldFocus', { detail: { field } }));
   };
-
-  const generateIdentifier = () => {
-    ongenerateIdentifier?.(new CustomEvent('generateIdentifier'));
-  };
 </script>
 
 <div class="basic-info-fields" tabindex="-1">
@@ -118,27 +114,17 @@
           {onfieldFocus}
         />
 
-        <div class="identifier-field">
-          <TextMetadataField
-            id="identifier"
-            label={$t('Identifier')}
-            value={metadata.identifier || ''}
-            placeholder={$t('Enter a unique identifier')}
-            required={true}
-            error={getFieldError('identifier')}
-            onchange={e => handleFieldChange('identifier', e.value)}
-            onblur={e => handleFieldSave('identifier', e.value)}
-            onfocus={() => handleFieldFocus('identifier')}
-          />
-          <button
-            type="button"
-            class="generate-button"
-            onclick={generateIdentifier}
-            disabled={saving}
-          >
-            {$t('Generate')}
-          </button>
-        </div>
+        <IdentifierEditor
+          identifier={metadata.identifier || ''}
+          identifierType={metadata.identifierType}
+          additionalIdentifiers={metadata.additionalIdentifiers}
+          {saving}
+          {getFieldError}
+          {onfieldChange}
+          {onfieldSave}
+          {onfieldFocus}
+          {ongenerateIdentifier}
+        />
       </fieldset>
 
       <CreatorRoleEditor
@@ -285,46 +271,6 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text-primary);
-  }
-
-  .identifier-field {
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-end;
-  }
-
-  .identifier-field :global(.metadata-field) {
-    flex: 1;
-    margin-block-end: 0;
-  }
-
-  .generate-button {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    height: fit-content;
-  }
-
-  .generate-button:hover:not(:disabled) {
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-border-hover);
-  }
-
-  .generate-button:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
-  }
-
-  .generate-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   .array-field {

@@ -43,6 +43,17 @@ export interface TitleEntry {
   id?: string;
 }
 
+/**
+ * A dc:identifier beyond the package's unique identifier (which stays on
+ * EPUBMetadata.identifier). `type` is an ONIX Code List 5 product-identifier
+ * code, e.g. "15" for ISBN-13.
+ */
+export interface IdentifierEntry {
+  value: string;
+  type?: string;
+  id?: string;
+}
+
 /** Normalize a creator value, tolerating legacy bare-string data. */
 export function toCreator(value: Creator | string): Creator {
   if (typeof value === 'string') return { name: value, roles: [] };
@@ -102,7 +113,11 @@ export interface EPUBMetadata {
   // Additional titles beyond the primary one (subtitle, collection, edition, …)
   additionalTitles?: TitleEntry[];
   language: string[]; // BCP 47 tags; at least one required
-  identifier: string;
+  identifier: string; // the package unique identifier
+  // ONIX Code List 5 type for the unique identifier (e.g. "15" = ISBN-13)
+  identifierType?: string;
+  // Additional identifiers beyond the unique one (e.g. an ISBN alongside a UUID)
+  additionalIdentifiers?: IdentifierEntry[];
 
   // Optional Dublin Core elements
   creator?: Creator[];
@@ -421,6 +436,23 @@ export class OPFUtils {
       .filter((_, i) => i !== mainTitleIndex)
       .map(t => ({ value: t.value, type: t.type, fileAs: t.fileAs }));
 
+    // The primary identifier is the one referenced by package@unique-identifier
+    // (falling back to the first); any others are additional identifiers.
+    const uniqueIdRef = doc.querySelector('package')?.getAttribute('unique-identifier');
+    const identifierEls = Array.from(identifierElements);
+    const primaryIdIndex = Math.max(
+      0,
+      identifierEls.findIndex(el => el.getAttribute('id') === uniqueIdRef)
+    );
+    const primaryIdEl = identifierEls[primaryIdIndex];
+    const extraIdentifiers: IdentifierEntry[] = identifierEls
+      .filter((_, i) => i !== primaryIdIndex)
+      .map(el => ({
+        value: el.textContent?.trim() ?? '',
+        type: refineValue(el.getAttribute('id'), 'identifier-type'),
+      }))
+      .filter(e => e.value);
+
     const creators = parseCreatorList(creatorElements, roleLookup);
     const contributors = parseCreatorList(contributorElements, roleLookup);
     const subjects = Array.from(subjectElements)
@@ -445,7 +477,9 @@ export class OPFUtils {
       language: Array.from(languageElements)
         .map(el => el.textContent?.trim())
         .filter(Boolean) as string[],
-      identifier: identifierElements[0].textContent!.trim(),
+      identifier: (primaryIdEl ?? identifierElements[0]).textContent!.trim(),
+      identifierType: refineValue(primaryIdEl?.getAttribute('id'), 'identifier-type') || undefined,
+      additionalIdentifiers: extraIdentifiers.length > 0 ? extraIdentifiers : undefined,
       creator: creators.length > 0 ? creators : undefined,
       contributor: contributors.length > 0 ? contributors : undefined,
       publisher:
@@ -646,6 +680,21 @@ export class OPFUtils {
     ${titleXML}
     ${languageXML}
     <dc:identifier id="${uniqueId}">${escapeXML(metadata.identifier)}</dc:identifier>`;
+
+    // Identifier-type for the unique identifier, then any additional identifiers
+    // (e.g. an ISBN alongside the UUID), each with its own id + identifier-type.
+    if (metadata.identifierType) {
+      xml += refinementMeta(uniqueId, 'identifier-type', metadata.identifierType, 'onix:codelist5');
+    }
+    let identifierIdCounter = 0;
+    for (const entry of metadata.additionalIdentifiers ?? []) {
+      if (!entry.value?.trim()) continue;
+      const id = `id-${++identifierIdCounter}`;
+      xml += `\n    <dc:identifier id="${id}">${escapeXML(entry.value)}</dc:identifier>`;
+      if (entry.type) {
+        xml += refinementMeta(id, 'identifier-type', entry.type, 'onix:codelist5');
+      }
+    }
 
     // Add optional metadata. Creators/contributors emit an id plus a
     // `<meta refines property="role">` per MARC relator role (EPUB 3).
