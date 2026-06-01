@@ -84,65 +84,119 @@
     }
   });
 
-  // Sort filtered items - manifest items first, then source items, then OPF items (each group sorted internally)
-  $: sortedItems = (() => {
-    const manifestItems = filteredItems.filter(item => item._type === 'manifest');
-    const sourceItems = filteredItems.filter(item => item._type === 'source');
-    const sourceZipItems = filteredItems.filter(item => item._type === 'source-zip');
-    const opfItems = filteredItems.filter(item => item._type === 'opf');
+  // Sort a set of rows by the active column (reactive so the grouping below
+  // re-runs when the sort changes).
+  $: sortGroup = (items: typeof filteredItems) => {
+    return [...items].sort((a, b) => {
+      let aValue: string | number | Date = '';
+      let bValue: string | number | Date = '';
 
-    const sortGroup = (items: typeof filteredItems) => {
-      return [...items].sort((a, b) => {
-        let aValue: string | number | Date = '';
-        let bValue: string | number | Date = '';
+      if (sortField === 'id') {
+        aValue = a._type === 'manifest' ? (a as ManifestItem).id : (a as any).name;
+        bValue = b._type === 'manifest' ? (b as ManifestItem).id : (b as any).name;
+      } else if (sortField === 'href') {
+        aValue = a._type === 'manifest' ? (a as ManifestItem).href : (a as any).path;
+        bValue = b._type === 'manifest' ? (b as ManifestItem).href : (b as any).path;
+      } else if (sortField === 'size') {
+        aValue = a.size || 0;
+        bValue = b.size || 0;
+      }
 
-        if (sortField === 'id') {
-          aValue =
-            a._type === 'manifest'
-              ? (a as ManifestItem).id
-              : a._type === 'source'
-                ? (a as SourceItem).name
-                : a._type === 'source-zip'
-                  ? (a as any).name
-                : (a as any).name;
-          bValue =
-            b._type === 'manifest'
-              ? (b as ManifestItem).id
-              : b._type === 'source'
-                ? (b as SourceItem).name
-                : b._type === 'source-zip'
-                  ? (b as any).name
-                : (b as any).name;
-        } else if (sortField === 'href') {
-          aValue =
-            a._type === 'manifest'
-              ? (a as ManifestItem).href
-              : a._type === 'source'
-                ? (a as SourceItem).path
-                : a._type === 'source-zip'
-                  ? (a as any).path
-                : (a as any).path;
-          bValue =
-            b._type === 'manifest'
-              ? (b as ManifestItem).href
-              : b._type === 'source'
-                ? (b as SourceItem).path
-                : b._type === 'source-zip'
-                  ? (b as any).path
-                : (b as any).path;
-        } else if (sortField === 'size') {
-          aValue = a.size || 0;
-          bValue = b.size || 0;
-        }
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
 
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
+  type RowGroup = {
+    key: string;
+    label: string;
+    kind: 'root' | 'dir' | 'source' | 'opf';
+    indent: number;
+    items: typeof filteredItems;
+  };
+
+  // Group manifest items by their full directory path (the href's dirname).
+  // Every distinct directory that directly contains files becomes its own
+  // group, so nesting is honoured and a parent with no direct files yields no
+  // heading while its subgroups still do. SOURCE files stay in one flat group;
+  // content.opf gets its own. Root-level files (no directory) render first
+  // without a heading.
+  $: groups = ((): RowGroup[] => {
+    const manifest = filteredItems.filter(i => i._type === 'manifest');
+    const source = filteredItems.filter(i => i._type === 'source' || i._type === 'source-zip');
+    const opf = filteredItems.filter(i => i._type === 'opf');
+
+    const root: typeof filteredItems = [];
+    const byDir = new Map<string, typeof filteredItems>();
+    for (const item of manifest) {
+      const segs = (item as ManifestItem).href.split('/');
+      const dir = segs.slice(0, -1).join('/');
+      if (!dir) {
+        root.push(item);
+      } else {
+        const list = byDir.get(dir) ?? [];
+        list.push(item);
+        byDir.set(dir, list);
+      }
+    }
+
+    const result: RowGroup[] = [];
+    if (root.length) {
+      result.push({ key: 'root', label: '', kind: 'root', indent: 0, items: sortGroup(root) });
+    }
+    const dirs = [...byDir.keys()].sort((a, b) => {
+      const al = a.toLowerCase();
+      const bl = b.toLowerCase();
+      return al < bl ? -1 : al > bl ? 1 : 0;
+    });
+    for (const dir of dirs) {
+      result.push({
+        key: `dir:${dir}`,
+        label: `${dir}/`,
+        kind: 'dir',
+        indent: dir.split('/').length - 1,
+        items: sortGroup(byDir.get(dir)!),
       });
-    };
-
-    return [...sortGroup(manifestItems), ...sortGroup(sourceItems), ...sortGroup(opfItems), ...sortGroup(sourceZipItems)];
+    }
+    if (source.length) {
+      result.push({ key: 'source', label: 'SOURCE.zip', kind: 'source', indent: 0, items: sortGroup(source) });
+    }
+    if (opf.length) {
+      result.push({ key: 'opf', label: 'Package Files', kind: 'opf', indent: 0, items: sortGroup(opf) });
+    }
+    return result;
   })();
+
+  // While filtering, show every match regardless of collapse state.
+  $: forceExpand = filterText.trim().length > 0;
+
+  // --- Collapse state (persisted so the table feels stable across reloads) ---
+  const COLLAPSED_STORAGE_KEY = 'editme_manifest_collapsed_groups';
+
+  const loadCollapsedGroups = (): Set<string> => {
+    try {
+      const raw = localStorage.getItem(COLLAPSED_STORAGE_KEY);
+      if (raw) return new Set(JSON.parse(raw) as string[]);
+    } catch {
+      // Ignore unavailable/malformed storage.
+    }
+    return new Set();
+  };
+
+  let collapsedGroups = loadCollapsedGroups();
+
+  const toggleGroup = (key: string) => {
+    const next = new Set(collapsedGroups);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    collapsedGroups = next;
+    try {
+      localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify([...collapsedGroups]));
+    } catch {
+      // Best effort.
+    }
+  };
 
   const handleSort = (field: SortableFields) => {
     if (sortField === field) {
@@ -309,7 +363,7 @@
 
   <!-- Table container -->
   <div class="table-container">
-    {#if sortedItems.length === 0}
+    {#if filteredItems.length === 0}
       <div class="empty-state">
         {#if filterText}
           <p>{$t('No items match your filter')}</p>
@@ -360,118 +414,78 @@
           </tr>
         </thead>
         <tbody>
-          {#each sortedItems as item, index}
-            {@const itemType = item._type}
-            {@const isSelected = isItemSelected(item, itemType)}
-            {@const hasError =
-              itemType === 'manifest' ? hasValidationError(item as ManifestItem) : false}
-            {@const prevItemType = index > 0 ? sortedItems[index - 1]._type : null}
-            {@const showSourceSeparator = itemType === 'source' && prevItemType === 'manifest'}
-            {@const showSourceZipSeparator = itemType === 'source-zip' && prevItemType === 'opf'}
-            {@const showOpfSeparator = itemType === 'opf' && (prevItemType === 'manifest' || prevItemType === 'source')}
-
-            <!-- Source items separator -->
-            {#if showSourceSeparator}
-              <tr class="source-separator">
+          {#each groups as group (group.key)}
+            {@const collapsed = !forceExpand && collapsedGroups.has(group.key)}
+            {#if group.kind !== 'root'}
+              <tr class="group-heading" class:collapsed>
                 <td colspan="4" class="separator-cell">
-                  <div class="separator-content">
-                    <span class="separator-label">{$t('SOURCE.zip')}</span>
-                  </div>
+                  <button
+                    type="button"
+                    class="group-toggle"
+                    style="padding-inline-start: {group.indent}rem"
+                    aria-expanded={!collapsed}
+                    onclick={() => toggleGroup(group.key)}
+                  >
+                    <span class="disclosure" aria-hidden="true">▸</span>
+                    <span class="separator-label">{group.label}</span>
+                  </button>
                 </td>
               </tr>
             {/if}
 
-            <!-- SOURCE.zip separator (non-advanced mode) -->
-            {#if showSourceZipSeparator}
-              <tr class="source-separator">
-                <td colspan="4" class="separator-cell">
-                  <div class="separator-content">
-                    <span class="separator-label">Source Files</span>
-                  </div>
-                </td>
-              </tr>
+            {#if !collapsed}
+              {#each group.items as item}
+                {@const itemType = item._type}
+                {@const isSelected = isItemSelected(item, itemType)}
+                {@const hasError =
+                  itemType === 'manifest' ? hasValidationError(item as ManifestItem) : false}
+                <tr
+                  class="manifest-row"
+                  class:selected={isSelected}
+                  class:error={hasError}
+                  class:source-item={itemType === 'source'}
+                  class:source-zip-item={itemType === 'source-zip'}
+                  class:opf-item={itemType === 'opf'}
+                  tabindex="0"
+                  aria-selected={isSelected}
+                  onclick={() => handleRowClick(item, itemType)}
+                  onkeydown={event => handleRowKeyDown(event, item, itemType)}
+                >
+                  <td class="id-cell">
+                    <span class="item-id" dir="ltr">
+                      {itemType === 'manifest'
+                        ? (item as ManifestItem).id
+                        : itemType === 'source' || itemType === 'source-zip'
+                          ? (item as SourceItem).name || (item as any).name
+                          : (item as any).name}
+                    </span>
+                  </td>
+                  <td class="href-cell">
+                    <span class="item-href" dir="ltr">
+                      {itemType === 'manifest'
+                        ? (item as ManifestItem).href
+                        : itemType === 'source' || itemType === 'source-zip'
+                          ? (item as SourceItem).path || (item as any).path
+                          : (item as any).path}
+                    </span>
+                  </td>
+                  <td class="size-cell">
+                    {formatFileSize(item.size)}
+                  </td>
+                  <td class="properties-cell">
+                    {#if itemType === 'manifest' && (item as ManifestItem).properties && ((item as ManifestItem).properties?.length ?? 0) > 0}
+                      <div class="properties-list">
+                        {#each (item as ManifestItem).properties || [] as property}
+                          <span class="property-tag">{property}</span>
+                        {/each}
+                      </div>
+                    {:else}
+                      -
+                    {/if}
+                  </td>
+                </tr>
+              {/each}
             {/if}
-
-            <!-- OPF items separator -->
-            {#if showOpfSeparator}
-              <tr class="source-separator">
-                <td colspan="4" class="separator-cell">
-                  <div class="separator-content">
-                    <span class="separator-label">Package Files</span>
-                  </div>
-                </td>
-              </tr>
-            {/if}
-            <tr
-              class="manifest-row"
-              class:selected={isSelected}
-              class:error={hasError}
-              class:source-item={itemType === 'source'}
-              class:source-zip-item={itemType === 'source-zip'}
-              class:opf-item={itemType === 'opf'}
-              tabindex="0"
-              aria-selected={isSelected}
-              onclick={() => handleRowClick(item, itemType)}
-              onkeydown={event => handleRowKeyDown(event, item, itemType)}
-            >
-              <td class="id-cell">
-                <span class="item-id" dir="ltr">
-                  {itemType === 'manifest'
-                    ? (item as ManifestItem).id
-                    : itemType === 'source' || itemType === 'source-zip'
-                      ? (item as SourceItem).name || (item as any).name
-                      : (item as any).name}
-                </span>
-              </td>
-              <td class="href-cell">
-                <span class="item-href" dir="ltr">
-                  {itemType === 'manifest'
-                    ? (item as ManifestItem).href
-                    : itemType === 'source' || itemType === 'source-zip'
-                      ? (item as SourceItem).path || (item as any).path
-                      : (item as any).path}
-                </span>
-              </td>
-              <td class="size-cell">
-                {formatFileSize(item.size)}
-              </td>
-              <td class="properties-cell">
-                {#if itemType === 'manifest' && (item as ManifestItem).properties && ((item as ManifestItem).properties?.length ?? 0) > 0}
-                  <div class="properties-list">
-                    {#each (item as ManifestItem).properties || [] as property}
-                      <span class="property-tag">{property}</span>
-                    {/each}
-                  </div>
-                {:else}
-                  -
-                {/if}
-              </td>
-              <!-- Hover-based action buttons -->
-              {#if itemType === 'manifest'}
-                <!-- <td class="actions-overlay">
-                  <div class="row-actions">
-                    <button
-                      type="button"
-                      class="action-button edit-button"
-                      title={$t('Edit {id}', { id: (item as ManifestItem).id })}
-                      tabindex={isSelected ? 0 : -1}
-                      onclick={event => handleEditClick(event, item as ManifestItem)}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      type="button"
-                      class="action-button delete-button"
-                      title={$t('Delete {id}', { id: (item as ManifestItem).id })}
-                      tabindex={isSelected ? 0 : -1}
-                      onclick={event => handleDeleteClick(event, item as ManifestItem)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td> -->
-              {/if}
-            </tr>
           {/each}
         </tbody>
       </table>
@@ -715,20 +729,43 @@
     color: var(--color-text-secondary);
   }
 
-  .source-separator {
+  .group-heading {
     background-color: var(--color-bg-secondary);
   }
 
   .separator-cell {
-    padding: 0.75rem 0.75rem;
+    padding: 0;
     border-bottom: 2px solid var(--color-border-strong);
     border-top: 1px solid var(--color-border-default);
   }
 
-  .separator-content {
+  .group-toggle {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: start;
+    color: inherit;
+  }
+
+  .group-toggle:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
+  }
+
+  .disclosure {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    transition: transform 0.15s ease;
+  }
+
+  .group-heading:not(.collapsed) .disclosure {
+    transform: rotate(90deg);
   }
 
   .separator-label {
