@@ -113,6 +113,7 @@
             checked={(selected ?? []).includes(opt.value)}
             disabled={saving}
             onchange={e => toggle(field, selected, opt.value, e.currentTarget.checked)}
+            onfocus={() => focus(field as keyof EPUBMetadata)}
           />
           <span>{opt.label}</span>
         </label>

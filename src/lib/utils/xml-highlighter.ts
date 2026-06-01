@@ -41,7 +41,28 @@ const METADATA_MAPPINGS: MetadataFieldMapping[] = [
   { field: 'renditionLayout', xmlPattern: 'meta-property', selector: 'meta[property="rendition:layout"]', displayName: 'Layout' },
   { field: 'renditionOrientation', xmlPattern: 'meta-property', selector: 'meta[property="rendition:orientation"]', displayName: 'Orientation' },
   { field: 'renditionSpread', xmlPattern: 'meta-property', selector: 'meta[property="rendition:spread"]', displayName: 'Spread' },
+  { field: 'renditionViewport', xmlPattern: 'meta-property', selector: 'meta[property="rendition:viewport"]', displayName: 'Viewport' },
+  { field: 'renditionFlow', xmlPattern: 'meta-property', selector: 'meta[property="rendition:flow"]', displayName: 'Flow' },
   // Note: pageProgressionDirection is handled as an attribute on spine element - skip for now
+
+  // Title / identifier refinements
+  { field: 'titleFileAs', xmlPattern: 'meta-property', selector: 'meta[property="file-as"]', displayName: 'Title sort-as' },
+  { field: 'identifierType', xmlPattern: 'meta-property', selector: 'meta[property="identifier-type"]', displayName: 'Identifier type' },
+
+  // Collections
+  { field: 'collections', xmlPattern: 'meta-property', selector: 'meta[property="belongs-to-collection"]', displayName: 'Collections', isArray: true },
+
+  // Accessibility (Schema.org discovery + EPUB Accessibility 1.1)
+  { field: 'accessMode', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessMode"]', displayName: 'Access modes', isArray: true },
+  { field: 'accessModeSufficient', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessModeSufficient"]', displayName: 'Sufficient access modes', isArray: true },
+  { field: 'accessibilityFeature', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessibilityFeature"]', displayName: 'Accessibility features', isArray: true },
+  { field: 'accessibilityHazard', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessibilityHazard"]', displayName: 'Hazards', isArray: true },
+  { field: 'accessibilityControl', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessibilityControl"]', displayName: 'Control methods', isArray: true },
+  { field: 'accessibilityAPI', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessibilityAPI"]', displayName: 'Accessibility API', isArray: true },
+  { field: 'accessibilitySummary', xmlPattern: 'meta-property', selector: 'meta[property="schema:accessibilitySummary"]', displayName: 'Accessibility summary' },
+  { field: 'accessibilityConformance', xmlPattern: 'meta-property', selector: 'meta[property="dcterms:conformsTo"]', displayName: 'Conformance' },
+  { field: 'accessibilityCertifiedBy', xmlPattern: 'meta-property', selector: 'meta[property="a11y:certifiedBy"]', displayName: 'Certified by' },
+  { field: 'accessibilityCertifierCredential', xmlPattern: 'meta-property', selector: 'meta[property="a11y:certifierCredential"]', displayName: 'Certifier credential' },
 ];
 
 export interface HighlightingOptions {
@@ -181,9 +202,15 @@ export class XMLHighlighter {
     if (!propertyMatch) return xml;
     
     const propertyValue = propertyMatch[1];
-    
-    // Pattern to match <meta property="propertyValue">content</meta>
-    const pattern = new RegExp(`(&lt;meta[^&]*?property=&quot;${propertyValue.replace(':', '\\:')}&quot;[^&]*?&gt;)(.*?)(&lt;/meta&gt;)`, 'gi');
+    const escapedProperty = propertyValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Match <meta …property="propertyValue"…>content</meta>. The tempered
+    // `(?:(?!&gt;)[\s\S])*?` walks the opening tag's attributes (e.g. an id on
+    // belongs-to-collection) without crossing the tag's closing &gt;.
+    const pattern = new RegExp(
+      `(&lt;meta(?:(?!&gt;)[\\s\\S])*?property=&quot;${escapedProperty}&quot;(?:(?!&gt;)[\\s\\S])*?&gt;)(.*?)(&lt;/meta&gt;)`,
+      'gi'
+    );
     
     return xml.replace(pattern, (match, openTag, content, closeTag) => {
       let result = '';
