@@ -174,6 +174,14 @@ describe('generateOPFXML - creator roles', () => {
     );
   });
 
+  it('emits a file-as refinement for a creator', () => {
+    const xml = OPFUtils.generateOPFXML(
+      docWith({ creator: [{ name: 'J. R. R. Tolkien', roles: ['aut'], fileAs: 'Tolkien, J. R. R.' }] })
+    );
+    expect(xml).toContain('<dc:creator id="creator1">J. R. R. Tolkien</dc:creator>');
+    expect(xml).toContain('<meta refines="#creator1" property="file-as">Tolkien, J. R. R.</meta>');
+  });
+
   it('emits multiple role metas for a multi-role creator (Example 92)', () => {
     const xml = OPFUtils.generateOPFXML(
       docWith({ creator: [{ name: 'Maurice Sendak', roles: ['aut', 'ill'] }] })

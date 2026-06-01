@@ -25,6 +25,8 @@ export function generateEPUBTimestamp(): string {
 export interface Creator {
   name: string;
   roles: string[];
+  /** file-as (sort form), e.g. "Tolkien, J. R. R." */
+  fileAs?: string;
   id?: string;
 }
 
@@ -57,7 +59,7 @@ export interface IdentifierEntry {
 /** Normalize a creator value, tolerating legacy bare-string data. */
 export function toCreator(value: Creator | string): Creator {
   if (typeof value === 'string') return { name: value, roles: [] };
-  return { name: value.name, roles: value.roles ?? [], id: value.id };
+  return { name: value.name, roles: value.roles ?? [], fileAs: value.fileAs, id: value.id };
 }
 
 /** Normalize a list of creator values (tolerating legacy strings). */
@@ -93,14 +95,16 @@ export function primaryLanguage(meta?: { language?: string[] | string }): string
  */
 export function parseCreatorList(
   elements: ArrayLike<Element>,
-  refinesLookup: (id: string) => string[]
+  refinesLookup: (id: string) => string[],
+  fileAsLookup?: (id: string) => string | undefined
 ): Creator[] {
   return Array.from(elements)
     .map(el => {
       const name = el.textContent?.trim() ?? '';
       const id = el.getAttribute('id') || undefined;
       const roles = id ? refinesLookup(id) : [];
-      return { name, roles, id };
+      const fileAs = id ? fileAsLookup?.(id) : undefined;
+      return { name, roles, fileAs: fileAs || undefined, id };
     })
     .filter(c => c.name.length > 0);
 }
@@ -453,8 +457,9 @@ export class OPFUtils {
       }))
       .filter(e => e.value);
 
-    const creators = parseCreatorList(creatorElements, roleLookup);
-    const contributors = parseCreatorList(contributorElements, roleLookup);
+    const fileAsLookup = (id: string) => refineValue(id, 'file-as');
+    const creators = parseCreatorList(creatorElements, roleLookup, fileAsLookup);
+    const contributors = parseCreatorList(contributorElements, roleLookup, fileAsLookup);
     const subjects = Array.from(subjectElements)
       .map(el => el.textContent?.trim())
       .filter(Boolean) as string[];
@@ -709,6 +714,9 @@ export class OPFUtils {
       xml += `\n    <${tag} id="${id}">${escapeXML(creator.name)}</${tag}>`;
       for (const role of creator.roles) {
         xml += refinementMeta(id, 'role', role, 'marc:relators');
+      }
+      if (creator.fileAs) {
+        xml += refinementMeta(id, 'file-as', creator.fileAs);
       }
     };
     if (metadata.creator && metadata.creator.length > 0) {

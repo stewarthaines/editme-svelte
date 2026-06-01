@@ -44,6 +44,10 @@
     save(creators.map((c, i) => (i === index ? { ...c, name } : c)));
   };
 
+  const updateFileAs = (index: number, fileAs: string) => {
+    save(creators.map((c, i) => (i === index ? { ...c, fileAs } : c)));
+  };
+
   const addRole = (index: number, role: string) => {
     if (!role) return;
     save(
@@ -122,6 +126,17 @@
             {/each}
           </div>
         {/if}
+
+        <div class="file-as-row">
+          <TextMetadataField
+            id="{field}-fileas-{index}"
+            label={$t('Sort as')}
+            value={creator.fileAs ?? ''}
+            placeholder={$t('e.g. Tolkien, J. R. R.')}
+            onblur={e => updateFileAs(index, e.value)}
+            onfocus={focus}
+          />
+        </div>
       </div>
     {/each}
 
