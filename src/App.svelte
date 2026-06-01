@@ -39,13 +39,13 @@
   let extensionManager = $state<ExtensionManager>();
 
   const simpleThemeStore = {
-    setTheme: () => {},
-    useSystemPreference: () => {},
+    setTheme: () => {/* no-op placeholder store */},
+    useSystemPreference: () => {/* no-op placeholder store */},
     getCurrentTheme: () => 'system',
   };
 
   const simpleI18nStore = {
-    setLocale: () => {},
+    setLocale: () => {/* no-op placeholder store */},
     getCurrentLocale: () => 'en',
   };
 

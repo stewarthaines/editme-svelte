@@ -223,7 +223,7 @@ describe('Text Editor Store', () => {
         const beforeReset = subscriberSpy.mock.calls[0][0].lastUpdated;
         
         // Small delay and reset
-        setTimeout(() => {}, 1);
+        setTimeout(() => {/* noop tick */}, 1);
         store.reset();
         
         const resetState = subscriberSpy.mock.calls[subscriberSpy.mock.calls.length - 1][0] as TextEditorState;

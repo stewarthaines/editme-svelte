@@ -25,18 +25,18 @@ export class JavaScriptValidator {
       try {
         // Create a minimal sandbox with common globals that might exist in browser
         const sandbox = {
-          console: { log: () => {}, warn: () => {}, error: () => {} },
+          console: { log: () => {/* sandbox noop */}, warn: () => {/* sandbox noop */}, error: () => {/* sandbox noop */} },
           window: {},
-          document: { 
+          document: {
             querySelector: () => null,
             createElement: () => ({}),
-            addEventListener: () => {}
+            addEventListener: () => {/* sandbox noop */}
           },
           // Common browser APIs that scripts might reference
           setTimeout: () => 0,
           setInterval: () => 0,
-          clearTimeout: () => {},
-          clearInterval: () => {},
+          clearTimeout: () => {/* sandbox noop */},
+          clearInterval: () => {/* sandbox noop */},
           fetch: () => Promise.resolve(),
           // Allow common utility functions
           Math: Math,
