@@ -820,6 +820,18 @@ describe('OPFUtils', () => {
       expect(xml).toContain('<spine>');
     });
 
+    it('omits rendition:viewport for reflowable layout even when a value is set', () => {
+      // A viewport left over from a pre-paginated session must not leak into the
+      // OPF once the layout is reflowable (rendition:viewport is fixed-layout only).
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.renditionLayout = 'reflowable';
+      testDoc.metadata.renditionViewport = 'width=1200, height=1600';
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+
+      expect(xml).not.toContain('rendition:viewport');
+    });
+
     // Note: Parsing tests require getElementsByTagNameNS which doesn't work in happy-dom
     // Round-trip parsing functionality is tested in browser environment via Storybook
   });

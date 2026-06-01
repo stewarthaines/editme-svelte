@@ -15,6 +15,7 @@
 import type { FileStorageAPI } from '../storage/index.js';
 import { generateXHTMLDocument } from './xhtml-template.js';
 import { primaryLanguage } from '../epub/opf-utils.js';
+import { DEFAULT_FXL_VIEWPORT } from '../epub/fixed-layout.js';
 import type { ExtensionManager } from '../extensions/extension-manager.js';
 import type { SettingsService } from '../services/settings/settings.service.js';
 import type { WorkspaceService } from '../services/workspace/workspace.service.js';
@@ -388,10 +389,9 @@ export class SpinePreviewManager {
       const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
 
       // Fixed-layout publications carry a single package-level viewport
-      // (rendition:viewport); fall back to a sane default if it is absent.
+      // (rendition:viewport); fall back to the shared default if it is absent.
       if (workspace.opf.metadata.renditionLayout === 'pre-paginated') {
-        viewport =
-          workspace.opf.metadata.renditionViewport || 'width=1200, height=1600, initial-scale=1.0';
+        viewport = workspace.opf.metadata.renditionViewport || DEFAULT_FXL_VIEWPORT;
       }
 
       // Stylesheets: filter CSS files from manifest

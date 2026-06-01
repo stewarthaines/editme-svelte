@@ -634,7 +634,10 @@ export class OPFUtils {
       xml += `\n    <meta property="rendition:spread">${escapeXML(metadata.renditionSpread)}</meta>`;
     }
 
-    if (metadata.renditionViewport) {
+    // rendition:viewport only applies to fixed-layout content; a value left over
+    // from a pre-paginated session must not be emitted once the layout is
+    // reflowable (where it is inert and deprecated).
+    if (metadata.renditionViewport && metadata.renditionLayout === 'pre-paginated') {
       xml += `\n    <meta property="rendition:viewport">${escapeXML(metadata.renditionViewport)}</meta>`;
     }
 

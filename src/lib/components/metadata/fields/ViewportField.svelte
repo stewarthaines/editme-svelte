@@ -1,5 +1,9 @@
 <script lang="ts">
   import { t } from '../../../i18n';
+  import {
+    DEFAULT_FXL_VIEWPORT_WIDTH,
+    DEFAULT_FXL_VIEWPORT_HEIGHT,
+  } from '../../../epub/fixed-layout';
 
   interface Props {
     /** The rendition:viewport string, e.g. "width=1200, height=600". */
@@ -77,7 +81,7 @@
       step="1"
       inputmode="numeric"
       bind:value={width}
-      placeholder={$t('Width')}
+      placeholder={String(DEFAULT_FXL_VIEWPORT_WIDTH)}
       aria-label={$t('Viewport width in pixels')}
       {disabled}
       class="field-input"
@@ -94,7 +98,7 @@
       step="1"
       inputmode="numeric"
       bind:value={height}
-      placeholder={$t('Height')}
+      placeholder={String(DEFAULT_FXL_VIEWPORT_HEIGHT)}
       aria-label={$t('Viewport height in pixels')}
       {disabled}
       class="field-input"
