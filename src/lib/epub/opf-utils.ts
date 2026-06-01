@@ -689,11 +689,15 @@ export class OPFUtils {
     let identifierIdCounter = 0;
     for (const entry of metadata.additionalIdentifiers ?? []) {
       if (!entry.value?.trim()) continue;
-      const id = `id-${++identifierIdCounter}`;
-      xml += `\n    <dc:identifier id="${id}">${escapeXML(entry.value)}</dc:identifier>`;
-      if (entry.type) {
-        xml += refinementMeta(id, 'identifier-type', entry.type, 'onix:codelist5');
+      // Only mint an id when there is an identifier-type to refine; an untyped
+      // identifier needs no id (mirrors the title generation above).
+      if (!entry.type) {
+        xml += `\n    <dc:identifier>${escapeXML(entry.value)}</dc:identifier>`;
+        continue;
       }
+      const id = `identifier${++identifierIdCounter}`;
+      xml += `\n    <dc:identifier id="${id}">${escapeXML(entry.value)}</dc:identifier>`;
+      xml += refinementMeta(id, 'identifier-type', entry.type, 'onix:codelist5');
     }
 
     // Add optional metadata. Creators/contributors emit an id plus a

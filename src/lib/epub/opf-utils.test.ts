@@ -838,8 +838,20 @@ describe('OPFUtils', () => {
       const xml = OPFUtils.generateOPFXML(testDoc);
       expectValidXML(xml, 'OPF with additional identifier');
 
-      expect(xml).toContain('<dc:identifier id="id-1">urn:isbn:9780000000001</dc:identifier>');
-      expect(xml).toContain('<meta refines="#id-1" property="identifier-type" scheme="onix:codelist5">15</meta>');
+      expect(xml).toContain('<dc:identifier id="identifier1">urn:isbn:9780000000001</dc:identifier>');
+      expect(xml).toContain('<meta refines="#identifier1" property="identifier-type" scheme="onix:codelist5">15</meta>');
+    });
+
+    it('emits an untyped additional identifier without an id', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.metadata.identifier = 'urn:uuid:12345';
+      testDoc.metadata.additionalIdentifiers = [{ value: 'urn:isbn:9780000000001' }];
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with untyped additional identifier');
+
+      expect(xml).toContain('<dc:identifier>urn:isbn:9780000000001</dc:identifier>');
+      expect(xml).not.toContain('property="identifier-type"');
     });
   });
 
