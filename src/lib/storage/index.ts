@@ -969,6 +969,35 @@ export class FileStorageAPI {
   }
 
   /**
+   * Return a live OPFS directory handle for a workspace, or null when the active
+   * backend isn't OPFS (the IndexedDB fallback can't surface a handle).
+   *
+   * Used to hand the publish output directory to a plugin in its `init` message.
+   * Resolved directly against the origin's OPFS — both OPFS backends store under
+   * `workspaces/<id>`, so the handle reflects whatever the sync worker or async
+   * backend wrote. The directory is created if missing so an empty output dir can
+   * still be handed over before the first package.
+   */
+  async getWorkspaceDirectoryHandle(
+    workspaceId: string
+  ): Promise<FileSystemDirectoryHandle | null> {
+    const backendType = this.manager.getBackendType();
+    if (backendType !== 'opfs-async' && backendType !== 'opfs-sync') {
+      return null;
+    }
+    if (!('storage' in navigator) || !('getDirectory' in navigator.storage)) {
+      return null;
+    }
+    try {
+      const root = await navigator.storage.getDirectory();
+      const workspaces = await root.getDirectoryHandle('workspaces', { create: true });
+      return await workspaces.getDirectoryHandle(workspaceId, { create: true });
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Utility methods
    */
   async writeTextFile(workspaceId: string, path: string, content: string): Promise<void> {
