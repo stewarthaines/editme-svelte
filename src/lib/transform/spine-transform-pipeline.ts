@@ -55,6 +55,37 @@ export class SpineTransformPipeline {
   }
 
   /**
+   * Resolve a configured transform-script reference to its workspace path.
+   * Settings may store either a bare filename ("transformText.js") or a full
+   * SOURCE path ("SOURCE/scripts/transformText.js"); accept both so we never
+   * double-prefix (which previously made the default settings unresolvable).
+   */
+  private resolveScriptPath(name: string): string {
+    return name.startsWith('SOURCE/') ? name : `SOURCE/scripts/${name}`;
+  }
+
+  /**
+   * Read a transform script, retrying briefly. On a freshly downloaded/unpacked
+   * EPUB the first preview can run before SOURCE/scripts has finished being
+   * written; a short bounded retry lets the file appear instead of rendering
+   * with an empty transform. Returns null if it never becomes readable.
+   */
+  private async readScriptWithRetry(path: string): Promise<string | null> {
+    const attempts = 5;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      try {
+        return await this.fileStorage.readTextFile(this.workspaceId, path);
+      } catch {
+        if (attempt < attempts - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+    }
+    console.warn(`Transform script not available after ${attempts} attempts: ${path}`);
+    return null;
+  }
+
+  /**
    * Load transform scripts from workspace settings
    */
   async loadTransformScripts(): Promise<TransformScripts> {
@@ -69,29 +100,22 @@ export class SpineTransformPipeline {
         const settings = await this.settingsService.loadEPUBSettings(this.workspaceId);
 
         if (settings.text_transform) {
-          try {
-            scripts.textTransform = await this.fileStorage.readTextFile(
-              this.workspaceId,
-              `SOURCE/scripts/${settings.text_transform}`
-            );
-          } catch {
-            console.warn(`Failed to load text transform script: ${settings.text_transform}`);
-          }
+          const content = await this.readScriptWithRetry(
+            this.resolveScriptPath(settings.text_transform)
+          );
+          // Leave textTransform empty if unreadable; the engine passes the input
+          // through unchanged rather than erroring.
+          if (content !== null) scripts.textTransform = content;
         }
 
         if (settings.dom_transforms && settings.dom_transforms.length > 0) {
-          scripts.domTransforms = [];
+          const domTransforms: string[] = [];
           for (const scriptName of settings.dom_transforms) {
-            try {
-              const scriptContent = await this.fileStorage.readTextFile(
-                this.workspaceId,
-                `SOURCE/scripts/${scriptName}`
-              );
-              scripts.domTransforms.push(scriptContent);
-            } catch {
-              console.warn(`Failed to load DOM transform script: ${scriptName}`);
-            }
+            const content = await this.readScriptWithRetry(this.resolveScriptPath(scriptName));
+            // Skip an unreadable DOM transform rather than queueing an empty one.
+            if (content !== null) domTransforms.push(content);
           }
+          scripts.domTransforms = domTransforms;
         }
       }
 

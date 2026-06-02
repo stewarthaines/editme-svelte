@@ -352,6 +352,13 @@ class TransformExecutionEngine {
    * @param {any} idref
    */
   executeTextTransformSync(plainText, idref) {
+    // No text transform loaded yet (e.g. scripts still being read on first
+    // load) — pass the input through unchanged rather than throwing on a
+    // missing transformText function.
+    if (!this.textTransformScript || !this.textTransformScript.trim()) {
+      return plainText;
+    }
+
     // Create sandboxed execution environment
     const globals = this.createSafeExecutionEnvironment();
     const globalNames = Object.keys(globals);
