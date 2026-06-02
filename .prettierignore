@@ -15,6 +15,9 @@ __screenshots__/
 # Vendored / third-party sample assets (not ours to reformat)
 src/assets/sample/vextab.js
 
+# Vendored minified libraries (e.g. axe-core for the accessibility check)
+*.min.js
+
 # Workspace plugins are separate packages with their own formatting config
 plugins/
 

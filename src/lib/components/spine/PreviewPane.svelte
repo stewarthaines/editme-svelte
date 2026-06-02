@@ -37,6 +37,121 @@
       | null;
   } = $props();
 
+  // --- Accessibility check -----------------------------------------------------
+  // Inject axe-core into the same-origin preview iframe and run it on demand so the
+  // author gets in-context feedback they can fix immediately (tweak the stylesheet,
+  // re-check). axe-core (MPL-2.0) is vendored at public/axe.min.js and served over
+  // http; file:// can't fetch it, so the button is hidden there.
+  const canCheckA11y = typeof location !== 'undefined' && location.protocol !== 'file:';
+
+  interface AxeViolation {
+    id: string;
+    impact: string | null;
+    description: string;
+    help: string;
+    helpUrl: string;
+    nodes: Array<{ target: string[]; html: string }>;
+  }
+  interface AxeWindow extends Window {
+    axe?: { run: (context: Document | Element) => Promise<{ violations: AxeViolation[] }> };
+  }
+
+  let a11yRunning = $state(false);
+  let a11yIssueCount = $state<number | null>(null);
+  let a11yViolations = $state<AxeViolation[]>([]);
+  let a11yPanelOpen = $state(false);
+  let a11yAutoTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const IMPACT_RANK: Record<string, number> = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+  const impactRank = (impact: string | null): number =>
+    impact && impact in IMPACT_RANK ? IMPACT_RANK[impact] : 4;
+
+  function loadAxe(doc: Document, win: AxeWindow): Promise<void> {
+    if (win.axe) return Promise.resolve();
+    return new Promise<void>((resolve, reject) => {
+      const script = doc.createElement('script');
+      // Vendored axe.min.js served from the app origin (resolves under any base path).
+      script.src = new URL('axe.min.js', document.baseURI).href;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load axe-core'));
+      doc.head.appendChild(script);
+    });
+  }
+
+  function clearHighlights(doc: Document): void {
+    doc.querySelectorAll<HTMLElement>('[data-axe-violation]').forEach(el => {
+      el.removeAttribute('data-axe-violation');
+      el.style.outline = '';
+      el.title = '';
+    });
+  }
+
+  function highlightViolations(doc: Document, violations: AxeViolation[]): void {
+    clearHighlights(doc);
+    for (const v of violations) {
+      for (const node of v.nodes) {
+        const selector = node.target[node.target.length - 1];
+        let el: HTMLElement | null = null;
+        try {
+          el = doc.querySelector<HTMLElement>(selector);
+        } catch {
+          el = null;
+        }
+        if (!el) continue;
+        el.setAttribute('data-axe-violation', v.id);
+        el.style.outline = '2px solid #e53935';
+        el.title = `${v.help} (${v.impact ?? 'n/a'})`;
+      }
+    }
+  }
+
+  async function runA11yCheck(): Promise<void> {
+    const doc = previewIframe?.contentDocument;
+    const win = previewIframe?.contentWindow as AxeWindow | null;
+    if (!doc || !win) return;
+    a11yRunning = true;
+    try {
+      await loadAxe(doc, win);
+      const results = await win.axe!.run(doc);
+      const violations = results.violations
+        .slice()
+        .sort((a, b) => impactRank(a.impact) - impactRank(b.impact));
+      a11yIssueCount = violations.length;
+      a11yViolations = violations;
+      // eslint-disable-next-line no-console
+      console.table(
+        violations.map(v => ({ impact: v.impact, help: v.help, nodes: v.nodes.length }))
+      );
+      highlightViolations(doc, violations);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Accessibility check failed:', error);
+      a11yIssueCount = null;
+    } finally {
+      a11yRunning = false;
+    }
+  }
+
+  // The button toggles the panel; opening runs a check, closing clears the outlines.
+  function toggleA11yPanel(): void {
+    if (a11yPanelOpen) {
+      a11yPanelOpen = false;
+      const doc = previewIframe?.contentDocument;
+      if (doc) clearHighlights(doc);
+    } else {
+      a11yPanelOpen = true;
+      void runA11yCheck();
+    }
+  }
+
+  // The preview re-render invalidates the last report; while the panel is open,
+  // re-run the check (debounced) so the author sees fresh results as they edit.
+  function scheduleAutoA11yCheck(): void {
+    if (!a11yPanelOpen) return;
+    clearTimeout(a11yAutoTimer);
+    a11yAutoTimer = setTimeout(() => void runA11yCheck(), 500);
+  }
+
   // Preview configuration
   const DEVICE_PRESETS = [
     {
@@ -335,6 +450,9 @@
       iframeDoc.close();
 
       lastUpdateTime.set(Date.now());
+
+      // The rewrite invalidated any prior axe results; re-check if the panel is open.
+      scheduleAutoA11yCheck();
     } catch (error) {
       console.error('Failed to update preview content:', error);
     }
@@ -694,6 +812,24 @@
     </div>
 
     <div class="preview-controls">
+      <!-- Accessibility check (spike): inject axe-core into the preview + run it -->
+      {#if canCheckA11y}
+        <button
+          type="button"
+          class="a11y-check"
+          class:active={a11yPanelOpen}
+          onclick={toggleA11yPanel}
+          disabled={!xhtmlContent}
+          aria-pressed={a11yPanelOpen}
+          title="Accessibility check (axe-core) — re-runs as you edit while open"
+        >
+          {a11yRunning ? 'Checking…' : 'Accessibility check'}
+          {#if !a11yRunning && a11yPanelOpen && a11yIssueCount !== null}
+            <span class="a11y-count" class:clean={a11yIssueCount === 0}>{a11yIssueCount}</span>
+          {/if}
+        </button>
+      {/if}
+
       <!-- Orientation toggle (only show for mobile devices) -->
       {#if selectedDevice !== 'desktop'}
         <button
@@ -744,6 +880,46 @@
     <div class="transform-status warning">
       <span class="status-icon">⚠️</span>
       <span>{transformWarnings.length} warnings</span>
+    </div>
+  {/if}
+
+  <!-- Accessibility results panel (spike): plain-text violations, sorted by impact -->
+  {#if a11yPanelOpen}
+    <div class="a11y-panel" role="region" aria-label="Accessibility issues">
+      <div class="a11y-panel-header">
+        <strong>
+          {a11yViolations.length === 0
+            ? 'No accessibility issues found'
+            : `${a11yViolations.length} accessibility issue${a11yViolations.length === 1 ? '' : 's'}`}
+        </strong>
+        <button
+          type="button"
+          class="a11y-panel-close"
+          onclick={() => (a11yPanelOpen = false)}
+          aria-label="Close accessibility panel"
+          title="Close"
+        >
+          ✕
+        </button>
+      </div>
+      {#if a11yViolations.length > 0}
+        <ul class="a11y-list">
+          {#each a11yViolations as v (v.id)}
+            <li class="a11y-item">
+              <span class="a11y-impact" data-impact={v.impact ?? 'minor'}>
+                {v.impact ?? 'n/a'}
+              </span>
+              <div class="a11y-detail">
+                <span class="a11y-help" title={v.description}>{v.help}</span>
+                <span class="a11y-meta">
+                  {v.nodes.length} element{v.nodes.length === 1 ? '' : 's'} ·
+                  <a href={v.helpUrl} target="_blank" rel="noopener noreferrer">learn more</a>
+                </span>
+              </div>
+            </li>
+          {/each}
+        </ul>
+      {/if}
     </div>
   {/if}
 
@@ -849,6 +1025,132 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
+  }
+
+  /* Accessibility check button (spike) */
+  .a11y-check {
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .a11y-check:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .a11y-check.active {
+    border-color: var(--color-primary, #0074d9);
+    background: var(--color-bg-tertiary, var(--color-bg-secondary));
+  }
+
+  .a11y-count {
+    min-width: 1.2em;
+    padding: 0 var(--space-1);
+    border-radius: var(--radius-xs);
+    background: var(--color-error-text, #e53935);
+    color: #fff;
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .a11y-count.clean {
+    background: var(--color-success-text, #2e7d32);
+  }
+
+  .a11y-panel {
+    max-height: 220px;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--color-border-default);
+    background: var(--color-bg-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .a11y-panel-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .a11y-panel-close {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    padding: 0 var(--space-1);
+  }
+
+  .a11y-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .a11y-item {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-start;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .a11y-impact {
+    flex-shrink: 0;
+    min-width: 64px;
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-xs);
+    color: #fff;
+    font-size: var(--text-xs);
+    text-transform: capitalize;
+    text-align: center;
+    background: #9e9e9e;
+  }
+
+  .a11y-impact[data-impact='critical'] {
+    background: #b71c1c;
+  }
+  .a11y-impact[data-impact='serious'] {
+    background: #e53935;
+  }
+  .a11y-impact[data-impact='moderate'] {
+    background: #f57c00;
+  }
+  .a11y-impact[data-impact='minor'] {
+    background: #9e9e9e;
+  }
+
+  .a11y-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .a11y-help {
+    color: var(--color-text-primary);
+  }
+
+  .a11y-meta {
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+  }
+
+  .a11y-meta a {
+    color: var(--color-primary, #0074d9);
   }
 
   .orientation-toggle {
