@@ -32,15 +32,24 @@ This is a **Svelte 5 application using runes mode** that runs in modern browsers
 
 ### Svelte 5 & Runes Mode
 
-The application has been modernized to use Svelte 5's runes-based reactivity system. All new components should use runes syntax:
+**CONSTRAINT: All Svelte components MUST use runes mode.** This is a hard project
+rule, not a preference — for new components and existing ones alike:
 
 - **State**: Use `$state()` instead of `let` for reactive variables
 - **Props**: Use `$props()` instead of `export let`
 - **Bindable Props**: Use `$bindable()` for two-way binding
 - **Derived**: Use `$derived()` for simple expressions, `$derived.by()` for function bodies
 - **Effects**: Use `$effect()` instead of reactive statements
+- **Component events**: Use **callback props** (`onFoo?: (detail) => void`), not `createEventDispatcher`/`dispatch`
+- **Composition**: Use **snippets** (`{#snippet}` / `{@render}`), not `<slot>`
+- **DOM events**: Use `onclick`/`oninput`/… attributes, not `on:click`/`on:input` directives
 
-**Legacy Svelte 4 syntax is being phased out** - when working with existing components, prefer converting to runes syntax when making significant changes.
+**Legacy Svelte 4 syntax is prohibited** — `export let`, top-level `$:` reactive
+statements, `createEventDispatcher`, `<slot>`, and `on:` event directives. If you
+touch a component that still uses any of these, convert it to runes as part of
+your change; do not add new legacy syntax. A small set of components is mid-
+migration — finish them when you work in them rather than matching their old
+style.
 
 ### Distribution Model
 

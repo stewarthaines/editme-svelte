@@ -140,14 +140,25 @@ theme-toggle.svelte       # Svelte should be PascalCase
 
 ## Component Development Guidelines
 
-### Svelte 5 Runes Migration Strategy
+### Svelte 5 Runes (mandatory — no legacy syntax)
 
-When working with existing Svelte 4 components:
+**All components use runes mode. Legacy Svelte 4 syntax is not permitted** and
+must be converted whenever you touch a file that still contains it (don't match
+its old style). Conversion reference:
 
-- **Minor Changes**: Keep existing `export let` syntax to avoid breaking changes
-- **Major Refactoring**: Convert to runes syntax (`$props()`, `$state()`, etc.) for consistency
-- **New Components**: Always use Svelte 5 runes syntax from the start
-- **Bindable Props**: Use `$bindable()` for two-way data binding in new components
+| Legacy (Svelte 4) | Runes (Svelte 5) |
+| --- | --- |
+| `export let x = d` | `let { x = d } = $props()` |
+| `export let x` (two-way bound) | `let { x = $bindable() } = $props()` |
+| `$: y = f(a)` (pure) | `let y = $derived(f(a))` / `$derived.by(...)` |
+| `$: { …side effects… }` | `$effect(() => { … })` |
+| `createEventDispatcher()` + `dispatch('foo', d)` | callback prop `onFoo?.(d)` |
+| parent `on:foo={h}` | parent `onFoo={h}` |
+| `<slot name="x" />` | `Snippet` prop + `{@render x?.()}` (parent passes `{#snippet x()}…{/snippet}`) |
+| `on:click` / `on:input` | `onclick` / `oninput` |
+
+`svelte-check` (`npm run check`) flags mixed runes/legacy in one component as an
+error, so migrate a file fully in one pass.
 
 ### Accessibility Requirements
 
@@ -165,7 +176,7 @@ Before considering a component complete:
 - **CSS & Styling**: Use the comprehensive design system in `src/styles/`
 - **Browser APIs**: Prefer browser-native APIs over regex for structured data handling
 - **Error Handling**: Implement proper TypeScript error types and handling patterns
-- **Svelte 5 Runes**: Use runes syntax for all new components - `$props()`, `$state()`, `$derived()`, `$effect()`, and `$bindable()` for two-way binding
+- **Svelte 5 Runes**: Runes are mandatory for all components (no legacy syntax) - `$props()`, `$state()`, `$derived()`, `$effect()`, `$bindable()`, callback props, and snippets
 
 ### Reference Components
 

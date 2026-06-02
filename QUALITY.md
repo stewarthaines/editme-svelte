@@ -112,6 +112,15 @@ npm run check && npm run lint && npm run format && npm test
 
 - Use absolute paths (`$lib/`) even though some existing code doesn't
 
+### Svelte Component Standards
+
+- **Runes-only — no legacy Svelte 4 syntax.** Prohibited: `export let`,
+  top-level `$:`, `createEventDispatcher`/`dispatch`, `<slot>`, `on:` event
+  directives. Use `$props()`/`$bindable()`, `$state()`, `$derived()`/`$effect()`,
+  callback props, snippets, and `onclick`-style event attributes. Convert any
+  legacy syntax in a file you touch (see [DEVELOPMENT.md](./DEVELOPMENT.md) for
+  the conversion table). `npm run check` errors on mixed runes/legacy.
+
 ## Build Configuration Standards
 
 ### Svelte 5 Compatibility

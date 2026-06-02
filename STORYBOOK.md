@@ -146,14 +146,13 @@ export const Bad: Story = {
 
 ### ✅ DO: Follow Component Separation Pattern
 
-**1. Component (MyComponent.svelte)**
+**1. Component (MyComponent.svelte)** — runes only
 ```svelte
 <script lang="ts">
-  export let title: string;
-  export let onAction: () => void;
+  let { title, onAction }: { title: string; onAction: () => void } = $props();
 </script>
 
-<button on:click={onAction}>{title}</button>
+<button onclick={onAction}>{title}</button>
 ```
 
 **2. Demo Component (MyComponentDemo.svelte)**

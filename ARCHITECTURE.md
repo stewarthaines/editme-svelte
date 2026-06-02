@@ -278,9 +278,11 @@ Components receive services via props and use reactive state:
 <script lang="ts">
   import type { WorkspaceService, WorkspaceState } from '../services/workspace/workspace.service.js';
   
-  // Service injection via props
-  export let workspace: WorkspaceState;
-  export let workspaceService: WorkspaceService;
+  // Service injection via props (runes)
+  let { workspace, workspaceService }: {
+    workspace: WorkspaceState;
+    workspaceService: WorkspaceService;
+  } = $props();
   
   // Local reactive state
   let loading = $state(false);
