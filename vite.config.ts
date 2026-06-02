@@ -32,6 +32,14 @@ export default defineConfig({
       // Use Vite's default treeshaking instead, which is tuned for Svelte compatibility
     }
   },
+  optimizeDeps: {
+    // Only scan the core app's own entry for dependency pre-bundling. Otherwise
+    // Vite crawls every .html under the project root — including the workspace
+    // plugin's plugin.html / plugin-test.html — and tries to pre-bundle its heavy
+    // deps (epubcheck-ts → libxml2-wasm, which uses top-level await), which aborts
+    // dep optimization and leaves the dev server serving a blank app.
+    entries: ['index.html'],
+  },
   define: {
     // Exclude development-only code from production builds
     __DEV__: process.env.NODE_ENV !== 'production',
