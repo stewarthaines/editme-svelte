@@ -3,14 +3,22 @@
   import { navigationStore } from '../navigation-store';
   import { t } from '../../i18n';
 
-  export let viewType: string = 'Unknown';
-  export let title: string = 'View';
-  export let description: string = 'This view will be implemented in Phase 3.';
-  export let icon: string = '📄';
-  export let comingSoon: boolean = true;
+  let {
+    viewType = 'Unknown',
+    title = 'View',
+    description = 'This view will be implemented in Phase 3.',
+    icon = '📄',
+    comingSoon = true,
+  }: {
+    viewType?: string;
+    title?: string;
+    description?: string;
+    icon?: string;
+    comingSoon?: boolean;
+  } = $props();
 
   let guardId: string;
-  let viewData: any = {};
+  let viewData = $state<any>({});
 
   // ViewComponent interface implementation
   export function onViewEnter(data?: any): void {

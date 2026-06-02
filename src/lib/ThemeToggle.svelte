@@ -1,11 +1,13 @@
 <script lang="ts">
   import { themeStore } from './stores/theme';
 
-  export let size: 'small' | 'medium' | 'large' = 'medium';
-  export let showLabel = true;
+  let { size = 'medium', showLabel = true }: {
+    size?: 'small' | 'medium' | 'large';
+    showLabel?: boolean;
+  } = $props();
 
-  $: currentTheme = $themeStore.current;
-  $: isDark = currentTheme === 'dark';
+  let currentTheme = $derived($themeStore.current);
+  let isDark = $derived(currentTheme === 'dark');
 
   function handleToggle() {
     themeStore.toggleTheme();

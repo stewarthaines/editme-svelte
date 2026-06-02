@@ -2,13 +2,21 @@
   import { onMount } from 'svelte';
 
   // Component props
-  export let content: string;
-  export let deviceSize: DeviceSize = 'responsive';
-  export let orientation: 'portrait' | 'landscape' = 'portrait';
-  export let fontSizeAdjustment: number = 0;
-  export let onNavigate: ((chapterId: string) => void) | undefined = undefined;
-  let className: string = '';
-  export { className as class };
+  let {
+    content,
+    deviceSize = 'responsive',
+    orientation = 'portrait',
+    fontSizeAdjustment = 0,
+    onNavigate = undefined,
+    class: className = '',
+  }: {
+    content: string;
+    deviceSize?: DeviceSize;
+    orientation?: 'portrait' | 'landscape';
+    fontSizeAdjustment?: number;
+    onNavigate?: (chapterId: string) => void;
+    class?: string;
+  } = $props();
 
   // Types
   type DeviceSize =
@@ -167,19 +175,25 @@
   }
 
   // Reactive updates
-  $: if (iframeElement && content) {
-    // Update iframe content
-    iframeElement.srcdoc = content;
-  }
+  $effect(() => {
+    if (iframeElement && content) {
+      // Update iframe content
+      iframeElement.srcdoc = content;
+    }
+  });
 
-  $: if (containerElement && wrapperElement && iframeElement) {
-    updateLayout();
-  }
+  $effect(() => {
+    if (containerElement && wrapperElement && iframeElement) {
+      updateLayout();
+    }
+  });
 
-  $: if (iframeElement) {
-    // Re-inject styles when font settings change
-    injectDeviceStyles(iframeElement, deviceSize, fontSizeAdjustment);
-  }
+  $effect(() => {
+    if (iframeElement) {
+      // Re-inject styles when font settings change
+      injectDeviceStyles(iframeElement, deviceSize, fontSizeAdjustment);
+    }
+  });
 
   onMount(() => {
     updateLayout();
@@ -211,7 +225,7 @@
         class="content-preview__iframe"
         bind:this={iframeElement}
         srcdoc={content}
-        on:load={handleIframeLoad}
+        onload={handleIframeLoad}
         title="Content Preview"
       ></iframe>
     </div>
