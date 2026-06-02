@@ -1282,16 +1282,9 @@
       {contentService}
       onPaneToggle={() => handlePaneToggle()}
       onFileSelect={(pane, filePath, fileType) =>
-        handleFileSelect({ detail: { pane, filePath, fileType } } as CustomEvent<{
-          pane: 1 | 2;
-          filePath: string;
-          fileType: string;
-        }>)}
+        handleFileSelect({ detail: { pane, filePath, fileType } } as CustomEvent)}
       onContentChange={(pane, content) =>
-        handlePaneContentChange({ detail: { pane, content } } as CustomEvent<{
-          pane: 1 | 2;
-          content: string;
-        }>)}
+        handlePaneContentChange({ detail: { pane, content } } as CustomEvent)}
       onForceUpdate={() => forcePreviewUpdate()}
       {workspace}
       {audioClipService}
