@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import MetadataTabBar from './MetadataTabBar.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
@@ -11,19 +10,23 @@
   import { MetadataService } from '../../services/metadata/metadata.service.js';
   import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
 
-  const dispatch = createEventDispatcher<{
-    metadataChanged: { field: string; value: any };
-    fieldFocus: { field: keyof EPUBMetadata | null };
-    tabFieldsChange: { fields: string[] };
-  }>();
-
   interface Props {
     workspace?: WorkspaceState | null;
     metadataService: MetadataService;
     advancedMode?: boolean;
+    onMetadataChanged?: (detail: { field: string; value: any }) => void;
+    onFieldFocus?: (detail: { field: keyof EPUBMetadata | null }) => void;
+    onTabFieldsChange?: (detail: { fields: string[] }) => void;
   }
 
-  let { workspace = $bindable(null), metadataService, advancedMode = false }: Props = $props();
+  let {
+    workspace = $bindable(null),
+    metadataService,
+    advancedMode = false,
+    onMetadataChanged,
+    onFieldFocus,
+    onTabFieldsChange,
+  }: Props = $props();
 
   // Reactive state using Svelte 5 runes
   let metadata = $derived(workspace?.opf.metadata ?? { title: '', language: [], identifier: '' });
@@ -86,7 +89,7 @@
   };
 
   const handleFieldFocus = (event: { detail: { field: keyof EPUBMetadata | null } }) => {
-    dispatch('fieldFocus', event.detail);
+    onFieldFocus?.(event.detail);
   };
 
   const handleFieldSave = async (event: { detail: any }) => {
@@ -110,7 +113,7 @@
       workspace = await metadataService.updateField(workspace, field, value);
       
       // Notify that metadata has changed
-      dispatch('metadataChanged', { field, value });
+      onMetadataChanged?.({ field, value });
       
       error = null;
     } catch (err: any) {
@@ -137,7 +140,7 @@
         workspace = await metadataService.addArrayItem(workspace, field);
 
         // Notify that metadata has changed
-        dispatch('metadataChanged', { field, value: workspace.opf.metadata[field as keyof EPUBMetadata] });
+        onMetadataChanged?.({ field, value: workspace.opf.metadata[field as keyof EPUBMetadata] });
       }
       error = null;
     } catch (err: any) {
@@ -166,7 +169,7 @@
         workspace = await metadataService.removeArrayItem(workspace, field, index);
         
         // Notify that metadata has changed
-        dispatch('metadataChanged', { field, value: workspace.opf.metadata[field as keyof EPUBMetadata] });
+        onMetadataChanged?.({ field, value: workspace.opf.metadata[field as keyof EPUBMetadata] });
       }
       error = null;
     } catch (err: any) {
@@ -184,8 +187,8 @@
     await handleFieldSave({ detail: { field: 'identifier', value: newIdentifier } });
   };
 
-  const handleTabSwitch = async (event: { detail: { tabId: any } }) => {
-    const newTabId = event.detail.tabId;
+  const handleTabSwitch = async (detail: { tabId: any }) => {
+    const newTabId = detail.tabId;
 
     // Allow tab switching - validation errors will be shown inline
     // No need to block navigation, users should be able to access all tabs
@@ -195,14 +198,14 @@
   // Tell the preview which fields the active tab owns, so it can softly
   // highlight that group in the content.opf.
   $effect(() => {
-    dispatch('tabFieldsChange', { fields: getTabFields(activeTab) });
+    onTabFieldsChange?.({ fields: getTabFields(activeTab) });
   });
 
 </script>
 
 <div class="metadata-editor">
   <div class="pane-header" tabindex="-1">
-    <MetadataTabBar {activeTab} {validationErrors} {tabs} on:tabClick={handleTabSwitch} />
+    <MetadataTabBar {activeTab} {validationErrors} {tabs} onTabClick={handleTabSwitch} />
   </div>
 
   <div class="pane-content" tabindex="-1">

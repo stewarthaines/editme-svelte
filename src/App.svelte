@@ -127,8 +127,8 @@
   };
 
   // Handle metadata changes - refresh workspace list when author/title changes
-  const handleMetadataChanged = async (event: CustomEvent<{ field: string; value: any }>) => {
-    const { field } = event.detail;
+  const handleMetadataChanged = async (detail: { field: string; value: any }) => {
+    const { field } = detail;
 
     // Refresh workspace list for fields that affect workspace display
     if (field === 'creator' || field === 'title' || field === 'language') {
@@ -140,16 +140,16 @@
   };
 
   // Handle metadata field focus for OPF preview highlighting
-  const handleMetadataFieldFocus = (
-    event: CustomEvent<{ field: keyof import('./lib/epub/opf-utils.js').EPUBMetadata | null }>
-  ) => {
-    focusedMetadataField = event.detail.field;
+  const handleMetadataFieldFocus = (detail: {
+    field: keyof import('./lib/epub/opf-utils.js').EPUBMetadata | null;
+  }) => {
+    focusedMetadataField = detail.field;
   };
 
   // Track the active metadata tab's fields (for soft group highlighting), and
   // drop a stale focused field when the tab changes.
-  const handleMetadataTabFields = (event: CustomEvent<{ fields: string[] }>) => {
-    activeMetadataTabFields = event.detail.fields;
+  const handleMetadataTabFields = (detail: { fields: string[] }) => {
+    activeMetadataTabFields = detail.fields;
     focusedMetadataField = null;
   };
 
@@ -605,9 +605,9 @@
             bind:workspace={appState.workspace}
             {metadataService}
             advancedMode={appState.isAdvancedMode}
-            on:metadataChanged={handleMetadataChanged}
-            on:fieldFocus={handleMetadataFieldFocus}
-            on:tabFieldsChange={handleMetadataTabFields}
+            onMetadataChanged={handleMetadataChanged}
+            onFieldFocus={handleMetadataFieldFocus}
+            onTabFieldsChange={handleMetadataTabFields}
           />
         {:else}
           <PlaceholderView

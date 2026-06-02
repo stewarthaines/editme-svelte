@@ -1,18 +1,23 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
   import MetadataTab from './MetadataTab.svelte';
   import type { ValidationResult } from '../../metadata/MetadataValidator';
 
-  const dispatch = createEventDispatcher();
-
-  export let activeTab = 'basic';
-  export let validationErrors: ValidationResult[] = [];
-  export let tabs = [
-    { id: 'basic', label: $t('metadata.tab.basic') },
-    { id: 'advanced', label: $t('metadata.tab.advanced') },
-    { id: 'accessibility', label: $t('metadata.tab.accessibility') },
-  ];
+  let {
+    activeTab = 'basic',
+    validationErrors = [],
+    tabs = [
+      { id: 'basic', label: $t('metadata.tab.basic') },
+      { id: 'advanced', label: $t('metadata.tab.advanced') },
+      { id: 'accessibility', label: $t('metadata.tab.accessibility') },
+    ],
+    onTabClick,
+  }: {
+    activeTab?: string;
+    validationErrors?: ValidationResult[];
+    tabs?: Array<{ id: string; label: string }>;
+    onTabClick?: (detail: { tabId: string }) => void;
+  } = $props();
 
   const getTabErrorCount = (tabId: string) => {
     const tabFields = getTabFields(tabId);
@@ -58,8 +63,8 @@
     }
   };
 
-  const handleTabClick = (event: { detail: any }) => {
-    dispatch('tabClick', event.detail);
+  const handleTabClick = (detail: { tabId: string }) => {
+    onTabClick?.(detail);
   };
 </script>
 
@@ -70,7 +75,7 @@
       label={tab.label}
       active={activeTab === tab.id}
       errorCount={getTabErrorCount(tab.id)}
-      on:click={handleTabClick}
+      onSelect={handleTabClick}
     />
   {/each}
 </div>

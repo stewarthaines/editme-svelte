@@ -1,25 +1,32 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { t } from '../../i18n';
 
-  const dispatch = createEventDispatcher();
-
-  export let id = '';
-  export let label = '';
-  export let active = false;
-  export let errorCount = 0;
-  export let disabled = false;
+  let {
+    id = '',
+    label = '',
+    active = false,
+    errorCount = 0,
+    disabled = false,
+    onSelect,
+  }: {
+    id?: string;
+    label?: string;
+    active?: boolean;
+    errorCount?: number;
+    disabled?: boolean;
+    onSelect?: (detail: { tabId: string }) => void;
+  } = $props();
 
   const handleClick = () => {
     if (!disabled) {
-      dispatch('click', { tabId: id });
+      onSelect?.({ tabId: id });
     }
   };
 
   const handleKeydown = (event: KeyboardEvent) => {
     if ((event.key === 'Enter' || event.key === ' ') && !disabled) {
       event.preventDefault();
-      dispatch('click', { tabId: id });
+      onSelect?.({ tabId: id });
     }
   };
 </script>
@@ -30,8 +37,8 @@
   class:has-errors={errorCount > 0}
   class:disabled
   {disabled}
-  on:click={handleClick}
-  on:keydown={handleKeydown}
+  onclick={handleClick}
+  onkeydown={handleKeydown}
   aria-controls="metadata-panel-{id}"
   id="metadata-tab-{id}"
 >
