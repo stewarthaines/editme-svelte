@@ -13,6 +13,7 @@
     onUpload,
     onValidate,
     onViewReport,
+    onDelete,
   }: {
     epubs: File[];
     remoteObjects: S3Object[];
@@ -30,9 +31,11 @@
     onUpload: (epub: File) => void;
     onValidate: (epub: File) => void;
     onViewReport: (epub: File) => void;
+    onDelete: (epub: File) => void;
   } = $props();
 
   let confirmOverwrite: { [key: string]: boolean } = $state({});
+  let deleteConfirm: string | null = $state(null);
 
   function wouldOverwrite(epub: File): boolean {
     return remoteObjects.some((o) => o.key === epub.name);
@@ -89,18 +92,6 @@
                 >
               {/if}
 
-              <button
-                class="btn-secondary btn-sm"
-                onclick={() => onValidate(epub)}
-                disabled={epubValidationStatus.get(epub.name)?.isValidating ||
-                  uploading}
-                title="Validate EPUB"
-              >
-                {epubValidationStatus.get(epub.name)?.isValidating
-                  ? 'Validating...'
-                  : 'Validate'}
-              </button>
-
               {#if epubValidationStatus.get(epub.name)?.report}
                 <button
                   class="btn-secondary btn-sm"
@@ -109,8 +100,42 @@
                 >
                   Report
                 </button>
+              {:else}
+                <button
+                  class="btn-secondary btn-sm"
+                  onclick={() => onValidate(epub)}
+                  disabled={epubValidationStatus.get(epub.name)?.isValidating ||
+                    uploading}
+                  title="Validate EPUB"
+                >
+                  {epubValidationStatus.get(epub.name)?.isValidating
+                    ? 'Validating...'
+                    : 'Validate'}
+                </button>
               {/if}
             </div>
+
+            {#if deleteConfirm === epub.name}
+              <div class="delete-confirm">
+                <span>Confirm delete?</span>
+                <button
+                  class="btn-danger-small"
+                  onclick={() => {
+                    onDelete(epub);
+                    deleteConfirm = null;
+                  }}>Yes</button
+                >
+                <button
+                  class="btn-cancel-small"
+                  onclick={() => (deleteConfirm = null)}>No</button
+                >
+              </div>
+            {:else}
+              <button
+                class="btn-danger-small"
+                onclick={() => (deleteConfirm = epub.name)}>Delete</button
+              >
+            {/if}
           {/if}
         </div>
       </div>
@@ -176,6 +201,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .delete-confirm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
   }
 
   .status-icon {

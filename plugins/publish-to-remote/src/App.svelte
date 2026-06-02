@@ -17,6 +17,7 @@
     validateEpub,
     saveValidationReport,
     loadValidationReport,
+    deleteValidationReport,
   } from './epub-validation.js';
   import type { RemoteConfig, RemotesStore, S3Object } from './types.js';
   import type { ValidationReport } from './epub-validation.js';
@@ -250,6 +251,19 @@
     }
   }
 
+  async function onDeleteEpub(epub: File) {
+    if (!$dirHandle) return;
+    try {
+      await $dirHandle.removeEntry(epub.name);
+      await deleteValidationReport(epub.name);
+      epubValidationStatus.delete(epub.name);
+      await loadLocalEpubs();
+      showStatus(`${epub.name} deleted`, 'info');
+    } catch (error) {
+      showStatus(`Delete error: ${String(error)}`, 'error');
+    }
+  }
+
   function onViewValidationReport(epub: File) {
     const status = epubValidationStatus.get(epub.name);
     if (!status?.report) return;
@@ -396,6 +410,7 @@
                 onUpload={onUploadEpub}
                 onValidate={onValidateEpub}
                 onViewReport={onViewValidationReport}
+                onDelete={onDeleteEpub}
               />
             </div>
           </div>

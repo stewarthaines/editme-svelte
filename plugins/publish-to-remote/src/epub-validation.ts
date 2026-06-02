@@ -95,3 +95,17 @@ export async function loadValidationReport(
     throw error;
   }
 }
+
+export async function deleteValidationReport(filename: string): Promise<void> {
+  try {
+    const root = await navigator.storage.getDirectory();
+    const validationDir = await root.getDirectoryHandle('validations');
+    await validationDir.removeEntry(`${filename}.json`);
+  } catch (error) {
+    // Idempotent: no report (or no validations dir) is fine.
+    if (error instanceof DOMException && error.name === 'NotFoundError') {
+      return;
+    }
+    throw error;
+  }
+}
