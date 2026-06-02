@@ -1,27 +1,24 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { onDestroy } from 'svelte';
   import type { TextEditorStore } from '../../stores/index.js';
   import './outline-editor.css';
 
   // Props interface matching API specification
-  export let editorStore: TextEditorStore;
-  export let placeholder: string =
-    'Navigation content will be auto-generated from your chapters...';
-
-  // Event dispatcher with typed events
-  const dispatch = createEventDispatcher<{
-    contentChanged: {
-      editorId: string;
-      timestamp: number;
-      isEmpty: boolean;
-    };
-  }>();
+  let {
+    editorStore,
+    placeholder = 'Navigation content will be auto-generated from your chapters...',
+    onContentChanged,
+  }: {
+    editorStore: TextEditorStore;
+    placeholder?: string;
+    onContentChanged?: (detail: { editorId: string; timestamp: number; isEmpty: boolean }) => void;
+  } = $props();
 
   // Debouncing timer for content updates
   let debounceTimer: ReturnType<typeof setTimeout>;
 
   // Subscribe to store for textarea synchronization
-  $: currentContent = $editorStore.content;
+  const currentContent = $derived($editorStore.content);
 
   function handleTextareaInput(event: Event) {
     const target = event.target as HTMLTextAreaElement;
@@ -34,7 +31,7 @@
       editorStore.updateContent(target.value);
 
       // Emit lightweight event without content duplication
-      dispatch('contentChanged', {
+      onContentChanged?.({
         editorId: 'outline-nav',
         timestamp: Date.now(),
         isEmpty: target.value.trim() === '',
@@ -43,7 +40,6 @@
   }
 
   // Cleanup timer on component destroy
-  import { onDestroy } from 'svelte';
   onDestroy(() => {
     clearTimeout(debounceTimer);
   });
@@ -54,7 +50,7 @@
     class="outline-editor__textarea"
     value={currentContent}
     {placeholder}
-    on:input={handleTextareaInput}
+    oninput={handleTextareaInput}
     aria-label="Navigation content editor"
     aria-describedby="editor-help"
     spellcheck="false"

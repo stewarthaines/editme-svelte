@@ -262,7 +262,7 @@
     }
   }
 
-  function handleEditorContentChanged(_event: CustomEvent) {
+  function handleEditorContentChanged(_detail: { editorId: string; timestamp: number; isEmpty: boolean }) {
     // The reactive statement above handles the actual processing
     // This just receives the lightweight event from OutlineEditor
   }
@@ -378,7 +378,7 @@
   <OutlineEditor
     editorStore={outlineStore}
     placeholder="Navigation content will be auto-generated from your chapters..."
-    on:contentChanged={handleEditorContentChanged}
+    onContentChanged={handleEditorContentChanged}
   />
 </div>
 
