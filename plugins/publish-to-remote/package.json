@@ -28,7 +28,14 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.60.0",
     "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^3.2.2"
+  },
+  "editmePlugin": {
+    "id": "publish-to-remote",
+    "name": "Publish to Remote",
+    "presentation": "view",
+    "buildEntry": "dist/plugin.html"
   },
   "keywords": [
     "epub",
