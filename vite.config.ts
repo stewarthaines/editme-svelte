@@ -155,6 +155,8 @@ export default defineConfig({
         test: {
           name: "unit",
           include: ["src/**/*.{test,spec}.{js,ts}"],
+          // Browser-mode contract tests run separately (npm run test:plugins).
+          exclude: ["**/node_modules/**", "**/dist/**", "**/*.browser.{test,spec}.{js,ts}"],
           environment: "happy-dom",
         },
       },

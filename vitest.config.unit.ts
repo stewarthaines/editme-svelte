@@ -6,6 +6,11 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     include: ['src/**/*.{test,spec}.{js,ts}'],
-    exclude: ['src/**/*.stories.{js,ts}', '**/node_modules/**'],
+    exclude: [
+      'src/**/*.stories.{js,ts}',
+      '**/node_modules/**',
+      // Browser-mode contract tests run separately (npm run test:plugins).
+      '**/*.browser.{test,spec}.{js,ts}',
+    ],
   },
 });
