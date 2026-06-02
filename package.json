@@ -19,7 +19,7 @@
     "worktree": "bash scripts/new-worktree.sh",
     "lint": "eslint . --ext .js,.ts,.svelte --max-warnings 325",
     "lint:fix": "eslint . --ext .js,.ts,.svelte --fix",
-    "validate": "npm run check && npm run lint && npm run test",
+    "validate": "npm run check && npm run lint && npm run format:check && npm run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "i18n:extract": "node build-scripts/i18n-extract.js",

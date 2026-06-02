@@ -1,0 +1,6 @@
+# Revisions to ignore in `git blame` (whitespace-only / mechanical reformats).
+# Enable locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Format the entire repository with Prettier (one-time bulk reformat)
+5446212fee6161f2c3955c351d475bd1878773c8
