@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { S3Object } from '../types.js';
+  import FileName from './FileName.svelte';
 
   let {
     objects,
@@ -21,28 +22,23 @@
 {:else if objects.length === 0}
   <p class="empty-message">Bucket is empty</p>
 {:else}
-  <div class="objects-table">
-    <div class="table-header">
-      <div class="col-name">Name</div>
-      <div class="col-size">Size</div>
-      <div class="col-modified">Modified</div>
-      <div class="col-actions">Actions</div>
-    </div>
+  <div class="remote-list">
     {#each objects as obj (obj.key)}
-      <div class="table-row">
-        <div class="col-name">{obj.key}</div>
-        <div class="col-size">{(obj.size / 1024).toFixed(0)} KB</div>
-        <div class="col-modified">
-          {new Date(obj.lastModified).toLocaleDateString()}
+      <div class="remote-item">
+        <div class="remote-info">
+          <FileName name={obj.key} />
+          <span class="remote-meta">
+            {(obj.size / 1024).toFixed(0)} KB · {new Date(
+              obj.lastModified,
+            ).toLocaleDateString()}
+          </span>
         </div>
-        <div class="col-actions">
-          <div class="url-section">
-            <button
-              class="btn-icon"
-              onclick={() => onCopyUrl(obj.key, obj.fileId)}
-              title="Copy URL">📋</button
-            >
-          </div>
+        <div class="remote-actions">
+          <button
+            class="btn-icon"
+            onclick={() => onCopyUrl(obj.key, obj.fileId)}
+            title="Copy URL">📋</button
+          >
           {#if deleteConfirmKey === obj.key}
             <div class="delete-confirm">
               <span>Confirm delete?</span>
@@ -71,50 +67,49 @@
 {/if}
 
 <style>
-  .objects-table {
+  .remote-list {
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     overflow: hidden;
   }
 
-  .table-header {
-    display: grid;
-    grid-template-columns: 1fr 80px 110px 85px;
-    gap: 12px;
-    padding: 12px;
-    background: #f0f0f0;
-    font-weight: 600;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .table-row {
-    display: grid;
-    grid-template-columns: 1fr 80px 110px 85px;
-    gap: 12px;
-    padding: 12px;
-    border-bottom: 1px solid #e0e0e0;
+  .remote-item {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 8px 16px;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
   }
 
-  .table-row:last-child {
+  .remote-item:last-child {
     border-bottom: none;
   }
 
-  .col-name {
-    word-break: break-all;
-  }
-
-  .col-size,
-  .col-modified {
-    text-align: right;
-  }
-
-  .col-actions {
-    text-align: right;
+  /* Same responsive pattern as the local list: name takes the width and
+     middle-ellipsises; actions wrap below when the pane is too narrow. */
+  .remote-info {
+    flex: 1 1 200px;
+    min-width: 0;
     display: flex;
-    gap: 8px;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    align-items: baseline;
+  }
+
+  .remote-meta {
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .remote-actions {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 8px;
+    margin-left: auto;
   }
 
   .delete-confirm {
@@ -122,11 +117,5 @@
     gap: 8px;
     align-items: center;
     font-size: 12px;
-  }
-
-  .url-section {
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 </style>

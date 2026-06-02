@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { S3Object } from '../types.js';
   import type { ValidationReport } from '../epub-validation.js';
+  import FileName from './FileName.svelte';
 
   let {
     epubs,
@@ -46,7 +47,7 @@
       {@const overwrite = wouldOverwrite(epub)}
       <div class="epub-item">
         <div class="epub-info">
-          <span class="epub-name">{epub.name}</span>
+          <FileName name={epub.name} />
           <span class="epub-size">({(epub.size / 1024).toFixed(0)} KB)</span>
         </div>
         <div class="epub-actions">
@@ -126,36 +127,36 @@
 
   .epub-item {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
     padding: 12px;
     background: #f8f8f8;
     border-radius: 4px;
-    gap: 16px;
+    gap: 8px 16px;
   }
 
+  /* Takes the available width; when the row is too narrow for the actions, they
+     wrap to the next line and the name (middle-ellipsised) gets the full width. */
   .epub-info {
-    flex: 1;
+    flex: 1 1 220px;
+    min-width: 0;
     display: flex;
     gap: 8px;
     align-items: baseline;
   }
 
-  .epub-name {
-    font-weight: 500;
-    word-break: break-all;
-  }
-
   .epub-size {
     font-size: 12px;
     color: #999;
+    flex-shrink: 0;
   }
 
   .epub-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    white-space: nowrap;
+    margin-left: auto;
   }
 
   .checkbox {
@@ -175,7 +176,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 8px;
   }
 
   .status-icon {
