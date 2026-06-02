@@ -9,6 +9,7 @@
   import type { ContentService } from '../../services/content/content.service.js';
   import type { AudioClipService } from '../../audio/audio-clip.service.js';
   import type { SpineItemWithSource } from '../../spine/types';
+  import { readChapterMeta, writeChapterMeta } from '../../spine/chapter-metadata.js';
   import EditorPane from '../../components/spine/EditorPane.svelte';
   // import PreviewPane from '../../components/spine/PreviewPane.svelte';
   import {
@@ -70,6 +71,38 @@
 
   // Component state - using $state() for reactivity in Svelte 5
   let selectedItem = $state<SpineItemWithSource | null>(null);
+
+  // Authored chapter title (persisted to the SOURCE/text/{id}.json sidecar). Loaded
+  // when the selected item changes; the editor input shows the idref as placeholder.
+  let chapterTitle = $state('');
+  $effect(() => {
+    const item = selectedItem;
+    if (!item || !servicesInitialized) {
+      chapterTitle = '';
+      return;
+    }
+    readChapterMeta(fileStorage, workspace.id, item.idref)
+      .then(meta => {
+        // Ignore a stale read if the selection changed while we were reading.
+        if (selectedItem?.idref === item.idref) chapterTitle = meta.title ?? '';
+      })
+      .catch(() => {
+        // Sidecar unreadable — fall back to the idref placeholder.
+      });
+  });
+
+  async function handleChapterTitleChange(title: string): Promise<void> {
+    const item = selectedItem;
+    if (!item) return;
+    chapterTitle = title;
+    try {
+      await writeChapterMeta(fileStorage, workspace.id, item.idref, { title });
+      // Re-run the transform so the <title> in the preview and the saved xhtml update.
+      await forcePreviewUpdate();
+    } catch {
+      // Persisting the title failed (e.g. storage error); the input keeps its value.
+    }
+  }
   let isLoading = $state(false);
   let error = $state<string | null>(null);
   let guardId: string;
@@ -1286,6 +1319,9 @@
       onContentChange={(pane, content) =>
         handlePaneContentChange({ detail: { pane, content } } as CustomEvent)}
       onForceUpdate={() => forcePreviewUpdate()}
+      {chapterTitle}
+      chapterTitlePlaceholder={selectedItem?.idref ?? ''}
+      onChapterTitleChange={handleChapterTitleChange}
       {workspace}
       {audioClipService}
       {workspaceService}

@@ -16,6 +16,7 @@ import type { FileStorageAPI } from '../storage/index.js';
 import { generateXHTMLDocument, serializeInnerXHTML } from './xhtml-template.js';
 import { primaryLanguage } from '../epub/opf-utils.js';
 import { DEFAULT_FXL_VIEWPORT } from '../epub/fixed-layout.js';
+import { readChapterMeta } from '../spine/chapter-metadata.js';
 import type { ExtensionManager } from '../extensions/extension-manager.js';
 import type { SettingsService } from '../services/settings/settings.service.js';
 import type { WorkspaceService } from '../services/workspace/workspace.service.js';
@@ -367,8 +368,10 @@ export class SpinePreviewManager {
    * Auto-generate chapter metadata from workspace configuration
    */
   private async generateChapterMetadata(): Promise<ChapterMetadata> {
-    // Title: use spine item ID
-    const title = this.spineItemId;
+    // Title: the authored chapter title from the sidecar (SOURCE/text/{id}.json),
+    // falling back to the spine item id when none has been set.
+    const meta = await readChapterMeta(this.fileStorage, this.workspaceId, this.spineItemId);
+    const title = meta.title?.trim() || this.spineItemId;
     // Reflowable default; replaced with the fixed-layout viewport below when the
     // publication is pre-paginated.
     let viewport = 'width=device-width, initial-scale=1.0';

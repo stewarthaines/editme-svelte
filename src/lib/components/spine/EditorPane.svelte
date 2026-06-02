@@ -51,6 +51,9 @@
     audioClipService = null,
     workspaceService = null,
     settingsService = null,
+    chapterTitle = '',
+    chapterTitlePlaceholder = '',
+    onChapterTitleChange,
   }: {
     transformError?: TransformError | null;
     transformWarnings?: string[];
@@ -88,6 +91,11 @@
     audioClipService?: AudioClipService | null;
     workspaceService?: WorkspaceService | null;
     settingsService?: SettingsService | null;
+    /** Authored chapter title (the spine item's content-document <title>). */
+    chapterTitle?: string;
+    /** Placeholder shown when no title is set — the spine item id it falls back to. */
+    chapterTitlePlaceholder?: string;
+    onChapterTitleChange?: (title: string) => void;
   } = $props();
 
   /**
@@ -570,6 +578,15 @@
                 <option value={file.value}>{file.label}</option>
               {/each}
             </select>
+            <input
+              type="text"
+              class="chapter-title-input"
+              value={chapterTitle}
+              placeholder={chapterTitlePlaceholder}
+              onchange={e => onChapterTitleChange?.((e.currentTarget as HTMLInputElement).value)}
+              aria-label="Chapter title"
+              title="Chapter title — used in the content document <title>; defaults to the spine id"
+            />
           </div>
 
           {#if pane1SelectedFile === 'text' && audioEditorVisible && hasAudioFiles && audioClipService && workspace && settingsService && workspaceService}
@@ -825,6 +842,17 @@
     color: var(--color-text-primary);
     font-size: var(--text-sm);
     cursor: pointer;
+  }
+
+  .chapter-title-input {
+    flex: 2;
+    min-width: 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
   }
 
   .file-selector:focus {

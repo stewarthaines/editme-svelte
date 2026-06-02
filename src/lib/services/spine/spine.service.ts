@@ -370,12 +370,15 @@ export class SpineService {
       }
 
       try {
-        // Delete source text file
-        const sourcePath = `SOURCE/text/${chapterId}.txt`;
+        // Delete the source text file and its metadata sidecar (SOURCE/text/{id}.{txt,json})
         const fileStorage = (this.workspaceService as any).fileStorage;
-        await fileStorage.deleteFile(updatedWorkspace.id, sourcePath);
+        await fileStorage.deleteFile(updatedWorkspace.id, `SOURCE/text/${chapterId}.txt`);
+        const metaPath = `SOURCE/text/${chapterId}.json`;
+        if (await this.workspaceService.fileExists(updatedWorkspace.id, metaPath)) {
+          await fileStorage.deleteFile(updatedWorkspace.id, metaPath);
+        }
       } catch (error) {
-        console.warn('Failed to delete source file:', error);
+        console.warn('Failed to delete chapter source files:', error);
       }
 
       return { updatedWorkspace };
@@ -439,6 +442,13 @@ export class SpineService {
 
       if (await this.workspaceService.fileExists(workspace.id, oldSourcePath)) {
         await this.workspaceService.renameFile(workspace.id, oldSourcePath, newSourcePath);
+      }
+
+      // Rename the per-chapter metadata sidecar alongside the source, if present
+      const oldMetaPath = `SOURCE/text/${oldId}.json`;
+      const newMetaPath = `SOURCE/text/${newId}.json`;
+      if (await this.workspaceService.fileExists(workspace.id, oldMetaPath)) {
+        await this.workspaceService.renameFile(workspace.id, oldMetaPath, newMetaPath);
       }
 
       return { updatedWorkspace };
