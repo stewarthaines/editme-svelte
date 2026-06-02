@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, untrack } from 'svelte';
   import OutlineEditor from './OutlineEditor.svelte';
   import { createTextEditorStore } from '../../stores/index.js';
   import type { TextEditorStore } from '../../stores/index.js';
@@ -49,13 +49,16 @@
   const editorId = `outline-nav-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
   const outlineStore: TextEditorStore = createTextEditorStore(editorId);
 
-  const transformPipeline = new SpineTransformPipeline(
-    workspace.id,
-    fileStorage,
-    extensionManager,
-    blobURLManager,
-    transformEngine,
-    settingsService
+  const transformPipeline = untrack(
+    () =>
+      new SpineTransformPipeline(
+        workspace.id,
+        fileStorage,
+        extensionManager,
+        blobURLManager,
+        transformEngine,
+        settingsService
+      )
   );
 
   // Component initialization state

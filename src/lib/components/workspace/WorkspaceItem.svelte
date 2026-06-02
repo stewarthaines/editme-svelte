@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { t } from '../../i18n';
   import type {
     WorkspaceInfo,
@@ -26,9 +26,11 @@
   // renders, so the Projects view appears instantly. Prefer eager values if a
   // caller already populated them on the workspace object.
   let details = $state<WorkspaceRowDetails | null>(
-    workspace.fileCount !== undefined
-      ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds }
-      : null
+    untrack(() =>
+      workspace.fileCount !== undefined
+        ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds }
+        : null
+    )
   );
 
   onMount(async () => {

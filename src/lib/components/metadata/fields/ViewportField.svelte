@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { t } from '../../../i18n';
   import {
     DEFAULT_FXL_VIEWPORT_WIDTH,
@@ -47,8 +48,8 @@
     return '';
   };
 
-  let width = $state(parse(value).width);
-  let height = $state(parse(value).height);
+  let width = $state(untrack(() => parse(value).width));
+  let height = $state(untrack(() => parse(value).height));
 
   // Re-sync from the prop when it changes from outside (e.g. workspace reload).
   $effect(() => {

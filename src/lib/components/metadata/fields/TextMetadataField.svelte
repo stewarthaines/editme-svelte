@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { t as _t } from '../../../i18n';
 
   interface Props {
@@ -28,7 +29,7 @@
   }: Props = $props();
 
   // Local state that tracks the actual DOM input value
-  let localValue = $state(value);
+  let localValue = $state(untrack(() => value));
 
   // Sync local value with prop when prop changes (from parent updates)
   $effect(() => {
