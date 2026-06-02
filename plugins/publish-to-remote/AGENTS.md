@@ -1,0 +1,180 @@
+# AGENTS.md
+
+Best practices for agents working on this Svelte plugin project.
+
+## Architecture
+
+**Separation of concerns:**
+- `src/index.ts` — message handling, store updates (imperative)
+- `src/App.svelte` — UI, state machine, user interactions (reactive)
+- `src/types.ts` — discriminated union types for S3/Dropbox/Google Drive config
+- `src/remote-ops.ts` — dispatch layer for remote storage operations
+- `src/opfs.ts` — file system operations (navigator.storage.getDirectory for shared credentials, dirHandle for project files)
+- `src/s3-upload.ts` — S3 API calls (aws4fetch for signing)
+- `src/dropbox.ts` — Dropbox OAuth 2.0 PKCE flow, folder listing
+- `src/dropbox-upload.ts` — Dropbox file operations (upload, list, delete, shared links)
+- `src/google-drive.ts` — Google OAuth, Google Picker for folder selection
+- `src/google-drive-upload.ts` — Google Drive file operations (upload, list, delete)
+
+**Data flow:**
+- Credentials live in localStorage (keyed by remote config name), not per-project
+- Remote type selector → OAuth/credential entry → folder selection (Dropbox/Google Drive) or credential validation (S3) → file operations
+- UI state machine: `init → select-remote → configure ↔ loading → ready`
+- Each remote type (S3, Dropbox, Google Drive) has its own configuration shape in `RemoteConfig` discriminated union
+
+## Key Patterns
+
+### Svelte 5 Runes
+
+**`$state()` vs `$derived()` — the critical distinction:**
+- `$state()` — mutable variable; can be reassigned (`view = 'configure'` works)
+- `$derived()` — read-only computed value; assigning to it silently fails or throws
+
+Rule: if a variable is ever directly assigned in an event handler or async function, use `$state()`. Only use `$derived()` for values that are always computed from other state (e.g., `activeRemote` computed from `remotesStore`).
+
+**`SvelteMap` from `svelte/reactivity`** — already deeply reactive, no `$state()` wrapper. Mutate in place:
+```ts
+let epubValidationStatus: Map<string, ...> = new SvelteMap();
+epubValidationStatus.set(key, value);  // reactive — do this
+epubValidationStatus = new SvelteMap(...);  // do NOT reassign
+```
+
+**Event syntax:** Use `onclick` not `on:click`. No modifiers — call `e.stopPropagation()` explicitly.
+
+**One-time initialization — use `onMount`:**
+```svelte
+onMount(async () => {
+  await doOneTimeSetup();
+});
+```
+
+### File System Access
+
+**Reading files from OPFS (shared credentials):**
+```ts
+const root = await navigator.storage.getDirectory();
+const fileHandle = await root.getFileHandle('config.json', { create: true });
+const file = await fileHandle.getFile();
+const content = await file.text();
+```
+
+**Enumerating project files (via dirHandle from parent):**
+```ts
+for await (const entry of dirHandle.values()) {
+  if (entry.kind === 'file' && entry.name.endsWith('.epub')) {
+    const file = await entry.getFile();
+  }
+}
+```
+See [MDN: File System API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API).
+
+### OAuth + Folder Browser Pattern (Dropbox, Google Drive)
+
+**Dropbox folder browser flow:**
+1. User clicks "Connect to Dropbox" → calls `authorizeDropbox()` (OAuth PKCE flow)
+2. OAuth popup opens, user authenticates, tokens stored in form object
+3. `openDropboxBrowser(path)` lists folders at that path via `/2/files/list_folder`
+4. User navigates folders or selects current folder
+5. `onSelectDropboxFolder()` saves path and folder name to form
+6. On save, config is persisted and files are listed
+
+**Dropbox API key points:**
+- OAuth scope: `files.content.write files.metadata.read sharing.read sharing.write`
+- Root folder path is empty string `''`, not `'/'`
+- Path construction: `config.folderId ? \`${config.folderId}/${objectKey}\` : \`/${objectKey}\``
+- Shared links: use `/2/files/get_temporary_link` for direct downloads, or `/2/sharing/create_shared_link_with_settings` for persistent sharing
+- Token refresh: catch 401 errors and call `refreshDropboxToken()` to get new access token
+
+**Google Drive auth pattern:**
+1. User clicks "Connect to Google" → calls `authorizeGoogleDrive(clientId)` (Google Identity Services popup)
+2. Google Picker widget opens for folder selection; folderId and folderName stored in config
+3. `accessToken` is persisted in the remote config (OPFS) after authorization
+4. On page load, token is used directly; if missing/expired, a banner with "Connect to Google Drive" button is shown (no auto-popup — browsers block popups without user gesture)
+5. `GOOGLE_AUTH_REQUIRED` sentinel error string propagates through the stack; `refreshObjectList` handles it by setting `googleAuthRequired = true` and showing the banner
+
+### Error Handling
+
+**Remote operations return `{ success, error?, ... }` — check the error field:**
+```ts
+const result = await listDropboxFiles(config);
+if (result.error) {
+  if (result.error === 'DROPBOX_AUTH_EXPIRED') {
+    // Specific error: token expired, trigger re-auth
+    dbxBrowserActive = false;
+  } else {
+    // General error: display message
+    dbxBrowserError = result.error;
+  }
+}
+```
+
+All remote-ops functions return result objects with optional `error` field, never throw. This allows UI to handle errors gracefully without try-catch blocks.
+
+## Linting
+
+Run `npm run lint` to check for errors. Run `npm run lint:fix` to auto-fix. Config is in `eslint.config.js` (ESLint 9 flat config format). Rules:
+- `@typescript-eslint/no-explicit-any`: off (too noisy for this project)
+- `@typescript-eslint/no-unused-vars`: error, with `argsIgnorePattern: '^_'` (prefix unused args with `_`)
+- Svelte a11y rules from `eslint-plugin-svelte` flat/recommended config
+
+## Testing
+
+**Manual testing workflow:**
+1. Open http://localhost:8000 (or 8001 if port 8000 is in use)
+2. Select remote type (S3, Dropbox, or Google Drive)
+3. **For S3:**
+   - Enter Access Key ID and Secret Access Key
+   - Select endpoint (Cloudflare R2, Backblaze B2, AWS S3, or custom)
+   - Bucket name and region
+4. **For Dropbox:**
+   - Click "Connect to Dropbox"
+   - Authorize OAuth (popup)
+   - Browse and select target folder
+   - Click "Save & Connect"
+5. **For Google Drive:**
+   - Click "Connect to Google"
+   - Select folder via Google Picker
+   - Click "Save & Connect"
+6. Verify:
+   - File list populates with EPUBs from source directory
+   - Upload succeeds and file appears in list
+   - "Copy URL" provides a download link
+   - Delete removes file from remote
+7. Reload page — remote config and credentials should persist
+
+**Debugging in browser console:**
+- Network tab: check API calls for correct headers, request/response formats
+- Dropbox: look for 401 (auth expired) or 400 (bad request) errors — check path format and parameter names
+- Google Drive: verify Picker opens and folder selection callback fires
+- S3: verify aws4fetch signature and endpoint URL construction
+- All remotes: check localStorage for persisted config
+
+
+## Known Issues & Future Work
+
+**Current status:** All three remotes (S3/R2, Dropbox, Google Drive) confirmed working end-to-end.
+
+**Current limitations:**
+- File list refresh: calls shared link endpoints for each file (slower for large folders)
+- No batch upload UI (files uploaded one at a time)
+- Google Drive token expires after ~1 hour — user must click "Connect to Google Drive" banner to re-authorize
+
+**Nice-to-haves for future sessions:**
+- Add file preview/metadata display in file list
+- Support nested folder browser for Google Drive (currently one-level picker)
+- Optimize file listing: cache shared links or use metadata API instead of individual calls
+- Add upload progress bar (currently just success/failure)
+- Support OPDS catalog generation from uploaded files
+- Export/import remote config as JSON for easy sharing
+- Add retry logic for failed uploads
+- Support multiple remotes of same type with different credentials
+
+## Recent Changes
+
+**ESLint setup:** Added `eslint.config.js` (ESLint 9 flat config) with TypeScript and Svelte support. Run `npm run lint`.
+
+**Svelte 5 migration fixes:** Corrected `$derived()` → `$state()` for all mutable state variables. Fixed `SvelteMap` to mutate in place rather than reassign. Fixed event syntax (`onclick` not `on:click`).
+
+**Google Drive auth fix:** Removed auto-refresh popup on page load (browsers block it). Token now persisted in OPFS config. `GOOGLE_AUTH_REQUIRED` sentinel propagates to a banner UI with a user-triggered reconnect button.
+
+**EPUB validation:** Validation report modal fixed (duplicate key crash on repeated messages). Validation status tracked per-file in `SvelteMap`.

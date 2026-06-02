@@ -158,6 +158,9 @@ export default [
       'storybook-static/',
       'coverage/',
       '.claude/',
+      // Workspace plugins are separate packages with their own lint/format/test
+      // toolchain (and newer dep majors); the core gate does not govern them.
+      'plugins/',
       '*.config.js',
       '*.config.ts',
       '.storybook/',

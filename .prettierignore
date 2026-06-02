@@ -15,11 +15,17 @@ __screenshots__/
 # Vendored / third-party sample assets (not ours to reformat)
 src/assets/sample/vextab.js
 
+# Workspace plugins are separate packages with their own formatting config
+plugins/
+
 # Config files that should keep their original formatting
 *.config.js
 *.config.ts
 vite.config.ts
 vitest.config.ts
+
+# Tooling / agent config (not project source)
+.claude/
 
 # Temporary files
 .DS_Store
