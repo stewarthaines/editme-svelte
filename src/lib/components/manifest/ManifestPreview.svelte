@@ -212,7 +212,9 @@
       cleanupBlobUrl();
 
       if (selectedItemType === 'manifest') {
-        const manifestItem = selectedItem as ManifestItem;
+        // Use the live (possibly just-edited) item so a renamed File Path is
+        // read from its new location rather than the stale selectedItem prop.
+        const manifestItem = (liveItem ?? selectedItem) as ManifestItem;
         // For now, create a simplified preview since we don't have getContentPreview in WorkspaceService yet
         const filePath = manifestItem.href.startsWith(workspace.pathInfo.basePath + '/')
           ? manifestItem.href
@@ -372,8 +374,10 @@
       let mimeType: string;
 
       if (selectedItemType === 'manifest') {
-        const manifestItem = selectedItem as ManifestItem;
-        
+        // Use the live (possibly just-edited) item so a renamed File Path
+        // downloads from its new location.
+        const manifestItem = (liveItem ?? selectedItem) as ManifestItem;
+
         // Resolve file path using same logic as loadContentPreview
         const filePath = manifestItem.href.startsWith(workspace.pathInfo.basePath + '/')
           ? manifestItem.href

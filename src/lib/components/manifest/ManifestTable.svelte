@@ -744,7 +744,7 @@
     align-items: center;
     gap: 0.4rem;
     width: 100%;
-    padding: 0.6rem 0.75rem;
+    padding: 0.35rem 0.75rem;
     background: none;
     border: none;
     cursor: pointer;
@@ -759,7 +759,8 @@
 
   .disclosure {
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 1.4rem;
+    line-height: 1;
     color: var(--color-text-secondary);
     transition: transform 0.15s ease;
   }
