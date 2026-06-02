@@ -8,7 +8,7 @@
     "build": "npm run i18n:build && vite build",
     "build:dev": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json --fail-on-warnings && tsc -p tsconfig.node.json",
     "test": "vitest run --config vitest.config.unit.ts",
     "test:watch": "vitest --config vitest.config.unit.ts",
     "test:coverage": "vitest run --coverage --config vitest.config.unit.ts",
