@@ -364,7 +364,7 @@
   class="outline-view"
   role="group"
   aria-label="Navigation editor"
-  on:keydown={handleKeyboardSave}
+  onkeydown={handleKeyboardSave}
 >
   <!-- Screen reader announcements -->
   <div bind:this={politeAnnouncement} aria-live="polite" aria-atomic="true" class="sr-only"></div>
