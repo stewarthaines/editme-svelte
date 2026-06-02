@@ -212,7 +212,7 @@
       <!-- Chapters section header (non-clickable) -->
       {#if hasWorkspace}
         {#if isExpanded}
-          <div class="spine-section-header">
+          <div class="spine-section-header workspace-title-section">
             <span class="section-label">{$t('Chapters')}</span>
             <button
               class="append-button-nav"
@@ -386,7 +386,9 @@
 
   .sidebar-section:focus-visible {
     outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus); /* Use standard focus ring */
-    outline-offset: var(--focus-ring-offset);
+    /* Inset the ring so it sits inside the item rather than bleeding into
+       adjacent sidebar sections. */
+    outline-offset: calc(-1 * var(--focus-ring-offset));
     z-index: 1; /* Ensure focus ring appears above */
   }
 
@@ -411,7 +413,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: var(--space-2);
+    padding-block: 0 var(--space-2) 0;
     padding-inline: var(--space-2);
     min-block-size: var(--touch-target-min); /* 44px - meets WCAG AA touch target requirements */
     color: var(--color-text-primary);
@@ -570,7 +572,7 @@
     border-top: 1px solid var(--color-border-default);
     border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-tertiary);
-    margin-block: var(--space-2);
+    margin-block: 0 var(--space-2) 0;
   }
 
   .workspace-title-header {

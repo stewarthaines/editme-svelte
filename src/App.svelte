@@ -863,8 +863,11 @@
   }
 
   .package-epub-button:focus-visible {
-    outline: none;
-    border-color: var(--color-button-primary-bg);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
+    /* The ring is a similar blue to the button fill, so an inset ring blends
+       in. Sit an actual outline a couple of pixels OUTSIDE the button, against
+       the lighter sidebar, where it reads. */
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: none;
   }
 </style>

@@ -224,7 +224,9 @@
 
   .spine-item:focus-visible {
     outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
-    outline-offset: var(--focus-ring-offset);
+    /* Inset the ring so it sits inside the row rather than bleeding into the
+       rows above/below. */
+    outline-offset: calc(-1 * var(--focus-ring-offset));
     position: relative;
     z-index: 1; /* Ensure focus ring appears above other elements */
   }
