@@ -56,15 +56,15 @@ SOURCE/
 
 SOURCE.zip is a **non-publication data file** and is intentionally **not** listed in the
 OPF manifest — do not add it. Per [EPUB 3.3](https://www.w3.org/TR/epub-33/#sec-manifest-elem),
-the manifest lists *only* publication resources (those that contribute to rendering), and
-the container *may* carry data files "to allow data files to travel with an EPUB
+the manifest lists _only_ publication resources (those that contribute to rendering), and
+the container _may_ carry data files "to allow data files to travel with an EPUB
 publication" — which is exactly SOURCE.zip's role. Declaring it would be non-conformant (a
 non-publication resource in the manifest) and could invite other validator flags.
 
 Validation is unaffected: reading systems ignore undeclared container files, the bundled
 checker (`@likecoin/epubcheck-ts`) emits nothing for it, and full Java EPUBCheck reports at
-most a non-blocking `OPF-003` *warning* — expected, not a bug. Note the contrast with an
-*orphaned* content file (e.g. a stray `OEBPS/Images/*` that triggers `PKG-010`): that's an
+most a non-blocking `OPF-003` _warning_ — expected, not a bug. Note the contrast with an
+_orphaned_ content file (e.g. a stray `OEBPS/Images/*` that triggers `PKG-010`): that's an
 accident to clean up, whereas SOURCE.zip is a deliberate payload.
 
 ### 3: Create Extraction Instructions
