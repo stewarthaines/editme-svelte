@@ -75,7 +75,12 @@
     />
 
     {#if !disabled}
-      <button type="button" class="today-button" onclick={setToday} aria-label={$t('Set to today')}>
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        onclick={setToday}
+        aria-label={$t('Set to today')}
+      >
         {$t('Today')}
       </button>
     {/if}
@@ -155,29 +160,6 @@
   .field-input.needs-attention:focus {
     border-color: var(--color-success-600);
     box-shadow: 0 0 0 2px rgba(34, 139, 34, 0.2);
-  }
-
-  .today-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-
-  .today-button:hover {
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-border-hover);
-  }
-
-  .today-button:focus {
-    outline: none;
-    border-color: var(--color-focus);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .field-error {

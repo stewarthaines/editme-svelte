@@ -334,7 +334,7 @@
   {:else if error}
     <div class="error">
       <p>{error}</p>
-      <button class="retry-button" onclick={loadSpineItems}>
+      <button class="btn btn-secondary" onclick={loadSpineItems}>
         {$t('Retry')}
       </button>
     </div>
@@ -373,7 +373,7 @@
   {:else if workspace && !isLoading}
     <div class="empty-state">
       <p>{$t('No spine items yet')}</p>
-      <button class="retry-button" onclick={loadSpineItems}>
+      <button class="btn btn-secondary" onclick={loadSpineItems}>
         {$t('Refresh')}
       </button>
     </div>
@@ -408,27 +408,9 @@
     color: var(--color-status-error);
   }
 
-  .retry-button {
+  .error .btn,
+  .empty-state .btn {
     margin-block-start: var(--space-2);
-    padding-block: var(--space-2);
-    padding-inline: var(--space-4);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg-primary);
-    color: var(--color-text-primary);
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-  }
-
-  .retry-button:hover {
-    background: var(--color-interactive-secondary-hover);
-    border-color: var(--color-border-strong);
-  }
-
-  .retry-button:focus-visible {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
-    outline-offset: var(--focus-ring-offset);
   }
 
   .spine-list {

@@ -309,7 +309,7 @@
       <div class="error-banner">
         <span class="error-icon" aria-hidden="true">⚠️</span>
         <span class="error-text">{error}</span>
-        <button type="button" class="retry-button" onclick={loadWorkspaces}>
+        <button type="button" class="btn btn-secondary" onclick={loadWorkspaces}>
           {$t('Retry')}
         </button>
       </div>
@@ -372,29 +372,6 @@
   .error-text {
     flex: 1;
     font-weight: 500;
-  }
-
-  .retry-button {
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-error);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-error);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-    min-height: 44px; /* Accessibility: min touch target */
-  }
-
-  .retry-button:hover {
-    background-color: var(--color-error);
-    color: var(--color-surface);
-  }
-
-  .retry-button:focus-visible {
-    outline: none;
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .unsaved-indicator {
