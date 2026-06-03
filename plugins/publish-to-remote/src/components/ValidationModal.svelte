@@ -102,7 +102,7 @@
               </div>
               <p class="message-text">{msg.message}</p>
               {#if msg.suggestion}
-                <p class="suggestion">💡 {msg.suggestion}</p>
+                <p class="suggestion">{msg.suggestion}</p>
               {/if}
             </div>
           {/each}

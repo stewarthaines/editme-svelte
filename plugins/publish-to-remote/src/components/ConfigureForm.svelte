@@ -541,7 +541,7 @@
                 class="folder-item"
                 onclick={() => openDropboxBrowser(folder.path)}
               >
-                📁 {folder.name}
+                {folder.name}
               </button>
             {/each}
             {#if dbxBrowserFolders.length === 0}

@@ -127,7 +127,7 @@
                     <span class="vpanel-loc">{formatLocation(msg.location)}</span>
                   {/if}
                   {#if msg.suggestion}
-                    <span class="vpanel-suggestion">💡 {msg.suggestion}</span>
+                    <span class="vpanel-suggestion">{msg.suggestion}</span>
                   {/if}
                 </label>
               </li>
