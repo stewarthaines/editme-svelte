@@ -82,6 +82,7 @@
     "vitest": "^3.2.2"
   },
   "dependencies": {
-    "paneforge": "^1.0.0"
+    "paneforge": "^1.0.0",
+    "phosphor-svelte": "^3.1.0"
   }
 }

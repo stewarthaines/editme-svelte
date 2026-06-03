@@ -3,6 +3,18 @@
   import { layoutStore, type SidebarSection } from './stores/layout';
   import { t } from '../lib/i18n';
   import ThemeToggle from './ThemeToggle.svelte';
+  import {
+    House,
+    Export,
+    Gear,
+    Article,
+    ListBullets,
+    BookOpen,
+    Info,
+    Plus,
+    CaretLeft,
+    CaretRight,
+  } from 'phosphor-svelte';
 
   // Props
   interface Props {
@@ -67,18 +79,18 @@
   // Main navigation sections (clickable)
   const MAIN_SECTIONS: Array<{
     id: Exclude<SidebarSection, 'spine'>;
-    icon: string;
+    icon: typeof House;
     label: string;
     requiresWorkspace?: boolean;
   }> = [
-    { id: 'about', icon: 'ℹ️', label: $t('About') },
-    { id: 'workspace', icon: '🏠', label: $t('Projects') },
-    { id: 'publish', icon: '📤', label: $t('Publish') },
-    { id: 'settings', icon: '⚙️', label: $t('Settings') },
-    { id: 'metadata', icon: '📄', label: $t('Metadata'), requiresWorkspace: true },
-    { id: 'manifest', icon: '📋', label: $t('Manifest'), requiresWorkspace: true },
-    { id: 'navigation', icon: '📖', label: $t('Navigation'), requiresWorkspace: true },
-  ] as const;
+    { id: 'about', icon: Info, label: $t('About') },
+    { id: 'workspace', icon: House, label: $t('Projects') },
+    { id: 'publish', icon: Export, label: $t('Publish') },
+    { id: 'settings', icon: Gear, label: $t('Settings') },
+    { id: 'metadata', icon: Article, label: $t('Metadata'), requiresWorkspace: true },
+    { id: 'manifest', icon: ListBullets, label: $t('Manifest'), requiresWorkspace: true },
+    { id: 'navigation', icon: BookOpen, label: $t('Navigation'), requiresWorkspace: true },
+  ];
 
   function toggleSidebar() {
     layoutStore.toggleSidebar();
@@ -114,7 +126,7 @@
       aria-expanded={isExpanded}
       aria-label={$t('Toggle sidebar')}
     >
-      {isExpanded ? '◀️' : '▶️'}
+      {#if isExpanded}<CaretLeft size={16} />{:else}<CaretRight size={16} />{/if}
     </button>
 
     {#if isExpanded}
@@ -133,6 +145,7 @@
     <nav class="sidebar-nav" aria-label={$t('Main navigation')}>
       <!-- Non-workspace sections first -->
       {#each MAIN_SECTIONS.filter(section => !section.requiresWorkspace) as section}
+        {@const Icon = section.icon}
         {#if section.id === 'settings'}
           <!-- Workspace title section before Settings -->
           {#if hasWorkspace && currentWorkspace}
@@ -178,18 +191,18 @@
           aria-current={activeSection === section.id ? 'page' : undefined}
           title={$t(section.label)}
         >
-          <span class="section-label">
-            {#if isExpanded}
-              {$t(section.label)}
-            {:else}
-              {generateCompactLabel($t(section.label))}
-            {/if}
+          <span class="section-icon">
+            <Icon size={18} weight={activeSection === section.id ? 'fill' : 'regular'} />
           </span>
+          {#if isExpanded}
+            <span class="section-label">{$t(section.label)}</span>
+          {/if}
         </button>
       {/each}
 
       <!-- Workspace-specific sections (only show if workspace exists) -->
       {#each MAIN_SECTIONS.filter(section => section.requiresWorkspace) as section}
+        {@const Icon = section.icon}
         {#if shouldShowSection(section)}
           <button
             class="sidebar-section"
@@ -198,13 +211,12 @@
             aria-current={activeSection === section.id ? 'page' : undefined}
             title={$t(section.label)}
           >
-            <span class="section-label">
-              {#if isExpanded}
-                {$t(section.label)}
-              {:else}
-                {generateCompactLabel($t(section.label))}
-              {/if}
+            <span class="section-icon">
+              <Icon size={18} weight={activeSection === section.id ? 'fill' : 'regular'} />
             </span>
+            {#if isExpanded}
+              <span class="section-label">{$t(section.label)}</span>
+            {/if}
           </button>
         {/if}
       {/each}
@@ -220,7 +232,7 @@
               aria-label={$t('Append Item')}
               title={$t('Append Item')}
             >
-              <span class="append-icon">+</span>
+              <Plus size={14} />
             </button>
           </div>
         {:else}
@@ -232,7 +244,7 @@
               aria-label={$t('Append Item')}
               title={$t('Append Item')}
             >
-              <span class="append-icon">+</span>
+              <Plus size={14} />
             </button>
           </div>
         {/if}
@@ -364,6 +376,7 @@
     border: none;
     display: flex;
     align-items: center;
+    gap: var(--space-2);
     padding-block: var(--space-2); /* Match spine item padding */
     padding-inline: var(--space-2);
     cursor: pointer;
@@ -469,9 +482,10 @@
     font-size: var(--text-xs);
   }
 
-  .append-icon {
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
+  .section-icon {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
   .spine-items-container {
