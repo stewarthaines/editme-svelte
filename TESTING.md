@@ -45,6 +45,27 @@ This document provides comprehensive guidance for writing tests in the editme-sv
 | **Error Handling**    | ✅         | ✅                | ✅        | Test at appropriate level for error source |
 | **Performance**       | ❌         | ❌                | ✅        | Real browser performance characteristics   |
 
+## Accessibility (a11y)
+
+The app's accessibility is covered at three levels:
+
+- **Compile-time** — Svelte's `a11y-*` compiler warnings, enforced by
+  `svelte-check --fail-on-warnings` (part of `npm run check`). Catches missing alt
+  text, labels, roles, etc. as a hard gate.
+- **Component** — `@storybook/addon-a11y` runs axe-core on every story. In dev,
+  `npm run storybook` shows a live **Accessibility** panel per story; headless,
+  `npm run test:stories` runs axe across all stories in Chromium + Firefox
+  (`preview.ts` sets `a11y.test: 'todo'` — reported, not failed; flip to `'error'` to
+  gate).
+- **Full page** — `npm run test:a11y` (`scripts/a11y-scan.mjs`) drives the **running
+  app** with Playwright and runs axe on each view (Projects, About, Publish, Settings,
+  and — after creating a project — Metadata, Manifest, Navigation, Spine). This catches
+  whole-page issues (landmarks, focus order, contrast, cross-component) that isolated
+  stories miss. Requires the dev server (`npm run dev`, or set `A11Y_URL`). The EPUB
+  preview iframe is excluded (it's author content with its own in-preview axe).
+  Report-only by default; `npm run test:a11y -- --fail-on=serious` exits non-zero on
+  serious/critical violations.
+
 ## Testing Framework Configuration
 
 ### Vitest Configuration

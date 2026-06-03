@@ -22,6 +22,7 @@
     "test:stories": "vitest run --config .storybook/vitest.config.ts",
     "test:plugins": "vitest run --config vitest.config.plugins.ts",
     "screenshots": "node scripts/capture-screenshots.js",
+    "test:a11y": "node scripts/a11y-scan.mjs",
     "worktree": "bash scripts/new-worktree.sh",
     "lint": "eslint . --ext .js,.ts,.svelte --max-warnings 320",
     "lint:fix": "eslint . --ext .js,.ts,.svelte --fix",
@@ -40,6 +41,7 @@
     "opds:dev": "cd opds-server && npm run dev"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
     "@chromatic-com/storybook": "^4.0.0",
     "@eslint/js": "^9.29.0",
     "@storybook/addon-a11y": "^9.0.5",
