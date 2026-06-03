@@ -55,6 +55,7 @@
   );
   const others = $derived(chaptersWithIssues(report).filter(c => c.chapterId !== chapterId));
   const addressed = $derived(thisChapter.filter(({ index }) => checked.has(index)).length);
+  const allAddressed = $derived(thisChapter.length > 0 && addressed === thisChapter.length);
 
   function toggle(index: number): void {
     if (checked.has(index)) checked.delete(index);
@@ -90,8 +91,8 @@
       aria-expanded={open}
       title="Validation report"
     >
-      <span class="vpanel-chip" class:has-issues={thisChapter.length > 0}>
-        {thisChapter.length === 0 ? '✓' : thisChapter.length}
+      <span class="vpanel-chip" class:complete={thisChapter.length === 0 || allAddressed}>
+        {thisChapter.length === 0 ? '✓' : `${addressed}/${thisChapter.length}`}
       </span>
       <span class="vpanel-toggle-label">Validation</span>
       <span class="vpanel-meta-inline">
@@ -116,21 +117,19 @@
             {#each thisChapter as { msg, index } (index)}
               {@const done = checked.has(index)}
               <li class="vpanel-item" class:done>
-                <label class="vpanel-check">
+                <!-- Whole row is the label, so a click anywhere toggles the tick. -->
+                <label class="vpanel-row">
                   <input type="checkbox" checked={done} onchange={() => toggle(index)} />
-                </label>
-                <div class="vpanel-detail">
-                  <div class="vpanel-detail-head">
-                    <span class="vpanel-level" data-level={msg.level}>{msg.level}</span>
-                    {#if msg.id}<span class="vpanel-id">{msg.id}</span>{/if}
-                    {#if msg.location}
-                      <span class="vpanel-loc">{formatLocation(msg.location)}</span>
-                    {/if}
-                  </div>
+                  <span class="vpanel-level" data-level={msg.level}>{msg.level}</span>
+                  {#if msg.id}<span class="vpanel-id">{msg.id}</span>{/if}
                   <span class="vpanel-text">{msg.message}</span>
-                  {#if msg.suggestion}<span class="vpanel-suggestion">💡 {msg.suggestion}</span
-                    >{/if}
-                </div>
+                  {#if msg.location}
+                    <span class="vpanel-loc">{formatLocation(msg.location)}</span>
+                  {/if}
+                  {#if msg.suggestion}
+                    <span class="vpanel-suggestion">💡 {msg.suggestion}</span>
+                  {/if}
+                </label>
               </li>
             {/each}
           </ul>
@@ -199,14 +198,16 @@
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: var(--color-success-text, #2e7d32);
-    color: #fff;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
     font-size: var(--text-xs);
     font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
-  .vpanel-chip.has-issues {
-    background: var(--color-error-text, #c62828);
+  .vpanel-chip.complete {
+    background: var(--color-success-text, #2e7d32);
+    color: #fff;
   }
 
   .vpanel-toggle-label {
@@ -257,35 +258,35 @@
   }
 
   .vpanel-item {
-    display: flex;
-    gap: var(--space-2);
-    align-items: flex-start;
-    padding: var(--space-2) var(--space-3);
     border-bottom: 1px solid var(--color-border-default);
   }
 
-  .vpanel-item.done .vpanel-detail {
-    opacity: 0.5;
+  /* One line per issue, wrapping only when it must. The whole row is the label, so
+     a click anywhere toggles the tick — no need to hit the checkbox precisely. */
+  .vpanel-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+  }
+
+  .vpanel-row:hover {
+    background: var(--color-bg-tertiary);
+  }
+
+  .vpanel-row input {
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  .vpanel-item.done .vpanel-text {
     text-decoration: line-through;
   }
 
-  .vpanel-check {
-    flex-shrink: 0;
-    padding-top: 2px;
-  }
-
-  .vpanel-detail {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  .vpanel-detail-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-1) var(--space-2);
+  .vpanel-item.done .vpanel-row {
+    opacity: 0.55;
   }
 
   .vpanel-level {
@@ -316,10 +317,13 @@
   }
 
   .vpanel-text {
+    flex: 1 1 auto;
+    min-width: 0;
     color: var(--color-text-primary);
   }
 
   .vpanel-suggestion {
+    flex-basis: 100%;
     color: var(--color-success-text, #2e7d32);
     font-size: var(--text-xs);
   }
