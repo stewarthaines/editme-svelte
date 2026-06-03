@@ -215,7 +215,7 @@
     {:else if error}
       <div class="error-state">
         <p class="error-message">{error}</p>
-        <button type="button" class="retry-button" onclick={() => (error = null)}>
+        <button type="button" class="btn btn-primary" onclick={() => (error = null)}>
           {$t('Retry')}
         </button>
       </div>
@@ -304,26 +304,5 @@
   .error-message {
     color: var(--color-error);
     margin-block-end: 1rem;
-  }
-
-  .retry-button {
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .retry-button:hover {
-    background-color: var(--color-interactive-primary-hover);
-    border-color: var(--color-interactive-primary-hover);
-  }
-
-  .retry-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--color-focus-ring);
   }
 </style>

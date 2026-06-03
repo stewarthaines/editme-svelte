@@ -79,7 +79,7 @@
       </div>
     {/each}
 
-    <button type="button" class="add-button" onclick={addLanguage} disabled={saving}>
+    <button type="button" class="btn btn-secondary btn-sm" onclick={addLanguage} disabled={saving}>
       {$t('Add Language')}
     </button>
   </div>
@@ -87,13 +87,13 @@
 
 <style>
   .language-editor {
-    margin-block-end: 1rem;
+    margin-block-end: 0.625rem;
   }
 
   .field-sublabel {
     display: block;
     font-weight: 500;
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.25rem;
     color: var(--color-text-primary);
     font-size: 0.875rem;
   }
@@ -112,10 +112,10 @@
 
   .lang-input {
     flex: 1;
-    padding: 0.75rem;
+    padding: 0.375rem 0.5rem;
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    font-size: 1rem;
+    font-size: 0.875rem;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
   }
@@ -160,18 +160,8 @@
     color: var(--color-error);
   }
 
-  .add-button {
+  /* Keep the add button to its content width (entries fill the column). */
+  .lang-list > button {
     align-self: flex-start;
-    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-    border: 1px dashed var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-interactive-primary, var(--color-text-primary));
-    font-size: var(--text-sm, 0.875rem);
-    cursor: pointer;
-  }
-
-  .add-button:hover:not(:disabled) {
-    background-color: var(--color-bg-secondary);
   }
 </style>

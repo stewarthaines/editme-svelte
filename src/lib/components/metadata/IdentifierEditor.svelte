@@ -71,7 +71,7 @@
       onblur={e => save('identifier', e.value)}
       onfocus={() => focus('identifier')}
     />
-    <button type="button" class="generate-button" onclick={generate} disabled={saving}>
+    <button type="button" class="btn btn-secondary" onclick={generate} disabled={saving}>
       {$t('Generate')}
     </button>
   </div>
@@ -94,7 +94,7 @@
       <span class="identifier-entry-label">{$t('Additional identifier')}</span>
       <button
         type="button"
-        class="remove-button"
+        class="btn btn-icon"
         onclick={() => removeEntry(index)}
         disabled={saving}
         aria-label={$t('Remove')}
@@ -120,7 +120,7 @@
 {/each}
 
 {#if showAdditional}
-  <button type="button" class="add-button" onclick={addEntry} disabled={saving}>
+  <button type="button" class="btn btn-secondary btn-sm" onclick={addEntry} disabled={saving}>
     {$t('Add another identifier')}
   </button>
 {/if}
@@ -129,7 +129,7 @@
   .identifier-field {
     display: flex;
     gap: 0.5rem;
-    align-items: flex-start;
+    align-items: flex-end;
   }
 
   .identifier-field :global(.metadata-field) {
@@ -137,29 +137,13 @@
     margin-block-end: 0;
   }
 
-  .generate-button {
-    flex: none;
-    padding: 0.75rem 1rem;
-    margin-block-start: 1.75rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  .generate-button:hover:not(:disabled) {
-    background-color: var(--color-bg-tertiary);
-  }
-
   .identifier-primary {
-    margin-block-end: 1rem;
+    margin-block-end: 0.625rem;
   }
 
   .identifier-entry {
-    margin-block-end: 1rem;
-    padding: var(--space-3, 0.75rem);
+    margin-block-end: 0.5rem;
+    padding: var(--space-2);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background-color: var(--color-bg-primary);
@@ -169,50 +153,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.25rem;
   }
 
   .identifier-entry-label {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     color: var(--color-text-secondary);
-  }
-
-  .remove-button {
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg-secondary);
-    color: var(--color-error);
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
-  }
-
-  .add-button {
-    padding: 0.75rem 1rem;
-    border: 1px dashed var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .add-button:hover:not(:disabled) {
-    background-color: var(--color-primary-surface);
-    border-color: var(--color-primary);
-    border-style: solid;
-  }
-
-  .add-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

@@ -41,7 +41,7 @@
       <span class="collection-entry-label">{$t('Collection')}</span>
       <button
         type="button"
-        class="remove-button"
+        class="btn btn-icon"
         onclick={() => removeEntry(index)}
         disabled={saving}
         aria-label={$t('Remove')}
@@ -80,14 +80,14 @@
   </div>
 {/each}
 
-<button type="button" class="add-button" onclick={addEntry} disabled={saving}>
+<button type="button" class="btn btn-secondary btn-sm" onclick={addEntry} disabled={saving}>
   {$t('Add a collection')}
 </button>
 
 <style>
   .collection-entry {
-    margin-block-end: 1rem;
-    padding: var(--space-3, 0.75rem);
+    margin-block-end: 0.5rem;
+    padding: var(--space-2);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background-color: var(--color-bg-primary);
@@ -97,60 +97,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.25rem;
   }
 
   .collection-entry-label {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
     color: var(--color-text-secondary);
   }
 
   .collection-meta {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .collection-meta :global(.metadata-field) {
     flex: 1;
     margin-block-end: 0;
-  }
-
-  .remove-button {
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg-secondary);
-    color: var(--color-error);
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
-  }
-
-  .add-button {
-    padding: 0.75rem 1rem;
-    border: 1px dashed var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .add-button:hover:not(:disabled) {
-    background-color: var(--color-primary-surface);
-    border-color: var(--color-primary);
-    border-style: solid;
-  }
-
-  .add-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

@@ -185,7 +185,7 @@
               </div>
               <button
                 type="button"
-                class="remove-button"
+                class="btn btn-icon"
                 onclick={() => removeSet(index)}
                 disabled={saving}
                 aria-label={$t('Remove')}
@@ -195,7 +195,7 @@
             </div>
           {/each}
 
-          <button type="button" class="add-button" onclick={addSet} disabled={saving}>
+          <button type="button" class="btn btn-secondary btn-sm" onclick={addSet} disabled={saving}>
             {$t('Add a sufficient set')}
           </button>
         </fieldset>
@@ -296,7 +296,7 @@
 
 <style>
   .accessibility-fields {
-    padding: 1.5rem;
+    padding: var(--space-3);
     /* Query the pane width, not the viewport (this form sits in a split pane). */
     container-type: inline-size;
   }
@@ -304,7 +304,7 @@
   .form-columns {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
   }
 
   @container (min-width: 640px) {
@@ -318,11 +318,11 @@
   }
 
   .field-group {
-    margin-block-end: 2rem;
+    margin-block-end: 1rem;
     background-color: var(--color-bg-tertiary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
-    padding: 1.5rem;
+    padding: var(--space-3);
   }
 
   .field-group:last-child {
@@ -390,38 +390,5 @@
   .mode-chip.selected {
     background-color: var(--color-primary-surface, var(--color-bg-accent));
     border-color: var(--color-primary);
-  }
-
-  .remove-button {
-    flex: none;
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg-secondary);
-    color: var(--color-error);
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
-  }
-
-  .add-button {
-    padding: 0.5rem 0.875rem;
-    border: 1px dashed var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  .add-button:hover:not(:disabled) {
-    background-color: var(--color-primary-surface);
-    border-color: var(--color-primary);
-    border-style: solid;
   }
 </style>

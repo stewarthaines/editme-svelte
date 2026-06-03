@@ -69,7 +69,7 @@
     {#if error}
       <div class="error-state">
         <p class="error-message">{error}</p>
-        <button type="button" class="retry-button" onclick={updateHighlighting}>
+        <button type="button" class="btn btn-secondary" onclick={updateHighlighting}>
           {$t('Retry')}
         </button>
       </div>
@@ -161,27 +161,6 @@
 
   .error-message {
     margin-bottom: var(--space-3);
-  }
-
-  .retry-button {
-    padding: var(--space-2) var(--space-4);
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-primary);
-    cursor: pointer;
-    font-size: var(--text-sm);
-    transition: all var(--duration-fast) ease;
-  }
-
-  .retry-button:hover {
-    background: var(--color-interactive-secondary-hover);
-    border-color: var(--color-border-strong);
-  }
-
-  .retry-button:focus-visible {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
-    outline-offset: var(--focus-ring-offset);
   }
 
   /* XML Syntax Highlighting Styles */

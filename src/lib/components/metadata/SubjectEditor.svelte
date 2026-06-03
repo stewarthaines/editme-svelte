@@ -93,7 +93,7 @@
     </div>
   {/each}
 
-  <button type="button" class="add-button" onclick={addEntry} disabled={saving}>
+  <button type="button" class="btn btn-secondary btn-sm" onclick={addEntry} disabled={saving}>
     {$t('Add Another Subject')}
   </button>
 </div>
@@ -102,7 +102,12 @@
   .subject-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  /* Keep the add button to its content width (entries fill the column). */
+  .subject-list > button {
+    align-self: flex-start;
   }
 
   .subject-entry {
@@ -168,28 +173,5 @@
   .scheme-input:focus {
     outline: none;
     border-color: var(--color-focus);
-  }
-
-  .add-button {
-    align-self: flex-start;
-    padding: 0.75rem 1rem;
-    border: 1px dashed var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: transparent;
-    color: var(--color-primary);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .add-button:hover:not(:disabled) {
-    background-color: var(--color-primary-surface);
-    border-color: var(--color-primary);
-    border-style: solid;
-  }
-
-  .add-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

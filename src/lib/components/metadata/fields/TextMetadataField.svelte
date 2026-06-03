@@ -95,13 +95,13 @@
 
 <style>
   .metadata-field {
-    margin-block-end: 1rem;
+    margin-block-end: 0.625rem;
   }
 
   .field-label {
     display: block;
     font-weight: 500;
-    margin-block-end: 0.5rem;
+    margin-block-end: 0.25rem;
     color: var(--color-text-primary);
     font-size: 0.875rem; /* Smaller label like Craigslist */
   }
@@ -112,10 +112,10 @@
 
   .field-input {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.375rem 0.5rem;
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: 0.875rem;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     transition: border-color 0.2s ease;
