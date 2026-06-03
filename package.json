@@ -23,7 +23,7 @@
     "test:plugins": "vitest run --config vitest.config.plugins.ts",
     "screenshots": "node scripts/capture-screenshots.js",
     "worktree": "bash scripts/new-worktree.sh",
-    "lint": "eslint . --ext .js,.ts,.svelte --max-warnings 325",
+    "lint": "eslint . --ext .js,.ts,.svelte --max-warnings 320",
     "lint:fix": "eslint . --ext .js,.ts,.svelte --fix",
     "validate": "npm run check && npm run lint && npm run format:check && npm run test",
     "format": "prettier --write .",

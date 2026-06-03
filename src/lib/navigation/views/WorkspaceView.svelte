@@ -5,7 +5,6 @@
   import type { EPUBMetadata } from '../../epub/opf-utils';
   import WorkspaceActionBar from '../../components/workspace/WorkspaceActionBar.svelte';
   import WorkspaceList from '../../components/workspace/WorkspaceList.svelte';
-  import { EPUBPackager } from '../../epub/EPUBPackager.js';
 
   // Service layer types for return values
   import type {
@@ -48,10 +47,6 @@
   let error = $state<string | null>(null);
   let hasUnsavedChanges = $state(false);
   let guardId = $state<string>('');
-  let isPackaging = $state(false);
-
-  // Initialize EPUB packager
-  const epubPackager = new EPUBPackager();
 
   // Service layer handles state directly - no reactive subscriptions needed
 
@@ -235,47 +230,6 @@
     }
   };
 
-  // Handle EPUB packaging and download.
-  // Currently unreachable: the project list has no per-row package action, so
-  // nothing triggers this. Kept (prefixed) until a package control is added.
-  const _handlePackageRequest = async (detail: { workspaceId: string }) => {
-    const { workspaceId } = detail;
-    const workspace = workspaces.find(w => w.id === workspaceId);
-
-    if (!workspace) return;
-
-    try {
-      isPackaging = true;
-
-      // Package EPUB with progress tracking
-      const result = await epubPackager.packageEPUB(workspaceId, {
-        progressCallback: progress => {
-          console.log(
-            `Packaging progress: ${progress.phase} - ${progress.processedFiles}/${progress.totalFiles} files`
-          );
-        },
-      });
-
-      if (result.success && result.blob && result.filename) {
-        // Immediately download the packaged EPUB
-        epubPackager.downloadEPUB(result.blob, result.filename);
-
-        console.log(`✅ Successfully packaged and downloaded: ${result.filename}`);
-      } else {
-        throw new Error(result.error || 'Unknown packaging error');
-      }
-    } catch (err) {
-      console.error('Failed to package EPUB:', err);
-      alert(
-        $t('Failed to package EPUB: {error}', {
-          error: err instanceof Error ? err.message : 'Unknown error',
-        })
-      );
-    } finally {
-      isPackaging = false;
-    }
-  };
-
   // Navigation guard
   export async function canLeave(): Promise<boolean> {
     if (hasUnsavedChanges) {
@@ -368,7 +322,7 @@
       {workspaces}
       {currentWorkspaceId}
       {onLoadWorkspaceDetails}
-      isLoading={loading || isPackaging}
+      isLoading={loading}
       onWorkspaceSelected={handleWorkspaceSelect}
       onWorkspaceDeleted={handleWorkspaceDelete}
     />

@@ -401,18 +401,10 @@
         appState.workspace = updatedWorkspace;
       }
 
-      // Then package EPUB with progress tracking
-      const result = await epubPackager.packageEPUB(workspaceId, {
-        progressCallback: progress => {
-          console.log(
-            `Packaging progress: ${progress.phase} - ${progress.processedFiles}/${progress.totalFiles} files`
-          );
-        },
-      });
+      // Then package the EPUB.
+      const result = await epubPackager.packageEPUB(workspaceId);
 
       if (result.success && result.blob && result.filename) {
-        console.log(`✅ Successfully packaged: ${result.filename}`);
-
         // Take the user to the Publish view to see the newly packaged epub.
         // (No-op if already there; its onMount load picks up the new file when
         // navigating in fresh.)
