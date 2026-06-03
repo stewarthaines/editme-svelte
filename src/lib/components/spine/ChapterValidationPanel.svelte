@@ -1,66 +1,64 @@
 <!--
   Chapter Validation Panel
 
-  Read-only reference band that surfaces the latest epubcheck report (dropped into
-  localStorage by the publish plugin) inside the spine item's preview pane — sharing
-  the position of the accessibility panel. Shows the current chapter's issues, lets
-  the author tick them off as they fix (persisted, so progress survives chapter hops
-  and reloads), and offers one-click jumps to the other chapters that still have
-  issues — so the fix-many-errors loop no longer round-trips through the Publish view.
+  Read-only panel that surfaces the latest epubcheck report (dropped into localStorage
+  by the publish plugin) inside the spine item's preview pane. Opened from a toolbar
+  "Validation" button (the host owns the report + open state, mirroring the a11y panel)
+  and closeable. Shows the current chapter's issues, lets the author tick them off as
+  they fix (persisted, so progress survives chapter hops and reloads), and offers
+  one-click jumps to the other chapters that still have issues — so the fix-many-errors
+  loop no longer round-trips through the Publish view.
 -->
 
 <script lang="ts">
   import { SvelteSet } from 'svelte/reactivity';
   import {
-    readValidationReport,
     readAddressedIndices,
     writeAddressedIndices,
     chapterIdOf,
     chaptersWithIssues,
-    VALIDATION_REPORT_STORAGE_KEY,
     type ValidationReport,
     type ValidationMessage,
   } from '$lib/plugins/validation-report';
 
-  let { chapterId = null }: { chapterId?: string | null } = $props();
+  let {
+    report,
+    chapterId = null,
+    onClose,
+  }: {
+    report: ValidationReport;
+    chapterId?: string | null;
+    onClose?: () => void;
+  } = $props();
 
-  const initialReport = readValidationReport();
-  let report = $state<ValidationReport | null>(initialReport);
-  let open = $state(true);
   // Author's self-tracked progress, keyed by the message's index in the full report.
   // Persisted under the report's timestamp, so a re-validation starts a fresh list.
-  const checked = new SvelteSet<number>(
-    initialReport ? readAddressedIndices(initialReport.timestamp) : []
-  );
+  const checked = new SvelteSet<number>();
 
-  // Re-read when the plugin re-validates while this view is still mounted, reseeding
-  // ticks from whatever was persisted for the new report (empty for a fresh one).
+  // Seed ticks from persistence on mount, and reseed if the report itself changes
+  // (a re-validation) while we're mounted.
+  let seededTimestamp = $state<number | null>(null);
   $effect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key !== null && e.key !== VALIDATION_REPORT_STORAGE_KEY) return;
-      report = readValidationReport();
-      checked.clear();
-      if (report) for (const i of readAddressedIndices(report.timestamp)) checked.add(i);
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    if (report.timestamp === seededTimestamp) return;
+    seededTimestamp = report.timestamp;
+    checked.clear();
+    for (const i of readAddressedIndices(report.timestamp)) checked.add(i);
   });
 
   // Messages for the current chapter, paired with their index in the full report so
   // each row has a stable tick key.
   const thisChapter = $derived(
-    (report?.messages ?? [])
+    report.messages
       .map((msg, index) => ({ msg, index }))
       .filter(({ msg }) => msg.location != null && chapterIdOf(msg.location.path) === chapterId)
   );
   const others = $derived(chaptersWithIssues(report).filter(c => c.chapterId !== chapterId));
   const addressed = $derived(thisChapter.filter(({ index }) => checked.has(index)).length);
-  const allAddressed = $derived(thisChapter.length > 0 && addressed === thisChapter.length);
 
   function toggle(index: number): void {
     if (checked.has(index)) checked.delete(index);
     else checked.add(index);
-    if (report) writeAddressedIndices(report.timestamp, [...checked]);
+    writeAddressedIndices(report.timestamp, [...checked]);
   }
 
   function jumpTo(itemId: string): void {
@@ -82,136 +80,107 @@
   }
 </script>
 
-{#if report}
-  <div class="vpanel" class:open>
+<div class="vpanel" role="region" aria-label="Validation issues for this chapter">
+  <div class="vpanel-header">
+    <strong>Validation</strong>
+    <span class="vpanel-meta-inline">
+      {report.filename} · validated {validatedAgo(report.timestamp)}
+    </span>
     <button
       type="button"
-      class="vpanel-toggle"
-      onclick={() => (open = !open)}
-      aria-expanded={open}
-      title="Validation report"
+      class="vpanel-close"
+      onclick={() => onClose?.()}
+      aria-label="Close validation panel"
+      title="Close"
     >
-      <span class="vpanel-chip" class:complete={thisChapter.length === 0 || allAddressed}>
-        {thisChapter.length === 0 ? '✓' : `${addressed}/${thisChapter.length}`}
-      </span>
-      <span class="vpanel-toggle-label">Validation</span>
-      <span class="vpanel-meta-inline">
-        {report.filename} · validated {validatedAgo(report.timestamp)}
-      </span>
-      <span class="vpanel-caret">{open ? '▾' : '▸'}</span>
+      ✕
     </button>
+  </div>
 
-    {#if open}
-      <div class="vpanel-body" role="region" aria-label="Validation issues for this chapter">
-        <div class="vpanel-section-head">
-          <strong>This chapter</strong>
-          {#if thisChapter.length > 0}
-            <span class="vpanel-progress">{addressed}/{thisChapter.length} addressed</span>
-          {/if}
-        </div>
+  <div class="vpanel-body">
+    <div class="vpanel-section-head">
+      <strong>This chapter</strong>
+      {#if thisChapter.length > 0}
+        <span class="vpanel-progress">{addressed}/{thisChapter.length} addressed</span>
+      {/if}
+    </div>
 
-        {#if thisChapter.length === 0}
-          <p class="vpanel-empty">No validation issues in this chapter.</p>
-        {:else}
-          <ul class="vpanel-list">
-            {#each thisChapter as { msg, index } (index)}
-              {@const done = checked.has(index)}
-              <li class="vpanel-item" class:done>
-                <!-- Whole row is the label, so a click anywhere toggles the tick. -->
-                <label class="vpanel-row">
-                  <input type="checkbox" checked={done} onchange={() => toggle(index)} />
-                  <span class="vpanel-level" data-level={msg.level}>{msg.level}</span>
-                  {#if msg.id}<span class="vpanel-id">{msg.id}</span>{/if}
-                  <span class="vpanel-text">{msg.message}</span>
-                  {#if msg.location}
-                    <span class="vpanel-loc">{formatLocation(msg.location)}</span>
-                  {/if}
-                  {#if msg.suggestion}
-                    <span class="vpanel-suggestion">{msg.suggestion}</span>
-                  {/if}
-                </label>
-              </li>
-            {/each}
-          </ul>
-        {/if}
+    {#if thisChapter.length === 0}
+      <p class="vpanel-empty">No validation issues in this chapter.</p>
+    {:else}
+      <ul class="vpanel-list">
+        {#each thisChapter as { msg, index } (index)}
+          {@const done = checked.has(index)}
+          <li class="vpanel-item" class:done>
+            <!-- Whole row is the label, so a click anywhere toggles the tick. -->
+            <label class="vpanel-row">
+              <input type="checkbox" checked={done} onchange={() => toggle(index)} />
+              <span class="vpanel-level" data-level={msg.level}>{msg.level}</span>
+              {#if msg.id}<span class="vpanel-id">{msg.id}</span>{/if}
+              <span class="vpanel-text">{msg.message}</span>
+              {#if msg.location}
+                <span class="vpanel-loc">{formatLocation(msg.location)}</span>
+              {/if}
+              {#if msg.suggestion}
+                <span class="vpanel-suggestion">{msg.suggestion}</span>
+              {/if}
+            </label>
+          </li>
+        {/each}
+      </ul>
+    {/if}
 
-        {#if others.length > 0}
-          <div class="vpanel-section-head">
-            <strong>Other chapters with issues</strong>
-          </div>
-          <ul class="vpanel-others">
-            {#each others as c (c.chapterId)}
-              <li>
-                <button type="button" class="vpanel-jump" onclick={() => jumpTo(c.chapterId)}>
-                  <span class="vpanel-jump-id">{c.chapterId}</span>
-                  <span class="vpanel-jump-counts">
-                    {#if c.errorCount > 0}<span class="vpanel-c err">{c.errorCount}</span>{/if}
-                    {#if c.warningCount > 0}<span class="vpanel-c warn">{c.warningCount}</span>{/if}
-                  </span>
-                </button>
-              </li>
-            {/each}
-          </ul>
-        {/if}
+    {#if others.length > 0}
+      <div class="vpanel-section-head">
+        <strong>Other chapters with issues</strong>
       </div>
+      <ul class="vpanel-others">
+        {#each others as c (c.chapterId)}
+          <li>
+            <button type="button" class="vpanel-jump" onclick={() => jumpTo(c.chapterId)}>
+              <span class="vpanel-jump-id">{c.chapterId}</span>
+              <span class="vpanel-jump-counts">
+                {#if c.errorCount > 0}<span class="vpanel-c err">{c.errorCount}</span>{/if}
+                {#if c.warningCount > 0}<span class="vpanel-c warn">{c.warningCount}</span>{/if}
+              </span>
+            </button>
+          </li>
+        {/each}
+      </ul>
     {/if}
   </div>
-{/if}
+</div>
 
 <style>
-  /* Sits in the preview pane's flow as a band, mirroring the a11y panel. */
+  /* A panel band in the preview pane, opened from the toolbar like the a11y panel. */
   .vpanel {
+    max-height: 40vh;
+    overflow-y: auto;
     border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-secondary);
     font-size: var(--text-sm);
   }
 
-  .vpanel.open {
-    max-height: 40vh;
-    overflow-y: auto;
-  }
-
-  .vpanel-toggle {
+  .vpanel-header {
     position: sticky;
     top: 0;
     z-index: 1;
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    width: 100%;
     padding: var(--space-2) var(--space-3);
-    border: none;
-    border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-    cursor: pointer;
-    font-size: var(--text-sm);
-    text-align: left;
+    border-bottom: 1px solid var(--color-border-default);
   }
 
-  .vpanel-chip {
+  .vpanel-close {
     flex-shrink: 0;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-    font-size: var(--text-xs);
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .vpanel-chip.complete {
-    background: var(--color-success-text, #2e7d32);
-    color: #fff;
-  }
-
-  .vpanel-toggle-label {
-    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    padding: 0 var(--space-1);
   }
 
   .vpanel-meta-inline {
@@ -222,11 +191,6 @@
     white-space: nowrap;
     color: var(--color-text-secondary);
     font-size: var(--text-xs);
-  }
-
-  .vpanel-caret {
-    flex-shrink: 0;
-    color: var(--color-text-secondary);
   }
 
   .vpanel-section-head {

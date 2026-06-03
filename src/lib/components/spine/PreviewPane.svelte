@@ -18,6 +18,11 @@
   import type { TransformError } from '$lib/types/spine-editor.js';
   import { t } from '$lib/i18n';
   import ChapterValidationPanel from './ChapterValidationPanel.svelte';
+  import {
+    readValidationReport,
+    messagesForChapter,
+    VALIDATION_REPORT_STORAGE_KEY,
+  } from '$lib/plugins/validation-report';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -65,6 +70,26 @@
   let a11yViolations = $state<AxeViolation[]>([]);
   let a11yPanelOpen = $state(false);
   let a11yAutoTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // --- Validation report -------------------------------------------------------
+  // The latest epubcheck report is dropped into localStorage by the publish plugin.
+  // We own the report + open state here (mirroring the a11y panel), so the panel
+  // opens from a toolbar button and its open/closed state survives chapter hops.
+  let validationReport = $state(readValidationReport());
+  let validationPanelOpen = $state(false);
+  const validationChapterCount = $derived(
+    validationReport ? messagesForChapter(validationReport, chapterId).length : 0
+  );
+
+  $effect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === VALIDATION_REPORT_STORAGE_KEY) {
+        validationReport = readValidationReport();
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  });
 
   const IMPACT_RANK: Record<string, number> = { critical: 0, serious: 1, moderate: 2, minor: 3 };
   const impactRank = (impact: string | null): number =>
@@ -834,6 +859,23 @@
         </button>
       {/if}
 
+      <!-- Validation report (epubcheck), opened like the accessibility panel. -->
+      {#if validationReport}
+        <button
+          type="button"
+          class="a11y-check"
+          class:active={validationPanelOpen}
+          onclick={() => (validationPanelOpen = !validationPanelOpen)}
+          aria-pressed={validationPanelOpen}
+          title="Validation report (epubcheck) for this chapter"
+        >
+          Validation
+          {#if validationChapterCount > 0}
+            <span class="a11y-count">{validationChapterCount}</span>
+          {/if}
+        </button>
+      {/if}
+
       <!-- Orientation toggle (only show for mobile devices) -->
       {#if selectedDevice !== 'desktop'}
         <button
@@ -928,7 +970,13 @@
   {/if}
 
   <!-- Validation report reference (shares this band with the a11y panel) -->
-  <ChapterValidationPanel {chapterId} />
+  {#if validationPanelOpen && validationReport}
+    <ChapterValidationPanel
+      report={validationReport}
+      {chapterId}
+      onClose={() => (validationPanelOpen = false)}
+    />
+  {/if}
 
   <!-- Preview content -->
   <div class="preview-content" bind:this={previewContentEl}>
