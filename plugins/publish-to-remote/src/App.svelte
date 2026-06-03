@@ -256,6 +256,12 @@
         `${epub.name}: ${report.errorCount} errors, ${report.warningCount} warnings`,
         report.isValid ? 'success' : 'info',
       );
+      // Surface the report immediately when there's something to act on, saving the
+      // extra click on "Report". Info-only/clean results just leave the summary.
+      if (report.errorCount > 0 || report.warningCount > 0) {
+        validationModalReport = report;
+        showValidationModal = true;
+      }
     } catch (error) {
       epubValidationStatus.set(epub.name, {
         isValid: prev?.isValid ?? null,
