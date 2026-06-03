@@ -285,6 +285,16 @@
   background-color: var(--color-button-secondary-bg-hover);
 }
 
+.btn-danger {
+  color: var(--color-button-danger-text);
+  background-color: var(--color-button-danger-bg);
+  border-color: var(--color-button-danger-border);
+}
+
+.btn-danger:hover {
+  background-color: var(--color-button-danger-bg-hover);
+}
+
 .btn-link {
   padding: 0;
   color: var(--color-text-link);
@@ -297,6 +307,20 @@
   color: var(--color-text-link-hover);
   text-decoration: var(--link-text-decoration-hover);
   background-color: transparent;
+}
+
+/* Icon-only button (✕, small actions) — square, transparent, subtle hover. */
+.btn-icon {
+  padding: var(--space-1);
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: none;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-tertiary);
 }
 
 /* Button sizes */
@@ -360,7 +384,7 @@ legend {
   border-color: var(--color-success-600);
 }
 
-/* Minimal button style */
+/* Deprecated: prefer .btn-secondary. Kept until remaining call sites migrate. */
 .btn-minimal {
   padding: var(--space-1) var(--space-2);
   color: var(--color-text-primary);
@@ -373,7 +397,7 @@ legend {
   background-color: var(--color-neutral-200);
 }
 
-/* Link-style button (underlined) */
+/* Deprecated: prefer .btn-link. Kept until remaining call sites migrate. */
 .btn-text {
   padding: 0;
   color: var(--color-text-link);

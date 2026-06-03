@@ -16,6 +16,7 @@
     onUpload,
     onValidate,
     onViewReport,
+    onDownload,
     onDelete,
   }: {
     epubs: File[];
@@ -34,6 +35,7 @@
     onUpload: (epub: File) => void;
     onValidate: (epub: File) => void;
     onViewReport: (epub: File) => void;
+    onDownload: (epub: File) => void;
     onDelete: (epub: File) => void;
   } = $props();
 
@@ -75,12 +77,19 @@
               </label>
             {/if}
             <button
-              class="btn-secondary"
+              class="btn btn-secondary"
               onclick={() => onUpload(epub)}
               disabled={uploading ||
                 (overwrite && !confirmOverwrite[epub.name])}
             >
               {overwrite ? 'Replace' : 'Upload'}
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick={() => onDownload(epub)}
+              title="Download EPUB to disk"
+            >
+              Download
             </button>
             <div class="validation-section">
               {#if summary}
@@ -121,7 +130,7 @@
 
               {#if status?.report}
                 <button
-                  class="btn-secondary btn-sm"
+                  class="btn btn-secondary btn-sm"
                   onclick={() => onViewReport(epub)}
                   title="View validation report"
                 >
@@ -129,7 +138,7 @@
                 </button>
               {:else}
                 <button
-                  class="btn-secondary btn-sm"
+                  class="btn btn-secondary btn-sm"
                   onclick={() => onValidate(epub)}
                   disabled={status?.isValidating || uploading}
                   title="Validate EPUB"
@@ -143,20 +152,20 @@
               <div class="delete-confirm">
                 <span>Confirm delete?</span>
                 <button
-                  class="btn-danger-small"
+                  class="btn btn-danger btn-sm"
                   onclick={() => {
                     onDelete(epub);
                     deleteConfirm = null;
                   }}>Yes</button
                 >
                 <button
-                  class="btn-cancel-small"
+                  class="btn btn-secondary btn-sm"
                   onclick={() => (deleteConfirm = null)}>No</button
                 >
               </div>
             {:else}
               <button
-                class="btn-danger-small"
+                class="btn btn-danger btn-sm"
                 onclick={() => (deleteConfirm = epub.name)}>Delete</button
               >
             {/if}

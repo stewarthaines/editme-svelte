@@ -44,33 +44,33 @@
         </option>
       {/each}
     </select>
-    <button class="btn-secondary" onclick={onAdd}>Add Remote</button>
+    <button class="btn btn-secondary" onclick={onAdd}>Add Remote</button>
     <button
-      class="btn-secondary"
+      class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
     >
       Edit
     </button>
-    <button class="btn-danger-small" onclick={onRemove}>Remove</button>
+    <button class="btn btn-danger btn-sm" onclick={onRemove}>Remove</button>
   </div>
 {:else if remotesStore.remotes.length === 1}
   <div class="remote-selector-bar">
     <span>Remote: <strong>{activeRemote?.name}</strong></span>
-    <button class="btn-secondary" onclick={onAdd}>Add Remote</button>
+    <button class="btn btn-secondary" onclick={onAdd}>Add Remote</button>
     <button
-      class="btn-secondary"
+      class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
     >
       Edit
     </button>
-    <button class="btn-danger-small" onclick={onRemove}>Remove</button>
+    <button class="btn btn-danger btn-sm" onclick={onRemove}>Remove</button>
   </div>
 {/if}
 
 {#if googleAuthRequired && activeRemote?.type === 'google-drive'}
   <div class="auth-required-banner">
     <span>Google Drive authorization required.</span>
-    <button class="btn-primary" onclick={onReconnect}>
+    <button class="btn btn-primary" onclick={onReconnect}>
       Connect to Google Drive
     </button>
   </div>

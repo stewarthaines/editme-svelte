@@ -50,7 +50,7 @@
     >
       <div class="modal-header">
         <h3>Validation Report: {report.filename}</h3>
-        <button class="btn-close" onclick={onClose}>✕</button>
+        <button class="btn btn-icon" onclick={onClose}>✕</button>
       </div>
       <div class="modal-body">
         <div class="report-summary">
@@ -109,7 +109,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-primary" onclick={onClose}>Close</button>
+        <button class="btn btn-primary" onclick={onClose}>Close</button>
       </div>
     </div>
   </div>

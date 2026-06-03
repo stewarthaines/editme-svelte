@@ -342,13 +342,13 @@
       </div>
       {#if canCancel}
         <div class="form-actions">
-          <button class="btn-secondary" onclick={onCancel}>Cancel</button>
+          <button class="btn btn-secondary" onclick={onCancel}>Cancel</button>
         </div>
       {/if}
     </div>
   {:else if remoteType === 's3-compatible'}
     <div class="form-header">
-      <button class="btn-back" onclick={() => (remoteType = 'none')}
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
         >← Back</button
       >
       <h3>S3-Compatible Storage</h3>
@@ -441,12 +441,14 @@
     </div>
 
     <div class="form-actions">
-      <button onclick={handleSave} class="btn-primary">Save & Connect</button>
-      <button onclick={onCancel} class="btn-secondary">Cancel</button>
+      <button onclick={handleSave} class="btn btn-primary"
+        >Save & Connect</button
+      >
+      <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
     </div>
   {:else if remoteType === 'google-drive'}
     <div class="form-header">
-      <button class="btn-back" onclick={() => (remoteType = 'none')}
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
         >← Back</button
       >
       <h3>Google Drive</h3>
@@ -456,7 +458,7 @@
       <div class="form-group folder-selected">
         <p><strong>Folder selected:</strong> {pickedFolderName}</p>
         <button
-          class="btn-secondary btn-small"
+          class="btn btn-secondary btn-sm"
           onclick={() => {
             form.folderId = '';
             form.folderName = '';
@@ -468,7 +470,7 @@
       </div>
     {:else}
       <div class="form-actions">
-        <button onclick={onConnectGoogleDrive} class="btn-primary">
+        <button onclick={onConnectGoogleDrive} class="btn btn-primary">
           Connect & Pick Folder
         </button>
       </div>
@@ -486,13 +488,15 @@
       </div>
 
       <div class="form-actions">
-        <button onclick={handleSave} class="btn-primary">Save & Connect</button>
-        <button onclick={onCancel} class="btn-secondary">Cancel</button>
+        <button onclick={handleSave} class="btn btn-primary"
+          >Save & Connect</button
+        >
+        <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
       </div>
     {/if}
   {:else if remoteType === 'dropbox'}
     <div class="form-header">
-      <button class="btn-back" onclick={() => (remoteType = 'none')}
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
         >← Back</button
       >
       <h3>Dropbox</h3>
@@ -500,7 +504,7 @@
 
     {#if !form.accessToken}
       <div class="form-actions">
-        <button onclick={() => onConnectDropbox()} class="btn-primary">
+        <button onclick={() => onConnectDropbox()} class="btn btn-primary">
           Connect to Dropbox
         </button>
       </div>
@@ -517,7 +521,7 @@
         {:else if dbxBrowserError}
           <div class="browser-error">{dbxBrowserError}</div>
           <button
-            class="btn-secondary"
+            class="btn btn-secondary"
             onclick={() => openDropboxBrowser(dbxBrowserPath)}
           >
             Retry
@@ -546,7 +550,7 @@
           </div>
           <div class="browser-actions">
             <button
-              class="btn-primary"
+              class="btn btn-primary"
               onclick={() =>
                 onSelectDropboxFolder(
                   dbxBrowserPath,
@@ -562,7 +566,7 @@
       <div class="form-group folder-selected">
         <p><strong>Folder selected:</strong> {pickedFolderName}</p>
         <button
-          class="btn-secondary btn-small"
+          class="btn btn-secondary btn-sm"
           onclick={() => openDropboxBrowser(form.folderId)}
         >
           Change Folder
@@ -580,8 +584,10 @@
       </div>
 
       <div class="form-actions">
-        <button onclick={handleSave} class="btn-primary">Save & Connect</button>
-        <button onclick={onCancel} class="btn-secondary">Cancel</button>
+        <button onclick={handleSave} class="btn btn-primary"
+          >Save & Connect</button
+        >
+        <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
       </div>
     {/if}
   {/if}

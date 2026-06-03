@@ -332,6 +332,18 @@
     }
   }
 
+  // Save a local epub to disk. The epub is already an in-memory File.
+  function onDownloadEpub(epub: File) {
+    const url = URL.createObjectURL(epub);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = epub.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function onDeleteObject(key: string) {
     if (!activeRemote) return;
     try {
@@ -440,6 +452,7 @@
                 onUpload={onUploadEpub}
                 onValidate={onValidateEpub}
                 onViewReport={onViewValidationReport}
+                onDownload={onDownloadEpub}
                 onDelete={onDeleteEpub}
               />
             </div>
@@ -474,7 +487,7 @@
             {#if activeRemote?.type !== 'google-drive'}
               <div class="footer">
                 <button
-                  class="btn-secondary"
+                  class="btn btn-secondary"
                   onclick={onUpdateCatalog}
                   disabled={generatingFeed}
                 >

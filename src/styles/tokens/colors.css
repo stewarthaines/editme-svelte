@@ -166,6 +166,10 @@
   --color-button-secondary-bg-hover: var(--color-neutral-100);
   --color-button-secondary-text: var(--color-text-primary);
   --color-button-secondary-border: var(--color-border-default);
+  --color-button-danger-bg: var(--color-error-600);
+  --color-button-danger-bg-hover: var(--color-error-700);
+  --color-button-danger-text: var(--color-white);
+  --color-button-danger-border: var(--color-error-600);
 
   /* Form colors */
   --color-input-bg: var(--color-bg-primary);

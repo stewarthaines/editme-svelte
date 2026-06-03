@@ -35,7 +35,7 @@
         </div>
         <div class="remote-actions">
           <button
-            class="btn-icon"
+            class="btn btn-icon"
             onclick={() => onCopyUrl(obj.key, obj.fileId)}
             title="Copy URL">📋</button
           >
@@ -43,20 +43,20 @@
             <div class="delete-confirm">
               <span>Confirm delete?</span>
               <button
-                class="btn-danger-small"
+                class="btn btn-danger btn-sm"
                 onclick={() => {
                   onDelete(obj.key);
                   deleteConfirmKey = null;
                 }}>Yes</button
               >
               <button
-                class="btn-cancel-small"
+                class="btn btn-secondary btn-sm"
                 onclick={() => (deleteConfirmKey = null)}>No</button
               >
             </div>
           {:else}
             <button
-              class="btn-danger-small"
+              class="btn btn-danger btn-sm"
               onclick={() => (deleteConfirmKey = obj.key)}>Delete</button
             >
           {/if}
