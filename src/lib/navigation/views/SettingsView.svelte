@@ -228,11 +228,6 @@
 <div class="settings-view">
   <div class="settings-header">
     <h1>{$t('Settings')}</h1>
-    {#if !workspaceId}
-      <p class="no-workspace-message">{$t('Please select a workspace to configure settings.')}</p>
-    {:else if loading}
-      <p class="loading-message">{$t('Loading settings...')}</p>
-    {/if}
   </div>
 
   {#if error}
@@ -242,9 +237,33 @@
     </div>
   {/if}
 
-  {#if canEditSettings}
-    <div class="settings-content">
-      <!-- Full-width settings layout with responsive grid -->
+  <div class="settings-content">
+    <!-- App settings: global, available without a project (plugins are enabled
+         per browser, not per project). -->
+    {#if availablePlugins.length > 0}
+      <section class="plugins-settings">
+        <h2>{$t('Plugins')}</h2>
+        <p class="setting-description plugins-intro">
+          {$t('Optional features available when the app is served over HTTP.')}
+        </p>
+        {#each availablePlugins as plugin (plugin.id)}
+          <div class="setting-group">
+            <label class="setting-label">
+              <input
+                type="checkbox"
+                checked={enabledPluginIds.includes(plugin.id)}
+                onchange={event =>
+                  onTogglePlugin?.(plugin.id, (event.target as HTMLInputElement).checked)}
+              />
+              <span class="setting-text">{plugin.name}</span>
+            </label>
+          </div>
+        {/each}
+      </section>
+    {/if}
+
+    <!-- Project settings: require an open project. -->
+    {#if canEditSettings}
       <section class="workspace-settings">
         <h2>{$t('Project Settings')}</h2>
 
@@ -287,29 +306,6 @@
               &lt;begin&gt;, &lt;end&gt;, &lt;label&gt;, &lt;rate&gt;
             </p>
           </div>
-        </section>
-      {/if}
-
-      <!-- Plugins (HTTP-only enrichment layer; enabled per browser) -->
-      {#if isAdvancedMode && availablePlugins.length > 0}
-        <section class="plugins-settings">
-          <h2>{$t('Plugins')}</h2>
-          <p class="setting-description plugins-intro">
-            {$t('Optional features available when the app is served over HTTP.')}
-          </p>
-          {#each availablePlugins as plugin (plugin.id)}
-            <div class="setting-group">
-              <label class="setting-label">
-                <input
-                  type="checkbox"
-                  checked={enabledPluginIds.includes(plugin.id)}
-                  onchange={event =>
-                    onTogglePlugin?.(plugin.id, (event.target as HTMLInputElement).checked)}
-                />
-                <span class="setting-text">{plugin.name}</span>
-              </label>
-            </div>
-          {/each}
         </section>
       {/if}
 
@@ -359,8 +355,12 @@
           </ul>
         {/if}
       </section>
-    </div>
-  {/if}
+    {:else if loading}
+      <p class="loading-message">{$t('Loading settings…')}</p>
+    {:else}
+      <p class="no-workspace-message">{$t('Open a project to configure its settings.')}</p>
+    {/if}
+  </div>
 </div>
 
 <style>
