@@ -9,7 +9,7 @@ import { mount } from 'svelte';
 import App from './App.svelte';
 import './styles.css';
 import { dirHandle } from './store.js';
-import type { InitMessage, MainToPlugin } from './types.js';
+import type { ContextMessage, InitMessage, MainToPlugin } from './types.js';
 
 function handleMessage(event: MessageEvent) {
   if (event.origin !== window.origin) {
@@ -21,7 +21,18 @@ function handleMessage(event: MessageEvent) {
 
   if (message.type === 'init') {
     handleInit(message);
+  } else if (message.type === 'context') {
+    handleContext(message);
   }
+}
+
+// Mirror the host's ambient environment onto our own document root: theme drives
+// the [data-theme] CSS, lang/dir keep the iframe in sync with the app's locale.
+function handleContext(message: ContextMessage) {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', message.theme);
+  root.lang = message.locale;
+  root.dir = message.dir;
 }
 
 function handleInit(message: InitMessage) {

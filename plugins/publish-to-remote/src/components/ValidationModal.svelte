@@ -130,7 +130,7 @@
   }
 
   .modal {
-    background: white;
+    background: var(--color-surface-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: 600px;
@@ -145,7 +145,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--color-border-default);
   }
 
   .modal-header h3 {
@@ -162,7 +162,7 @@
   .report-summary {
     margin-bottom: 16px;
     padding: 12px;
-    background: #f8f8f8;
+    background: var(--color-surface-secondary);
     border-radius: 4px;
   }
 
@@ -179,30 +179,30 @@
 
   .message {
     padding: 12px;
-    border-left: 4px solid #ddd;
+    border-left: 4px solid var(--color-border-default);
     border-radius: 2px;
     font-size: 12px;
   }
 
   .message.error {
-    background: #ffebee;
-    border-left-color: #f44336;
+    background: var(--color-error-bg);
+    border-left-color: var(--color-error-text);
   }
 
   .message.warning {
-    background: #fff3e0;
-    border-left-color: #ff9800;
+    background: var(--color-warning-bg);
+    border-left-color: var(--color-warning-border);
   }
 
   .message .level {
     font-weight: bold;
     font-size: 11px;
-    color: #666;
+    color: var(--color-text-secondary);
     margin-right: 8px;
   }
 
   .message .location {
-    color: #999;
+    color: var(--color-text-tertiary);
     font-size: 11px;
   }
 
@@ -216,14 +216,14 @@
   .message .rule-id {
     font-family: monospace;
     font-size: 11px;
-    color: #555;
-    background: rgba(0, 0, 0, 0.06);
+    color: var(--color-text-secondary);
+    background: var(--color-surface-secondary);
     padding: 1px 4px;
     border-radius: 3px;
   }
 
   .message .location-link {
-    color: #0074d9;
+    color: var(--color-accent);
     background: none;
     border: none;
     margin: 0;
@@ -235,7 +235,7 @@
   }
 
   .message .location-link:hover {
-    color: #0051a0;
+    color: var(--color-accent-hover);
   }
 
   .message p {
@@ -243,12 +243,12 @@
   }
 
   .message .suggestion {
-    color: #2e7d32;
+    color: var(--color-success-text);
   }
 
   .modal-footer {
     padding: 12px 16px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--color-border-default);
     text-align: right;
   }
 </style>

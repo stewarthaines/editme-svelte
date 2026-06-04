@@ -6,6 +6,16 @@ export type InitMessage = {
   opfsDirHandle: FileSystemDirectoryHandle;
 };
 
+// main → plugin: ambient host environment the plugin inherits and applies to its
+// own document root (theme, locale, direction). Sent on handshake and re-sent on
+// any change. Mirrors src/lib/plugins/contract.ts (the plugin builds separately).
+export type ContextMessage = {
+  type: 'context';
+  theme: 'light' | 'dark';
+  locale: string;
+  dir: 'ltr' | 'rtl';
+};
+
 // plugin → main: ask the host to open the editor resource at `path` (e.g. a
 // content document flagged by epubcheck). The host resolves and navigates.
 export type NavigateMessage = {
@@ -13,7 +23,7 @@ export type NavigateMessage = {
   path: string;
 };
 
-export type MainToPlugin = InitMessage;
+export type MainToPlugin = InitMessage | ContextMessage;
 export type PluginToMain = NavigateMessage;
 
 // Remote Configuration and Objects

@@ -595,7 +595,7 @@
 
 <style>
   .form-container {
-    background: #f8f8f8;
+    background: var(--color-surface-secondary);
     padding: 20px;
     border-radius: 8px;
   }
@@ -609,7 +609,7 @@
   }
 
   .type-selector p {
-    color: #666;
+    color: var(--color-text-secondary);
     margin-bottom: 20px;
   }
 
@@ -639,14 +639,14 @@
     display: block;
     margin-bottom: 4px;
     font-weight: 500;
-    color: #333;
+    color: var(--color-text-primary);
   }
 
   .folder-selected {
-    background: #e8f5e9;
+    background: var(--color-success-bg);
     padding: 12px;
     border-radius: 4px;
-    border-left: 4px solid #28a745;
+    border-left: 4px solid var(--color-success-border);
   }
 
   .folder-selected p {
@@ -657,7 +657,7 @@
   .form-group select {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
@@ -666,7 +666,7 @@
   .form-group input:focus,
   .form-group select:focus {
     outline: none;
-    border-color: #0074d9;
+    border-color: var(--color-accent);
     box-shadow: 0 0 0 3px rgba(0, 116, 217, 0.1);
   }
 
@@ -677,7 +677,7 @@
   }
 
   .folder-browser {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     padding: 12px;
     margin-bottom: 16px;
@@ -685,7 +685,7 @@
 
   .browser-path {
     font-size: 12px;
-    color: #666;
+    color: var(--color-text-secondary);
     margin-bottom: 8px;
   }
 
@@ -701,8 +701,8 @@
   .folder-item {
     text-align: left;
     padding: 8px 12px;
-    background: #f8f8f8;
-    border: 1px solid #e0e0e0;
+    background: var(--color-surface-secondary);
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     cursor: pointer;
     width: 100%;
@@ -710,12 +710,12 @@
   }
 
   .folder-item:hover {
-    background: #e8f1ff;
-    border-color: #0074d9;
+    background: var(--color-info-bg);
+    border-color: var(--color-accent);
   }
 
   .folder-item--up {
-    color: #666;
+    color: var(--color-text-secondary);
     font-style: italic;
   }
 
@@ -726,9 +726,9 @@
   }
 
   .browser-error {
-    color: #dc3545;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
+    color: var(--color-error-border);
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
     border-radius: 4px;
   }
 

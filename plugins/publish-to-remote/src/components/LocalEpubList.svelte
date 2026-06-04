@@ -188,7 +188,7 @@
     flex-wrap: wrap;
     align-items: center;
     padding: 12px;
-    background: #f8f8f8;
+    background: var(--color-surface-secondary);
     border-radius: 4px;
     gap: 8px 16px;
   }
@@ -205,7 +205,7 @@
 
   .epub-size {
     font-size: 12px;
-    color: #999;
+    color: var(--color-text-tertiary);
     flex-shrink: 0;
   }
 
@@ -251,15 +251,15 @@
   }
 
   .status-valid {
-    color: #2e7d32;
+    color: var(--color-success-text);
   }
 
   .status-invalid {
-    color: #c62828;
+    color: var(--color-error-text);
   }
 
   .status-unknown {
-    color: #999;
+    color: var(--color-text-tertiary);
   }
 
   .vsummary {
@@ -271,7 +271,7 @@
 
   .vsummary-clean {
     font-size: 12px;
-    color: #2e7d32;
+    color: var(--color-success-text);
   }
 
   .vchip {
@@ -285,18 +285,18 @@
   }
 
   .vchip.error {
-    background: #fdecea;
-    color: #c62828;
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
   }
 
   .vchip.warning {
-    background: #fff4e5;
-    color: #e65100;
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
   }
 
   .vchip.info {
-    background: #eceff1;
-    color: #455a64;
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
   }
 
   .progress-wrap {
@@ -312,7 +312,7 @@
 
   .progress-label {
     font-size: 12px;
-    color: #666;
+    color: var(--color-text-secondary);
     min-width: 32px;
   }
 </style>

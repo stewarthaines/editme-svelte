@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   createInitMessage,
+  createContextMessage,
+  isContextMessage,
   isInitMessage,
   isInsertMessage,
   isNavigateMessage,
@@ -54,6 +56,23 @@ describe('contract message shapes', () => {
       true
     );
     expect(isPluginReadyMessage({ type: 'init' })).toBe(false);
+  });
+
+  it('isContextMessage requires a valid theme, locale string, and dir', () => {
+    const ctx = createContextMessage('dark', 'ar', 'rtl');
+    expect(ctx).toEqual({ type: 'context', theme: 'dark', locale: 'ar', dir: 'rtl' });
+    expect(isContextMessage(ctx)).toBe(true);
+    expect(isContextMessage({ type: 'context', theme: 'light', locale: 'en', dir: 'ltr' })).toBe(
+      true
+    );
+    expect(isContextMessage({ type: 'context', theme: 'sepia', locale: 'en', dir: 'ltr' })).toBe(
+      false
+    );
+    expect(isContextMessage({ type: 'context', theme: 'dark', locale: 'en', dir: 'up' })).toBe(
+      false
+    );
+    expect(isContextMessage({ type: 'context', theme: 'dark', dir: 'ltr' })).toBe(false);
+    expect(isContextMessage({ type: 'init', projectId: 'p' })).toBe(false);
   });
 
   it('isInitMessage requires a projectId and a directory handle', () => {

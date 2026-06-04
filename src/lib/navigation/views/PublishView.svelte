@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { t } from '$lib/i18n';
+  import { t, currentLocale, documentDirection } from '$lib/i18n';
+  import { themeStore } from '$lib/stores/theme';
   import { downloadBlob } from '$lib/zip/index.js';
   import type { PublishService, PublishedEpub } from '$lib/services/publish/publish.service.js';
   import {
     createInitMessage,
+    createContextMessage,
     isPluginReadyMessage,
     isNavigateMessage,
   } from '$lib/plugins/contract';
@@ -56,6 +58,7 @@
       if (event.origin !== window.location.origin) return;
       if (isPluginReadyMessage(event.data)) {
         void sendPluginInit();
+        sendPluginContext();
       } else if (isNavigateMessage(event.data)) {
         // Open the chapter for a content-document path by reusing the core's
         // spine selection event. The id is the file basename (same as the nav
@@ -89,6 +92,32 @@
     const targetOrigin = new URL(pluginUrl, window.location.href).origin;
     frameWindow.postMessage(createInitMessage(projectId, handle), targetOrigin);
   }
+
+  // Hand the ambient app environment (theme/locale/dir) to the plugin so it can
+  // mirror it on its own document. Reads the env stores; posting before the frame
+  // is ready is harmless (the plugin-ready handler re-sends this snapshot).
+  function sendPluginContext(): void {
+    const frameWindow = pluginFrame?.contentWindow;
+    if (!frameWindow || !pluginUrl) return;
+    const targetOrigin = new URL(pluginUrl, window.location.href).origin;
+    // documentDirection is a string store; narrow it to the contract's literal.
+    const dir = $documentDirection === 'rtl' ? 'rtl' : 'ltr';
+    frameWindow.postMessage(
+      createContextMessage($themeStore.current, $currentLocale, dir),
+      targetOrigin
+    );
+  }
+
+  // Re-send context whenever the theme, locale, or direction changes, so the
+  // iframe tracks the app live — no reload, no lost plugin state.
+  $effect(() => {
+    if (!pluginUrl) return;
+    // Touch each store so the effect re-runs on change.
+    void $themeStore.current;
+    void $currentLocale;
+    void $documentDirection;
+    sendPluginContext();
+  });
 
   async function handleDownload(filename: string) {
     try {

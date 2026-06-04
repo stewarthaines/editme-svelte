@@ -68,7 +68,7 @@
 
 <style>
   .remote-list {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -79,7 +79,7 @@
     align-items: center;
     gap: 8px 16px;
     padding: 12px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--color-border-default);
   }
 
   .remote-item:last-child {
@@ -99,7 +99,7 @@
 
   .remote-meta {
     font-size: 12px;
-    color: #999;
+    color: var(--color-text-tertiary);
     white-space: nowrap;
     flex-shrink: 0;
   }

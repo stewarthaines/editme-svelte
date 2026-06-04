@@ -12,6 +12,11 @@
  *     listening, so the host may now send `init`.
  *   - init   (main → plugin): hands over a working-directory OPFS handle (the
  *     shared output dir) plus a projectId the plugin echoes/validates.
+ *   - context (main → plugin): ambient host environment the plugin inherits and
+ *     applies to its own document (theme, locale, text direction). Sent on
+ *     handshake and re-sent whenever any field changes, so the iframe tracks the
+ *     app live without reloading. Deliberately extensible: plugins ignore unknown
+ *     fields, so new keys can be added without breaking older plugins.
  *   - insert (plugin → main): inserts a string at the editor cursor (panel
  *     plugins only; the publish `view` plugin does not use it).
  *
@@ -62,6 +67,22 @@ export interface InitMessage {
   opfsDirHandle: FileSystemDirectoryHandle;
 }
 
+/**
+ * main → plugin, the ambient host environment the plugin inherits and mirrors on
+ * its own document root. Sent after `plugin-ready` and re-sent on any change.
+ * Extensible: add fields (e.g. a runtime mode) without breaking existing plugins,
+ * which simply ignore keys they don't read.
+ */
+export interface ContextMessage {
+  type: 'context';
+  /** Active app theme; the plugin reflects it as `data-theme`. */
+  theme: 'light' | 'dark';
+  /** Active UI locale as a BCP 47 code (e.g. 'en', 'ar'); set as `lang`. */
+  locale: string;
+  /** Text direction derived from the locale; set as `dir`. */
+  dir: 'ltr' | 'rtl';
+}
+
 /** plugin → main, inserts a plain string at the active textarea's cursor. */
 export interface InsertMessage {
   type: 'insert';
@@ -78,7 +99,7 @@ export interface NavigateMessage {
   path: string;
 }
 
-export type MainToPlugin = InitMessage;
+export type MainToPlugin = InitMessage | ContextMessage;
 export type PluginToMain = PluginReadyMessage | InsertMessage | NavigateMessage;
 
 /** Build an `init` message for a given output-dir handle. */
@@ -87,6 +108,15 @@ export function createInitMessage(
   opfsDirHandle: FileSystemDirectoryHandle
 ): InitMessage {
   return { type: 'init', projectId, opfsDirHandle };
+}
+
+/** Build a `context` message carrying the inheritable host environment. */
+export function createContextMessage(
+  theme: 'light' | 'dark',
+  locale: string,
+  dir: 'ltr' | 'rtl'
+): ContextMessage {
+  return { type: 'context', theme, locale, dir };
 }
 
 /** Runtime guard: is this an `init` message carrying a usable directory handle? */
@@ -98,6 +128,18 @@ export function isInitMessage(value: unknown): value is InitMessage {
     typeof (value as { projectId?: unknown }).projectId === 'string' &&
     'opfsDirHandle' in value &&
     (value as InitMessage).opfsDirHandle?.kind === 'directory'
+  );
+}
+
+/** Runtime guard: is this a `context` message carrying a valid environment? */
+export function isContextMessage(value: unknown): value is ContextMessage {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as { type?: unknown }).type === 'context' &&
+    ((value as ContextMessage).theme === 'light' || (value as ContextMessage).theme === 'dark') &&
+    typeof (value as { locale?: unknown }).locale === 'string' &&
+    ((value as ContextMessage).dir === 'ltr' || (value as ContextMessage).dir === 'rtl')
   );
 }
 

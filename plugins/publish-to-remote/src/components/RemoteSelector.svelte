@@ -78,8 +78,8 @@
 
 <style>
   .remote-selector-bar {
-    background: #f8f8f8;
-    border: 1px solid #e0e0e0;
+    background: var(--color-surface-secondary);
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     padding: 12px;
     margin-bottom: 16px;
@@ -96,7 +96,7 @@
 
   .remote-selector-bar select {
     padding: 6px 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     font-size: 14px;
   }
@@ -112,8 +112,8 @@
     gap: 12px;
     padding: 12px 16px;
     margin-bottom: 16px;
-    background: #fff8e1;
-    border: 1px solid #ffe082;
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
     border-radius: 4px;
     font-size: 14px;
   }

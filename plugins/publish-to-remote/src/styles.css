@@ -12,19 +12,23 @@ body {
     -apple-system,
     sans-serif;
   font-size: 14px;
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
 }
 
 button {
   cursor: pointer;
 }
 
-/* --- Buttons --------------------------------------------------------------
-   Canonical button system, vendored from the core design system (src/styles).
-   The plugin builds separately and can't import core styles, so the button
-   color tokens below MIRROR core's light theme — keep them in sync with
-   src/styles/tokens/colors.css and src/styles/utilities/forms.css. Usage
-   matches core: e.g. <button class="btn btn-secondary btn-sm">. */
+/* --- Design tokens ---------------------------------------------------------
+   Vendored from the core design system (src/styles). The plugin builds
+   separately and can't import core styles, so the tokens below MIRROR core —
+   keep them in sync with src/styles/tokens/colors.css, themes/{light,dark}.css
+   and utilities/forms.css. `:root` holds the light defaults; the
+   [data-theme='dark'] block overrides them. The host sets data-theme on <html>
+   via the `context` message. Usage matches core: <button class="btn btn-sm">. */
 :root {
+  /* Buttons */
   --color-button-primary-bg: #0000ee;
   --color-button-primary-bg-hover: #0000cc;
   --color-button-primary-text: #ffffff;
@@ -43,6 +47,80 @@ button {
   --color-button-icon-text-hover: #222222;
   --color-button-icon-bg-hover: #f0f0f0;
   --color-button-focus-ring: #3333ff;
+
+  /* Surfaces / text / borders */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8f8f8;
+  --color-surface-hover: #f0f0f0;
+  --color-border-default: #e0e0e0;
+  --color-border-strong: #cccccc;
+  --color-text-primary: #222222;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-accent: #0074d9;
+  --color-accent-hover: #0051a0;
+
+  /* Status: info / success / warning / error (bg + border + text) */
+  --color-info-bg: #e8f1ff;
+  --color-info-border: #0074d9;
+  --color-info-text: #0074d9;
+  --color-success-bg: #e8f5e9;
+  --color-success-border: #28a745;
+  --color-success-text: #2e7d32;
+  --color-warning-bg: #fff8e1;
+  --color-warning-border: #ffc107;
+  --color-warning-text: #e65100;
+  --color-error-bg: #ffebee;
+  --color-error-border: #dc3545;
+  --color-error-text: #c62828;
+}
+
+[data-theme='dark'] {
+  /* Buttons */
+  --color-button-primary-bg: #3333ff;
+  --color-button-primary-bg-hover: #6666ff;
+  --color-button-primary-text: #ffffff;
+  --color-button-primary-border: #3333ff;
+  --color-button-secondary-bg: #333333;
+  --color-button-secondary-bg-hover: #444444;
+  --color-button-secondary-text: #e0e0e0;
+  --color-button-secondary-border: #555555;
+  --color-button-danger-bg: #dc2626;
+  --color-button-danger-bg-hover: #b91c1c;
+  --color-button-danger-text: #ffffff;
+  --color-button-danger-border: #dc2626;
+  --color-button-link: #6699ff;
+  --color-button-link-hover: #99bbff;
+  --color-button-icon-text: #cccccc;
+  --color-button-icon-text-hover: #ffffff;
+  --color-button-icon-bg-hover: #444444;
+  --color-button-focus-ring: #6666ff;
+
+  /* Surfaces / text / borders */
+  --color-surface-primary: #222222;
+  --color-surface-secondary: #333333;
+  --color-surface-hover: #444444;
+  --color-border-default: #444444;
+  --color-border-strong: #666666;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-tertiary: #cccccc;
+  --color-accent: #4aa3ff;
+  --color-accent-hover: #7ab8ff;
+
+  /* Status (dark): dark tints with AA-tuned text mirrored from core dark.css */
+  --color-info-bg: #13283d;
+  --color-info-border: #4aa3ff;
+  --color-info-text: #9ccbff;
+  --color-success-bg: #102a16;
+  --color-success-border: #2f8f4f;
+  --color-success-text: #86efac;
+  --color-warning-bg: #2a230a;
+  --color-warning-border: #a87f1a;
+  --color-warning-text: #fcd34d;
+  --color-error-bg: #2c1416;
+  --color-error-border: #b04a4a;
+  --color-error-text: #fca5a5;
 }
 
 .btn {
@@ -144,8 +222,8 @@ button {
 .btn-type {
   flex: 0 1 200px;
   padding: 16px;
-  background: white;
-  border: 2px solid #ddd;
+  background: var(--color-surface-primary);
+  border: 2px solid var(--color-border-default);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -158,27 +236,27 @@ button {
 }
 
 .btn-type:hover {
-  border-color: #0074d9;
-  background: #f0f8ff;
+  border-color: var(--color-accent);
+  background: var(--color-info-bg);
 }
 
 .btn-type small {
   font-weight: normal;
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .empty-message {
-  color: #999;
+  color: var(--color-text-tertiary);
   text-align: center;
   padding: 20px;
   margin: 0;
 }
 
 .status-valid {
-  color: #4caf50;
+  color: var(--color-success-text);
 }
 
 .status-invalid {
-  color: #f44336;
+  color: var(--color-error-text);
 }
