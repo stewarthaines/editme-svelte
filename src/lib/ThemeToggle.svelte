@@ -1,5 +1,6 @@
 <script lang="ts">
   import { themeStore } from './stores/theme';
+  import { Sun, Moon } from 'phosphor-svelte';
 
   let {
     size = 'medium',
@@ -27,18 +28,11 @@
 >
   <span class="theme-toggle__icon" aria-hidden="true">
     {#if isDark}
-      <!-- Sun icon for dark mode (clicking switches to light) -->
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5" />
-        <path
-          d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-        />
-      </svg>
+      <!-- Sun: dark mode active, clicking switches to light -->
+      <Sun weight="regular" aria-hidden="true" />
     {:else}
-      <!-- Moon icon for light mode (clicking switches to dark) -->
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-      </svg>
+      <!-- Moon: light mode active, clicking switches to dark -->
+      <Moon weight="regular" aria-hidden="true" />
     {/if}
   </span>
 
@@ -53,6 +47,7 @@
   .theme-toggle {
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* center the icon when there's no label and the 44px min-width applies */
     gap: var(--space-2);
     padding-block: var(--space-2); /* Using logical properties */
     padding-inline: var(--space-3);
@@ -111,7 +106,9 @@
     flex-shrink: 0;
   }
 
-  .theme-toggle__icon svg {
+  /* The icon svg is rendered by the Phosphor child component, so reach it with
+     :global to size it to the wrapper (per-variant 1em/1.2em/1.4em). */
+  .theme-toggle__icon :global(svg) {
     inline-size: 100%; /* Using logical properties */
     block-size: 100%;
   }
