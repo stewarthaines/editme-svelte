@@ -97,20 +97,7 @@
         <p class="loading-text">{$t('Loading projects…')}</p>
       </div>
     {:else if workspaces.length === 0}
-      <div class="empty-state">
-        <div class="empty-tips">
-          <h3 class="tips-title">{$t('Quick Start Tips:')}</h3>
-          <ul class="tips-list">
-            <li>{$t('Create New: Start with a minimal project')}</li>
-            <li>{$t('Load EPUB: Load .epub file from the filesystem')}</li>
-            <li>
-              {@html $t('Download: Start with a sample from {link}', {
-                link: `<a target="_blank" href="https://stewarthaines.com/epub">${$t('SEED.html home page')}</a>`,
-              })}
-            </li>
-          </ul>
-        </div>
-      </div>
+      <!-- No projects yet — the "Get Started" action bar above is the first-run guide. -->
     {:else if filteredWorkspaces.length === 0}
       <div class="no-results">
         <div class="no-results-icon" aria-hidden="true">🔍</div>
@@ -256,37 +243,6 @@
     margin: var(--space-4) 0 0 0;
   }
 
-  .empty-state {
-    text-align: center;
-    padding: var(--space-8) var(--space-4);
-    color: var(--color-text-secondary);
-  }
-
-  .empty-tips {
-    max-width: 400px;
-    margin: 0 auto;
-    text-align: left;
-  }
-
-  .tips-title {
-    margin: 0 0 var(--space-2) 0;
-    font-size: var(--text-base);
-    font-weight: 600;
-    color: var(--color-text-primary);
-  }
-
-  .tips-list {
-    margin: 0;
-    padding-inline-start: var(--space-4);
-    list-style-type: disc;
-  }
-
-  .tips-list li {
-    margin-block-end: var(--space-1);
-    font-size: var(--text-sm);
-    line-height: 1.5;
-  }
-
   .no-results {
     text-align: center;
     padding: var(--space-8) var(--space-4);
@@ -360,14 +316,6 @@
 
     .search-input-wrapper {
       max-width: none;
-    }
-
-    .empty-state {
-      padding: var(--space-6) var(--space-2);
-    }
-
-    .empty-tips {
-      text-align: center;
     }
   }
 </style>

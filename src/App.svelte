@@ -7,7 +7,6 @@
   import ThirdPartyView from './lib/navigation/views/ThirdPartyView.svelte';
   import WorkspaceView from './lib/navigation/views/WorkspaceView.svelte';
   import MetadataEditor from './lib/components/metadata/MetadataEditor.svelte';
-  import PlaceholderView from './lib/navigation/views/PlaceholderView.svelte';
   import SpineView from './lib/navigation/views/SpineView.svelte';
   import PublishView from './lib/navigation/views/PublishView.svelte';
   import SettingsView from './lib/navigation/views/SettingsView.svelte';
@@ -645,12 +644,7 @@
             onTabFieldsChange={handleMetadataTabFields}
           />
         {:else}
-          <PlaceholderView
-            viewType="metadata"
-            title={$t('EPUB Metadata')}
-            description={$t('Configure publication metadata and details')}
-            icon="📝"
-          />
+          <div class="view-loading">{$t('Loading project…')}</div>
         {/if}
       {:else if currentView === 'manifest'}
         {#if initialized && currentWorkspaceState && appState}
@@ -664,12 +658,7 @@
             }}
           />
         {:else}
-          <PlaceholderView
-            viewType="manifest"
-            title={$t('File Manifest')}
-            description={$t('Manage EPUB files and resources')}
-            icon="📋"
-          />
+          <div class="view-loading">{$t('Loading project…')}</div>
         {/if}
       {:else if currentView === 'navigation'}
         {#if initialized && currentWorkspaceState && appState && blobURLManager}
@@ -685,12 +674,7 @@
             previewUpdate={handleNavigationPreviewUpdate}
           />
         {:else}
-          <PlaceholderView
-            viewType="navigation"
-            title={$t('Table of Contents')}
-            description={$t('Loading project…')}
-            icon="📖"
-          />
+          <div class="view-loading">{$t('Loading project…')}</div>
         {/if}
       {:else if currentView === 'spine'}
         {#if initialized && currentWorkspaceState && appState}
@@ -705,12 +689,7 @@
             onPreviewUpdate={handleSpinePreviewUpdate}
           />
         {:else}
-          <PlaceholderView
-            viewType="spine"
-            title={$t('Spine Items')}
-            description={$t('Loading project…')}
-            icon="📚"
-          />
+          <div class="view-loading">{$t('Loading project…')}</div>
         {/if}
       {:else if currentView === 'publish'}
         <PublishView
@@ -796,7 +775,6 @@
         <div class="placeholder-content">
           <h3>{$t('Preview Pane')}</h3>
           <p>{$t('Content preview will appear here based on the current view')}</p>
-          <p class="current-view-info">{$t('Current view')}: <strong>{currentView}</strong></p>
         </div>
       {/if}
     {/snippet}
@@ -867,15 +845,12 @@
   .placeholder-content p {
     margin: 0;
     font-size: 0.875rem;
-    opacity: 0.8;
   }
 
-  .current-view-info {
-    margin-top: 1rem !important;
-    padding: 0.5rem;
-    background: var(--color-bg-secondary);
-    border-radius: 4px;
-    font-size: 0.75rem !important;
+  .view-loading {
+    padding: var(--space-4);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
   }
 
   /* Package EPUB button styling */
