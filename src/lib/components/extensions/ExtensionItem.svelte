@@ -118,10 +118,10 @@
 
 <style>
   .extension-item {
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--color-border-default);
     border-radius: 0.25rem;
     margin-bottom: 0.5rem;
-    background: var(--bg-primary, #fff);
+    background: var(--color-bg-primary);
     overflow: hidden;
   }
 
@@ -134,7 +134,7 @@
 
   .extension-name {
     font-weight: 500;
-    color: var(--text-primary, #333);
+    color: var(--color-text-primary);
   }
 
   .extension-actions {
@@ -162,7 +162,7 @@
   }
 
   .remove-button {
-    background: var(--error-bg, #dc3545);
+    background: var(--color-button-danger-bg);
     color: white;
     border: none;
     padding: 0.25rem 0.75rem;
@@ -172,7 +172,7 @@
   }
 
   .remove-button:hover:not(:disabled) {
-    background: var(--error-hover, #c82333);
+    background: var(--color-button-danger-bg-hover);
   }
 
   .remove-button:disabled {
@@ -193,7 +193,7 @@
   }
 
   .license-section {
-    border-top: 1px solid var(--border-color, #ddd);
+    border-top: 1px solid var(--color-border-default);
     padding: 0.75rem;
     background: var(--color-bg-secondary, #f8f9fa);
   }
@@ -202,20 +202,20 @@
     width: 100%;
     min-height: 120px;
     padding: 0.5rem;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--color-border-default);
     border-radius: 0.25rem;
     font-family: var(--font-mono, monospace);
     font-size: 0.875rem;
     line-height: 1.4;
     resize: vertical;
-    background: var(--bg-primary, #fff);
-    color: var(--text-primary, #333);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
   }
 
   .license-textarea:focus {
-    outline: 2px solid var(--focus-color, #007acc);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
-    border-color: var(--focus-color, #007acc);
+    border-color: var(--color-focus);
   }
 
   .license-textarea:read-only {

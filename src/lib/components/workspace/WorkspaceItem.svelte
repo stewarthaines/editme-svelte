@@ -140,6 +140,7 @@
 
 <style>
   .workspace-item {
+    position: relative; /* anchor the select button's full-row hit area */
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -174,6 +175,14 @@
     font: inherit;
     text-align: start;
     cursor: pointer;
+  }
+
+  /* Stretch the select button's hit area over the whole row so a click anywhere
+     (not just the label) opens the project. The delete button is lifted above it. */
+  .workspace-select::after {
+    content: '';
+    position: absolute;
+    inset: 0;
   }
 
   .workspace-select:focus-visible {
@@ -299,6 +308,8 @@
   }
 
   .workspace-actions {
+    position: relative; /* sit above the select button's full-row overlay */
+    z-index: 1;
     display: flex;
     gap: var(--space-2);
     flex-shrink: 0;

@@ -60,6 +60,31 @@ async function ensureWorkspace(page) {
   return true;
 }
 
+// Seed a throwaway extension so the per-extension rows (ExtensionItem) get scanned —
+// they're data-dependent and otherwise never render. Requires advanced mode (which also
+// reveals the full project settings). Idempotent: skips if one already exists (it
+// persists in OPFS across the light/dark passes).
+async function ensureDemoExtension(page) {
+  await clickNav(page, 'Settings');
+  const advanced = page.getByRole('checkbox', { name: /Advanced Mode/i }).first();
+  if ((await advanced.count()) && !(await advanced.isChecked())) {
+    await advanced.check();
+    await page.waitForTimeout(400);
+  }
+  if ((await page.locator('.extension-item').count()) === 0) {
+    await page.setInputFiles('#extension-file', {
+      name: 'a11y-demo.js',
+      mimeType: 'text/javascript',
+      buffer: Buffer.from('// demo extension for the accessibility scan\n'),
+    });
+    await page
+      .locator('.extension-item')
+      .first()
+      .waitFor({ timeout: 10000 })
+      .catch(() => undefined);
+  }
+}
+
 async function scanAllViews(page, theme) {
   const reports = [];
   const scan = async name => {
@@ -109,6 +134,16 @@ async function scanAllViews(page, theme) {
       }
     } catch (e) {
       console.warn(`\nWARN [${theme}]: could not open the Spine editor: ${e.message}`);
+    }
+
+    // Re-scan Settings with advanced mode on and an extension installed, so the
+    // per-extension rows (ExtensionItem) — which only render when extensions exist —
+    // get checked in both themes.
+    try {
+      await ensureDemoExtension(page);
+      await scan('Settings (advanced + extension)');
+    } catch (e) {
+      console.warn(`\nWARN [${theme}]: could not seed/scan extensions: ${e.message}`);
     }
   }
   return reports;

@@ -76,7 +76,13 @@
     {:else if highlightedContent}
       <div class="preview-body">
         <div class="text-preview">
-          <pre class="text-content highlighted-xml" dir="ltr">{@html highlightedContent}</pre>
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <pre
+            class="text-content highlighted-xml"
+            dir="ltr"
+            tabindex="0"
+            role="region"
+            aria-label={$t('OPF source preview')}>{@html highlightedContent}</pre>
         </div>
       </div>
     {:else}
