@@ -6,6 +6,8 @@ export interface ThemeState {
   current: ThemeMode;
   systemPreference: ThemeMode;
   isInitialized: boolean;
+  /** True when following the OS preference (no explicit light/dark choice saved). */
+  isSystem: boolean;
 }
 
 export interface ThemeStore extends Writable<ThemeState> {
@@ -26,6 +28,7 @@ const DEFAULT_STATE: ThemeState = {
   current: 'light',
   systemPreference: 'light',
   isInitialized: false,
+  isSystem: true,
 };
 
 // Create the writable store
@@ -69,6 +72,7 @@ function createThemeStore(): ThemeStore {
         current: currentTheme,
         systemPreference,
         isInitialized: true,
+        isSystem: !savedTheme,
       }));
 
       // Apply theme to DOM
@@ -79,19 +83,15 @@ function createThemeStore(): ThemeStore {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         mediaQuery.addEventListener('change', e => {
           const newSystemPreference: ThemeMode = e.matches ? 'dark' : 'light';
-          update(state => ({
-            ...state,
-            systemPreference: newSystemPreference,
-          }));
-
-          // If no saved preference, follow system
-          if (!savedTheme) {
-            update(state => ({
-              ...state,
-              current: newSystemPreference,
-            }));
-            applyThemeToDOM(newSystemPreference);
-          }
+          update(state => {
+            const next = { ...state, systemPreference: newSystemPreference };
+            // Only follow the OS when no explicit preference is set.
+            if (state.isSystem) {
+              next.current = newSystemPreference;
+              applyThemeToDOM(newSystemPreference);
+            }
+            return next;
+          });
         });
       }
     },
@@ -111,6 +111,7 @@ function createThemeStore(): ThemeStore {
         return {
           ...state,
           current: theme,
+          isSystem: false,
         };
       });
     },
@@ -132,6 +133,7 @@ function createThemeStore(): ThemeStore {
         return {
           ...state,
           current: newTheme,
+          isSystem: false,
         };
       });
     },
@@ -151,6 +153,7 @@ function createThemeStore(): ThemeStore {
         return {
           ...state,
           current: state.systemPreference,
+          isSystem: true,
         };
       });
     },

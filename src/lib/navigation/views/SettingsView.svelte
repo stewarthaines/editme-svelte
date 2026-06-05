@@ -9,7 +9,10 @@
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
   import type { TransformEngine } from '../../infrastructure/transform-engine.js';
   import ExtensionItem from '../../components/extensions/ExtensionItem.svelte';
-  import { t } from '../../i18n';
+  import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+  import { t, currentLocale, setLocale } from '../../i18n';
+  import { LOCALE_CONFIGS } from '../../i18n/locale-config.js';
+  import { themeStore } from '../../stores/theme.js';
   import type { PluginManifestEntry } from '../../plugins/contract';
 
   interface Props {
@@ -223,13 +226,31 @@
   const isAdvancedMode = $derived(workspaceSettings?.editor?.advanced_mode ?? false);
   const canEditSettings = $derived(workspaceId !== null && workspaceSettings !== null);
   const canEditEPUBSettings = $derived(workspaceId !== null && epubSettings !== null);
+
+  // App settings: theme (light/dark/system) and locale, backed by the global stores
+  // the app already uses (the sidebar quick-toggle shares the theme store).
+  const themeChoice = $derived($themeStore.isSystem ? 'system' : $themeStore.current);
+  const locales = Object.values(LOCALE_CONFIGS);
+
+  function handleThemeChange(value: string): void {
+    if (value === 'system') {
+      themeStore.useSystemPreference();
+    } else if (value === 'light' || value === 'dark') {
+      themeStore.setTheme(value);
+    }
+  }
+
+  async function handleLocaleChange(event: Event): Promise<void> {
+    const value = (event.target as HTMLSelectElement).value;
+    try {
+      await setLocale(value);
+    } catch (err) {
+      error = err instanceof Error ? err.message : $t('Failed to change language');
+    }
+  }
 </script>
 
 <div class="settings-view">
-  <div class="settings-header">
-    <h1>{$t('Settings')}</h1>
-  </div>
-
   {#if error}
     <div class="error-message" role="alert">
       <strong>{$t('Error')}:</strong>
@@ -237,144 +258,206 @@
     </div>
   {/if}
 
-  <div class="settings-content">
-    <!-- App settings: global, available without a project (plugins are enabled
-         per browser, not per project). -->
-    {#if availablePlugins.length > 0}
-      <section class="plugins-settings">
-        <h2>{$t('Plugins')}</h2>
-        <p class="setting-description plugins-intro">
-          {$t('Optional features available when the app is served over HTTP.')}
-        </p>
-        {#each availablePlugins as plugin (plugin.id)}
-          <div class="setting-group">
-            <label class="setting-label">
-              <input
-                type="checkbox"
-                checked={enabledPluginIds.includes(plugin.id)}
-                onchange={event =>
-                  onTogglePlugin?.(plugin.id, (event.target as HTMLInputElement).checked)}
-              />
-              <span class="setting-text">{plugin.name}</span>
-            </label>
-          </div>
-        {/each}
-      </section>
-    {/if}
+  <!-- Shares the editor's pane key so the split proportion is one global value. -->
+  <div class="settings-panes-wrap">
+    <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
+      <!-- App settings: global, usable without a project. -->
+      <Pane defaultSize={50} minSize={25}>
+        <div class="settings-pane">
+          <h2 class="pane-title">{$t('App Settings')}</h2>
 
-    <!-- Project settings: require an open project. -->
-    {#if canEditSettings}
-      <section class="workspace-settings">
-        <h2>{$t('Project Settings')}</h2>
+          <section>
+            <h3>{$t('General')}</h3>
+            <div class="setting-group">
+              <label for="theme-select" class="setting-label-text">{$t('Theme')}</label>
+              <select
+                id="theme-select"
+                class="setting-select"
+                value={themeChoice}
+                onchange={event => handleThemeChange((event.target as HTMLSelectElement).value)}
+              >
+                <option value="light">{$t('Light')}</option>
+                <option value="dark">{$t('Dark')}</option>
+                <option value="system">{$t('System')}</option>
+              </select>
+            </div>
 
-        <div class="setting-group">
-          <label class="setting-label">
-            <input
-              type="checkbox"
-              checked={isAdvancedMode}
-              onchange={handleAdvancedModeChange}
-              disabled={loading}
-            />
-            <span class="setting-text">{$t('Advanced Mode')}</span>
-          </label>
-          <p class="setting-description">
-            {$t('Enable advanced editing features and additional controls for power users.')}
-          </p>
-        </div>
-      </section>
+            <div class="setting-group">
+              <label for="language-select" class="setting-label-text">{$t('Language')}</label>
+              <select
+                id="language-select"
+                class="setting-select"
+                value={$currentLocale}
+                onchange={handleLocaleChange}
+              >
+                {#each locales as loc (loc.code)}
+                  <option value={loc.code}>{loc.name}</option>
+                {/each}
+              </select>
+            </div>
+          </section>
 
-      <!-- EPUB Settings -->
-      {#if canEditEPUBSettings && isAdvancedMode}
-        <section class="epub-settings">
-          <h2>{$t('EPUB Settings')}</h2>
-
-          <div class="setting-group">
-            <label for="audio-clip-template" class="setting-label-text">
-              {$t('Audio Clip Template')}
-            </label>
-            <input
-              id="audio-clip-template"
-              type="text"
-              class="template-input"
-              value={epubSettings?.audio_clip_template || ''}
-              placeholder=":clip[label]&#123;src=href begin=begin end=end&#125;"
-              onblur={handleAudioTemplateChange}
-              disabled={epubLoading}
-            />
-            <p class="setting-description">
-              Template for inserting audio clip directives. Use placeholders: &lt;href&gt;,
-              &lt;begin&gt;, &lt;end&gt;, &lt;label&gt;, &lt;rate&gt;
-            </p>
-          </div>
-        </section>
-      {/if}
-
-      <!-- Extension Management -->
-      <section class="extensions-settings">
-        <h2>{$t('Extensions')}</h2>
-
-        <!-- Import Extension -->
-        <div class="extension-import" class:disabled={!isAdvancedMode}>
-          <label for="extension-file">
-            {$t('Import JavaScript Extension')}: {$t(
-              'Please copy license text into the License field below to comply with open source requirements.'
-            )}
-          </label>
-          <input
-            id="extension-file"
-            type="file"
-            accept=".js"
-            onchange={handleExtensionImport}
-            disabled={extensionsLoading}
-          />
-          {#if !isAdvancedMode}
-            <p class="advanced-mode-note">
-              {$t('Advanced Mode required for extension management')}
-            </p>
+          {#if availablePlugins.length > 0}
+            <section class="plugins-settings">
+              <h3>{$t('Plugins')}</h3>
+              <p class="setting-description plugins-intro">
+                {$t('Optional features available when the app is served over HTTP.')}
+              </p>
+              {#each availablePlugins as plugin (plugin.id)}
+                <div class="setting-group">
+                  <label class="setting-label">
+                    <input
+                      type="checkbox"
+                      checked={enabledPluginIds.includes(plugin.id)}
+                      onchange={event =>
+                        onTogglePlugin?.(plugin.id, (event.target as HTMLInputElement).checked)}
+                    />
+                    <span class="setting-text">{plugin.name}</span>
+                  </label>
+                </div>
+              {/each}
+            </section>
           {/if}
         </div>
+      </Pane>
 
-        <!-- Extensions List -->
-        {#if extensionsLoading}
-          <p>{$t('Loading extensions...')}</p>
-        {:else if extensions.length === 0}
-          <p>{$t('No extensions installed.')}</p>
-        {:else}
-          <ul class="extensions-list">
-            {#each extensions as extension}
-              {#if workspaceId}
-                <ExtensionItem
-                  {extension}
-                  {workspaceId}
-                  {isAdvancedMode}
-                  {extensionManager}
-                  onRemove={() => handleExtensionRemoval(extension.name)}
+      <PaneResizer />
+
+      <!-- Project settings: require an open project. -->
+      <Pane defaultSize={50} minSize={20}>
+        <div class="settings-pane">
+          <h2 class="pane-title">{$t('Project Settings')}</h2>
+
+          {#if canEditSettings}
+            <section class="workspace-settings">
+              <h3>{$t('Editor')}</h3>
+
+              <div class="setting-group">
+                <label class="setting-label">
+                  <input
+                    type="checkbox"
+                    checked={isAdvancedMode}
+                    onchange={handleAdvancedModeChange}
+                    disabled={loading}
+                  />
+                  <span class="setting-text">{$t('Advanced Mode')}</span>
+                </label>
+                <p class="setting-description">
+                  {$t('Enable advanced editing features and additional controls for power users.')}
+                </p>
+              </div>
+            </section>
+
+            <!-- EPUB Settings -->
+            {#if canEditEPUBSettings && isAdvancedMode}
+              <section class="epub-settings">
+                <h3>{$t('EPUB Settings')}</h3>
+
+                <div class="setting-group">
+                  <label for="audio-clip-template" class="setting-label-text">
+                    {$t('Audio Clip Template')}
+                  </label>
+                  <input
+                    id="audio-clip-template"
+                    type="text"
+                    class="template-input"
+                    value={epubSettings?.audio_clip_template || ''}
+                    placeholder=":clip[label]&#123;src=href begin=begin end=end&#125;"
+                    onblur={handleAudioTemplateChange}
+                    disabled={epubLoading}
+                  />
+                  <p class="setting-description">
+                    Template for inserting audio clip directives. Use placeholders: &lt;href&gt;,
+                    &lt;begin&gt;, &lt;end&gt;, &lt;label&gt;, &lt;rate&gt;
+                  </p>
+                </div>
+              </section>
+            {/if}
+
+            <!-- Extension Management -->
+            <section class="extensions-settings">
+              <h3>{$t('Extensions')}</h3>
+
+              <!-- Import Extension -->
+              <div class="extension-import" class:disabled={!isAdvancedMode}>
+                <label for="extension-file">
+                  {$t('Import JavaScript Extension')}: {$t(
+                    'Please copy license text into the License field below to comply with open source requirements.'
+                  )}
+                </label>
+                <input
+                  id="extension-file"
+                  type="file"
+                  accept=".js"
+                  onchange={handleExtensionImport}
+                  disabled={extensionsLoading}
                 />
+                {#if !isAdvancedMode}
+                  <p class="advanced-mode-note">
+                    {$t('Advanced Mode required for extension management')}
+                  </p>
+                {/if}
+              </div>
+
+              <!-- Extensions List -->
+              {#if extensionsLoading}
+                <p>{$t('Loading extensions...')}</p>
+              {:else if extensions.length === 0}
+                <p>{$t('No extensions installed.')}</p>
+              {:else}
+                <ul class="extensions-list">
+                  {#each extensions as extension}
+                    {#if workspaceId}
+                      <ExtensionItem
+                        {extension}
+                        {workspaceId}
+                        {isAdvancedMode}
+                        {extensionManager}
+                        onRemove={() => handleExtensionRemoval(extension.name)}
+                      />
+                    {/if}
+                  {/each}
+                </ul>
               {/if}
-            {/each}
-          </ul>
-        {/if}
-      </section>
-    {:else if loading}
-      <p class="loading-message">{$t('Loading settings…')}</p>
-    {:else}
-      <p class="no-workspace-message">{$t('Open a project to configure its settings.')}</p>
-    {/if}
+            </section>
+          {:else if loading}
+            <p class="loading-message">{$t('Loading settings…')}</p>
+          {:else}
+            <p class="no-workspace-message">{$t('Open a project to configure its settings.')}</p>
+          {/if}
+        </div>
+      </Pane>
+    </PaneGroup>
   </div>
 </div>
 
 <style>
   .settings-view {
-    padding: 1rem;
-    max-width: 100%;
+    height: 100%;
     width: 100%;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  .settings-header h1 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.5rem;
+  .settings-panes-wrap {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .settings-pane {
+    height: 100%;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .pane-title {
+    margin: 0;
+    font-size: 1.25rem;
     font-weight: 600;
+    color: var(--color-text-primary);
   }
 
   .no-workspace-message,
@@ -389,21 +472,7 @@
     padding: 0.75rem;
     border-radius: 0.25rem;
     border: 1px solid var(--color-border-error);
-    margin-bottom: 1rem;
-  }
-
-  .settings-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 1024px) {
-    .settings-content {
-      grid-template-columns: 1fr;
-    }
+    margin: 1rem;
   }
 
   section {
@@ -412,9 +481,9 @@
     padding: 1.5rem;
   }
 
-  section h2 {
+  section h3 {
     margin: 0 0 1rem 0;
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 500;
     color: var(--color-text-primary);
   }
@@ -452,6 +521,23 @@
     margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--color-text-primary);
+  }
+
+  .setting-select {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-default);
+    border-radius: 0.25rem;
+    background: var(--color-input-bg);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+  }
+
+  .setting-select:focus {
+    outline: none;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
   }
 
   .template-input {
