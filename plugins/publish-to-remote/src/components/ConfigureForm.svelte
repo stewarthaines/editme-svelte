@@ -72,6 +72,7 @@
     url: '',
     username: '',
     password: '',
+    catalogFilename: '',
   });
   let previousBucketForAutoName = '';
   let pickedFolderName: string | null = $state(null);
@@ -109,6 +110,7 @@
         url: '',
         username: '',
         password: '',
+        catalogFilename: remote.catalogFilename || '',
       };
       previousBucketForAutoName = remote.bucket;
     } else if (remote.type === 'google-drive') {
@@ -129,6 +131,7 @@
         url: '',
         username: '',
         password: '',
+        catalogFilename: '',
       };
       pickedFolderName = remote.folderName;
     } else if (remote.type === 'dropbox') {
@@ -150,6 +153,7 @@
         url: '',
         username: '',
         password: '',
+        catalogFilename: '',
       };
       pickedFolderName = remote.folderPath;
       if (form.accessToken && form.tokenExpiry > Date.now()) {
@@ -173,6 +177,7 @@
         url: remote.url,
         username: remote.username,
         password: remote.password,
+        catalogFilename: remote.catalogFilename || '',
       };
     }
   }
@@ -195,6 +200,7 @@
       url: '',
       username: '',
       password: '',
+      catalogFilename: '',
     };
     pickedFolderName = null;
     previousBucketForAutoName = '';
@@ -317,6 +323,7 @@
         secretAccessKey: form.secretAccessKey.trim(),
         region: form.region.trim() || undefined,
         publicUrlBase: form.publicUrlBase.trim() || undefined,
+        catalogFilename: form.catalogFilename.trim() || undefined,
       };
     } else if (remoteType === 'google-drive') {
       if (!form.folderId) {
@@ -362,6 +369,7 @@
         username: form.username.trim(),
         password: form.password,
         publicUrlBase: form.publicUrlBase.trim() || undefined,
+        catalogFilename: form.catalogFilename.trim() || undefined,
       };
     }
     onStatus('Please select a remote type', 'error');
@@ -494,6 +502,16 @@
         type="url"
         placeholder="https://pub-xxx.r2.dev"
         bind:value={form.publicUrlBase}
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="catalog-filename">Catalog Filename (optional)</label>
+      <input
+        id="catalog-filename"
+        type="text"
+        placeholder="catalog.xml"
+        bind:value={form.catalogFilename}
       />
     </div>
 
@@ -702,6 +720,16 @@
         type="url"
         placeholder="https://host/s/public-share"
         bind:value={form.publicUrlBase}
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="webdav-catalog-filename">Catalog Filename (optional)</label>
+      <input
+        id="webdav-catalog-filename"
+        type="text"
+        placeholder="catalog.xml"
+        bind:value={form.catalogFilename}
       />
     </div>
 

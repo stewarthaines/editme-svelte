@@ -401,18 +401,24 @@
     if (!activeRemote) return;
     generatingFeed = true;
     try {
+      // Configurable per remote (S3/WebDAV); defaults to catalog.xml.
+      const catalogName =
+        (activeRemote.type === 's3-compatible' || activeRemote.type === 'webdav') &&
+        activeRemote.catalogFilename?.trim()
+          ? activeRemote.catalogFilename.trim()
+          : 'catalog.xml';
       let feedUrl = '';
       if (activeRemote.type === 's3-compatible') {
-        feedUrl = getPublicUrl(activeRemote, 'catalog.xml');
+        feedUrl = getPublicUrl(activeRemote, catalogName);
       } else if (activeRemote.type === 'google-drive') {
-        feedUrl = 'https://drive.google.com/catalog.xml';
+        feedUrl = `https://drive.google.com/${catalogName}`;
       } else if (activeRemote.type === 'dropbox') {
-        feedUrl = 'https://www.dropbox.com/catalog.xml';
+        feedUrl = `https://www.dropbox.com/${catalogName}`;
       } else if (activeRemote.type === 'webdav') {
-        feedUrl = getPublicUrl(activeRemote, 'catalog.xml');
+        feedUrl = getPublicUrl(activeRemote, catalogName);
       }
       const xml = generateOpdsFeed(activeRemote, remoteObjects, feedUrl);
-      const result = await uploadTextFile(activeRemote, 'catalog.xml', xml);
+      const result = await uploadTextFile(activeRemote, catalogName, xml);
       if (result.success) {
         showStatus(`Catalog updated: ${result.url || feedUrl}`, 'success');
         await refreshObjectList();

@@ -38,6 +38,8 @@ export interface S3RemoteConfig {
   secretAccessKey: string;
   region?: string;
   publicUrlBase?: string;
+  /** OPDS catalog filename (defaults to catalog.xml when unset). */
+  catalogFilename?: string;
 }
 
 export interface GoogleDriveRemoteConfig {
@@ -75,6 +77,8 @@ export interface WebDAVRemoteConfig {
   /** Optional unauthenticated read URL base for public links (mirrors S3's
    * publicUrlBase). Falls back to `url` when unset. */
   publicUrlBase?: string;
+  /** OPDS catalog filename (defaults to catalog.xml when unset). */
+  catalogFilename?: string;
 }
 
 export type RemoteConfig =
