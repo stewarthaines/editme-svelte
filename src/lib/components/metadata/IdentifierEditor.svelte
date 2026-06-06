@@ -120,7 +120,7 @@
 {/each}
 
 {#if showAdditional}
-  <button type="button" class="btn btn-secondary btn-sm" onclick={addEntry} disabled={saving}>
+  <button type="button" class="btn btn-secondary" onclick={addEntry} disabled={saving}>
     {$t('Add another identifier')}
   </button>
 {/if}

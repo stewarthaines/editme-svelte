@@ -195,7 +195,7 @@
             </div>
           {/each}
 
-          <button type="button" class="btn btn-secondary btn-sm" onclick={addSet} disabled={saving}>
+          <button type="button" class="btn btn-secondary" onclick={addSet} disabled={saving}>
             {$t('Add a sufficient set')}
           </button>
         </fieldset>

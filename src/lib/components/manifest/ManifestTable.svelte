@@ -370,7 +370,7 @@
         onclick={handleLoadFileClick}
         disabled={loading}
       >
-        📁 {$t('Load File')}
+        {$t('Load File')}
       </button>
     </div>
 

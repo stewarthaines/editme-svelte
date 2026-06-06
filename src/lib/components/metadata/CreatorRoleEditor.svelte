@@ -146,7 +146,7 @@
       </div>
     {/each}
 
-    <button type="button" class="btn btn-secondary btn-sm" onclick={addPerson} disabled={saving}>
+    <button type="button" class="btn btn-secondary" onclick={addPerson} disabled={saving}>
       {addLabel}
     </button>
   </div>
@@ -277,11 +277,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    padding: 0.125rem 0.25rem 0.125rem 0.5rem;
+    padding: 0.15rem 0.25rem 0.15rem 0.5rem;
     border-radius: var(--radius-pill, 9999px);
     background-color: var(--color-bg-accent, var(--color-bg-secondary));
     color: var(--color-text-primary);
-    font-size: var(--text-sm, 0.875rem);
+    font-size: var(--text-sm);
     white-space: nowrap;
   }
 

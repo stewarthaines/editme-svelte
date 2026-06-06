@@ -79,7 +79,7 @@
       </div>
     {/each}
 
-    <button type="button" class="btn btn-secondary btn-sm" onclick={addLanguage} disabled={saving}>
+    <button type="button" class="btn btn-secondary" onclick={addLanguage} disabled={saving}>
       {$t('Add Language')}
     </button>
   </div>
