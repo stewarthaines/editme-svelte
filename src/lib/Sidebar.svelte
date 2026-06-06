@@ -14,6 +14,7 @@
     Plus,
     CaretLeft,
     CaretRight,
+    CaretDown,
   } from 'phosphor-svelte';
 
   // Props
@@ -102,6 +103,17 @@
       : $t('Chapters')
   );
 
+  // The book title hosts a disclosure that collapses the project nav group.
+  const PROJECT_NAV_IDS: SidebarSection[] = ['settings', 'metadata', 'manifest', 'navigation'];
+  const isProjectNav = (id: SidebarSection) => PROJECT_NAV_IDS.includes(id);
+  const projectNavExpanded = $derived($layoutStore.sidebar.projectNavExpanded);
+  // Only hide the group when there's a workspace (the disclosure lives on the book title).
+  const hideProjectNav = $derived(hasWorkspace && !projectNavExpanded);
+
+  function toggleProjectNav() {
+    layoutStore.toggleProjectNav();
+  }
+
   function toggleSidebar() {
     layoutStore.toggleSidebar();
   }
@@ -165,18 +177,37 @@
             <div class="workspace-title-section">
               {#if isExpanded}
                 <div class="workspace-title-header">
-                  <h3 class="workspace-title" title={workspaceTitle || 'Untitled Project'}>
-                    {workspaceTitle || 'Untitled Project'}
-                  </h3>
-                  {#if extensions.length > 0 || extensionsLoading}
-                    <h3 class="workspace-extensions">
-                      {#if extensionsLoading}
-                        Loading...
-                      {:else}
-                        {extensions.map(ext => ext.name).join(', ')}
-                      {/if}
+                  <div class="workspace-title-info">
+                    <h3 class="workspace-title" title={workspaceTitle || 'Untitled Project'}>
+                      {workspaceTitle || 'Untitled Project'}
                     </h3>
-                  {/if}
+                    {#if extensions.length > 0 || extensionsLoading}
+                      <h3 class="workspace-extensions">
+                        {#if extensionsLoading}
+                          Loading...
+                        {:else}
+                          {extensions.map(ext => ext.name).join(', ')}
+                        {/if}
+                      </h3>
+                    {/if}
+                  </div>
+                  <button
+                    class="append-button-nav"
+                    onclick={toggleProjectNav}
+                    aria-expanded={projectNavExpanded}
+                    aria-label={projectNavExpanded
+                      ? $t('Hide project sections')
+                      : $t('Show project sections')}
+                    title={projectNavExpanded
+                      ? $t('Hide project sections')
+                      : $t('Show project sections')}
+                  >
+                    {#if projectNavExpanded}
+                      <CaretDown size={14} aria-hidden="true" />
+                    {:else}
+                      <CaretRight size={14} aria-hidden="true" />
+                    {/if}
+                  </button>
                 </div>
               {:else}
                 <div class="workspace-title-header compact">
@@ -191,6 +222,23 @@
                       •{extensions.length}
                     </div>
                   {/if}
+                  <button
+                    class="append-button-nav compact"
+                    onclick={toggleProjectNav}
+                    aria-expanded={projectNavExpanded}
+                    aria-label={projectNavExpanded
+                      ? $t('Hide project sections')
+                      : $t('Show project sections')}
+                    title={projectNavExpanded
+                      ? $t('Hide project sections')
+                      : $t('Show project sections')}
+                  >
+                    {#if projectNavExpanded}
+                      <CaretDown size={12} aria-hidden="true" />
+                    {:else}
+                      <CaretRight size={12} aria-hidden="true" />
+                    {/if}
+                  </button>
                 </div>
               {/if}
             </div>
@@ -198,31 +246,33 @@
         {/if}
 
         {@const disabled = section.id === 'publish' && !hasPublishedEpubs}
-        <button
-          class="sidebar-section"
-          class:active={activeSection === section.id}
-          onclick={() => setSidebarSection(section.id)}
-          {disabled}
-          aria-current={activeSection === section.id ? 'page' : undefined}
-          title={disabled ? $t('No published EPUBs yet') : $t(section.label)}
-        >
-          <span class="section-icon">
-            <Icon
-              size={18}
-              weight={activeSection === section.id ? 'fill' : 'regular'}
-              aria-hidden="true"
-            />
-          </span>
-          {#if isExpanded}
-            <span class="section-label">{$t(section.label)}</span>
-          {/if}
-        </button>
+        {#if !isProjectNav(section.id) || !hideProjectNav}
+          <button
+            class="sidebar-section"
+            class:active={activeSection === section.id}
+            onclick={() => setSidebarSection(section.id)}
+            {disabled}
+            aria-current={activeSection === section.id ? 'page' : undefined}
+            title={disabled ? $t('No published EPUBs yet') : $t(section.label)}
+          >
+            <span class="section-icon">
+              <Icon
+                size={18}
+                weight={activeSection === section.id ? 'fill' : 'regular'}
+                aria-hidden="true"
+              />
+            </span>
+            {#if isExpanded}
+              <span class="section-label">{$t(section.label)}</span>
+            {/if}
+          </button>
+        {/if}
       {/each}
 
       <!-- Workspace-specific sections (only show if workspace exists) -->
       {#each MAIN_SECTIONS.filter(section => section.requiresWorkspace) as section}
         {@const Icon = section.icon}
-        {#if shouldShowSection(section)}
+        {#if shouldShowSection(section) && (!isProjectNav(section.id) || !hideProjectNav)}
           <button
             class="sidebar-section"
             class:active={activeSection === section.id}
@@ -614,13 +664,21 @@
 
   .workspace-title-header {
     display: flex;
-    align-items: left;
+    flex-direction: row;
+    align-items: center;
     gap: var(--space-2);
     padding-block: var(--space-2);
     padding-inline: var(--space-2);
     min-block-size: var(--touch-target-min);
-    /*overflow: hidden;*/
+  }
+
+  /* Title + extensions stack vertically; the disclosure sits to their right. */
+  .workspace-title-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
     flex-direction: column;
+    gap: var(--space-1);
   }
 
   .workspace-title-header.compact {

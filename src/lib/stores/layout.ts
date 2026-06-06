@@ -5,6 +5,8 @@ import type { Writable } from 'svelte/store';
 export interface SidebarState {
   isExpanded: boolean;
   activeSection: SidebarSection;
+  /** Whether the project nav group (Settings/Metadata/Manifest/Navigation) is shown. */
+  projectNavExpanded: boolean;
 }
 
 export interface LayoutState {
@@ -16,6 +18,7 @@ export interface LayoutStore extends Writable<LayoutState> {
   initialize(): void;
   toggleSidebar(): void;
   setSidebarSection(section: SidebarSection): void;
+  toggleProjectNav(): void;
 }
 
 export type SidebarSection =
@@ -32,6 +35,7 @@ export type SidebarSection =
 const STORAGE_KEYS = {
   SIDEBAR_EXPANDED: 'editme_sidebar_expanded',
   SIDEBAR_SECTION: 'editme_sidebar_section',
+  SIDEBAR_PROJECT_EXPANDED: 'editme_sidebar_project_expanded',
 } as const;
 
 // Default layout state
@@ -39,6 +43,7 @@ const DEFAULT_STATE: LayoutState = {
   sidebar: {
     isExpanded: true,
     activeSection: 'about',
+    projectNavExpanded: true,
   },
   isInitialized: false,
 };
@@ -56,6 +61,7 @@ function createLayoutStore(): LayoutStore {
     initialize(): void {
       let savedExpanded: boolean = DEFAULT_STATE.sidebar.isExpanded;
       let savedSection: SidebarSection = DEFAULT_STATE.sidebar.activeSection;
+      let savedProjectExpanded: boolean = DEFAULT_STATE.sidebar.projectNavExpanded;
 
       try {
         const expandedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_EXPANDED);
@@ -66,6 +72,17 @@ function createLayoutStore(): LayoutStore {
         // Ignore localStorage errors and use default
         // eslint-disable-next-line no-console
         console.warn('Failed to load sidebar expanded state:', error);
+      }
+
+      try {
+        const projectExpandedValue = localStorage.getItem(STORAGE_KEYS.SIDEBAR_PROJECT_EXPANDED);
+        if (projectExpandedValue) {
+          savedProjectExpanded = JSON.parse(projectExpandedValue) as boolean;
+        }
+      } catch (error) {
+        // Ignore localStorage errors and use default
+        // eslint-disable-next-line no-console
+        console.warn('Failed to load sidebar project-nav state:', error);
       }
 
       try {
@@ -84,9 +101,32 @@ function createLayoutStore(): LayoutStore {
         sidebar: {
           isExpanded: savedExpanded,
           activeSection: savedSection,
+          projectNavExpanded: savedProjectExpanded,
         },
         isInitialized: true,
       }));
+    },
+
+    // Toggle the project nav group (Settings/Metadata/Manifest/Navigation)
+    toggleProjectNav(): void {
+      update(state => {
+        const newValue = !state.sidebar.projectNavExpanded;
+
+        try {
+          localStorage.setItem(STORAGE_KEYS.SIDEBAR_PROJECT_EXPANDED, JSON.stringify(newValue));
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.warn('Failed to save sidebar project-nav state:', error);
+        }
+
+        return {
+          ...state,
+          sidebar: {
+            ...state.sidebar,
+            projectNavExpanded: newValue,
+          },
+        };
+      });
     },
 
     // Toggle sidebar expanded/collapsed
