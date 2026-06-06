@@ -627,13 +627,6 @@
   }
 
   /**
-   * Format timestamp for display
-   */
-  function formatTimestamp(timestamp: number): string {
-    return new Date(timestamp).toLocaleTimeString();
-  }
-
-  /**
    * Estimate the position of an element within the source document
    */
   function estimateDocumentPosition(element: Element): number {
@@ -829,15 +822,18 @@
   <!-- Header with controls -->
   <div class="preview-header">
     <div class="preview-title">
-      <!-- View toggle -->
+      <!-- Source/Preview toggle -->
       <button
         class="view-toggle"
         class:active={showSource}
         onclick={toggleSourceView}
-        title="Toggle source view"
+        title={showSource ? 'Show rendered preview' : 'Show generated source'}
       >
-        {showSource ? '👁️' : '📄'}
+        {showSource ? $t('Preview') : $t('Source')}
       </button>
+      {#if xhtmlContent}
+        <span class="content-size">{Math.round(xhtmlContent.length / 1024)}KB</span>
+      {/if}
     </div>
 
     <div class="preview-controls">
@@ -1033,22 +1029,14 @@
     {/if}
   </div>
 
-  <!-- Footer with meta info -->
-  <div class="preview-footer">
-    <div class="meta-info">
-      {#if $lastUpdateTime}
-        <span class="update-time">Updated: {formatTimestamp($lastUpdateTime)}</span>
-      {/if}
-
-      {#if xhtmlContent}
-        <span class="content-size">{Math.round(xhtmlContent.length / 1024)}KB</span>
-      {/if}
-
-      {#if transformWarnings.length > 0}
+  <!-- Footer: only shown when the transform produced warnings -->
+  {#if transformWarnings.length > 0}
+    <div class="preview-footer">
+      <div class="meta-info">
         <span class="warning-count">{transformWarnings.length} warnings</span>
-      {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>
@@ -1248,7 +1236,7 @@
   }
 
   .view-toggle {
-    padding: var(--space-1);
+    padding: var(--space-1) var(--space-3);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: var(--color-bg-secondary);
@@ -1264,6 +1252,13 @@
     background: var(--color-accent-primary);
     color: var(--color-accent-contrast);
     border-color: var(--color-accent-primary);
+  }
+
+  /* Generated file size shown beside the Source/Preview toggle in the header. */
+  .content-size {
+    font-size: var(--text-xs);
+    font-weight: var(--font-normal);
+    color: var(--color-text-secondary);
   }
 
   .transform-status {

@@ -1318,7 +1318,6 @@
         handleFileSelect({ detail: { pane, filePath, fileType } } as CustomEvent)}
       onContentChange={(pane, content) =>
         handlePaneContentChange({ detail: { pane, content } } as CustomEvent)}
-      onForceUpdate={() => forcePreviewUpdate()}
       {chapterTitle}
       chapterTitlePlaceholder={selectedItem?.idref ?? ''}
       onChapterTitleChange={handleChapterTitleChange}

@@ -44,7 +44,6 @@
     onPaneToggle,
     onFileSelect,
     onContentChange: _onContentChange,
-    onForceUpdate,
     onPreviewClick: _onPreviewClick = null,
     // Audio clip editor integration props
     workspace = null,
@@ -82,7 +81,6 @@
     onPaneToggle?: () => void;
     onFileSelect?: (pane: 1 | 2, filePath: string, fileType: string) => void;
     onContentChange?: (pane: 1 | 2, content: string) => void;
-    onForceUpdate?: () => void;
     onPreviewClick?:
       | ((detail: { text: string; documentPosition: number; elementType: string }) => void)
       | null;
@@ -169,13 +167,6 @@
     if (selectedFile) {
       onFileSelect?.(pane, selectedFile.path, selectedFile.type);
     }
-  }
-
-  /**
-   * Force immediate preview update
-   */
-  function handleForceUpdate(): void {
-    onForceUpdate?.();
   }
 
   /**
@@ -483,20 +474,9 @@
         </div>
       {:else}
         <div class="status-indicator success" title="Transform successful">
-          <span class="status-icon">✅</span>
           <span>{formatExecutionTime(executionTime)}</span>
         </div>
       {/if}
-
-      <button
-        type="button"
-        class="force-update-btn"
-        onclick={handleForceUpdate}
-        disabled={isTransforming}
-        title="Force immediate preview update"
-      >
-        🔄
-      </button>
     </div>
   </div>
 
@@ -775,25 +755,6 @@
     }
   }
 
-  .force-update-btn {
-    padding: var(--space-1);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg-secondary);
-    cursor: pointer;
-    font-size: var(--text-sm);
-    transition: all var(--duration-fast) ease;
-  }
-
-  .force-update-btn:hover:not(:disabled) {
-    background: var(--color-bg-hover);
-  }
-
-  .force-update-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   .editor-content {
     flex: 1;
     overflow: hidden;
@@ -829,12 +790,13 @@
   .pane-header-content {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-2);
     padding: var(--space-2);
   }
 
   .file-selector {
-    flex: 1;
+    flex: 1 1 7rem;
     padding: var(--space-2);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
@@ -845,7 +807,7 @@
   }
 
   .chapter-title-input {
-    flex: 2;
+    flex: 2 1 10rem;
     min-width: 0;
     padding: var(--space-2);
     border: 1px solid var(--color-border-default);
@@ -1019,8 +981,7 @@
       animation: none;
     }
 
-    .pane-toggle-btn,
-    .force-update-btn {
+    .pane-toggle-btn {
       transition: none;
     }
   }
