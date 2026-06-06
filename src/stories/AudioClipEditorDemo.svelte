@@ -198,7 +198,7 @@ The generated directives can then be processed by the EPUB transform pipeline.`;
 
 <div class="audio-clip-demo" role="main">
   <div class="demo-header">
-    <h1>🎵 Audio Clip Editor Demo</h1>
+    <h1>Audio Clip Editor Demo</h1>
     <p>Interactive demonstration of the AudioClipEditor component with sample audio file</p>
 
     <div class="demo-controls">
@@ -253,7 +253,7 @@ The generated directives can then be processed by the EPUB transform pipeline.`;
 
       <!-- Audio Clip Editor -->
       <div class="audio-editor-section">
-        <h2>🎵 Audio Clip Editor</h2>
+        <h2>Audio Clip Editor</h2>
         <p class="section-description">
           Use the controls below to select audio clips and insert them into your content.
         </p>

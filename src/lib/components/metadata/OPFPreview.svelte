@@ -62,7 +62,6 @@
 {#if isAdvancedMode}
   <div class="opf-preview">
     <div class="preview-header">
-      <span class="content-type-icon">📄</span>
       <span class="file-name">content.opf</span>
     </div>
 
@@ -112,10 +111,6 @@
     padding: var(--space-3);
     background: var(--color-bg-secondary);
     border-bottom: 1px solid var(--color-border-default);
-  }
-
-  .content-type-icon {
-    font-size: var(--text-lg);
   }
 
   .file-name {

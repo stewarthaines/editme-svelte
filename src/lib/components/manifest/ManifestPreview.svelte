@@ -446,21 +446,6 @@
       // Could dispatch an error event or show a toast notification here
     }
   };
-
-  const getContentIcon = (contentType: string) => {
-    switch (contentType) {
-      case 'text':
-        return '📄';
-      case 'image':
-        return '🖼️';
-      case 'audio':
-        return '🎵';
-      case 'video':
-        return '🎥';
-      default:
-        return '📦';
-    }
-  };
 </script>
 
 <div class="manifest-preview">
@@ -565,7 +550,6 @@
       <div class="preview-body">
         {#if contentPreview}
           <div class="content-header">
-            <span class="content-type-icon">{getContentIcon(contentPreview.contentType)}</span>
             <span class="content-type">{contentPreview.mediaType}</span>
           </div>
 
@@ -759,10 +743,6 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
-  }
-
-  .content-type-icon {
-    font-size: 1.25rem;
   }
 
   .content-type {

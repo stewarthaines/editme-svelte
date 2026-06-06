@@ -432,9 +432,6 @@
         <span class="toggle-icon" aria-hidden="true">
           {editorMode === 'single' ? '⊞' : '⊟'}
         </span>
-        <span class="toggle-label">
-          {editorMode === 'single' ? $t('Split Pane') : $t('Single Pane')}
-        </span>
       </button>
 
       {#if ((pane1SelectedFile === 'text' && editorMode === 'single') || (editorMode === 'dual' && (pane1SelectedFile === 'text' || pane2SelectedFile === 'text'))) && hasAudioFiles && audioClipService && workspace}
@@ -446,7 +443,7 @@
           title={audioEditorVisible ? 'Hide Audio Clip Editor' : 'Show Audio Clip Editor'}
           aria-label={audioEditorVisible ? 'Hide Audio Clip Editor' : 'Show Audio Clip Editor'}
         >
-          🎵 Audio Clip Editor
+          Audio Clip Editor
         </button>
       {/if}
     </div>
@@ -695,10 +692,6 @@
   .toggle-icon {
     font-size: var(--text-base);
     font-weight: bold;
-  }
-
-  .toggle-label {
-    font-size: var(--text-sm);
   }
 
   .editor-status {

@@ -35,7 +35,7 @@
       await canvas.findByRole('main', {}, { timeout: 10000 });
 
       // Wait for the audio editor section
-      await canvas.findByText('🎵 Audio Clip Editor', {}, { timeout: 5000 });
+      await canvas.findByText('Audio Clip Editor', {}, { timeout: 5000 });
 
       console.log('AudioClipEditor demo loaded successfully');
     } catch (error) {
@@ -60,7 +60,7 @@
       await canvas.findByRole('main', {}, { timeout: 10000 });
 
       // Wait for the audio editor section
-      await canvas.findByText('🎵 Audio Clip Editor', {}, { timeout: 5000 });
+      await canvas.findByText('Audio Clip Editor', {}, { timeout: 5000 });
 
       // Try to interact with the textarea
       const textarea = canvas.getByRole('textbox');
