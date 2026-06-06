@@ -243,6 +243,7 @@ describe('SettingsService Contract Tests', () => {
         dom_transforms: ['SOURCE/scripts/cleanup.js'],
         spine_basename: 'section',
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
+        filename_template: '<title> - <date>',
         cover: {
           template: 'modern',
           background_color: '#ffffff',
@@ -274,6 +275,7 @@ describe('SettingsService Contract Tests', () => {
         dom_transforms: ['SOURCE/scripts/transformDom.js'],
         spine_basename: 'chapter',
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
+        filename_template: '<title> - <author> - <date>',
       });
     });
 

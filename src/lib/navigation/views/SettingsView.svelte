@@ -204,6 +204,39 @@
     }
   }
 
+  // Handle packaged-filename template change
+  async function handleFilenameTemplateChange(event: Event): Promise<void> {
+    if (!workspaceId || !epubSettings) return;
+
+    const target = event.target as HTMLInputElement;
+    const newTemplate = target.value;
+
+    const validation = settingsService.validateEPUBSettings({ filename_template: newTemplate });
+    if (!validation.isValid) {
+      error = validation.errors[0] || 'Invalid filename template';
+      return;
+    }
+
+    const updatedSettings: EPUBSettings = {
+      ...epubSettings,
+      filename_template: newTemplate,
+    };
+
+    epubSettings = updatedSettings;
+
+    try {
+      await settingsService.saveEPUBSettings(workspaceId, updatedSettings);
+      onSettingsChanged?.();
+    } catch (err) {
+      error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
+      // Revert optimistic update
+      epubSettings = {
+        ...epubSettings,
+        filename_template: epubSettings.filename_template,
+      };
+    }
+  }
+
   // Handle extension removal
   async function handleExtensionRemoval(extensionName: string): Promise<void> {
     if (!workspaceId) return;
@@ -352,6 +385,26 @@
             {#if canEditEPUBSettings && isAdvancedMode}
               <section class="epub-settings">
                 <h3>{$t('EPUB Settings')}</h3>
+
+                <div class="setting-group">
+                  <label for="filename-template" class="setting-label-text">
+                    {$t('Packaged Filename')}
+                  </label>
+                  <input
+                    id="filename-template"
+                    type="text"
+                    class="template-input"
+                    value={epubSettings?.filename_template || ''}
+                    placeholder="&lt;title&gt; - &lt;author&gt; - &lt;date&gt;"
+                    onblur={handleFilenameTemplateChange}
+                    disabled={epubLoading}
+                  />
+                  <p class="setting-description">
+                    Template for the exported .epub filename. Use placeholders: &lt;title&gt;,
+                    &lt;author&gt;, &lt;date&gt;. Empty placeholders (e.g. no author) collapse
+                    cleanly.
+                  </p>
+                </div>
 
                 <div class="setting-group">
                   <label for="audio-clip-template" class="setting-label-text">

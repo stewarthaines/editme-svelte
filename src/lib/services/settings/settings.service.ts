@@ -6,6 +6,7 @@
  */
 
 import type { FileStorageAPI } from '../../storage/index.js';
+import { DEFAULT_FILENAME_TEMPLATE } from '../../epub/opf-utils.js';
 
 // Service-specific types
 export interface GlobalSettings {
@@ -30,6 +31,8 @@ export interface EPUBSettings {
   dom_transforms: string[];
   spine_basename: string;
   audio_clip_template?: string;
+  /** Template for the packaged .epub filename. Placeholders: <title>, <author>, <date>. */
+  filename_template?: string;
   cover?: {
     template: string;
     background_color: string;
@@ -315,6 +318,7 @@ export class SettingsService {
         dom_transforms: settings.dom_transforms ?? defaults.dom_transforms,
         spine_basename: settings.spine_basename ?? defaults.spine_basename,
         audio_clip_template: settings.audio_clip_template ?? defaults.audio_clip_template,
+        filename_template: settings.filename_template ?? defaults.filename_template,
         cover: settings.cover
           ? {
               template: settings.cover.template ?? 'default',
@@ -357,6 +361,7 @@ export class SettingsService {
       dom_transforms: ['SOURCE/scripts/transformDom.js'],
       spine_basename: 'chapter',
       audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
+      filename_template: DEFAULT_FILENAME_TEMPLATE,
     };
   }
 
@@ -575,6 +580,18 @@ export class SettingsService {
       if (missingPlaceholders.length > 0) {
         errors.push(
           `Audio clip template missing required placeholders: ${missingPlaceholders.join(', ')}`
+        );
+      }
+    }
+
+    // Validate filename template
+    if (settings.filename_template !== undefined) {
+      const template = settings.filename_template;
+      if (!template.trim()) {
+        errors.push('Filename template cannot be empty');
+      } else if (!/<(title|author|date)>/.test(template)) {
+        warnings.push(
+          'Filename template has no <title>, <author> or <date> placeholder; every export will share the same filename'
         );
       }
     }

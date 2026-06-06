@@ -7,7 +7,12 @@
 
 import { ZipWriter, downloadBlob } from '../zip/index.js';
 import { FileStorageAPI } from '../storage/index.js';
-import { OPFUtils, creatorName, type EPUBMetadata } from './opf-utils.js';
+import {
+  OPFUtils,
+  creatorName,
+  DEFAULT_FILENAME_TEMPLATE,
+  type EPUBMetadata,
+} from './opf-utils.js';
 import { getMimeType } from '../utils/mime-types.js';
 import { SourceManager } from '../source/index.js';
 import { PUBLISH_WORKSPACE_ID } from '../workspace/types.js';
@@ -116,7 +121,8 @@ export class EPUBPackager {
       });
 
       const blob = await zipWriter.buildBlob();
-      const filename = this.generateFilename(metadata);
+      const template = await this.readFilenameTemplate(workspaceId);
+      const filename = this.generateFilename(metadata, template);
 
       // Persist the packaged epub to the shared publish output directory so the
       // Publish view (and the publish plugin) can list and act on it.
@@ -243,10 +249,29 @@ export class EPUBPackager {
     return { method: 0x08, reason: 'Default compression' };
   }
 
-  generateFilename(metadata: EPUBMetadata): string {
+  /**
+   * Read the per-EPUB filename template from SOURCE/settings.json. Returns the
+   * default template when the file is absent, unreadable, or has no usable
+   * `filename_template` (reads existing config only; never writes a file).
+   */
+  private async readFilenameTemplate(workspaceId: string): Promise<string> {
+    try {
+      const content = await this.fileStorage.readTextFile(workspaceId, 'SOURCE/settings.json');
+      const parsed = JSON.parse(content);
+      const template = parsed?.filename_template;
+      if (typeof template === 'string' && template.trim()) {
+        return template;
+      }
+    } catch {
+      // No settings file (or invalid JSON) — fall back to the default template.
+    }
+    return DEFAULT_FILENAME_TEMPLATE;
+  }
+
+  generateFilename(metadata: EPUBMetadata, template: string = DEFAULT_FILENAME_TEMPLATE): string {
     const title = this.sanitizeFilename(metadata.title || 'Untitled');
     const authorName = creatorName(metadata.creator?.[0]);
-    const author = authorName ? this.sanitizeFilename(authorName) : null;
+    const author = authorName ? this.sanitizeFilename(authorName) : '';
 
     // Prefer the metadata publication date (dc:date); take its date portion so a
     // full timestamp becomes YYYY-MM-DD. Fall back to the package-generation date
@@ -254,11 +279,23 @@ export class EPUBPackager {
     const pubDate = metadata.date?.split('T')[0].trim();
     const date = pubDate ? this.sanitizeFilename(pubDate) : new Date().toISOString().split('T')[0];
 
-    const parts = [title];
-    if (author) parts.push(author);
-    parts.push(date);
+    const base = template
+      .split('<title>')
+      .join(title)
+      .split('<author>')
+      .join(author)
+      .split('<date>')
+      .join(date)
+      // Tidy separators orphaned by an empty token (e.g. no author): collapse a
+      // run of " - " into one and trim any leading/trailing separator.
+      .replace(/\s+/g, ' ')
+      .replace(/(?:-\s*){2,}/g, '- ')
+      .replace(/^[\s-]+|[\s-]+$/g, '')
+      // Strip any filesystem-invalid characters the template itself introduced.
+      .replace(/[<>:"/\\|?*]/g, '')
+      .trim();
 
-    return `${parts.join(' - ')}.epub`;
+    return `${base || 'Untitled'}.epub`;
   }
 
   private sanitizeFilename(name: string): string {

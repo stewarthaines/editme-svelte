@@ -18,6 +18,13 @@ export function generateEPUBTimestamp(): string {
 }
 
 /**
+ * Default template for the packaged .epub filename. Supports the placeholders
+ * `<title>`, `<author>` (first creator) and `<date>` (dc:date → YYYY-MM-DD,
+ * falling back to the packaging date). Stored per-EPUB in SOURCE/settings.json.
+ */
+export const DEFAULT_FILENAME_TEMPLATE = '<title> - <author> - <date>';
+
+/**
  * A creator or contributor with optional MARC relator roles.
  * `id` is the OPF id used by role refinements (`<meta refines="#id">`); it is
  * read on parse and re-minted on generate.

@@ -22,7 +22,6 @@
     WorkspaceState,
   } from '$lib/services/workspace/workspace.service.js';
   import type { SettingsService } from '$lib/services/settings/settings.service.js';
-  import { t } from '$lib/i18n';
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
 
   // Props using Svelte 5 runes syntax
