@@ -94,6 +94,14 @@
     { id: 'navigation', icon: BookOpen, label: $t('Navigation'), requiresWorkspace: true },
   ];
 
+  // Fixed-layout (pre-paginated) EPUBs are organized as pages, not chapters —
+  // relabel the spine section accordingly. Visible label only.
+  const spineSectionLabel = $derived(
+    currentWorkspace?.opf?.metadata?.renditionLayout === 'pre-paginated'
+      ? $t('Pages')
+      : $t('Chapters')
+  );
+
   function toggleSidebar() {
     layoutStore.toggleSidebar();
   }
@@ -240,7 +248,7 @@
       {#if hasWorkspace}
         {#if isExpanded}
           <div class="spine-section-header workspace-title-section">
-            <span class="section-label">{$t('Chapters')}</span>
+            <span class="section-label">{spineSectionLabel}</span>
             <button
               class="append-button-nav"
               onclick={handleAppendItem}
@@ -252,7 +260,7 @@
           </div>
         {:else}
           <div class="spine-section-header compact">
-            <span class="section-label">{generateCompactLabel($t('Chapters'))}</span>
+            <span class="section-label">{generateCompactLabel(spineSectionLabel)}</span>
             <button
               class="append-button-nav compact"
               onclick={handleAppendItem}
