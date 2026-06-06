@@ -40,6 +40,7 @@
   import { EPUBPackager } from './lib/epub/EPUBPackager.js';
   import { EPUBUnpacker } from './lib/epub/EPUBUnpacker.js';
   import { generateEPUBTimestamp } from './lib/epub/opf-utils.js';
+  import { ensureGeneratedNav } from './lib/outline/nav-coherence.js';
 
   // Extension manager instance
   let extensionManager = $state<ExtensionManager>();
@@ -436,9 +437,18 @@
         modifiedDate: generateEPUBTimestamp(),
       });
 
+      // Regenerate the auto-generated nav.xhtml from the current spine so the
+      // packaged EPUB always ships a coherent nav (a manual nav.txt is left
+      // untouched). Runs before packaging, which zips files straight from storage.
+      const { workspace: navWorkspace } = await ensureGeneratedNav(
+        updatedWorkspace,
+        spineService,
+        workspaceService
+      );
+
       // Update the workspace state in appState
       if (appState) {
-        appState.workspace = updatedWorkspace;
+        appState.workspace = navWorkspace;
       }
 
       // Then package the EPUB.

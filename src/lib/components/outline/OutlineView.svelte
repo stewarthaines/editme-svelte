@@ -9,6 +9,7 @@
   } from '../../services/workspace/workspace.service.js';
   import type { SpineService } from '../../services/spine/spine.service.js';
   import { OutlineGenerator } from '../../outline/outline-generator.js';
+  import { ensureGeneratedNav } from '../../outline/nav-coherence.js';
   import { TransformEngine } from '$lib/infrastructure/transform-engine';
   import { SpineTransformPipeline } from '$lib/transform/spine-transform-pipeline';
   import type { FileStorageAPI } from '$lib/storage';
@@ -91,23 +92,17 @@
 
   async function generateFromSpine() {
     try {
-      // Load spine items for the workspace
-      const spineItems = await spineService.loadSpineItems(workspace);
-
-      // Generate navigation from spine items (simplified - just use existing XHTML files)
-      const navigationDoc = await OutlineGenerator.generateFromSpine(
-        spineItems,
-        workspaceService,
-        workspace.id,
-        workspace.pathInfo
-      );
-
-      previewUpdate({ xhtml: navigationDoc.xhtmlContent });
-
-      const navPath = `${workspace.pathInfo.basePath}/nav.xhtml`;
-      await workspaceService.writeFile(workspace.id, navPath, navigationDoc.xhtmlContent);
+      // Mark auto mode (empty nav.txt), then regenerate + register via the
+      // shared helper so the in-view nav matches what packaging produces.
       const navSourcePath = 'SOURCE/text/nav.txt';
       await workspaceService.writeFile(workspace.id, navSourcePath, '');
+
+      const result = await ensureGeneratedNav(workspace, spineService, workspaceService);
+      workspace = result.workspace;
+
+      if (result.xhtml !== null) {
+        previewUpdate({ xhtml: result.xhtml });
+      }
     } catch (e) {
       console.error('Failed to generate navigation from spine:', e);
       // error({
