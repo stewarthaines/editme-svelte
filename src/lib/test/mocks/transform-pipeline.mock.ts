@@ -252,6 +252,12 @@ export class MockTransformPipeline {
 
     const title = metadata?.title || 'Untitled';
 
+    // Mirror the real template: wrap content in a single <main> landmark
+    // (idempotent — leave an existing main alone).
+    const body = /<main[\s/>]/i.test(bodyContent)
+      ? bodyContent
+      : `<main role="main">${bodyContent}</main>`;
+
     return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -260,7 +266,7 @@ export class MockTransformPipeline {
   <meta charset="UTF-8"/>
 </head>
 <body>
-  ${bodyContent}
+  ${body}
 </body>
 </html>`;
   }

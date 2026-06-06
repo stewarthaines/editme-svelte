@@ -339,10 +339,12 @@ export class SpineService {
     <link rel="stylesheet" type="text/css" href="../Styles/styles.css"/>
 </head>
 <body>
-    <section class="chapter">
-        <h1>${title}</h1>
-        <p>Your chapter content goes here...</p>
-    </section>
+    <main role="main">
+        <section class="chapter">
+            <h1>${title}</h1>
+            <p>Your chapter content goes here...</p>
+        </section>
+    </main>
 </body>
 </html>`;
   }
@@ -366,9 +368,11 @@ export class SpineService {
     <link rel="stylesheet" type="text/css" href="../Styles/styles.css"/>
 </head>
 <body>
-    <section class="chapter">
+    <main role="main">
+        <section class="chapter">
 ${body}
-    </section>
+        </section>
+    </main>
 </body>
 </html>`;
   }

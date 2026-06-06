@@ -77,7 +77,9 @@ describe('TransformPipeline', () => {
             <link rel="stylesheet" type="text/css" href="../Styles/page.css" />
           </head>
           <body>
-            <h1>Hi</h1>
+            <main role="main">
+              <h1>Hi</h1>
+            </main>
           </body>
         </html>"
       `);

@@ -46,9 +46,24 @@ export function generateXHTMLDocument(content: string, metadata: ChapterMetadata
     <title>${escapedTitle}</title>
 ${viewportTag}${viewportTag ? '\n' : ''}${stylesheetLinks}${stylesheetLinks ? '\n' : ''}${scriptTags}${scriptTags ? '\n' : ''}${customHeadContent}${customHeadContent ? '\n' : ''}  </head>
   <body>
-    ${content}
+    ${ensureMainLandmark(content)}
   </body>
 </html>`;
+}
+
+/**
+ * Wrap chapter content in a single `<main role="main">` landmark for accessibility
+ * (axe `landmark-one-main`; WCAG 2.4.1/1.3.1). Idempotent: if the content already
+ * contains a `<main>` element — e.g. a project transform script added one — it's
+ * left as-is so we never emit two mains (which would be invalid HTML).
+ */
+export function ensureMainLandmark(content: string): string {
+  if (/<main[\s/>]/i.test(content)) {
+    return content;
+  }
+  return `<main role="main">
+      ${content}
+    </main>`;
 }
 
 /**
