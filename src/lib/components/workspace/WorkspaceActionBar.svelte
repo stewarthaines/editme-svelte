@@ -5,10 +5,12 @@
     isLoading = false,
     onCreateNewRequested,
     onLoadEpubRequested,
+    onImportFromOPDSRequested,
   }: {
     isLoading?: boolean;
     onCreateNewRequested?: () => void;
     onLoadEpubRequested?: () => void;
+    onImportFromOPDSRequested?: () => void;
   } = $props();
 
   const handleCreateNew = () => {
@@ -17,6 +19,10 @@
 
   const handleLoadEpub = () => {
     onLoadEpubRequested?.();
+  };
+
+  const handleImportFromOPDS = () => {
+    onImportFromOPDSRequested?.();
   };
 
   // Future: import from folder functionality
@@ -54,6 +60,20 @@
       <div class="button-content">
         <span class="button-title">{$t('Load EPUB')}</span>
         <span class="button-subtitle">{$t('Edit existing file')}</span>
+      </div>
+    </button>
+
+    <button
+      type="button"
+      class="action-button secondary"
+      onclick={handleImportFromOPDS}
+      disabled={isLoading}
+      aria-label={$t('Import an EPUB from an OPDS catalog URL')}
+    >
+      <span class="button-icon" aria-hidden="true">🌐</span>
+      <div class="button-content">
+        <span class="button-title">{$t('Import from OPDS')}</span>
+        <span class="button-subtitle">{$t('From a catalog URL')}</span>
       </div>
     </button>
     <!--

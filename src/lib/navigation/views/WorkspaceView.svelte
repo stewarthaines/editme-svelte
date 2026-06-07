@@ -5,6 +5,7 @@
   import type { EPUBMetadata } from '../../epub/opf-utils';
   import WorkspaceActionBar from '../../components/workspace/WorkspaceActionBar.svelte';
   import WorkspaceList from '../../components/workspace/WorkspaceList.svelte';
+  import OPDSImportDialog from '../../components/workspace/OPDSImportDialog.svelte';
 
   // Service layer types for return values
   import type {
@@ -46,6 +47,7 @@
   let loading = $state(false);
   let error = $state<string | null>(null);
   let hasUnsavedChanges = $state(false);
+  let showOpdsDialog = $state(false);
   let guardId = $state<string>('');
 
   // Service layer handles state directly - no reactive subscriptions needed
@@ -166,6 +168,18 @@
     } finally {
       loading = false;
     }
+  };
+
+  // Open the OPDS import dialog
+  const handleImportFromOPDS = () => {
+    showOpdsDialog = true;
+  };
+
+  // Import the chosen book from the OPDS feed, reusing the EPUB-from-URL path.
+  const handleOpdsImport = async (sourceUrl: string) => {
+    await onEpubImportRequested(undefined, sourceUrl);
+    await loadWorkspaces();
+    showOpdsDialog = false;
   };
 
   // Handle workspace selection (open workspace) with smart navigation
@@ -302,7 +316,12 @@
       isLoading={loading}
       onCreateNewRequested={handleCreateNew}
       onLoadEpubRequested={handleLoadEpub}
+      onImportFromOPDSRequested={handleImportFromOPDS}
     />
+
+    {#if showOpdsDialog}
+      <OPDSImportDialog onImport={handleOpdsImport} onClose={() => (showOpdsDialog = false)} />
+    {/if}
 
     <!-- Error State -->
     {#if error}
