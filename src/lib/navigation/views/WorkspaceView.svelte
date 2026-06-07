@@ -49,6 +49,11 @@
   let error = $state<string | null>(null);
   let hasUnsavedChanges = $state(false);
   let showOpdsDialog = $state(false);
+
+  // OPDS import fetches over the network, which is pointless (and CORS-blocked)
+  // when the app runs offline from a file:// URL — the standalone SEED.html /
+  // Active EPUB case. Hide the option there.
+  const isFileUrl = typeof location !== 'undefined' && location.protocol === 'file:';
   let guardId = $state<string>('');
 
   // Service layer handles state directly - no reactive subscriptions needed
@@ -358,7 +363,7 @@
             isLoading={loading}
             onCreateNewRequested={handleCreateNew}
             onLoadEpubRequested={handleLoadEpub}
-            onImportFromOPDSRequested={handleImportFromOPDS}
+            onImportFromOPDSRequested={isFileUrl ? undefined : handleImportFromOPDS}
           />
         </div>
       </Pane>

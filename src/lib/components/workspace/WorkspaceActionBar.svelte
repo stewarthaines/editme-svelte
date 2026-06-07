@@ -62,19 +62,23 @@
       </div>
     </button>
 
-    <button
-      type="button"
-      class="action-button secondary"
-      onclick={handleImportFromOPDS}
-      disabled={isLoading}
-      aria-label={$t('Import an EPUB from an OPDS catalog URL')}
-    >
-      <span class="button-icon" aria-hidden="true">🌐</span>
-      <div class="button-content">
-        <span class="button-title">{$t('Import from OPDS')}</span>
-        <span class="button-subtitle">{$t('From a catalog URL')}</span>
-      </div>
-    </button>
+    <!-- OPDS import reaches the network; shown only when a handler is wired
+         (the Projects view omits it when running offline from a file:// URL). -->
+    {#if onImportFromOPDSRequested}
+      <button
+        type="button"
+        class="action-button secondary"
+        onclick={handleImportFromOPDS}
+        disabled={isLoading}
+        aria-label={$t('Import an EPUB from an OPDS catalog URL')}
+      >
+        <span class="button-icon" aria-hidden="true">🌐</span>
+        <div class="button-content">
+          <span class="button-title">{$t('Import from OPDS')}</span>
+          <span class="button-subtitle">{$t('From a catalog URL')}</span>
+        </div>
+      </button>
+    {/if}
     <!--
     <button
       type="button"
