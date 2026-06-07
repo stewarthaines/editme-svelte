@@ -1303,8 +1303,6 @@
       {availableFiles2}
       transformError={$transformError}
       transformWarnings={$transformWarnings}
-      isTransforming={$isTransforming}
-      executionTime={$executionTime}
       editorMode={paneState.mode}
       pane1SelectedFile={paneState.pane1.selectedFileValue}
       pane2SelectedFile={paneState.pane2.selectedFileValue}

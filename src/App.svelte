@@ -172,12 +172,14 @@
     isTransforming: boolean;
     transformError: any;
     transformWarnings: string[];
+    executionTime: number;
     spineItemId: string | null;
   }>({
     xhtmlContent: '',
     isTransforming: false,
     transformError: null,
     transformWarnings: [],
+    executionTime: 0,
     spineItemId: null,
   });
 
@@ -246,6 +248,7 @@
     isTransforming: boolean;
     transformError: any;
     transformWarnings: string[];
+    executionTime: number;
     spineItemId: string | null;
   }) => {
     spinePreviewData = {
@@ -253,6 +256,7 @@
       isTransforming: detail.isTransforming,
       transformError: detail.transformError,
       transformWarnings: detail.transformWarnings,
+      executionTime: detail.executionTime,
       spineItemId: detail.spineItemId,
     };
   };
@@ -782,6 +786,7 @@
             isTransforming={spinePreviewData.isTransforming}
             transformError={spinePreviewData.transformError}
             transformWarnings={spinePreviewData.transformWarnings}
+            executionTime={spinePreviewData.executionTime}
             onPreviewClick={handlePreviewClick}
             onNavigate={handleNavigationClick}
             chapterId={spinePreviewData.spineItemId}

@@ -30,6 +30,7 @@
     isTransforming = false,
     transformError = null,
     transformWarnings = [],
+    executionTime = 0,
     onNavigate = undefined,
     onPreviewClick = null,
     chapterId = null,
@@ -38,6 +39,7 @@
     isTransforming?: boolean;
     transformError?: TransformError | null;
     transformWarnings?: string[];
+    executionTime?: number;
     onNavigate: ((chapterId: string) => void) | undefined;
     onPreviewClick?:
       | ((detail: { text: string; documentPosition: number; elementType: string }) => void)
@@ -45,6 +47,11 @@
     /** Selected spine-item id, used to filter the validation report to this chapter. */
     chapterId?: string | null;
   } = $props();
+
+  /** Format the transform's execution time for the status indicator. */
+  function formatExecutionTime(ms: number): string {
+    return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+  }
 
   // --- Accessibility check -----------------------------------------------------
   // Inject axe-core into the same-origin preview iframe and run it on demand so the
@@ -834,6 +841,28 @@
       {#if xhtmlContent}
         <span class="content-size">{Math.round(xhtmlContent.length / 1024)}KB</span>
       {/if}
+
+      <!-- Transform status (moved here from the editor pane header). -->
+      {#if isTransforming}
+        <div class="status-indicator transforming" title="Transform in progress">
+          <div class="status-spinner"></div>
+          <span>Transforming...</span>
+        </div>
+      {:else if transformError}
+        <div class="status-indicator error" title="Transform error">
+          <span class="status-icon">⚠️</span>
+          <span>Error</span>
+        </div>
+      {:else if transformWarnings.length > 0}
+        <div class="status-indicator warning" title={`${transformWarnings.length} warnings`}>
+          <span class="status-icon">⚠️</span>
+          <span>{transformWarnings.length} warnings</span>
+        </div>
+      {:else if xhtmlContent}
+        <div class="status-indicator success" title="Transform successful">
+          <span>{formatExecutionTime(executionTime)}</span>
+        </div>
+      {/if}
     </div>
 
     <div class="preview-controls">
@@ -906,24 +935,6 @@
       </select>
     </div>
   </div>
-
-  <!-- Transform status -->
-  {#if isTransforming}
-    <div class="transform-status transforming">
-      <div class="status-spinner"></div>
-      <span>Transforming content...</span>
-    </div>
-  {:else if transformError}
-    <div class="transform-status error">
-      <span class="status-icon">🚨</span>
-      <span>Transform failed: {transformError.message}</span>
-    </div>
-  {:else if transformWarnings.length > 0}
-    <div class="transform-status warning">
-      <span class="status-icon">⚠️</span>
-      <span>{transformWarnings.length} warnings</span>
-    </div>
-  {/if}
 
   <!-- Accessibility results panel (spike): plain-text violations, sorted by impact -->
   {#if a11yPanelOpen}
@@ -1028,15 +1039,6 @@
       </div>
     {/if}
   </div>
-
-  <!-- Footer: only shown when the transform produced warnings -->
-  {#if transformWarnings.length > 0}
-    <div class="preview-footer">
-      <div class="meta-info">
-        <span class="warning-count">{transformWarnings.length} warnings</span>
-      </div>
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -1261,28 +1263,35 @@
     color: var(--color-text-secondary);
   }
 
-  .transform-status {
+  /* Compact transform-status pill in the header (moved from the editor pane). */
+  .status-indicator {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2);
-    font-size: var(--text-sm);
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
     font-weight: var(--font-medium);
   }
 
-  .transform-status.transforming {
+  .status-indicator.transforming {
     background: var(--color-info-bg);
     color: var(--color-info-text);
   }
 
-  .transform-status.error {
+  .status-indicator.error {
     background: var(--color-error-bg);
     color: var(--color-error-text);
   }
 
-  .transform-status.warning {
+  .status-indicator.warning {
     background: var(--color-warning-bg);
     color: var(--color-warning-text);
+  }
+
+  .status-indicator.success {
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
   }
 
   .status-spinner {
@@ -1418,35 +1427,6 @@
   .empty-content p {
     margin: 0;
     font-size: var(--text-sm);
-  }
-
-  .preview-footer {
-    padding: var(--space-2);
-    border-top: 1px solid var(--color-border-default);
-    background: var(--color-bg-tertiary);
-  }
-
-  .meta-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: var(--text-xs);
-    color: var(--color-text-secondary);
-  }
-
-  .meta-info > span {
-    margin-right: var(--space-3);
-  }
-
-  .meta-info > span:last-child {
-    margin-right: 0;
-  }
-
-  .warning-count {
-    color: var(--color-warning-text);
-    background: var(--color-warning-bg);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-sm);
   }
 
   /* Reduced motion support */

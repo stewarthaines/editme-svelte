@@ -28,8 +28,6 @@
   let {
     transformError = null,
     transformWarnings = [],
-    isTransforming = false,
-    executionTime = 0,
     availableFiles1 = [],
     availableFiles2 = [],
     editorMode = 'single',
@@ -55,8 +53,6 @@
   }: {
     transformError?: TransformError | null;
     transformWarnings?: string[];
-    isTransforming?: boolean;
-    executionTime?: number;
     availableFiles1?: Array<{
       value: string;
       label: string;
@@ -261,16 +257,6 @@
     return '';
   }
 
-  /**
-   * Format execution time for display
-   */
-  function formatExecutionTime(ms: number): string {
-    if (ms < 1000) {
-      return `${ms}ms`;
-    }
-    return `${(ms / 1000).toFixed(1)}s`;
-  }
-
   // Textarea references for navigation
   let pane1Textarea: HTMLTextAreaElement | undefined = $state();
   let pane2Textarea: HTMLTextAreaElement | undefined = $state();
@@ -418,8 +404,55 @@
   export { findAndSelectText };
 </script>
 
+<!-- Pane 1's file picker. Lives in the header row in single-pane mode; moves
+     into pane 1's own header in dual mode (next to its editor). -->
+{#snippet pane1FileSelector()}
+  <select
+    class="file-selector"
+    value={pane1SelectedFile}
+    onchange={e => handleFileSelect(1, e)}
+    aria-label="Select file for pane 1"
+  >
+    <option value="" disabled>Select file...</option>
+    {#each availableFiles1 as file}
+      <option value={file.value}>{file.label}</option>
+    {/each}
+  </select>
+{/snippet}
+
+<!-- The chapter title belongs to the chapter, not a pane, so it stays in the
+     header row in both single and dual mode. -->
+{#snippet chapterTitleInput()}
+  <input
+    type="text"
+    class="chapter-title-input"
+    value={chapterTitle}
+    placeholder={chapterTitlePlaceholder}
+    onchange={e => onChapterTitleChange?.((e.currentTarget as HTMLInputElement).value)}
+    aria-label="Chapter title"
+    title="Chapter title — used in the content document <title>; defaults to the spine id"
+  />
+{/snippet}
+
+{#snippet pane1Audio()}
+  {#if pane1SelectedFile === 'text' && audioEditorVisible && hasAudioFiles && audioClipService && workspace && settingsService && workspaceService}
+    <div class="audio-editor-panel">
+      <AudioClipEditor
+        {workspace}
+        {audioClipService}
+        {workspaceService}
+        {settingsService}
+        {textContent}
+        {textareaSelection}
+        onInsertClip={insertClipDirective}
+      />
+    </div>
+  {/if}
+{/snippet}
+
 <div class="editor-pane-container">
-  <!-- Header with pane toggle and status -->
+  <!-- Single header row: pane toggle, pane-1 file picker + chapter title
+       (single-pane mode), audio toggle, and the transform status. -->
   <div class="editor-header">
     <div class="editor-controls">
       <button
@@ -433,6 +466,11 @@
         </span>
       </button>
 
+      {#if editorMode === 'single'}
+        {@render pane1FileSelector()}
+      {/if}
+      {@render chapterTitleInput()}
+
       {#if ((pane1SelectedFile === 'text' && editorMode === 'single') || (editorMode === 'dual' && (pane1SelectedFile === 'text' || pane2SelectedFile === 'text'))) && hasAudioFiles && audioClipService && workspace}
         <button
           type="button"
@@ -444,34 +482,6 @@
         >
           Audio Clip Editor
         </button>
-      {/if}
-    </div>
-
-    <div class="editor-status">
-      {#if isTransforming}
-        <div class="status-indicator transforming" title="Transform in progress">
-          <div class="status-spinner"></div>
-          <span>Transforming...</span>
-        </div>
-      {:else if transformError && transformError.stage !== 'syntax-validation'}
-        <div class="status-indicator error" title="Transform error">
-          <span class="status-icon">⚠️</span>
-          <span>Error</span>
-        </div>
-      {:else if pane1Error || pane2Error}
-        <div class="status-indicator error" title="Syntax error prevents transform">
-          <span class="status-icon">⚠️</span>
-          <span>Syntax Error</span>
-        </div>
-      {:else if transformWarnings.length > 0}
-        <div class="status-indicator warning" title={`${transformWarnings.length} warnings`}>
-          <span class="status-icon">⚠️</span>
-          <span>{transformWarnings.length} warnings</span>
-        </div>
-      {:else}
-        <div class="status-indicator success" title="Transform successful">
-          <span>{formatExecutionTime(executionTime)}</span>
-        </div>
       {/if}
     </div>
   </div>
@@ -541,44 +551,18 @@
 
       <!-- Pane 1 (always visible, bottom when in dual mode) -->
       <div class="editor-pane pane-1">
-        <div class="pane-header">
-          <div class="pane-header-content">
-            <select
-              class="file-selector"
-              value={pane1SelectedFile}
-              onchange={e => handleFileSelect(1, e)}
-              aria-label="Select file for pane 1"
-            >
-              <option value="" disabled>Select file...</option>
-              {#each availableFiles1 as file}
-                <option value={file.value}>{file.label}</option>
-              {/each}
-            </select>
-            <input
-              type="text"
-              class="chapter-title-input"
-              value={chapterTitle}
-              placeholder={chapterTitlePlaceholder}
-              onchange={e => onChapterTitleChange?.((e.currentTarget as HTMLInputElement).value)}
-              aria-label="Chapter title"
-              title="Chapter title — used in the content document <title>; defaults to the spine id"
-            />
-          </div>
-
-          {#if pane1SelectedFile === 'text' && audioEditorVisible && hasAudioFiles && audioClipService && workspace && settingsService && workspaceService}
-            <div class="audio-editor-panel">
-              <AudioClipEditor
-                {workspace}
-                {audioClipService}
-                {workspaceService}
-                {settingsService}
-                {textContent}
-                {textareaSelection}
-                onInsertClip={insertClipDirective}
-              />
+        {#if editorMode === 'dual'}
+          <!-- In dual mode pane 1 gets its own header (controls aren't in the
+               top row, which is shared with pane 2). -->
+          <div class="pane-header">
+            <div class="pane-header-content">
+              {@render pane1FileSelector()}
             </div>
-          {/if}
-        </div>
+            {@render pane1Audio()}
+          </div>
+        {:else}
+          {@render pane1Audio()}
+        {/if}
 
         <div class="textarea-container">
           <textarea
@@ -660,7 +644,13 @@
 
   .editor-controls {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: var(--space-2);
+    /* Grow so the file picker + chapter title fill the row and the status
+       indicator sits at the far right. */
+    flex: 1;
+    min-width: 0;
   }
 
   .pane-toggle-btn {
@@ -691,60 +681,6 @@
   .toggle-icon {
     font-size: var(--text-base);
     font-weight: bold;
-  }
-
-  .editor-status {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-    font-weight: var(--font-medium);
-  }
-
-  .status-indicator.transforming {
-    background: var(--color-info-bg);
-    color: var(--color-info-text);
-  }
-
-  .status-indicator.error {
-    background: var(--color-error-bg);
-    color: var(--color-error-text);
-  }
-
-  .status-indicator.warning {
-    background: var(--color-warning-bg);
-    color: var(--color-warning-text);
-  }
-
-  .status-indicator.success {
-    background: var(--color-success-bg);
-    color: var(--color-success-text);
-  }
-
-  .status-spinner {
-    width: 12px;
-    height: 12px;
-    border: 2px solid currentColor;
-    border-top: 2px solid transparent;
-    border-radius: 50%;
-    animation: spin var(--duration-normal) linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
   }
 
   .editor-content {
@@ -969,10 +905,6 @@
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    .status-spinner {
-      animation: none;
-    }
-
     .pane-toggle-btn {
       transition: none;
     }
