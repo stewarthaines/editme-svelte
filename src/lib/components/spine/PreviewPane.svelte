@@ -23,6 +23,7 @@
     messagesForChapter,
     VALIDATION_REPORT_STORAGE_KEY,
   } from '$lib/plugins/validation-report';
+  import { snippetAroundClick } from './preview-click.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -671,29 +672,67 @@
     const target = event.target as Element;
     if (!target) return;
 
-    // Find the best text-containing element
-    const textElement =
-      target.closest('p, h1, h2, h3, h4, h5, h6, div, span, li, blockquote, td, th') || target;
-    const clickedText = textElement.textContent?.trim();
-
-    // Skip if no meaningful text content (increased minimum length)
-    if (!clickedText || clickedText.length < 8) return;
-
-    // Skip if text is too long (likely not a good match target)
-    if (clickedText.length > 500) return;
-
     try {
-      const documentPosition = estimateDocumentPosition(textElement);
-      const elementType = textElement.tagName.toLowerCase();
+      // Prefer the exact text node + caret under the cursor: a single rendered
+      // text node is a contiguous, markup-free slice of the source, so a short
+      // snippet from it matches even when the element has inline markup.
+      const caret = caretFromPoint(target.ownerDocument, event.clientX, event.clientY);
+      if (caret && caret.node.nodeType === Node.TEXT_NODE) {
+        const snippet = snippetAroundClick(caret.node.textContent || '', caret.offset);
+        if (snippet.length >= 3) {
+          const parent = caret.node.parentElement || target;
+          onPreviewClick({
+            text: snippet,
+            documentPosition: estimateDocumentPosition(parent),
+            elementType: parent.tagName.toLowerCase(),
+          });
+          return;
+        }
+      }
+
+      // Fallback (no caret API, or no usable text node): match the whole closest
+      // block element, as before — works for unstyled text.
+      const textElement =
+        target.closest('p, h1, h2, h3, h4, h5, h6, div, span, li, blockquote, td, th') || target;
+      const clickedText = textElement.textContent?.trim();
+      if (!clickedText || clickedText.length < 8 || clickedText.length > 500) return;
 
       onPreviewClick({
         text: clickedText,
-        documentPosition,
-        elementType,
+        documentPosition: estimateDocumentPosition(textElement),
+        elementType: textElement.tagName.toLowerCase(),
       });
     } catch (error) {
       console.warn('Failed to handle preview click:', error);
     }
+  }
+
+  /**
+   * Resolve the text node + offset under a click, across browser caret APIs.
+   * Returns null when neither API is available or the point has no caret.
+   */
+  function caretFromPoint(
+    doc: Document,
+    x: number,
+    y: number
+  ): { node: Node; offset: number } | null {
+    type CaretDoc = Document & {
+      caretRangeFromPoint?: (x: number, y: number) => Range | null;
+      caretPositionFromPoint?: (
+        x: number,
+        y: number
+      ) => { offsetNode: Node; offset: number } | null;
+    };
+    const cdoc = doc as CaretDoc;
+    if (typeof cdoc.caretRangeFromPoint === 'function') {
+      const range = cdoc.caretRangeFromPoint(x, y);
+      if (range) return { node: range.startContainer, offset: range.startOffset };
+    }
+    if (typeof cdoc.caretPositionFromPoint === 'function') {
+      const pos = cdoc.caretPositionFromPoint(x, y);
+      if (pos) return { node: pos.offsetNode, offset: pos.offset };
+    }
+    return null;
   }
 
   /**

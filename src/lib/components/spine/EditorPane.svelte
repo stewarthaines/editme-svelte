@@ -333,8 +333,6 @@
     documentPosition: number;
     elementType: string;
   }): void {
-    const { text } = detail;
-
     // Try both panes to find content
     let textarea: HTMLTextAreaElement | null = null;
     let content = '';
@@ -352,32 +350,69 @@
 
     if (!textarea || !content) return;
 
-    const searchText = text.trim();
-
-    // Normalize the preview text (convert curly quotes to straight quotes)
-    const normalizedSearchText = normalizeText(searchText);
-
-    // Try exact match with normalized preview text (case-insensitive)
     const contentLower = content.toLowerCase();
-    const normalizedSearchLower = normalizedSearchText.toLowerCase();
 
-    let index = contentLower.indexOf(normalizedSearchLower);
-    if (index !== -1) {
-      selectTextRange(textarea, index, index + normalizedSearchText.length);
-      return;
-    }
-
-    // If normalized search fails and text is substantial, try exact original search as fallback
-    if (searchText.length >= 8) {
-      const searchLower = searchText.toLowerCase();
-      index = contentLower.indexOf(searchLower);
+    // Try the snippet, then progressively shorter windows (the preview's edge
+    // words can be altered by the transform — entities, smart quotes). Longest
+    // (most specific) first; the first candidate found wins.
+    for (const candidate of buildSearchCandidates(detail.text)) {
+      const index = findNearestIndex(
+        contentLower,
+        candidate.toLowerCase(),
+        detail.documentPosition
+      );
       if (index !== -1) {
-        selectTextRange(textarea, index, index + searchText.length);
+        selectTextRange(textarea, index, index + candidate.length);
         return;
       }
     }
 
     // No good match found - fail silently rather than select wrong text
+  }
+
+  /**
+   * Candidate search strings for a clicked snippet, longest/most-specific first:
+   * the normalized snippet, the raw text, then progressively shorter word windows
+   * anchored at each end (down to 2 words). Deduped; only >= 3 chars.
+   */
+  function buildSearchCandidates(text: string): string[] {
+    const normalized = normalizeText(text);
+    const words = normalized.split(' ').filter(Boolean);
+    const out: string[] = [];
+    const add = (s: string) => {
+      const v = s.trim();
+      if (v.length >= 3 && !out.includes(v)) out.push(v);
+    };
+
+    add(normalized);
+    add(text.trim());
+    for (let len = words.length - 1; len >= 2; len--) {
+      add(words.slice(0, len).join(' ')); // drop trailing word(s)
+      add(words.slice(words.length - len).join(' ')); // drop leading word(s)
+    }
+    return out;
+  }
+
+  /**
+   * Index of `needle` in `haystack`, preferring the occurrence nearest `hint`
+   * (a rough source-position estimate) when there is more than one. -1 if absent.
+   */
+  function findNearestIndex(haystack: string, needle: string, hint: number): number {
+    if (needle.length < 3) return -1;
+    let index = haystack.indexOf(needle);
+    if (index === -1) return -1;
+
+    let best = index;
+    const target = Math.max(0, Math.min(hint || 0, haystack.length));
+    let bestDistance = Math.abs(index - target);
+    while ((index = haystack.indexOf(needle, index + 1)) !== -1) {
+      const distance = Math.abs(index - target);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    }
+    return best;
   }
 
   /**
