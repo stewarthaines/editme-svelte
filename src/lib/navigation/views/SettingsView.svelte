@@ -370,6 +370,19 @@
         await onExtensionAssets?.(assets);
       }
 
+      // Auto-enable the extension's DOM transforms — installing an extension
+      // should wire up its transforms, not leave the user to enable each by hand.
+      // Appended (deduped) after the project's existing list; order is preserved.
+      if (entry.domTransforms.length > 0 && epubSettings) {
+        const next = entry.domTransforms.reduce(
+          (list, file) => addTransform(list, `SOURCE/extensions/${entry.id}/${file}`),
+          epubSettings.dom_transforms
+        );
+        if (next !== epubSettings.dom_transforms) {
+          await persistDomTransforms(next);
+        }
+      }
+
       // Auto-adopt the extension's text transform when the project's is still the
       // untouched default — the typical "install one text extension" flow.
       const defaultText = settingsService.getDefaultEPUBSettings().text_transform;
@@ -390,6 +403,17 @@
   const isAdvancedMode = $derived(workspaceSettings?.editor?.advanced_mode ?? false);
   // Extension ids already imported into the current project (dir name === id).
   const installedExtensionIds = $derived(new Set(extensions.map(e => e.name)));
+
+  // Split the catalog by kind: text-format extensions (they provide a text
+  // transform — a markup language like djot/markdown) are a different choice
+  // from library/DOM ones, so they're grouped and listed first. Within-group
+  // order stays as the catalog order.
+  const textFormatExtensions = $derived(
+    availableExtensions.filter(e => e.textTransforms.length > 0)
+  );
+  const libraryExtensions = $derived(
+    availableExtensions.filter(e => e.textTransforms.length === 0)
+  );
   const canEditSettings = $derived(workspaceId !== null && workspaceSettings !== null);
   const canEditEPUBSettings = $derived(workspaceId !== null && epubSettings !== null);
 
@@ -545,7 +569,7 @@
                   'Add a library and its suggested DOM transform to the current project; then enable the transform under Project Settings.'
                 )}
               </p>
-              {#each availableExtensions as ext (ext.id)}
+              {#snippet catalogItem(ext: ExtensionCatalogEntry)}
                 {@const installed = installedExtensionIds.has(ext.id)}
                 <div class="catalog-item">
                   <div class="catalog-item-info">
@@ -568,7 +592,20 @@
                         : $t('Add to project')}
                   </button>
                 </div>
-              {/each}
+              {/snippet}
+
+              {#if textFormatExtensions.length > 0}
+                <h4 class="catalog-subhead">{$t('Text formats')}</h4>
+                {#each textFormatExtensions as ext (ext.id)}
+                  {@render catalogItem(ext)}
+                {/each}
+              {/if}
+              {#if libraryExtensions.length > 0}
+                <h4 class="catalog-subhead">{$t('Libraries')}</h4>
+                {#each libraryExtensions as ext (ext.id)}
+                  {@render catalogItem(ext)}
+                {/each}
+              {/if}
             </section>
           {/if}
         </div>
@@ -944,6 +981,16 @@
     opacity: 0.6;
     cursor: not-allowed;
     background: var(--color-surface-disabled);
+  }
+
+  /* Available-extensions catalog: group subheadings (Text formats / Libraries) */
+  .catalog-subhead {
+    margin: var(--space-4) 0 var(--space-1) 0;
+    padding-bottom: var(--space-1);
+    border-bottom: 1px solid var(--color-border-subtle);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
   }
 
   /* Available-extensions catalog rows */
