@@ -15,12 +15,15 @@
     workspace = null,
     workspaceService,
     advancedMode = true,
+    readOnly = false,
     onItemSelect,
     onWorkspaceUpdate,
   }: {
     workspace?: WorkspaceState | null;
     workspaceService: WorkspaceService;
     advancedMode?: boolean;
+    /** Read-only EPUB: no upload/delete. */
+    readOnly?: boolean;
     onItemSelect?: (event: {
       item: ManifestItem | SourceItem | any;
       type: 'manifest' | 'source' | 'opf';
@@ -108,7 +111,7 @@
   };
 
   const handleItemDelete = async (detail: { itemId: string }) => {
-    if (!workspace) return;
+    if (!workspace || readOnly) return;
 
     const confirmed = confirm($t('Are you sure you want to delete this item?'));
     if (!confirmed) return;
@@ -130,7 +133,7 @@
   };
 
   const handleFileUpload = async (detail: { files: FileList | File[] }) => {
-    if (!workspace) return;
+    if (!workspace || readOnly) return;
 
     const files = detail.files;
     const successfulFiles: string[] = [];
@@ -276,13 +279,13 @@
     Array.from(event.dataTransfer?.types ?? []).includes('Files');
 
   const handleWindowDragEnter = (event: DragEvent) => {
-    if (!dragHasFiles(event)) return;
+    if (readOnly || !dragHasFiles(event)) return;
     dragDepth += 1;
     isDragging = true;
   };
 
   const handleWindowDragOver = (event: DragEvent) => {
-    if (!dragHasFiles(event)) return;
+    if (readOnly || !dragHasFiles(event)) return;
     event.preventDefault(); // required for a drop to fire
     if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
   };
@@ -325,6 +328,7 @@
     {manifestItems}
     {sourceItems}
     {advancedMode}
+    {readOnly}
     {validationErrors}
     {selectedItem}
     {selectedItemType}

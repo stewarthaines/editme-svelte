@@ -51,6 +51,7 @@
     audioClipService = null,
     selectedItemId = null,
     transformEngine = null as any,
+    readOnly = false,
     onPreviewUpdate,
   }: {
     workspace: WorkspaceState;
@@ -60,6 +61,8 @@
     audioClipService: AudioClipService | null;
     selectedItemId: string | null;
     transformEngine: TransformEngine;
+    /** Read-only EPUB: preview the stored XHTML, no editor, no writes. */
+    readOnly?: boolean;
     onPreviewUpdate?: (detail: {
       xhtmlContent: string;
       isTransforming: boolean;
@@ -239,7 +242,7 @@
     // Initialize services and load selected item if available
     initializeServices();
     if (selectedItemId) {
-      loadSelectedItem();
+      loadSelected();
     }
   }
 
@@ -257,7 +260,7 @@
   export function setViewData(data: any): void {
     if (data.selectedItemId) {
       selectedItemId = data.selectedItemId;
-      loadSelectedItem();
+      loadSelected();
     }
   }
 
@@ -1079,6 +1082,60 @@
   // Race condition prevention
   let currentSpineItemLoadPromise: Promise<void> | null = null;
 
+  // Single entry point for loading the selected chapter: a read-only EPUB
+  // previews its stored XHTML; an editable project runs the full editor path.
+  // All callers (onViewEnter, setViewData, the prop effect) route through here so
+  // the read-only branch can't be bypassed.
+  function loadSelected(): void {
+    if (readOnly) {
+      renderReadOnlyChapter();
+    } else {
+      loadSelectedItem();
+    }
+  }
+
+  // Read-only EPUB: render the chapter's stored XHTML in the preview without the
+  // transform pipeline (which would run on empty source and overwrite the file).
+  async function renderReadOnlyChapter() {
+    if (!selectedItemId || !spineService) return;
+    if (!servicesInitialized) await initializeServices();
+
+    isLoading = true;
+    error = null;
+    try {
+      const spineItems = await spineService.loadSpineItems(workspace);
+      selectedItem = spineItems.find(item => item.id === selectedItemId) || null;
+      if (!selectedItem) return;
+
+      const manifestItem = workspace.opf.manifest.find(m => m.id === selectedItem!.idref);
+      const basePath = workspace.pathInfo.basePath;
+      const path =
+        manifestItem && (!basePath || manifestItem.href.startsWith(basePath + '/'))
+          ? manifestItem?.href
+          : `${basePath}/${manifestItem?.href}`;
+
+      let xhtmlContent = '';
+      if (manifestItem && path) {
+        const stored = await fileStorage.readTextFile(workspace.id, path);
+        blobURLManager.setActiveWorkspace(workspace.id);
+        xhtmlContent = await blobURLManager.processXHTMLForPreview(stored);
+      }
+
+      onPreviewUpdate?.({
+        xhtmlContent,
+        isTransforming: false,
+        transformError: null,
+        transformWarnings: [],
+        executionTime: 0,
+        spineItemId: selectedItemId,
+      });
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to load chapter';
+    } finally {
+      isLoading = false;
+    }
+  }
+
   // Load selected item data
   async function loadSelectedItem() {
     if (!selectedItemId || !spineService) return;
@@ -1271,7 +1328,9 @@
         }
 
         if (selectedItemId) {
-          loadSelectedItem();
+          // A read-only EPUB has no editable source — preview its stored XHTML
+          // directly instead of running (and persisting) the transform pipeline.
+          loadSelected();
         } else {
           // Clear previous workspace data
           selectedItem = null;
@@ -1298,6 +1357,17 @@
     <div class="empty-icon">📚</div>
     <h3>{$t('No spine item selected')}</h3>
     <p>{$t('Select a spine item from the sidebar to start editing')}</p>
+  </div>
+{:else if selectedItem && readOnly}
+  <!-- Read-only EPUB: the chapter renders in the preview pane; no editor here. -->
+  <div class="readonly-notice">
+    <div class="readonly-icon" aria-hidden="true">🔒</div>
+    <h3>{$t('Read-only chapter')}</h3>
+    <p>
+      {$t(
+        "This EPUB wasn't created in the Simple EPUB Editor, so its chapters can be viewed but not edited."
+      )}
+    </p>
   </div>
 {:else if selectedItem && servicesInitialized && previewManager && settingsService}
   <!-- Editor Pane -->
@@ -1341,7 +1411,8 @@
   /* Loading, error, and empty states */
   .loading-state,
   .error-state,
-  .empty-state {
+  .empty-state,
+  .readonly-notice {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1351,6 +1422,25 @@
     padding: var(--space-8);
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
+  }
+
+  .readonly-icon {
+    font-size: 2.5rem;
+    opacity: 0.6;
+    margin-bottom: var(--space-4);
+  }
+
+  .readonly-notice h3 {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+  }
+
+  .readonly-notice p {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
   }
 
   .spinner {

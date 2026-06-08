@@ -13,7 +13,11 @@ import {
   primaryLanguage,
   toEpubSafeHref,
 } from '../../epub/opf-utils.js';
-import { isSourceFile, classifySourceFile } from '../../source/source-utils.js';
+import {
+  isSourceFile,
+  classifySourceFile,
+  workspaceIsReadOnly,
+} from '../../source/source-utils.js';
 import type { SourceItem } from '../../manifest/types.js';
 import { getBrowserLocale } from '../../i18n/locale-config.js';
 
@@ -49,6 +53,8 @@ export interface WorkspaceInfo {
 export interface WorkspaceRowDetails {
   fileCount: number;
   extensionIds?: string[];
+  /** A regular EPUB (no SOURCE/ files) — viewable but not editable. */
+  readOnly: boolean;
 }
 
 export interface ChapterContent {
@@ -730,7 +736,9 @@ export class WorkspaceService {
       // Extensions are optional — don't fail the row if they can't be loaded.
     }
 
-    return { fileCount: files.length, extensionIds };
+    // Derived from the file list we already fetched — no extra I/O, so the lazy
+    // row load isn't slowed.
+    return { fileCount: files.length, extensionIds, readOnly: workspaceIsReadOnly(files) };
   }
 
   /**

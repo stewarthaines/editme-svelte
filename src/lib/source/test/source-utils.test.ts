@@ -3,6 +3,7 @@ import {
   classifySourceFile,
   validateSourcePath,
   isSourceFile,
+  workspaceIsReadOnly,
   getSourceFileType,
   validateSettingsJson,
   calculateDirectoryStats,
@@ -370,6 +371,28 @@ describe('source-utils', () => {
     it('should not modify dangerous path traversal (for validation)', () => {
       // Sanitization should not fix security issues - they should be caught by validation
       expect(sanitizeSourcePath('SOURCE/../../../etc/passwd')).toBe('SOURCE/../../../etc/passwd');
+    });
+  });
+
+  describe('workspaceIsReadOnly', () => {
+    it('is read-only when no SOURCE/ files are present (a regular EPUB)', () => {
+      expect(
+        workspaceIsReadOnly([
+          'mimetype',
+          'META-INF/container.xml',
+          'OEBPS/content.opf',
+          'OEBPS/Text/chap01.xhtml',
+        ])
+      ).toBe(true);
+    });
+
+    it('is editable when any SOURCE/ file is present (created / SEED EPUB)', () => {
+      expect(workspaceIsReadOnly(['OEBPS/content.opf', 'SOURCE/text/chapter1.txt'])).toBe(false);
+      expect(workspaceIsReadOnly(['SOURCE/settings.json'])).toBe(false);
+    });
+
+    it('is read-only for an empty file list', () => {
+      expect(workspaceIsReadOnly([])).toBe(true);
     });
   });
 });

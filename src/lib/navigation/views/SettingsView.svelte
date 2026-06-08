@@ -44,6 +44,8 @@
      * workspace + transform engine); a no-op when SettingsView is used standalone.
      */
     onExtensionAssets?: (assets: Array<{ target: string; media?: string }>) => Promise<void>;
+    /** Read-only EPUB: advanced mode is locked and extensions can't be added. */
+    readOnly?: boolean;
     onSettingsChanged?: () => void;
   }
 
@@ -57,6 +59,7 @@
     availableExtensions = [],
     onTogglePlugin,
     onExtensionAssets,
+    readOnly = false,
     onSettingsChanged,
   }: Props = $props();
 
@@ -142,7 +145,7 @@
 
   // Handle advanced mode toggle
   async function handleAdvancedModeChange(event: Event): Promise<void> {
-    if (!workspaceId || !workspaceSettings) return;
+    if (!workspaceId || !workspaceSettings || readOnly) return;
 
     const target = event.target as HTMLInputElement;
     const newAdvancedMode = target.checked;
@@ -355,7 +358,7 @@
   // installed list, the iframe libs, and the available-transforms picker.
   let importingExtensionId = $state<string | null>(null);
   async function handleAddCatalogExtension(entry: ExtensionCatalogEntry): Promise<void> {
-    if (!workspaceId) return;
+    if (!workspaceId || readOnly) return;
     importingExtensionId = entry.id;
     try {
       const assets = await extensionManager.importCatalogExtension(workspaceId, entry);
@@ -582,8 +585,15 @@
                     type="button"
                     class="btn btn-secondary"
                     onclick={() => handleAddCatalogExtension(ext)}
-                    disabled={installed || !workspaceId || importingExtensionId !== null}
-                    title={!workspaceId ? $t('Open a project to add extensions') : undefined}
+                    disabled={installed ||
+                      !workspaceId ||
+                      readOnly ||
+                      importingExtensionId !== null}
+                    title={readOnly
+                      ? $t("This EPUB is read-only, so extensions can't be added.")
+                      : !workspaceId
+                        ? $t('Open a project to add extensions')
+                        : undefined}
                   >
                     {installed
                       ? $t('Added')
@@ -628,7 +638,7 @@
                     type="checkbox"
                     checked={isAdvancedMode}
                     onchange={handleAdvancedModeChange}
-                    disabled={loading}
+                    disabled={loading || readOnly}
                   />
                   <span class="setting-text">{$t('Advanced Mode')}</span>
                 </label>

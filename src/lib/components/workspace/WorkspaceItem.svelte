@@ -28,7 +28,7 @@
   let details = $state<WorkspaceRowDetails | null>(
     untrack(() =>
       workspace.fileCount !== undefined
-        ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds }
+        ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds, readOnly: false }
         : null
     )
   );
@@ -101,6 +101,14 @@
             {/if}
             {#if isCurrent}
               <span class="current-badge" aria-label={$t('Currently open')}>{$t('Current')}</span>
+            {/if}
+            {#if details?.readOnly}
+              <span
+                class="readonly-badge"
+                title={$t('Not created in the Simple EPUB Editor — viewable but not editable.')}
+              >
+                {$t('Read-only')}
+              </span>
             {/if}
           </h3>
           <span class="workspace-time">{getRelativeTime(workspace.lastModified)}</span>
@@ -268,6 +276,17 @@
     padding: 2px var(--space-1);
     background-color: var(--color-primary);
     color: var(--color-surface);
+    border-radius: var(--radius-xs);
+    flex-shrink: 0;
+  }
+
+  .readonly-badge {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    padding: 2px var(--space-1);
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-xs);
     flex-shrink: 0;
   }

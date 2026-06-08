@@ -151,6 +151,8 @@
   let selectedSpineItemId = $derived(appState?.selectedChapterId); // renamed in enhanced
   let initialized = $derived(appState?.initialized || false);
   let currentWorkspaceState = $derived(appState?.workspace);
+  // A regular EPUB (no SOURCE/) opens read-only: viewable, every editor disabled.
+  let isReadOnly = $derived(appState?.readOnly ?? false);
 
   // Metadata field focus tracking for OPF preview highlighting
   let focusedMetadataField = $state<keyof import('./lib/epub/opf-utils.js').EPUBMetadata | null>(
@@ -290,7 +292,7 @@
 
   // Handle manifest item deletion
   const handleManifestItemDelete = async (detail: { itemId: string }) => {
-    if (!currentWorkspaceState || !appState) return;
+    if (!currentWorkspaceState || !appState || isReadOnly) return;
 
     const confirmed = confirm($t('Are you sure you want to delete this item?'));
     if (!confirmed) return;
@@ -595,7 +597,7 @@
 
   // Handle EPUB package request
   const handlePackageRequest = async (workspaceId: string) => {
-    if (!currentWorkspaceState) return;
+    if (!currentWorkspaceState || isReadOnly) return;
 
     try {
       // Update metadata.modifiedDate first
@@ -764,6 +766,7 @@
 {:else}
   <LayoutManager
     hasWorkspace={!!currentWorkspaceId}
+    readOnly={isReadOnly}
     {hasPublishedEpubs}
     {enabledPluginIds}
     currentWorkspace={currentWorkspaceState}
@@ -785,6 +788,7 @@
           {spineService}
           selectedItemId={selectedSpineItemId}
           {isExpanded}
+          readOnly={isReadOnly}
           onWorkspaceUpdate={updatedWorkspace => {
             if (appState) appState.workspace = updatedWorkspace;
           }}
@@ -802,7 +806,10 @@
           <button
             class="package-epub-button"
             onclick={() => handlePackageRequest(currentWorkspaceState.id)}
-            title={$t('Package EPUB')}
+            disabled={isReadOnly}
+            title={isReadOnly
+              ? $t("This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged.")
+              : $t('Package EPUB')}
           >
             <Package size={18} aria-hidden="true" />
             <span class="package-label">{$t('Package EPUB')}</span>
@@ -813,6 +820,13 @@
 
     {#snippet leftContent()}
       <h1 class="sr-only">{viewTitle}</h1>
+      {#if isReadOnly && currentView !== 'workspace' && currentView !== 'about'}
+        <div class="readonly-banner" role="status">
+          {$t(
+            "Read-only — this EPUB wasn't created in the Simple EPUB Editor, so it can't be edited."
+          )}
+        </div>
+      {/if}
       <!-- Main content area - switches based on current view -->
       {#if currentView === 'about'}
         <AboutView />
@@ -825,7 +839,8 @@
           onDuplicateWorkspace={id => appState?.duplicateWorkspace(id) ?? Promise.resolve('')}
           onLoadWorkspace={id => appState?.loadWorkspace(id) ?? Promise.resolve()}
           onLoadWorkspaceDetails={id =>
-            appState?.getWorkspaceRowDetails(id) ?? Promise.resolve({ fileCount: 0 })}
+            appState?.getWorkspaceRowDetails(id) ??
+            Promise.resolve({ fileCount: 0, readOnly: false })}
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
           onWorkspaceOpened={() => {
@@ -841,6 +856,7 @@
             bind:workspace={appState.workspace}
             {metadataService}
             advancedMode={appState.isAdvancedMode}
+            readOnly={isReadOnly}
             onMetadataChanged={handleMetadataChanged}
             onFieldFocus={handleMetadataFieldFocus}
             onTabFieldsChange={handleMetadataTabFields}
@@ -854,6 +870,7 @@
             workspace={currentWorkspaceState}
             {workspaceService}
             advancedMode={appState.isAdvancedMode}
+            readOnly={isReadOnly}
             onItemSelect={handleManifestItemSelect}
             onWorkspaceUpdate={updatedWorkspace => {
               if (appState) appState.workspace = updatedWorkspace;
@@ -873,6 +890,7 @@
             extensionManager={appState.getExtensionManager()}
             {blobURLManager}
             {fileStorage}
+            readOnly={isReadOnly}
             previewUpdate={handleNavigationPreviewUpdate}
           />
         {:else}
@@ -888,6 +906,7 @@
             transformEngine={appState.getTransformEngine()}
             contentService={appState.getContentService()}
             audioClipService={appState.getAudioClipService()}
+            readOnly={isReadOnly}
             onPreviewUpdate={handleSpinePreviewUpdate}
           />
         {:else}
@@ -908,6 +927,7 @@
           {availablePlugins}
           {enabledPluginIds}
           {availableExtensions}
+          readOnly={isReadOnly}
           onExtensionAssets={handleExtensionAssets}
           onTogglePlugin={(id, enabled) => {
             appState?.getSettingsService().setPluginEnabled(id, enabled);
@@ -944,6 +964,7 @@
           selectedItemType={selectedManifestItemType}
           workspace={currentWorkspaceState}
           {workspaceService}
+          readOnly={isReadOnly}
           onItemDelete={handleManifestItemDelete}
           onWorkspaceUpdate={updatedWorkspace => {
             if (appState) appState.workspace = updatedWorkspace;
@@ -1056,6 +1077,19 @@
     padding: var(--space-4);
     color: var(--color-text-secondary);
     font-size: var(--text-sm);
+  }
+
+  /* Read-only EPUB notice shown above the view content. */
+  .readonly-banner {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-warning-surface, var(--color-bg-tertiary));
+    color: var(--color-warning, var(--color-text-primary));
+    border-bottom: 1px solid var(--color-warning, var(--color-border-default));
+    font-size: var(--text-sm);
+    text-align: center;
   }
 
   /* Package EPUB button styling */

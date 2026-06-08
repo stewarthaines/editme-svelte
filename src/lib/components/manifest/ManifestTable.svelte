@@ -8,6 +8,7 @@
     manifestItems = [],
     sourceItems = [],
     advancedMode = true,
+    readOnly = false,
     validationErrors = [],
     selectedItem = null,
     selectedItemType = null,
@@ -19,6 +20,8 @@
     manifestItems?: ManifestItem[];
     sourceItems?: SourceItem[];
     advancedMode?: boolean;
+    /** Read-only EPUB: no Load File button, no per-row delete. */
+    readOnly?: boolean;
     validationErrors?: ValidationResult[];
     selectedItem?: ManifestItem | SourceItem | null;
     selectedItemType?: 'manifest' | 'source' | 'opf' | null;
@@ -363,16 +366,18 @@
     </div>
 
     <!-- Action buttons -->
-    <div class="action-buttons">
-      <button
-        type="button"
-        class="action-button primary"
-        onclick={handleLoadFileClick}
-        disabled={loading}
-      >
-        {$t('Load File')}
-      </button>
-    </div>
+    {#if !readOnly}
+      <div class="action-buttons">
+        <button
+          type="button"
+          class="action-button primary"
+          onclick={handleLoadFileClick}
+          disabled={loading}
+        >
+          {$t('Load File')}
+        </button>
+      </div>
+    {/if}
 
     <!-- Hidden file input -->
     <input

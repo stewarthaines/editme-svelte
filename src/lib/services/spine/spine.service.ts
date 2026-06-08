@@ -59,6 +59,13 @@ export class SpineService {
         const sourceFilePath = `SOURCE/text/${manifestItem.id}.txt`;
         const hasSourceFile = await this.workspaceService.fileExists(workspace.id, sourceFilePath);
 
+        // A source-less chapter (regular/read-only EPUB) has no editable source to
+        // label it; read its stored XHTML <title> so the sidebar can show a real
+        // name. Editable chapters always have a source, so this never runs for them.
+        const title = hasSourceFile
+          ? undefined
+          : await this.readStoredChapterTitle(workspace, manifestItem);
+
         spineItems.push({
           // Spine item properties
           idref: manifestItem.id,
@@ -72,6 +79,7 @@ export class SpineService {
           // Source file association
           sourcePath: hasSourceFile ? sourceFilePath : undefined,
           hasSourceFile,
+          title,
         });
       }
 
@@ -82,6 +90,37 @@ export class SpineService {
         'LOAD_ERROR',
         workspace.id
       );
+    }
+  }
+
+  /**
+   * Read a chapter's stored XHTML and extract a human title (`<title>`, falling
+   * back to the first heading). Best-effort: returns undefined on any failure.
+   */
+  private async readStoredChapterTitle(
+    workspace: WorkspaceState,
+    manifestItem: ManifestItem
+  ): Promise<string | undefined> {
+    try {
+      const basePath = workspace.pathInfo.basePath;
+      const path =
+        !basePath || manifestItem.href.startsWith(basePath + '/')
+          ? manifestItem.href
+          : `${basePath}/${manifestItem.href}`;
+      const buffer = await this.workspaceService.readFile(workspace.id, path);
+      const xhtml = new TextDecoder().decode(buffer);
+      // Parse as HTML (lenient) — we only need the title/heading text, and this
+      // avoids strict-XML namespace pitfalls.
+      const doc = new DOMParser().parseFromString(xhtml, 'text/html');
+      const fromTitle = doc.querySelector('title')?.textContent?.trim();
+      if (fromTitle) return fromTitle;
+      for (const tag of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
+        const heading = doc.querySelector(tag)?.textContent?.trim();
+        if (heading) return heading;
+      }
+      return undefined;
+    } catch {
+      return undefined;
     }
   }
 

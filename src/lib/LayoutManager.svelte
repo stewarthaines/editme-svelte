@@ -8,6 +8,7 @@
   // Props
   let {
     hasWorkspace = false,
+    readOnly = false,
     hasPublishedEpubs = false,
     enabledPluginIds = [],
     currentWorkspace = null,
@@ -24,6 +25,7 @@
     sidebarFooter,
   }: {
     hasWorkspace?: boolean;
+    readOnly?: boolean;
     hasPublishedEpubs?: boolean;
     enabledPluginIds?: string[];
     currentWorkspace?: any;
@@ -59,6 +61,7 @@
     isExpanded={sidebar.isExpanded}
     activeSection={sidebar.activeSection}
     {hasWorkspace}
+    {readOnly}
     {hasPublishedEpubs}
     {enabledPluginIds}
     {currentWorkspace}

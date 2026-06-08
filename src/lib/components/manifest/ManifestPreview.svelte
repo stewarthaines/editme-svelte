@@ -14,6 +14,7 @@
     workspaceService = undefined,
     onWorkspaceUpdate = undefined,
     onItemDelete,
+    readOnly = false,
   }: {
     selectedItem?: ManifestItem | SourceItem | any | null;
     selectedItemType?: 'manifest' | 'source' | 'opf' | null;
@@ -23,6 +24,8 @@
     workspaceService?: WorkspaceService;
     onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
     onItemDelete?: (detail: { itemId: string }) => void;
+    /** Read-only EPUB: no edit fields, no delete. */
+    readOnly?: boolean;
   } = $props();
 
   // --- Inline manifest-item editing -------------------------------------------
@@ -474,7 +477,7 @@
           <button type="button" class="btn btn-secondary" onclick={handleDownloadClick}>
             {$t('Download')}
           </button>
-          {#if selectedItemType === 'manifest'}
+          {#if selectedItemType === 'manifest' && !readOnly}
             <button type="button" class="btn btn-danger" onclick={handleDeleteClick}>
               {$t('Delete')}
             </button>
@@ -482,7 +485,7 @@
         </div>
       </div>
 
-      {#if isManifestItem}
+      {#if isManifestItem && !readOnly}
         <!-- Inline manifest-item editor (compact; saves on blur / toggle).
              XHTML items show EPUB properties; other media show editable
              id/href. Media type is fixed at upload (shown in the header). -->

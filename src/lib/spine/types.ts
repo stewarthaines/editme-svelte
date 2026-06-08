@@ -22,6 +22,10 @@ export interface SpineItemWithSource {
   sourcePath?: string; // Path to source file if it exists (SOURCE/text/{id}.txt)
   hasSourceFile: boolean; // Whether associated source file exists
 
+  // Human title from the stored XHTML, resolved only for source-less (read-only)
+  // chapters so the sidebar can label them instead of showing the raw idref.
+  title?: string;
+
   // UI state (not persisted)
   isEditing?: boolean; // Currently being edited in UI
   isDragging?: boolean; // Currently being dragged in UI

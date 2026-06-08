@@ -119,6 +119,15 @@ export function isSourceFile(path: string): boolean {
 }
 
 /**
+ * A workspace is read-only (a regular EPUB, not made by SEED.html) when it has no
+ * SOURCE/ files — no plain-text sources or settings to edit. Created projects and
+ * active/SEED EPUBs always carry SOURCE/, so they are editable.
+ */
+export function workspaceIsReadOnly(files: string[]): boolean {
+  return !files.some(isSourceFile);
+}
+
+/**
  * Get the file type for a SOURCE/ file (returns null for non-SOURCE files)
  */
 export function getSourceFileType(path: string): SourceFileType | null {

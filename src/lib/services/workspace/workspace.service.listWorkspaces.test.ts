@@ -95,6 +95,8 @@ describe('WorkspaceService.listWorkspaces (parallel, metadata-only)', () => {
     const details = await service.getWorkspaceRowDetails('ws-a');
     // container.xml + content.opf + ch1.xhtml
     expect(details.fileCount).toBe(3);
+    // No SOURCE/ files were seeded → a regular (read-only) EPUB.
+    expect(details.readOnly).toBe(true);
   });
 
   it('excludes reserved workspaces (publish, locales)', async () => {

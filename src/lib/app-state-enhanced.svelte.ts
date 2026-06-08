@@ -19,6 +19,7 @@ import type {
   ChapterContent,
 } from './services/workspace/workspace.service.js';
 import { creatorName, primaryLanguage } from './epub/opf-utils.js';
+import { workspaceIsReadOnly } from './source/source-utils.js';
 import type {
   GlobalSettings,
   WorkspaceSettings,
@@ -75,6 +76,8 @@ export class EnhancedAppState {
   initialized = $state(false);
   isLoading = $state(false);
   errorMessage = $state<string | null>(null);
+  // True for a regular EPUB (no SOURCE/ files) — viewable but not editable.
+  readOnly = $state(false);
 
   // Settings state
   globalSettings = $state<GlobalSettings | null>(null);
@@ -351,6 +354,8 @@ export class EnhancedAppState {
 
       // Set the newly created workspace
       this.workspace = populatedWorkspace;
+      // A freshly created project always has SOURCE/ — it's editable.
+      this.readOnly = false;
 
       return workspace.id;
     } catch (error) {
@@ -382,6 +387,14 @@ export class EnhancedAppState {
       this.errorMessage = null;
 
       this.workspace = await this.workspaceService.loadWorkspace(workspaceId);
+
+      // A regular EPUB (no SOURCE/ files) opens read-only — viewable, not editable.
+      try {
+        const files = await this.fileStorage.listFiles(workspaceId);
+        this.readOnly = workspaceIsReadOnly(files);
+      } catch {
+        this.readOnly = false;
+      }
 
       // Clear selections when loading new workspace
       this.selectedChapterId = null;
@@ -718,5 +731,6 @@ export class EnhancedAppState {
     this.initialized = false;
     this.isLoading = false;
     this.errorMessage = null;
+    this.readOnly = false;
   }
 }

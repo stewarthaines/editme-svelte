@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
+  import { t } from '../../i18n';
   import OutlineEditor from './OutlineEditor.svelte';
   import { createTextEditorStore } from '../../stores/index.js';
   import type { TextEditorStore } from '../../stores/index.js';
@@ -31,6 +32,8 @@
     error?: any;
     destroyed?: any;
     ready?: any;
+    /** Read-only EPUB: preview the existing nav.xhtml; never regenerate or save. */
+    readOnly?: boolean;
   }
   let {
     workspace,
@@ -43,6 +46,7 @@
     extensionManager,
     blobURLManager,
     settingsService,
+    readOnly = false,
   }: Props = $props();
 
   // Create internal store for this outline editor instance with unique ID
@@ -74,6 +78,8 @@
   });
 
   async function handleContentChange(isEmpty: boolean) {
+    // A read-only EPUB must never regenerate/overwrite its nav.
+    if (readOnly) return;
     try {
       if (isEmpty) {
         // Auto-generation mode: generate from spine items
@@ -186,6 +192,7 @@
   }
 
   export async function saveNavigationContent(): Promise<void> {
+    if (readOnly) return;
     await waitForReady();
     try {
       const content = outlineStore.getContent();
@@ -331,8 +338,13 @@
       // Dispatch ready event
       // ready({ timestamp: Date.now() });
 
-      // Load navigation content (triggers auto-generation if no nav.txt exists)
-      await loadNavigationContent();
+      if (readOnly) {
+        // Read-only EPUB: preview the existing nav, never auto-generate or save.
+        await previewExistingNav();
+      } else {
+        // Load navigation content (triggers auto-generation if no nav.txt exists)
+        await loadNavigationContent();
+      }
 
       // Don't save during initialization - reactive statement handles auto-generation
       // User can save manually when needed (Ctrl+Enter or save button)
@@ -342,6 +354,35 @@
       //   message: e instanceof Error ? e.message : 'Failed to initialize component',
       //   stage: 'generation',
       // });
+    }
+  }
+
+  // Read-only EPUB: show the existing nav.xhtml in the preview without
+  // regenerating it or writing anything.
+  async function previewExistingNav(): Promise<void> {
+    try {
+      const navItem =
+        workspace.opf.manifest.find(m => m.properties?.includes('nav')) ??
+        workspace.opf.manifest.find(m => m.href.endsWith('nav.xhtml'));
+      if (!navItem) return;
+
+      const basePath = workspace.pathInfo.basePath;
+      const path =
+        !basePath || navItem.href.startsWith(basePath + '/')
+          ? navItem.href
+          : `${basePath}/${navItem.href}`;
+
+      const buffer = await workspaceService.readFile(workspace.id, path);
+      let xhtml = new TextDecoder().decode(buffer);
+      try {
+        blobURLManager.setActiveWorkspace(workspace.id);
+        xhtml = await blobURLManager.processXHTMLForPreview(xhtml);
+      } catch {
+        // Asset rewriting failed — fall back to the raw nav markup.
+      }
+      previewUpdate?.({ xhtml });
+    } catch (e) {
+      console.error('Failed to preview existing navigation:', e);
     }
   }
 
@@ -377,17 +418,59 @@
     class="sr-only"
   ></div>
 
-  <OutlineEditor
-    editorStore={outlineStore}
-    placeholder="Navigation content will be auto-generated from your chapters..."
-    onContentChanged={handleEditorContentChanged}
-  />
+  {#if readOnly}
+    <div class="readonly-notice">
+      <div class="readonly-icon" aria-hidden="true">🔒</div>
+      <h3>{$t('Read-only navigation')}</h3>
+      <p>
+        {$t(
+          "This EPUB wasn't created in the Simple EPUB Editor — its navigation is shown for viewing only."
+        )}
+      </p>
+    </div>
+  {:else}
+    <OutlineEditor
+      editorStore={outlineStore}
+      placeholder="Navigation content will be auto-generated from your chapters..."
+      onContentChanged={handleEditorContentChanged}
+    />
+  {/if}
 </div>
 
 <style>
   .outline-view {
     height: 100%;
     width: 100%;
+  }
+
+  .readonly-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-text-primary);
+  }
+
+  .readonly-icon {
+    font-size: 2.5rem;
+    opacity: 0.6;
+    margin-bottom: var(--space-4);
+  }
+
+  .readonly-notice h3 {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+  }
+
+  .readonly-notice p {
+    margin: 0;
+    max-width: 28rem;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
   }
 
   /* Screen reader only content */

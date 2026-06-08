@@ -13,12 +13,15 @@
     selectedItemId = null,
     isExpanded = true,
     onWorkspaceUpdate = null,
+    readOnly = false,
   }: {
     workspace?: WorkspaceState | null;
     spineService: SpineService;
     selectedItemId?: string | null;
     isExpanded?: boolean;
     onWorkspaceUpdate?: ((workspace: WorkspaceState) => void) | null;
+    /** Read-only EPUB: list is view-only (no append/move/drag/delete). */
+    readOnly?: boolean;
   } = $props();
 
   // State
@@ -107,7 +110,7 @@
 
   // Handle append new chapter
   async function handleAppendChapter() {
-    if (!workspace) return;
+    if (!workspace || readOnly) return;
 
     try {
       isLoading = true;
@@ -178,7 +181,7 @@
 
   // Handle move up
   async function handleMoveUp(index: number) {
-    if (isReordering || index === 0 || !workspace) return;
+    if (isReordering || index === 0 || !workspace || readOnly) return;
 
     isReordering = true;
     try {
@@ -205,7 +208,7 @@
 
   // Handle move down
   async function handleMoveDown(index: number) {
-    if (isReordering || index === spineItems.length - 1 || !workspace) return;
+    if (isReordering || index === spineItems.length - 1 || !workspace || readOnly) return;
 
     isReordering = true;
     try {
@@ -267,7 +270,7 @@
     event: DragEvent & { currentTarget: EventTarget & HTMLDivElement },
     dropIndex: number
   ) {
-    if (!sidebarExpanded || isReordering) return;
+    if (!sidebarExpanded || isReordering || readOnly) return;
 
     event.preventDefault();
     const dragIndex = parseInt(event.dataTransfer!.getData('text/plain'), 10);
@@ -301,7 +304,7 @@
 
   // Handle delete item request
   async function handleDeleteItem(itemId: string) {
-    if (!workspace) return;
+    if (!workspace || readOnly) return;
 
     const confirmed = window.confirm(
       $t(
@@ -343,7 +346,7 @@
 
   // Handle rename ID request
   async function handleRenameId(itemId: string) {
-    if (!workspace) return;
+    if (!workspace || readOnly) return;
 
     const newId = window.prompt($t('Enter new ID for {item}:', { item: itemId }), itemId);
 
@@ -394,7 +397,7 @@
       {#each spineItems as item, index (item.id)}
         <div
           class="spine-item-wrapper"
-          draggable={sidebarExpanded}
+          draggable={sidebarExpanded && !readOnly}
           ondragstart={e => handleDragStart(e, index)}
           ondragover={handleDragOver}
           ondrop={e => handleDrop(e, index)}
@@ -403,6 +406,7 @@
           <SpineItem
             {item}
             {index}
+            {readOnly}
             isSelected={selectedItemId === item.id}
             isExpanded={sidebarExpanded}
             compact={!isExpanded}

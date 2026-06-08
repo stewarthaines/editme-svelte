@@ -8,6 +8,8 @@
     isSelected?: boolean;
     isExpanded?: boolean;
     compact?: boolean;
+    /** Read-only EPUB: no editing controls, and a missing source is expected (no warning). */
+    readOnly?: boolean;
     dragHandleProps?: Record<string, any>;
     isFirstItem?: boolean;
     isLastItem?: boolean;
@@ -24,6 +26,7 @@
     isSelected = false,
     isExpanded = true,
     compact = false,
+    readOnly = false,
     dragHandleProps = {},
     isFirstItem = false,
     isLastItem = false,
@@ -75,8 +78,13 @@
     }
   }
 
-  // Determine if we should show move buttons (only when selected and not compact)
-  const showMoveButtons = $derived(isSelected && !compact);
+  // Determine if we should show move buttons (only when selected, not compact,
+  // and the project is editable).
+  const showMoveButtons = $derived(isSelected && !compact && !readOnly);
+
+  // A missing source file is a real problem in an editable project, but expected
+  // in a read-only EPUB — so don't flag it there.
+  const hasWarning = $derived(!readOnly && (item.hasSourceFile === false || !item.linear));
 
   // Generate compact label for collapsed sidebar
   function generateCompactLabel(itemId: string): string {
@@ -104,15 +112,12 @@
     }
   }
 
-  const displayLabel = $derived(compact ? generateCompactLabel(item.id) : item.id);
+  // In a read-only EPUB a chapter has no editable id/title, so prefer the title
+  // resolved from its stored XHTML; otherwise show the id as before.
+  const displayLabel = $derived(compact ? generateCompactLabel(item.id) : (item.title ?? item.id));
 </script>
 
-<div
-  class="spine-item"
-  class:compact
-  class:selected={isSelected}
-  class:has-error={item.hasSourceFile === false || !item.linear}
->
+<div class="spine-item" class:compact class:selected={isSelected} class:has-error={hasWarning}>
   {#if !compact && isExpanded}
     <div class="drag-handle" {...dragHandleProps} tabindex="-1" aria-hidden="true">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -126,7 +131,7 @@
     class="spine-select"
     onclick={onSelect}
     aria-pressed={isSelected}
-    aria-label={`${item.id}${!item.hasSourceFile ? ', has validation error' : ''}`}
+    aria-label={`${displayLabel}${hasWarning ? ', has validation error' : ''}`}
   >
     <span class="chapter-id">{displayLabel}</span>
   </button>
@@ -190,7 +195,7 @@
     </div>
   {/if}
 
-  {#if !compact && (!item.hasSourceFile || !item.linear)}
+  {#if !compact && hasWarning}
     <span class="error-indicator" aria-label="Validation error">⚠️</span>
   {/if}
 </div>

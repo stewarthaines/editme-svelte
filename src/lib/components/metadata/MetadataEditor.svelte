@@ -14,6 +14,8 @@
     workspace?: WorkspaceState | null;
     metadataService: MetadataService;
     advancedMode?: boolean;
+    /** Read-only EPUB: fields are shown but disabled (tabs still switch). */
+    readOnly?: boolean;
     onMetadataChanged?: (detail: { field: string; value: any }) => void;
     onFieldFocus?: (detail: { field: keyof EPUBMetadata | null }) => void;
     onTabFieldsChange?: (detail: { fields: string[] }) => void;
@@ -23,6 +25,7 @@
     workspace = $bindable(null),
     metadataService,
     advancedMode = false,
+    readOnly = false,
     onMetadataChanged,
     onFieldFocus,
     onTabFieldsChange,
@@ -220,8 +223,12 @@
         </button>
       </div>
     {:else}
-      <div
-        class="tab-panel"
+      <!-- Read-only EPUB: a disabled fieldset greys out every field/control in
+           one shot, while the tab bar (outside it) stays switchable. -->
+      <fieldset
+        class="fields-fieldset"
+        class:is-readonly={readOnly}
+        disabled={readOnly}
         id="metadata-panel-{activeTab}"
         aria-labelledby="metadata-tab-{activeTab}"
         tabindex="-1"
@@ -262,7 +269,7 @@
             onfieldFocus={handleFieldFocus}
           />
         {/if}
-      </div>
+      </fieldset>
     {/if}
   </div>
 </div>
@@ -286,8 +293,18 @@
     background-color: var(--color-bg-primary);
   }
 
-  .tab-panel {
+  /* Fieldset used only to disable the whole field group in read-only mode;
+     reset its native chrome so it lays out like the plain panel it replaced. */
+  .fields-fieldset {
     height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+
+  .fields-fieldset.is-readonly {
+    opacity: 0.85;
   }
 
   .loading-state,

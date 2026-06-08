@@ -23,6 +23,8 @@
     isExpanded?: boolean;
     activeSection?: SidebarSection;
     hasWorkspace?: boolean;
+    /** Read-only EPUB: hide the add/import-chapter actions. */
+    readOnly?: boolean;
     hasPublishedEpubs?: boolean;
     enabledPluginIds?: string[];
     currentWorkspace?: any;
@@ -43,6 +45,7 @@
     isExpanded = true,
     activeSection = 'workspace',
     hasWorkspace = false,
+    readOnly = false,
     hasPublishedEpubs = false,
     enabledPluginIds = [],
     currentWorkspace = null,
@@ -323,26 +326,28 @@
         {#if isExpanded}
           <div class="spine-section-header workspace-title-section">
             <span class="section-label">{spineSectionLabel}</span>
-            <div class="spine-header-actions">
-              <button
-                class="append-button-nav"
-                onclick={handleImportTextClick}
-                aria-label={$t('Import text files as chapters')}
-                title={$t('Import text files as chapters')}
-              >
-                <FileArrowUp size={14} aria-hidden="true" />
-              </button>
-              <button
-                class="append-button-nav"
-                onclick={handleAppendItem}
-                aria-label={$t('Append Item')}
-                title={$t('Append Item')}
-              >
-                <Plus size={14} aria-hidden="true" />
-              </button>
-            </div>
+            {#if !readOnly}
+              <div class="spine-header-actions">
+                <button
+                  class="append-button-nav"
+                  onclick={handleImportTextClick}
+                  aria-label={$t('Import text files as chapters')}
+                  title={$t('Import text files as chapters')}
+                >
+                  <FileArrowUp size={14} aria-hidden="true" />
+                </button>
+                <button
+                  class="append-button-nav"
+                  onclick={handleAppendItem}
+                  aria-label={$t('Append Item')}
+                  title={$t('Append Item')}
+                >
+                  <Plus size={14} aria-hidden="true" />
+                </button>
+              </div>
+            {/if}
           </div>
-        {:else}
+        {:else if !readOnly}
           <!-- Collapsed: just the append button — a single uniform-height row.
                The title/aria identify the action; the import button is
                expanded-only. -->
