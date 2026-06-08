@@ -1,0 +1,11 @@
+{
+  "id": "markdown-it",
+  "name": "MarkdownIt",
+  "description": "Markdown parser done right. With markdown-it-attrs.",
+  "url": "https://markdown-it.github.io/markdown-it/",
+  "license": "LICENSE.txt",
+  "scripts": ["markdown-it-attrs.browser.min.js", "markdown-it.min.js"],
+  "chapter": "chapter.txt",
+  "domTransforms": [],
+  "textTransforms": ["transformMarkdown.js"]
+}

@@ -1,0 +1,17 @@
+# Achievement _Unlocked!_
+
+This is a minimal sample EPUB created in the Simple EPUB Editor app - **SEED.html**
+
+This project provides a text processor called `markdown-it` and the `markdown-it-attrs` plugin.
+
+## Markdown
+
+**This is strong**  and is created by wrapping text in double asterisks.
+
+*This is emphasised* and is created by wrapping text in single asterisks.
+
+You can write also xhtml directly in <em><strong>this</strong> EPUB</em>.
+
+## More about MarkdownIt
+
+Read more about [MarkdownIt](https://markdown-it.github.io/) and [MarkdownItAttrs](https://github.com/arve0/markdown-it-attrs)
