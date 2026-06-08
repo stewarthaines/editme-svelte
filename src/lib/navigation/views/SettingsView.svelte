@@ -388,12 +388,20 @@
     const listed = epubSettings?.dom_transforms ?? [];
     const usedPaths = new Set(listed);
     const usedNames = new Set(listed.map(basename));
-    const textPath = epubSettings?.text_transform;
-    const textName = textPath ? basename(textPath) : undefined;
+    // Exclude every known text transform (the active text_transform, the default
+    // transformText.js, and any extension's text transforms) — they're never DOM
+    // transforms. Match by path AND basename (a default settings path can differ
+    // from the discovered file path for the same script).
+    const textPaths = new Set(availableTextTransforms.map(t => t.path));
+    const textNames = new Set(availableTextTransforms.map(t => t.fileName));
+    if (epubSettings?.text_transform) {
+      textPaths.add(epubSettings.text_transform);
+      textNames.add(basename(epubSettings.text_transform));
+    }
 
     const groups = new Map<string, TransformOption[]>();
     for (const t of availableTransforms) {
-      if (t.path === textPath || t.fileName === textName) continue; // text transform
+      if (textPaths.has(t.path) || textNames.has(t.fileName)) continue; // text transform
       if (usedPaths.has(t.path) || usedNames.has(t.fileName)) continue; // already listed
       const group = transformGroup(t.path);
       const list = groups.get(group) ?? [];

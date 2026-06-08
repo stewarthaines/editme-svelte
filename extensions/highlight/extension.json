@@ -1,7 +1,7 @@
 {
   "id": "highlight",
   "name": "highlight.js",
-  "description": "Syntax highlighting library (no transform supplied yet).",
+  "description": "Syntax highlighting library.",
   "license": "LICENSE.txt",
   "scripts": ["highlight.min.js"],
   "domTransforms": [],
