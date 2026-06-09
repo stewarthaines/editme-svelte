@@ -57,9 +57,9 @@
       class="action-button"
       onclick={handleLoadEpub}
       disabled={isLoading}
-      aria-label={$t('Load an existing EPUB file for editing')}
+      aria-label={$t('Import an existing EPUB file for editing')}
     >
-      {$t('Load EPUB')}
+      {$t('Import from File')}
     </button>
 
     <!-- OPDS import reaches the network; shown only when a handler is wired
@@ -70,9 +70,9 @@
         class="action-button"
         onclick={handleImportFromOPDS}
         disabled={isLoading}
-        aria-label={$t('Import an EPUB from an OPDS catalog URL')}
+        aria-label={$t('Import an EPUB from a catalog URL')}
       >
-        {$t('Import from OPDS')}
+        {$t('Import from Catalog')}
       </button>
     {/if}
 

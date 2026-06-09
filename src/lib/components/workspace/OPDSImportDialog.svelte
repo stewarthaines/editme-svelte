@@ -6,6 +6,7 @@
     loadSavedFeeds,
     upsertSavedFeed,
     removeSavedFeed,
+    DEFAULT_CATALOG_FEED,
     type SavedFeed,
   } from '../../opds/saved-feeds.js';
 
@@ -29,10 +30,18 @@
 
   const isSaved = $derived(savedFeeds.some(f => f.url === url.trim()));
 
+  // The dropdown always leads with the built-in catalog (pinned, not removable),
+  // followed by the user's own saved feeds (most-recent first, deduped).
+  const displayFeeds = $derived([
+    DEFAULT_CATALOG_FEED,
+    ...savedFeeds.filter(f => f.url !== DEFAULT_CATALOG_FEED.url),
+  ]);
+
   onMount(() => {
     savedFeeds = loadSavedFeeds();
-    // Default to the most recently used feed, preserving the previous behaviour.
-    url = savedFeeds[0]?.url ?? '';
+    // Default to the most recently used feed, falling back to the built-in
+    // catalog when the user hasn't saved any of their own yet.
+    url = savedFeeds[0]?.url ?? DEFAULT_CATALOG_FEED.url;
     urlInput?.focus();
     // Auto-fetch the latest feed so the dialog opens already populated.
     if (url.trim()) fetchFeed();
@@ -67,7 +76,10 @@
       hasFetched = true;
 
       // Auto-remember this feed (most-recent first), labelled by its title.
-      savedFeeds = upsertSavedFeed(target, feed.title);
+      // The built-in catalog is pinned separately, so it's never stored.
+      if (target !== DEFAULT_CATALOG_FEED.url) {
+        savedFeeds = upsertSavedFeed(target, feed.title);
+      }
     } catch (e) {
       error =
         e instanceof Error
@@ -123,35 +135,33 @@
     onclick={event => event.stopPropagation()}
   >
     <header class="opds-header">
-      <h2 id="opds-dialog-title">{$t('Import from OPDS')}</h2>
+      <h2 id="opds-dialog-title">{$t('Import from Catalog')}</h2>
       <button type="button" class="opds-close" onclick={onClose} aria-label={$t('Close')}>✕</button>
     </header>
 
-    {#if savedFeeds.length > 0}
-      <div class="opds-saved-row">
-        <select
-          class="opds-saved-select"
-          bind:value={url}
-          onchange={handleSavedSelect}
-          aria-label={$t('Saved feeds')}
-          disabled={loading || importing}
-        >
-          <option value="" disabled>{$t('Saved feeds…')}</option>
-          {#each savedFeeds as feed (feed.url)}
-            <option value={feed.url}>{feed.title ?? feed.url}</option>
-          {/each}
-        </select>
-        <button
-          type="button"
-          class="opds-remove-btn"
-          onclick={removeSelected}
-          disabled={!isSaved || loading || importing}
-          aria-label={$t('Remove the selected feed from the list')}
-        >
-          {$t('Remove')}
-        </button>
-      </div>
-    {/if}
+    <div class="opds-saved-row">
+      <select
+        class="opds-saved-select"
+        bind:value={url}
+        onchange={handleSavedSelect}
+        aria-label={$t('Saved feeds')}
+        disabled={loading || importing}
+      >
+        <option value="" disabled>{$t('Saved feeds…')}</option>
+        {#each displayFeeds as feed (feed.url)}
+          <option value={feed.url}>{feed.title ?? feed.url}</option>
+        {/each}
+      </select>
+      <button
+        type="button"
+        class="opds-remove-btn"
+        onclick={removeSelected}
+        disabled={!isSaved || loading || importing}
+        aria-label={$t('Remove the selected feed from the list')}
+      >
+        {$t('Remove')}
+      </button>
+    </div>
 
     <div class="opds-url-row">
       <input
@@ -160,7 +170,7 @@
         type="url"
         class="opds-url-input"
         placeholder={$t('https://example.com/catalog.xml')}
-        aria-label={$t('OPDS feed URL')}
+        aria-label={$t('Catalog URL')}
         onkeydown={handleUrlKeydown}
         disabled={loading || importing}
       />

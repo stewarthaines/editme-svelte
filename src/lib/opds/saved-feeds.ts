@@ -12,6 +12,16 @@ export interface SavedFeed {
 
 const STORAGE_KEY = 'editme_opds_feeds';
 
+/**
+ * A built-in catalog pinned to the top of the feed list. It is not persisted to
+ * localStorage and cannot be removed, so the import dialog always offers a
+ * starting point even before the user has saved any of their own feeds.
+ */
+export const DEFAULT_CATALOG_FEED: SavedFeed = {
+  url: 'https://sample.readitinabook.com/catalog.xml',
+  title: 'Sample catalog',
+};
+
 /** Load the saved feeds (most-recent first). Returns [] on any error. */
 export function loadSavedFeeds(): SavedFeed[] {
   try {

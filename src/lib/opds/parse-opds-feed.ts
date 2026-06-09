@@ -1,5 +1,5 @@
 /**
- * OPDS feed parsing for "Import from OPDS".
+ * OPDS feed parsing for "Import from Catalog".
  *
  * Parses an OPDS (Atom) acquisition feed into the list of downloadable EPUBs it
  * advertises. Mirrors the schema produced by the publish plugin's
@@ -38,7 +38,7 @@ export function parseOpdsFeed(xml: string, feedUrl: string): OpdsFeed {
 
   // A parse failure yields a document containing a <parsererror> element.
   if (doc.querySelector('parsererror')) {
-    throw new Error('Could not parse the OPDS feed (invalid XML).');
+    throw new Error('Could not parse the catalog feed (invalid XML).');
   }
 
   const books: OpdsBook[] = [];
