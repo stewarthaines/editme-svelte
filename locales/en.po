@@ -33,27 +33,91 @@ msgstr ""
 msgid "About"
 msgstr "About"
 
-#: src/lib/navigation/views/AboutView.svelte
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.attribution.content"
-msgstr "SEED.html is developed by Stewart Haines."
+msgstr "Developed by Stewart Haines."
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.description.content"
+msgid "about.cta.closing"
 msgstr ""
-"SEED.html is a simple, browser-based EPUB editor. Create and edit EPUB "
-"books with plain text sources that are transformed to valid XHTML."
+"That's it — a complete book. From there you can refine the styling, add "
+"images, check it against EPUBCheck, and publish it to the web."
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.description.title"
-msgstr "Description"
+msgid "about.cta.intro"
+msgstr "You can have a real, shareable book in a few minutes:"
 
 #: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step1"
+msgstr "Create a new project and give it a title and author."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step2"
+msgstr ""
+"Write or paste a chapter as plain text — a heading and a few paragraphs is "
+"plenty."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step3"
+msgstr "Use the live preview to see it laid out on phone and tablet screens."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step4"
+msgstr "Add a few more chapters and arrange them in the spine."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step5"
+msgstr "Package the EPUB and open it in your favourite Reading System."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.title"
+msgstr "Make your first book"
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.editor"
+msgstr ""
+"This editor turns plain text into a valid EPUB with no servers, accounts, "
+"or installation. You write in simple, readable source; it's transformed "
+"into clean XHTML and packaged into a standards-compliant book you can open "
+"in any Reading System."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.format"
+msgstr ""
+"EPUB is the open standard for digital books: a single, self-contained file "
+"of text, styles, and images that any compliant app can open. The apps and "
+"devices that display them — Apple Books, Google Play Books, Kobo, Thorium "
+"Reader, and many more — are called Reading Systems. Because the format is "
+"open, a book you make once can be read almost anywhere, reflowing to fit "
+"any screen and adapting to each reader's chosen size, font, and contrast."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.title"
+msgstr "What is an EPUB?"
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.graphic.alt"
+msgstr "One EPUB made with the editor, opening on phones, tablets, and e-readers."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.graphic.caption"
+msgstr "Make it once — read it anywhere: phones, tablets, e-readers, and apps."
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "about.license.summary"
+msgstr ""
+"Simple EPUB Editor (distributed as SEED.html) is free and open-source "
+"software, released under the MIT License. You're welcome to use it, modify "
+"it, and redistribute it — including embedding it inside the EPUBs you "
+"create."
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.license.title"
 msgstr "License"
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.subtitle"
-msgstr "Simple EPUB Editor"
+msgid "about.tagline"
+msgstr "Make ebooks anyone can read — right in your browser."
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.thirdparty.intro"
@@ -67,9 +131,13 @@ msgstr "Third-party License"
 msgid "about.thirdparty.title"
 msgstr "Third-Party Libraries"
 
-#: src/lib/navigation/views/AboutView.svelte
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.version"
 msgstr "Version"
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.website.intro"
+msgstr "For guides, examples, and the bigger picture, visit the website:"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.website.link"
@@ -1907,6 +1975,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "WebDAV URL"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "Welcome"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte

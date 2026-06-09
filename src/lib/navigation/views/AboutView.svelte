@@ -1,25 +1,90 @@
-<script context="module" lang="ts">
-  // Version injected at build time from package.json
-  declare const __VERSION__: string;
-</script>
-
 <script lang="ts">
   import { t } from '../../i18n';
-  import LICENSE_TEXT from '../../../../LICENSE.txt?raw';
-
-  const VERSION = __VERSION__;
+  import PaneHeader from '$lib/components/layout/PaneHeader.svelte';
 </script>
 
-<div class="about-view">
-  <div class="about-content">
-    <header class="about-header">
-      <h1 class="app-title">{$t('about.subtitle')}</h1>
-      <p class="app-version">{$t('about.version')}: {VERSION}</p>
-    </header>
+<div class="about-pane">
+  <PaneHeader>
+    <span class="pane-title">{$t('Welcome')}</span>
+  </PaneHeader>
+  <div class="about-pane-body">
+    <p class="about-tagline">{$t('about.tagline')}</p>
+
+    <!-- One EPUB, made here, opening across many Reading Systems. Decorative
+         line-art; the caption below carries the meaning for screen readers. -->
+    <figure class="reach-figure">
+      <svg
+        class="reach-graphic"
+        viewBox="0 0 460 210"
+        role="img"
+        aria-label={$t('about.graphic.alt')}
+      >
+        <defs>
+          <marker
+            id="about-arrowhead"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path class="arrowhead" d="M0 0 L10 5 L0 10 z" />
+          </marker>
+        </defs>
+
+        <!-- Source: an EPUB made with this editor -->
+        <g class="g-source">
+          <rect x="26" y="64" width="86" height="104" rx="8" />
+          <line x1="45" y1="64" x2="45" y2="168" />
+          <line x1="60" y1="92" x2="96" y2="92" />
+          <line x1="60" y1="108" x2="96" y2="108" />
+          <line x1="60" y1="124" x2="84" y2="124" />
+        </g>
+
+        <!-- Fan-out arrows from the source to each device -->
+        <g class="g-arrows">
+          <path d="M120 116 C 220 116, 250 58, 332 58" marker-end="url(#about-arrowhead)" />
+          <path d="M120 116 C 230 116, 250 116, 330 118" marker-end="url(#about-arrowhead)" />
+          <path d="M120 116 C 220 116, 250 184, 326 184" marker-end="url(#about-arrowhead)" />
+        </g>
+
+        <!-- Reading Systems: phone, tablet, laptop -->
+        <g class="g-devices">
+          <!-- phone -->
+          <rect x="340" y="24" width="44" height="70" rx="8" />
+          <line x1="356" y1="32" x2="368" y2="32" />
+          <!-- tablet -->
+          <rect x="338" y="96" width="66" height="46" rx="6" />
+          <!-- laptop -->
+          <rect x="334" y="160" width="72" height="44" rx="3" />
+          <path d="M326 206 L414 206" />
+        </g>
+      </svg>
+      <figcaption class="reach-caption">{$t('about.graphic.caption')}</figcaption>
+    </figure>
 
     <section class="about-section">
-      <h2>{$t('about.description.title')}</h2>
-      <p>{$t('about.description.content')}</p>
+      <h2>{$t('about.epub.title')}</h2>
+      <p>{$t('about.epub.format')}</p>
+      <p>{$t('about.epub.editor')}</p>
+    </section>
+
+    <section class="about-section">
+      <h2>{$t('about.cta.title')}</h2>
+      <p>{$t('about.cta.intro')}</p>
+      <ol class="about-steps">
+        <li>{$t('about.cta.step1')}</li>
+        <li>{$t('about.cta.step2')}</li>
+        <li>{$t('about.cta.step3')}</li>
+        <li>{$t('about.cta.step4')}</li>
+        <li>{$t('about.cta.step5')}</li>
+      </ol>
+      <p>{$t('about.cta.closing')}</p>
+    </section>
+
+    <section class="about-section">
+      <p>{$t('about.website.intro')}</p>
       <p>
         <a
           href="https://stewarthaines.com/epub"
@@ -30,60 +95,95 @@
           {$t('about.website.link')}
         </a>
       </p>
-      <p>{$t('about.attribution.content')}</p>
-    </section>
-
-    <section class="about-section">
-      <h2>{$t('about.license.title')}</h2>
-      <pre class="license-text">{LICENSE_TEXT}</pre>
     </section>
   </div>
 </div>
 
 <style>
-  .about-view {
+  /* Fixed header over a scrolling body, matching the other split-pane views. */
+  .about-pane {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow: auto;
-    padding: var(--space-4);
+    min-width: 0;
     background: var(--color-bg-primary);
   }
 
-  .about-content {
-    max-width: 800px;
-    margin: 0 auto;
+  .pane-title {
+    font-weight: var(--font-semibold);
   }
 
-  .about-header {
-    text-align: center;
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border-default);
+  .about-pane-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-5);
   }
 
-  .app-title {
-    font-size: var(--text-3xl);
-    font-weight: var(--font-bold);
+  /* Keep a comfortable reading measure even when the pane is wide. */
+  .about-pane-body > * {
+    max-width: 42rem;
+  }
+
+  .about-tagline {
+    font-size: var(--text-lg);
+    line-height: 1.5;
     color: var(--color-text-primary);
-    margin: 0 0 var(--space-2) 0;
+    margin: 0 0 var(--space-4) 0;
   }
 
-  .app-version {
+  .reach-figure {
+    margin: 0 0 var(--space-5) 0;
+  }
+
+  .reach-graphic {
+    display: block;
+    width: 100%;
+    max-width: 24rem;
+    height: auto;
+    margin: 0 auto var(--space-2);
+    color: var(--color-text-tertiary);
+  }
+
+  .reach-graphic rect,
+  .reach-graphic line,
+  .reach-graphic path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .reach-graphic .g-source rect {
+    fill: var(--color-bg-secondary);
+  }
+
+  .reach-graphic .g-arrows path {
+    stroke: var(--color-accent);
+  }
+
+  .reach-graphic .arrowhead {
+    fill: var(--color-accent);
+    stroke: none;
+  }
+
+  .reach-caption {
+    text-align: center;
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     margin: 0;
   }
 
   .about-section {
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
   }
 
   .about-section h2 {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     font-weight: var(--font-semibold);
     color: var(--color-text-primary);
-    margin: 0 0 var(--space-3) 0;
-    border-bottom: 1px solid var(--color-border-subtle);
-    padding-bottom: var(--space-1);
+    margin: 0 0 var(--space-2) 0;
   }
 
   .about-section p {
@@ -93,6 +193,17 @@
     margin: 0 0 var(--space-3) 0;
   }
 
+  .about-steps {
+    margin: 0 0 var(--space-3) 0;
+    padding-left: var(--space-5);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .about-steps li {
+    margin-bottom: var(--space-2);
+  }
+
   .external-link {
     color: var(--color-text-link);
     text-decoration: underline;
@@ -100,44 +211,5 @@
 
   .external-link:hover {
     color: var(--color-text-link-hover);
-  }
-
-  .license-text {
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.5;
-    color: var(--color-text-primary);
-    white-space: pre-wrap;
-    overflow-x: auto;
-    overflow-y: auto;
-  }
-
-  /* Responsive design */
-  @media (max-width: 640px) {
-    .about-view {
-      padding: var(--space-3);
-    }
-
-    .app-title {
-      font-size: var(--text-2xl);
-    }
-  }
-
-  /* High contrast mode support */
-  @media (prefers-contrast: high) {
-    .license-text {
-      border-width: 2px;
-    }
-  }
-
-  /* Reduced motion support */
-  @media (prefers-reduced-motion: reduce) {
-    .about-view {
-      scroll-behavior: auto;
-    }
   }
 </style>

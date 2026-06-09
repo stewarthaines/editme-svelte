@@ -33,24 +33,72 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: src/lib/navigation/views/AboutView.svelte
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.attribution.content"
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.description.content"
+msgid "about.cta.closing"
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.description.title"
+msgid "about.cta.intro"
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step1"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step2"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step3"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step4"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.step5"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.cta.title"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.editor"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.format"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.epub.title"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.graphic.alt"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.graphic.caption"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "about.license.summary"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.license.title"
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "about.subtitle"
+msgid "about.tagline"
 msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
@@ -65,8 +113,12 @@ msgstr ""
 msgid "about.thirdparty.title"
 msgstr ""
 
-#: src/lib/navigation/views/AboutView.svelte
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.version"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "about.website.intro"
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
@@ -1871,6 +1923,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "WebDAV URL"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "Welcome"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte

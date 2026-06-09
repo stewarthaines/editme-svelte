@@ -1,5 +1,14 @@
+<script context="module" lang="ts">
+  // Version injected at build time from package.json
+  declare const __VERSION__: string;
+</script>
+
 <script lang="ts">
   import { t } from '../../i18n';
+  import PaneHeader from '$lib/components/layout/PaneHeader.svelte';
+  import LICENSE_TEXT from '../../../../LICENSE.txt?raw';
+
+  const VERSION = __VERSION__;
 
   // Third-party library information
   const THIRD_PARTY_LIBRARIES = [
@@ -51,16 +60,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`;
 </script>
 
-<div class="thirdparty-view">
-  <div class="thirdparty-content">
-    <header class="thirdparty-header">
+<div class="license-pane">
+  <PaneHeader>
+    <span class="pane-title">{$t('about.license.title')}</span>
+  </PaneHeader>
+  <div class="license-pane-body">
+    <!-- The app's own license — primary. -->
+    <section class="license-section">
+      <p class="license-summary">{$t('about.license.summary')}</p>
+      <p class="license-meta">
+        {$t('about.attribution.content')} · {$t('about.version')}: {VERSION}
+      </p>
+      <pre class="license-text">{LICENSE_TEXT}</pre>
+    </section>
+
+    <!-- Third-party libraries folded in below the main license. -->
+    <section class="thirdparty-section">
       <h2>{$t('about.thirdparty.title')}</h2>
       <p class="thirdparty-intro">{$t('about.thirdparty.intro')}</p>
-    </header>
 
-    <section class="libraries-section">
       <div class="library-list">
-        {#each THIRD_PARTY_LIBRARIES as library}
+        {#each THIRD_PARTY_LIBRARIES as library (library.name)}
           <div class="library-item">
             <h3 class="library-name">
               <a href={library.url} target="_blank" rel="noopener noreferrer" class="external-link">
@@ -85,41 +105,78 @@ SOFTWARE.`;
 </div>
 
 <style>
-  .thirdparty-view {
+  .license-pane {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow: auto;
-    padding: var(--space-4);
+    min-width: 0;
     background: var(--color-bg-primary);
   }
 
-  .thirdparty-content {
-    max-width: 800px;
-    margin: 0 auto;
+  .pane-title {
+    font-weight: var(--font-semibold);
   }
 
-  .thirdparty-header {
-    text-align: center;
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border-default);
+  .license-pane-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-5);
   }
 
-  .thirdparty-header h2 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-bold);
-    color: var(--color-text-primary);
+  .license-pane-body > * {
+    max-width: 42rem;
+  }
+
+  .license-section {
+    margin-bottom: var(--space-5);
+  }
+
+  .license-summary {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .license-meta {
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
     margin: 0 0 var(--space-3) 0;
   }
 
-  .thirdparty-intro {
-    font-size: var(--text-base);
-    line-height: 1.6;
+  /* License blocks are de-emphasized: small, muted, monospace. */
+  .license-text {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: 1.5;
     color: var(--color-text-secondary);
-    margin: 0;
+    white-space: pre-wrap;
+    overflow: auto;
   }
 
-  .libraries-section {
-    margin-bottom: var(--space-6);
+  .thirdparty-section {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .thirdparty-section h2 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .thirdparty-intro {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-3) 0;
   }
 
   .external-link {
@@ -131,24 +188,10 @@ SOFTWARE.`;
     color: var(--color-text-link-hover);
   }
 
-  .license-text {
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.5;
-    color: var(--color-text-primary);
-    white-space: pre-wrap;
-    overflow-x: auto;
-    overflow-y: auto;
-  }
-
   .library-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .library-item {
@@ -169,7 +212,7 @@ SOFTWARE.`;
   }
 
   .library-version {
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
     font-weight: var(--font-normal);
     color: var(--color-text-secondary);
     background: var(--color-bg-tertiary);
@@ -185,53 +228,26 @@ SOFTWARE.`;
 
   .library-copyright {
     font-size: var(--text-xs);
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
     margin: var(--space-1) 0 0 0;
     font-family: var(--font-mono);
   }
 
   .mit-license-section {
-    margin-top: var(--space-5);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border-subtle);
+    margin-top: var(--space-4);
   }
 
   .mit-license-section h3 {
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     font-weight: var(--font-semibold);
     color: var(--color-text-primary);
-    margin: 0 0 var(--space-3) 0;
+    margin: 0 0 var(--space-2) 0;
   }
 
-  /* Responsive design */
-  @media (max-width: 640px) {
-    .thirdparty-view {
-      padding: var(--space-3);
-    }
-
-    .thirdparty-header h2 {
-      font-size: var(--text-xl);
-    }
-
-    .library-name {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-1);
-    }
-  }
-
-  /* High contrast mode support */
   @media (prefers-contrast: high) {
     .license-text,
     .library-item {
       border-width: 2px;
-    }
-  }
-
-  /* Reduced motion support */
-  @media (prefers-reduced-motion: reduce) {
-    .thirdparty-view {
-      scroll-behavior: auto;
     }
   }
 </style>
