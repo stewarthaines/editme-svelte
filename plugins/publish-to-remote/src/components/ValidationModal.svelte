@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ValidationReport } from '../epub-validation.js';
+  import { t, translate } from '../i18n.js';
 
   let {
     report,
@@ -21,8 +22,12 @@
   }): string {
     if (loc.line != null) {
       return loc.column != null
-        ? `${loc.path} (line ${loc.line}, col ${loc.column})`
-        : `${loc.path} (line ${loc.line})`;
+        ? translate('{path} (line {line}, col {col})', {
+            path: loc.path,
+            line: loc.line,
+            col: loc.column,
+          })
+        : translate('{path} (line {line})', { path: loc.path, line: loc.line });
     }
     return loc.path;
   }
@@ -49,25 +54,27 @@
       onkeydown={(e) => e.stopPropagation()}
     >
       <div class="modal-header">
-        <h3>Validation Report: {report.filename}</h3>
+        <h3>
+          {$t('Validation Report: {filename}', { filename: report.filename })}
+        </h3>
         <button class="btn btn-icon" onclick={onClose}>✕</button>
       </div>
       <div class="modal-body">
         <div class="report-summary">
           <p>
-            <strong>Status:</strong>
+            <strong>{$t('Status:')}</strong>
             <span class={report.isValid ? 'status-valid' : 'status-invalid'}>
-              {report.isValid ? 'Valid' : 'Invalid'}
+              {report.isValid ? $t('Valid') : $t('Invalid')}
             </span>
           </p>
           <p>
-            <strong>Errors:</strong>
+            <strong>{$t('Errors:')}</strong>
             {report.errorCount} |
-            <strong>Warnings:</strong>
+            <strong>{$t('Warnings:')}</strong>
             {report.warningCount}
           </p>
           <p>
-            <strong>Checked:</strong>
+            <strong>{$t('Checked:')}</strong>
             {new Date(report.timestamp).toLocaleString()}
           </p>
         </div>
@@ -91,7 +98,7 @@
                       type="button"
                       class="location location-link"
                       onclick={() => onNavigate?.(path)}
-                      title="Open this chapter in the editor"
+                      title={$t('Open this chapter in the editor')}
                     >
                       {formatLocation(msg.location)}
                     </button>
@@ -109,7 +116,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" onclick={onClose}>Close</button>
+        <button class="btn btn-primary" onclick={onClose}>{$t('Close')}</button>
       </div>
     </div>
   </div>

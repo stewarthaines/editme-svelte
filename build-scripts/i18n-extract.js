@@ -107,13 +107,22 @@ async function extractStrings() {
   const extractedCommentsMap = new Map(); // text -> comment
 
   // Find all Svelte and TypeScript files, excluding test files
-  const svelteFiles = await glob('src/**/*.svelte', {
+  // Scan the app and in-repo plugin source into the one shared catalog, so
+  // plugins need no catalog/pipeline of their own (skip plugin deps + builds).
+  const ignore = [
+    '**/*.test.*',
+    '**/test/**',
+    '**/__tests__/**',
+    '**/node_modules/**',
+    '**/dist/**',
+  ];
+  const svelteFiles = await glob(['src/**/*.svelte', 'plugins/*/src/**/*.svelte'], {
     cwd: projectRoot,
-    ignore: ['**/*.test.*', '**/test/**', '**/__tests__/**'],
+    ignore,
   });
-  const tsFiles = await glob('src/**/*.ts', {
+  const tsFiles = await glob(['src/**/*.ts', 'plugins/*/src/**/*.ts'], {
     cwd: projectRoot,
-    ignore: ['**/*.test.*', '**/test/**', '**/__tests__/**'],
+    ignore,
   });
 
   console.log(

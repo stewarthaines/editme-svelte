@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { S3Object } from '../types.js';
   import FileName from './FileName.svelte';
+  import { t } from '../i18n.js';
 
   let {
     objects,
@@ -18,9 +19,9 @@
 </script>
 
 {#if googleAuthRequired}
-  <p class="empty-message">Connect to Google Drive to view files.</p>
+  <p class="empty-message">{$t('Connect to Google Drive to view files.')}</p>
 {:else if objects.length === 0}
-  <p class="empty-message">Bucket is empty</p>
+  <p class="empty-message">{$t('Bucket is empty')}</p>
 {:else}
   <div class="remote-list">
     {#each objects as obj (obj.key)}
@@ -37,27 +38,28 @@
           <button
             class="btn btn-secondary btn-sm"
             onclick={() => onCopyUrl(obj.key, obj.fileId)}
-            title="Copy URL">Copy</button
+            title={$t('Copy URL')}>{$t('Copy')}</button
           >
           {#if deleteConfirmKey === obj.key}
             <div class="delete-confirm">
-              <span>Confirm delete?</span>
+              <span>{$t('Confirm delete?')}</span>
               <button
                 class="btn btn-danger btn-sm"
                 onclick={() => {
                   onDelete(obj.key);
                   deleteConfirmKey = null;
-                }}>Yes</button
+                }}>{$t('Yes')}</button
               >
               <button
                 class="btn btn-secondary btn-sm"
-                onclick={() => (deleteConfirmKey = null)}>No</button
+                onclick={() => (deleteConfirmKey = null)}>{$t('No')}</button
               >
             </div>
           {:else}
             <button
               class="btn btn-danger btn-sm"
-              onclick={() => (deleteConfirmKey = obj.key)}>Delete</button
+              onclick={() => (deleteConfirmKey = obj.key)}
+              >{$t('Delete')}</button
             >
           {/if}
         </div>

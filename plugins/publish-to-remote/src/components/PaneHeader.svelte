@@ -3,7 +3,8 @@
 
   // A grey toolbar bar at the top of a pane, matching the core app's PaneHeader
   // convention (consistent single-row height) but using the plugin's own tokens.
-  let { children, actions }: { children?: Snippet; actions?: Snippet } = $props();
+  let { children, actions }: { children?: Snippet; actions?: Snippet } =
+    $props();
 </script>
 
 <div class="pane-header">

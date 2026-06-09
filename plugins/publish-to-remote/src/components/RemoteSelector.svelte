@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RemoteConfig, RemotesStore } from '../types.js';
+  import { t } from '../i18n.js';
 
   let {
     remotesStore,
@@ -24,7 +25,7 @@
 
 {#if remotesStore.remotes.length > 1}
   <div class="remote-selector-bar">
-    <label for="remote-select">Active Remote:</label>
+    <label for="remote-select">{$t('Active Remote:')}</label>
     <select
       id="remote-select"
       value={remotesStore.activeRemoteId}
@@ -49,34 +50,40 @@
         </option>
       {/each}
     </select>
-    <button class="btn btn-secondary" onclick={onAdd}>Add Remote</button>
+    <button class="btn btn-secondary" onclick={onAdd}>{$t('Add Remote')}</button
+    >
     <button
       class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
     >
-      Edit
+      {$t('Edit')}
     </button>
-    <button class="btn btn-danger btn-sm" onclick={onRemove}>Remove</button>
+    <button class="btn btn-danger btn-sm" onclick={onRemove}
+      >{$t('Remove')}</button
+    >
   </div>
 {:else if remotesStore.remotes.length === 1}
   <div class="remote-selector-bar">
-    <span>Remote: <strong>{activeRemote?.name}</strong></span>
-    <button class="btn btn-secondary" onclick={onAdd}>Add Remote</button>
+    <span>{$t('Remote:')} <strong>{activeRemote?.name}</strong></span>
+    <button class="btn btn-secondary" onclick={onAdd}>{$t('Add Remote')}</button
+    >
     <button
       class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
     >
-      Edit
+      {$t('Edit')}
     </button>
-    <button class="btn btn-danger btn-sm" onclick={onRemove}>Remove</button>
+    <button class="btn btn-danger btn-sm" onclick={onRemove}
+      >{$t('Remove')}</button
+    >
   </div>
 {/if}
 
 {#if googleAuthRequired && activeRemote?.type === 'google-drive'}
   <div class="auth-required-banner">
-    <span>Google Drive authorization required.</span>
+    <span>{$t('Google Drive authorization required.')}</span>
     <button class="btn btn-primary" onclick={onReconnect}>
-      Connect to Google Drive
+      {$t('Connect to Google Drive')}
     </button>
   </div>
 {/if}

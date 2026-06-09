@@ -12,6 +12,18 @@ msgstr ""
 "Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "-- Choose a preset --"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid ".. (up)"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "← Back"
+msgstr ""
+
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "1 day ago"
 msgstr ""
@@ -61,6 +73,14 @@ msgstr ""
 msgid "about.website.link"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Access Key"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Access Key ID"
+msgstr ""
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Access modes"
 msgstr ""
@@ -79,6 +99,10 @@ msgstr ""
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Actions"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Active Remote:"
 msgstr ""
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
@@ -125,6 +149,14 @@ msgstr ""
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Add Language"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Add Remote"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Add Remote Storage"
 msgstr ""
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
@@ -204,6 +236,18 @@ msgstr ""
 msgid "Auto"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Auto-filled from bucket name"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Auto-filled from folder name"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Auto-filled from URL"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Available Extensions"
 msgstr ""
@@ -228,10 +272,27 @@ msgstr ""
 msgid "Both values are required. rendition:viewport is deprecated in EPUB 3.3."
 msgstr ""
 
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Bring-your-own File Storage"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Bucket is empty"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Bucket Name"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
 msgstr "🇮🇱 Cancel"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Catalog Filename (optional)"
+msgstr ""
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Catalog URL"
@@ -253,12 +314,20 @@ msgstr ""
 msgid "Certifier report (URL)"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Change Folder"
+msgstr ""
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Chapter Content"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
 msgid "Chapters"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Checked:"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestTable.svelte
@@ -273,6 +342,7 @@ msgstr "🇮🇱 Clear search"
 msgid "Click on any row in the table to see details"
 msgstr "🇮🇱 Click on any row in the table to see details"
 
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
@@ -306,12 +376,37 @@ msgstr ""
 msgid "Complex Interactive"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Confirm delete?"
+msgstr ""
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Conformance"
 msgstr ""
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Conformance level"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Connect & Pick Folder"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Connect to Dropbox"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Connect to Google Drive"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Connect to Google Drive to view files."
+msgstr ""
+
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Connecting to storage..."
 msgstr ""
 
 #: src/App.svelte
@@ -336,6 +431,14 @@ msgstr "🇮🇱 Contributors"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Control methods"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Copy"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Copy URL"
 msgstr ""
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
@@ -404,6 +507,8 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete"
@@ -426,17 +531,30 @@ msgstr "🇮🇱 Description"
 msgid "Device:"
 msgstr ""
 
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Dismiss"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "DOM Transforms"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Download"
 msgstr "🇮🇱 Download"
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Download EPUB to disk"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Drop to add to the manifest"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Dropbox"
 msgstr ""
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
@@ -487,6 +605,10 @@ msgid ""
 "whole publication."
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Edit"
+msgstr ""
+
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Edition"
 msgstr ""
@@ -497,6 +619,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Enable advanced editing features and additional controls for power users."
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Endpoint URL"
 msgstr ""
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
@@ -551,6 +677,10 @@ msgstr ""
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Error"
 msgstr "🇮🇱 Error"
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Errors:"
+msgstr ""
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Essential Information"
@@ -678,6 +808,10 @@ msgstr "🇮🇱 Filter by ID, path, or media type..."
 msgid "Flow"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Folder selected:"
+msgstr ""
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Font Family:"
 msgstr ""
@@ -709,6 +843,14 @@ msgstr ""
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Get Started"
 msgstr "🇮🇱 Get Started"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Google Drive"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Google Drive authorization required."
+msgstr ""
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Hazards"
@@ -771,6 +913,18 @@ msgstr ""
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Initializing editor..."
+msgstr ""
+
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Initializing..."
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Invalid"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Invalid EPUB"
 msgstr ""
 
 #: src/stories/preview/ContentPreviewDemo.svelte
@@ -853,6 +1007,10 @@ msgstr "🇮🇱 Load File"
 msgid "Loading extensions..."
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Loading folders..."
+msgstr ""
+
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Loading manifest…"
 msgstr ""
@@ -888,6 +1046,14 @@ msgstr ""
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Loading…"
+msgstr ""
+
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Local Packaged EPUBs"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Location:"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
@@ -965,6 +1131,11 @@ msgstr ""
 msgid "New Project"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "No"
+msgstr ""
+
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "No content available"
 msgstr ""
@@ -973,12 +1144,20 @@ msgstr ""
 msgid "No DOM transforms configured."
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "No EPUB files found in this directory"
+msgstr ""
+
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "No EPUBs found in this feed."
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "No extensions installed."
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "No issues"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestTable.svelte
@@ -1018,6 +1197,10 @@ msgstr "🇮🇱 No spine item selected"
 msgid "No spine items yet"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "No subfolders here"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "None"
 msgstr ""
@@ -1030,12 +1213,20 @@ msgstr ""
 msgid "Not specified"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Not validated"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to configure its settings."
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Open this chapter in the editor"
 msgstr ""
 
 #: src/lib/components/metadata/OPFPreview.svelte
@@ -1052,6 +1243,10 @@ msgstr "🇮🇱 Orientation"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Orientation:"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Overwrite?"
 msgstr ""
 
 #: src/lib/navigation/views/PublishView.svelte
@@ -1076,6 +1271,10 @@ msgstr ""
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Paginated"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Password"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestTable.svelte
@@ -1119,6 +1318,10 @@ msgstr ""
 msgid "Pre-paginated"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Preset"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Preview"
 msgstr ""
@@ -1147,6 +1350,10 @@ msgstr ""
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Properties"
 msgstr "🇮🇱 Properties"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Public URL Base (optional)"
+msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publication"
@@ -1193,6 +1400,10 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Region (optional)"
+msgstr ""
+
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Relation"
 msgstr "🇮🇱 Relation"
@@ -1201,6 +1412,15 @@ msgstr "🇮🇱 Relation"
 msgid "Release the file anywhere to add it"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Remote Name (optional)"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Remote:"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/metadata/AccessibilityFields.svelte
 #: src/lib/components/metadata/CollectionsEditor.svelte
@@ -1232,6 +1452,14 @@ msgstr ""
 msgid "Rendition Properties"
 msgstr "🇮🇱 Rendition Properties"
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Replace"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Report"
+msgstr ""
+
 #: src/lib/components/metadata/fields/DateMetadataField.svelte
 #: src/lib/components/metadata/fields/TextareaMetadataField.svelte
 msgid "Required field"
@@ -1247,6 +1475,7 @@ msgstr ""
 msgid "Responsive"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/SpineSidebar.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
@@ -1263,6 +1492,18 @@ msgstr ""
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Rights"
 msgstr "🇮🇱 Rights"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Route uploads through the app proxy (for servers without CORS)"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "S3-Compatible"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "S3-Compatible Storage"
+msgstr ""
 
 #: src/lib/content/sample-content-generator.ts
 msgid "sample.author.name"
@@ -1298,6 +1539,10 @@ msgstr "🇮🇱 Sample Publisher"
 msgid "Sans-serif"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Save & Connect"
+msgstr ""
+
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Saved feeds"
 msgstr ""
@@ -1328,6 +1573,14 @@ msgstr ""
 msgid "Search projects…"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Secret Access Key"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Secret Key"
+msgstr ""
+
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Select a spine item from the sidebar to start editing"
 msgstr ""
@@ -1342,6 +1595,10 @@ msgstr "🇮🇱 Select an item to preview its content"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Select device preset"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Select This Folder"
 msgstr ""
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
@@ -1415,6 +1672,10 @@ msgstr "🇮🇱 Spread"
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for typical/common mobile phone or e-reader screen
 msgid "Standard"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Status:"
 msgstr ""
 
 #: src/lib/components/metadata/SubjectEditor.svelte
@@ -1538,6 +1799,18 @@ msgstr "🇮🇱 Unknown View"
 msgid "Untitled"
 msgstr ""
 
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Update Catalog"
+msgstr ""
+
+#: plugins/publish-to-remote/src/App.svelte
+msgid "Updating..."
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Upload"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Use the download button to access the file"
 msgstr "🇮🇱 Use the download button to access the file"
@@ -1546,9 +1819,37 @@ msgstr "🇮🇱 Use the download button to access the file"
 msgid "Use the publication’s own fonts (do not re-style)"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Username"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Valid"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Valid EPUB"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Validate"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Validate EPUB"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Validating..."
+msgstr ""
+
 #: src/App.svelte
 msgid "View type"
 msgstr "🇮🇱 View type"
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "View validation report"
+msgstr ""
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Viewport"
@@ -1560,6 +1861,27 @@ msgstr ""
 
 #: src/lib/components/metadata/fields/ViewportField.svelte
 msgid "Viewport width in pixels"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ValidationModal.svelte
+msgid "Warnings:"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "WebDAV"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "WebDAV Storage"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "WebDAV URL"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+msgid "Yes"
 msgstr ""
 
 #: src/lib/navigation/views/WorkspaceView.svelte

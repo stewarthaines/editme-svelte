@@ -14,6 +14,9 @@ export type ContextMessage = {
   theme: 'light' | 'dark';
   locale: string;
   dir: 'ltr' | 'rtl';
+  // The active locale's dictionary (English source → localized). Optional for
+  // back-compat; the plugin falls back to the English source string when absent.
+  messages?: Record<string, string>;
 };
 
 // plugin → main: ask the host to open the editor resource at `path` (e.g. a

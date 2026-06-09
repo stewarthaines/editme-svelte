@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { SvelteMap } from 'svelte/reactivity';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+  import { t, translate } from './i18n.js';
   import { dirHandle } from './store.js';
   import { readRemotes, writeRemotes } from './opfs.js';
   import {
@@ -89,7 +90,10 @@
       lastDirHandle = $dirHandle;
       loadLocalEpubs().catch((err) => {
         console.error('Failed to load local EPUBs:', err);
-        showStatus(`Failed to load EPUBs: ${String(err)}`, 'error');
+        showStatus(
+          translate('Failed to load EPUBs: {error}', { error: String(err) }),
+          'error',
+        );
       });
     }
   });
@@ -211,7 +215,10 @@
       view = 'loading';
       await refreshObjectList();
     } catch (error) {
-      showStatus(`Failed to save config: ${String(error)}`, 'error');
+      showStatus(
+        translate('Failed to save config: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -242,7 +249,10 @@
       googleAuthRequired = false;
       await refreshObjectList();
     } catch (error) {
-      showStatus(`Authorization failed: ${String(error)}`, 'error');
+      showStatus(
+        translate('Authorization failed: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -268,7 +278,11 @@
         report,
       });
       showStatus(
-        `${epub.name}: ${report.errorCount} errors, ${report.warningCount} warnings`,
+        translate('{name}: {errors} errors, {warnings} warnings', {
+          name: epub.name,
+          errors: report.errorCount,
+          warnings: report.warningCount,
+        }),
         report.isValid ? 'success' : 'info',
       );
       // Surface the report immediately when there's something to act on, saving the
@@ -283,7 +297,10 @@
         isValidating: false,
         report: prev?.report ?? null,
       });
-      showStatus(`Validation failed: ${String(error)}`, 'error');
+      showStatus(
+        translate('Validation failed: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -295,9 +312,12 @@
       clearLatestReport(epub.name);
       epubValidationStatus.delete(epub.name);
       await loadLocalEpubs();
-      showStatus(`${epub.name} deleted`, 'info');
+      showStatus(translate('{name} deleted', { name: epub.name }), 'info');
     } catch (error) {
-      showStatus(`Delete error: ${String(error)}`, 'error');
+      showStatus(
+        translate('Delete error: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -333,13 +353,19 @@
         },
       );
       if (result.success) {
-        showStatus(`${epub.name} uploaded successfully`, 'success');
+        showStatus(
+          translate('{name} uploaded successfully', { name: epub.name }),
+          'success',
+        );
         await refreshObjectList();
       } else {
-        showStatus(result.error || 'Upload failed', 'error');
+        showStatus(result.error || translate('Upload failed'), 'error');
       }
     } catch (error) {
-      showStatus(`Upload error: ${String(error)}`, 'error');
+      showStatus(
+        translate('Upload error: {error}', { error: String(error) }),
+        'error',
+      );
     } finally {
       uploading = false;
       uploadProgress = null;
@@ -365,12 +391,15 @@
       const result = await deleteFile(activeRemote, key);
       if (result.success) {
         remoteObjects = remoteObjects.filter((o) => o.key !== key);
-        showStatus(`${key} deleted`, 'success');
+        showStatus(translate('{key} deleted', { key }), 'success');
       } else {
-        showStatus(result.error || 'Delete failed', 'error');
+        showStatus(result.error || translate('Delete failed'), 'error');
       }
     } catch (error) {
-      showStatus(`Delete error: ${String(error)}`, 'error');
+      showStatus(
+        translate('Delete error: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -387,7 +416,7 @@
       };
       await writeRemotes(remotesStore);
       remoteObjects = [];
-      showStatus(`Removed ${name}`, 'info');
+      showStatus(translate('Removed {name}', { name }), 'info');
       // No remotes left → offer the configure form in the right pane.
       if (remotesStore.remotes.length === 0) {
         editingRemote = null;
@@ -395,7 +424,10 @@
       }
       view = 'ready';
     } catch (error) {
-      showStatus(`Sign out error: ${String(error)}`, 'error');
+      showStatus(
+        translate('Sign out error: {error}', { error: String(error) }),
+        'error',
+      );
     }
   }
 
@@ -412,7 +444,7 @@
     const url = getPublicUrl(activeRemote, key, fileId);
     if (url) {
       navigator.clipboard.writeText(url).then(() => {
-        showStatus('URL copied to clipboard', 'success');
+        showStatus(translate('URL copied to clipboard'), 'success');
       });
     }
   }
@@ -423,7 +455,8 @@
     try {
       // Configurable per remote (S3/WebDAV); defaults to catalog.xml.
       const catalogName =
-        (activeRemote.type === 's3-compatible' || activeRemote.type === 'webdav') &&
+        (activeRemote.type === 's3-compatible' ||
+          activeRemote.type === 'webdav') &&
         activeRemote.catalogFilename?.trim()
           ? activeRemote.catalogFilename.trim()
           : 'catalog.xml';
@@ -440,13 +473,19 @@
       const xml = generateOpdsFeed(activeRemote, remoteObjects, feedUrl);
       const result = await uploadTextFile(activeRemote, catalogName, xml);
       if (result.success) {
-        showStatus(`Catalog updated: ${result.url || feedUrl}`, 'success');
+        showStatus(
+          translate('Catalog updated: {url}', { url: result.url || feedUrl }),
+          'success',
+        );
         await refreshObjectList();
       } else {
-        showStatus(result.error || 'Catalog update failed', 'error');
+        showStatus(result.error || translate('Catalog update failed'), 'error');
       }
     } catch (error) {
-      showStatus(`Catalog update error: ${String(error)}`, 'error');
+      showStatus(
+        translate('Catalog update error: {error}', { error: String(error) }),
+        'error',
+      );
     } finally {
       generatingFeed = false;
     }
@@ -471,7 +510,7 @@
       <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
         <Pane defaultSize={50} minSize={25}>
           <div class="pane">
-            <PaneHeader>Local Packaged EPUBs</PaneHeader>
+            <PaneHeader>{$t('Local Packaged EPUBs')}</PaneHeader>
             <div class="pane-body">
               <LocalEpubList
                 epubs={localEpubs}
@@ -494,7 +533,7 @@
 
         <Pane defaultSize={50} minSize={20}>
           <div class="pane">
-            <PaneHeader>Bring-your-own File Storage</PaneHeader>
+            <PaneHeader>{$t('Bring-your-own File Storage')}</PaneHeader>
             <div class="pane-body">
               {#if configuring}
                 <ConfigureForm
@@ -534,7 +573,9 @@
                       onclick={onUpdateCatalog}
                       disabled={generatingFeed}
                     >
-                      {generatingFeed ? 'Updating...' : 'Update Catalog'}
+                      {generatingFeed
+                        ? $t('Updating...')
+                        : $t('Update Catalog')}
                     </button>
                   </div>
                 {/if}
@@ -547,9 +588,9 @@
   {:else}
     <div class="centered">
       {#if view === 'init'}
-        <div class="loading">Initializing...</div>
+        <div class="loading">{$t('Initializing...')}</div>
       {:else if view === 'loading'}
-        <div class="loading">Connecting to storage...</div>
+        <div class="loading">{$t('Connecting to storage...')}</div>
       {/if}
     </div>
   {/if}
@@ -566,7 +607,7 @@
       <span class="status-toast-text">{statusMessage.text}</span>
       <button
         class="status-toast-close"
-        aria-label="Dismiss"
+        aria-label={$t('Dismiss')}
         onclick={() => (statusMessage = null)}>×</button
       >
     </div>

@@ -9,6 +9,7 @@ import { mount } from 'svelte';
 import App from './App.svelte';
 import './styles.css';
 import { dirHandle } from './store.js';
+import { setPluginMessages } from './i18n.js';
 import type { ContextMessage, InitMessage, MainToPlugin } from './types.js';
 
 function handleMessage(event: MessageEvent) {
@@ -33,6 +34,8 @@ function handleContext(message: ContextMessage) {
   root.setAttribute('data-theme', message.theme);
   root.lang = message.locale;
   root.dir = message.dir;
+  // Feed the active locale's dictionary to the plugin's `t` store.
+  setPluginMessages(message.messages ?? {});
 }
 
 function handleInit(message: InitMessage) {

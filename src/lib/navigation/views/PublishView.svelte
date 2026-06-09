@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t, currentLocale, documentDirection } from '$lib/i18n';
+  import { t, currentLocale, documentDirection, i18nService } from '$lib/i18n';
   import { themeStore } from '$lib/stores/theme';
   import PaneHeader from '$lib/components/layout/PaneHeader.svelte';
   import { downloadBlob } from '$lib/zip/index.js';
@@ -103,8 +103,11 @@
     const targetOrigin = new URL(pluginUrl, window.location.href).origin;
     // documentDirection is a string store; narrow it to the contract's literal.
     const dir = $documentDirection === 'rtl' ? 'rtl' : 'ltr';
+    // Hand over the active locale's dictionary so the plugin can translate its
+    // own UI from the shared catalog (no plugin-side bundle/pipeline).
+    const messages = i18nService.getCatalogs()[$currentLocale]?.messages ?? {};
     frameWindow.postMessage(
-      createContextMessage($themeStore.current, $currentLocale, dir),
+      createContextMessage($themeStore.current, $currentLocale, dir, messages),
       targetOrigin
     );
   }

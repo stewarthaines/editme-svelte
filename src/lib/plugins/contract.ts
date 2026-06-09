@@ -81,6 +81,12 @@ export interface ContextMessage {
   locale: string;
   /** Text direction derived from the locale; set as `dir`. */
   dir: 'ltr' | 'rtl';
+  /**
+   * The active locale's translation dictionary (English source string → localized
+   * string), so the plugin can translate its own UI without its own catalog or
+   * bundle. Optional for back-compat; absent → the plugin shows English source.
+   */
+  messages?: Record<string, string>;
 }
 
 /** plugin → main, inserts a plain string at the active textarea's cursor. */
@@ -114,9 +120,10 @@ export function createInitMessage(
 export function createContextMessage(
   theme: 'light' | 'dark',
   locale: string,
-  dir: 'ltr' | 'rtl'
+  dir: 'ltr' | 'rtl',
+  messages?: Record<string, string>
 ): ContextMessage {
-  return { type: 'context', theme, locale, dir };
+  return { type: 'context', theme, locale, dir, messages };
 }
 
 /** Runtime guard: is this an `init` message carrying a usable directory handle? */

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t, translate } from '../i18n.js';
   import {
     loadGoogleScripts,
     authorizeGoogleDrive,
@@ -248,7 +249,7 @@
   async function onConnectGoogleDrive() {
     try {
       if (!googleClientId || !googleApiKey) {
-        onStatus('Google Drive credentials not configured', 'error');
+        onStatus(translate('Google Drive credentials not configured'), 'error');
         return;
       }
       await loadGoogleScripts();
@@ -261,16 +262,24 @@
       form.folderName = folderName;
       form.accessToken = accessToken;
       pickedFolderName = folderName;
-      onStatus(`Selected folder: ${folderName}`, 'success');
+      onStatus(
+        translate('Selected folder: {name}', { name: folderName }),
+        'success',
+      );
     } catch (error) {
-      onStatus(`Google Drive setup failed: ${String(error)}`, 'error');
+      onStatus(
+        translate('Google Drive setup failed: {error}', {
+          error: String(error),
+        }),
+        'error',
+      );
     }
   }
 
   async function onConnectDropbox(): Promise<void> {
     try {
       if (!dropboxAppKey) {
-        onStatus('Dropbox app key not configured', 'error');
+        onStatus(translate('Dropbox app key not configured'), 'error');
         return;
       }
       const { accessToken, refreshToken, tokenExpiry } = await authorizeDropbox(
@@ -282,7 +291,12 @@
       form.tokenExpiry = tokenExpiry;
       await openDropboxBrowser('');
     } catch (error) {
-      onStatus(`Dropbox authorization failed: ${String(error)}`, 'error');
+      onStatus(
+        translate('Dropbox authorization failed: {error}', {
+          error: String(error),
+        }),
+        'error',
+      );
     }
   }
 
@@ -300,7 +314,7 @@
         form.refreshToken = '';
         form.tokenExpiry = 0;
         dbxBrowserActive = false;
-        onStatus('Session expired — please reconnect', 'error');
+        onStatus(translate('Session expired — please reconnect'), 'error');
       } else {
         dbxBrowserError =
           error instanceof Error ? error.message : String(error);
@@ -331,7 +345,7 @@
         !form.accessKeyId ||
         !form.secretAccessKey
       ) {
-        onStatus('Please fill all required fields', 'error');
+        onStatus(translate('Please fill all required fields'), 'error');
         return null;
       }
       return {
@@ -348,7 +362,7 @@
       };
     } else if (remoteType === 'google-drive') {
       if (!form.folderId) {
-        onStatus('Please select a folder', 'error');
+        onStatus(translate('Please select a folder'), 'error');
         return null;
       }
       return {
@@ -363,7 +377,10 @@
       };
     } else if (remoteType === 'dropbox') {
       if (!form.accessToken || pickedFolderName === null) {
-        onStatus('Please select a folder and authorize first', 'error');
+        onStatus(
+          translate('Please select a folder and authorize first'),
+          'error',
+        );
         return null;
       }
       return {
@@ -379,7 +396,7 @@
       };
     } else if (remoteType === 'webdav') {
       if (!form.url || !form.username || !form.password) {
-        onStatus('Please fill all required fields', 'error');
+        onStatus(translate('Please fill all required fields'), 'error');
         return null;
       }
       return {
@@ -394,7 +411,7 @@
         routeViaProxy,
       };
     }
-    onStatus('Please select a remote type', 'error');
+    onStatus(translate('Please select a remote type'), 'error');
     return null;
   }
 
@@ -407,43 +424,45 @@
 <div class="form-container">
   {#if remoteType === 'none'}
     <div class="type-selector">
-      <h3>Add Remote Storage</h3>
+      <h3>{$t('Add Remote Storage')}</h3>
       <div class="type-buttons">
         <button class="btn-type" onclick={() => (remoteType = 's3-compatible')}>
-          S3-Compatible
+          {$t('S3-Compatible')}
         </button>
         <button class="btn-type" onclick={onConnectGoogleDrive}>
-          Google Drive
+          {$t('Google Drive')}
         </button>
         <button class="btn-type" onclick={() => (remoteType = 'dropbox')}>
-          Dropbox
+          {$t('Dropbox')}
         </button>
         <button class="btn-type" onclick={() => (remoteType = 'webdav')}>
-          WebDAV
+          {$t('WebDAV')}
         </button>
       </div>
       {#if canCancel}
         <div class="form-actions">
-          <button class="btn btn-secondary" onclick={onCancel}>Cancel</button>
+          <button class="btn btn-secondary" onclick={onCancel}
+            >{$t('Cancel')}</button
+          >
         </div>
       {/if}
     </div>
   {:else if remoteType === 's3-compatible'}
     <div class="form-header">
       <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >← Back</button
+        >{$t('← Back')}</button
       >
-      <h3>S3-Compatible Storage</h3>
+      <h3>{$t('S3-Compatible Storage')}</h3>
     </div>
 
     <div class="form-group">
-      <label for="preset">Preset</label>
+      <label for="preset">{$t('Preset')}</label>
       <select
         id="preset"
         onchange={(e) =>
           onPresetSelected(e.currentTarget.value as keyof typeof S3_PRESETS)}
       >
-        <option value="">-- Choose a preset --</option>
+        <option value="">{$t('-- Choose a preset --')}</option>
         <option value="cloudflare-r2">Cloudflare R2</option>
         <option value="backblaze-b2">Backblaze B2</option>
         <option value="digitalocean-spaces">DigitalOcean Spaces</option>
@@ -452,17 +471,17 @@
     </div>
 
     <div class="form-group">
-      <label for="name">Remote Name (optional)</label>
+      <label for="name">{$t('Remote Name (optional)')}</label>
       <input
         id="name"
         type="text"
-        placeholder="Auto-filled from bucket name"
+        placeholder={$t('Auto-filled from bucket name')}
         bind:value={form.name}
       />
     </div>
 
     <div class="form-group">
-      <label for="endpoint">Endpoint URL</label>
+      <label for="endpoint">{$t('Endpoint URL')}</label>
       <input
         id="endpoint"
         type="url"
@@ -472,7 +491,7 @@
     </div>
 
     <div class="form-group">
-      <label for="bucket">Bucket Name</label>
+      <label for="bucket">{$t('Bucket Name')}</label>
       <input
         id="bucket"
         type="text"
@@ -483,27 +502,27 @@
     </div>
 
     <div class="form-group">
-      <label for="access-key">Access Key ID</label>
+      <label for="access-key">{$t('Access Key ID')}</label>
       <input
         id="access-key"
         type="text"
-        placeholder="Access Key"
+        placeholder={$t('Access Key')}
         bind:value={form.accessKeyId}
       />
     </div>
 
     <div class="form-group">
-      <label for="secret-key">Secret Access Key</label>
+      <label for="secret-key">{$t('Secret Access Key')}</label>
       <input
         id="secret-key"
         type="password"
-        placeholder="Secret Key"
+        placeholder={$t('Secret Key')}
         bind:value={form.secretAccessKey}
       />
     </div>
 
     <div class="form-group">
-      <label for="region">Region (optional)</label>
+      <label for="region">{$t('Region (optional)')}</label>
       <input
         id="region"
         type="text"
@@ -513,7 +532,7 @@
     </div>
 
     <div class="form-group">
-      <label for="public-url">Public URL Base (optional)</label>
+      <label for="public-url">{$t('Public URL Base (optional)')}</label>
       <input
         id="public-url"
         type="url"
@@ -523,7 +542,7 @@
     </div>
 
     <div class="form-group">
-      <label for="catalog-filename">Catalog Filename (optional)</label>
+      <label for="catalog-filename">{$t('Catalog Filename (optional)')}</label>
       <input
         id="catalog-filename"
         type="text"
@@ -534,21 +553,23 @@
 
     <div class="form-actions">
       <button onclick={handleSave} class="btn btn-primary"
-        >Save & Connect</button
+        >{$t('Save & Connect')}</button
       >
-      <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
+      <button onclick={onCancel} class="btn btn-secondary"
+        >{$t('Cancel')}</button
+      >
     </div>
   {:else if remoteType === 'google-drive'}
     <div class="form-header">
       <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >← Back</button
+        >{$t('← Back')}</button
       >
-      <h3>Google Drive</h3>
+      <h3>{$t('Google Drive')}</h3>
     </div>
 
     {#if pickedFolderName}
       <div class="form-group folder-selected">
-        <p><strong>Folder selected:</strong> {pickedFolderName}</p>
+        <p><strong>{$t('Folder selected:')}</strong> {pickedFolderName}</p>
         <button
           class="btn btn-secondary btn-sm"
           onclick={() => {
@@ -557,66 +578,67 @@
             pickedFolderName = null;
           }}
         >
-          Change Folder
+          {$t('Change Folder')}
         </button>
       </div>
     {:else}
       <div class="form-actions">
         <button onclick={onConnectGoogleDrive} class="btn btn-primary">
-          Connect & Pick Folder
+          {$t('Connect & Pick Folder')}
         </button>
       </div>
     {/if}
 
     {#if form.folderId}
       <div class="form-group">
-        <label for="gd-name">Remote Name (optional)</label>
+        <label for="gd-name">{$t('Remote Name (optional)')}</label>
         <input
           id="gd-name"
           type="text"
-          placeholder="Auto-filled from folder name"
+          placeholder={$t('Auto-filled from folder name')}
           bind:value={form.name}
         />
       </div>
 
       <div class="form-actions">
         <button onclick={handleSave} class="btn btn-primary"
-          >Save & Connect</button
+          >{$t('Save & Connect')}</button
         >
-        <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
+        <button onclick={onCancel} class="btn btn-secondary"
+          >{$t('Cancel')}</button
+        >
       </div>
     {/if}
   {:else if remoteType === 'dropbox'}
     <div class="form-header">
       <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >← Back</button
+        >{$t('← Back')}</button
       >
-      <h3>Dropbox</h3>
+      <h3>{$t('Dropbox')}</h3>
     </div>
 
     {#if !form.accessToken}
       <div class="form-actions">
         <button onclick={() => onConnectDropbox()} class="btn btn-primary">
-          Connect to Dropbox
+          {$t('Connect to Dropbox')}
         </button>
       </div>
     {:else if dbxBrowserActive}
       <div class="folder-browser">
         <div class="browser-path">
-          Location: <strong
-            >{dbxBrowserPath === '' ? '/' : dbxBrowserPath}</strong
-          >
+          {$t('Location:')}
+          <strong>{dbxBrowserPath === '' ? '/' : dbxBrowserPath}</strong>
         </div>
 
         {#if dbxBrowserLoading}
-          <div class="browser-loading">Loading folders...</div>
+          <div class="browser-loading">{$t('Loading folders...')}</div>
         {:else if dbxBrowserError}
           <div class="browser-error">{dbxBrowserError}</div>
           <button
             class="btn btn-secondary"
             onclick={() => openDropboxBrowser(dbxBrowserPath)}
           >
-            Retry
+            {$t('Retry')}
           </button>
         {:else}
           <div class="folder-list">
@@ -625,7 +647,7 @@
                 class="folder-item folder-item--up"
                 onclick={() => openDropboxBrowser(parentOf(dbxBrowserPath))}
               >
-                .. (up)
+                {$t('.. (up)')}
               </button>
             {/if}
             {#each dbxBrowserFolders as folder (folder.path)}
@@ -637,7 +659,7 @@
               </button>
             {/each}
             {#if dbxBrowserFolders.length === 0}
-              <p class="empty-message">No subfolders here</p>
+              <p class="empty-message">{$t('No subfolders here')}</p>
             {/if}
           </div>
           <div class="browser-actions">
@@ -649,59 +671,61 @@
                   dbxBrowserPath === '' ? '/' : dbxBrowserPath,
                 )}
             >
-              Select This Folder
+              {$t('Select This Folder')}
             </button>
           </div>
         {/if}
       </div>
     {:else}
       <div class="form-group folder-selected">
-        <p><strong>Folder selected:</strong> {pickedFolderName}</p>
+        <p><strong>{$t('Folder selected:')}</strong> {pickedFolderName}</p>
         <button
           class="btn btn-secondary btn-sm"
           onclick={() => openDropboxBrowser(form.folderId)}
         >
-          Change Folder
+          {$t('Change Folder')}
         </button>
       </div>
 
       <div class="form-group">
-        <label for="db-name">Remote Name (optional)</label>
+        <label for="db-name">{$t('Remote Name (optional)')}</label>
         <input
           id="db-name"
           type="text"
-          placeholder="Auto-filled from folder name"
+          placeholder={$t('Auto-filled from folder name')}
           bind:value={form.name}
         />
       </div>
 
       <div class="form-actions">
         <button onclick={handleSave} class="btn btn-primary"
-          >Save & Connect</button
+          >{$t('Save & Connect')}</button
         >
-        <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
+        <button onclick={onCancel} class="btn btn-secondary"
+          >{$t('Cancel')}</button
+        >
       </div>
     {/if}
   {:else if remoteType === 'webdav'}
     <div class="form-header">
       <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >← Back</button
+        >{$t('← Back')}</button
       >
-      <h3>WebDAV Storage</h3>
+      <h3>{$t('WebDAV Storage')}</h3>
     </div>
 
     <div class="form-group">
-      <label for="webdav-name">Remote Name (optional)</label>
+      <label for="webdav-name">{$t('Remote Name (optional)')}</label>
       <input
         id="webdav-name"
         type="text"
-        placeholder="Auto-filled from URL"
+        placeholder={$t('Auto-filled from URL')}
         bind:value={form.name}
       />
     </div>
 
     <div class="form-group">
-      <label for="webdav-url">WebDAV URL</label>
+      <label for="webdav-url">{$t('WebDAV URL')}</label>
       <input
         id="webdav-url"
         type="url"
@@ -711,7 +735,7 @@
     </div>
 
     <div class="form-group">
-      <label for="webdav-username">Username</label>
+      <label for="webdav-username">{$t('Username')}</label>
       <input
         id="webdav-username"
         type="text"
@@ -721,7 +745,7 @@
     </div>
 
     <div class="form-group">
-      <label for="webdav-password">Password</label>
+      <label for="webdav-password">{$t('Password')}</label>
       <input
         id="webdav-password"
         type="password"
@@ -731,7 +755,7 @@
     </div>
 
     <div class="form-group">
-      <label for="webdav-public-url">Public URL Base (optional)</label>
+      <label for="webdav-public-url">{$t('Public URL Base (optional)')}</label>
       <input
         id="webdav-public-url"
         type="url"
@@ -741,7 +765,9 @@
     </div>
 
     <div class="form-group">
-      <label for="webdav-catalog-filename">Catalog Filename (optional)</label>
+      <label for="webdav-catalog-filename"
+        >{$t('Catalog Filename (optional)')}</label
+      >
       <input
         id="webdav-catalog-filename"
         type="text"
@@ -753,25 +779,31 @@
     <div class="proxy-toggle">
       <label>
         <input type="checkbox" bind:checked={routeViaProxy} />
-        Route uploads through the app's proxy (for servers without CORS)
+        {$t('Route uploads through the app proxy (for servers without CORS)')}
       </label>
       <small class="field-note">
         {#if routeViaProxy}
-          Requests go through this app's <code>/dav</code> endpoint; your WebDAV
-          credentials transit the app host.{#if !proxyAvailable}
-            No proxy was detected on this host, so this only works once the app
-            is deployed with the WebDAV proxy.{/if}
+          {$t(
+            'Requests go through this app’s /dav endpoint; your WebDAV credentials transit the app host.',
+          )}{#if !proxyAvailable}
+            {$t(
+              'No proxy was detected on this host, so this only works once the app is deployed with the WebDAV proxy.',
+            )}{/if}
         {:else}
-          Requests go straight to the server, which must send CORS headers.
+          {$t(
+            'Requests go straight to the server, which must send CORS headers.',
+          )}
         {/if}
       </small>
     </div>
 
     <div class="form-actions">
       <button onclick={handleSave} class="btn btn-primary"
-        >Save & Connect</button
+        >{$t('Save & Connect')}</button
       >
-      <button onclick={onCancel} class="btn btn-secondary">Cancel</button>
+      <button onclick={onCancel} class="btn btn-secondary"
+        >{$t('Cancel')}</button
+      >
     </div>
   {/if}
 </div>

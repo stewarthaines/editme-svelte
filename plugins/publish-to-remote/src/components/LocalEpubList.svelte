@@ -5,6 +5,7 @@
     type ValidationReport,
   } from '../epub-validation.js';
   import FileName from './FileName.svelte';
+  import { t } from '../i18n.js';
 
   let {
     epubs,
@@ -48,7 +49,7 @@
 </script>
 
 {#if epubs.length === 0}
-  <p class="empty-message">No EPUB files found in this directory</p>
+  <p class="empty-message">{$t('No EPUB files found in this directory')}</p>
 {:else}
   <div class="epub-list">
     {#each epubs as epub (epub.name)}
@@ -73,7 +74,7 @@
                   type="checkbox"
                   bind:checked={confirmOverwrite[epub.name]}
                 />
-                Overwrite?
+                {$t('Overwrite?')}
               </label>
             {/if}
             <button
@@ -82,14 +83,14 @@
               disabled={uploading ||
                 (overwrite && !confirmOverwrite[epub.name])}
             >
-              {overwrite ? 'Replace' : 'Upload'}
+              {overwrite ? $t('Replace') : $t('Upload')}
             </button>
             <button
               class="btn btn-secondary"
               onclick={() => onDownload(epub)}
-              title="Download EPUB to disk"
+              title={$t('Download EPUB to disk')}
             >
-              Download
+              {$t('Download')}
             </button>
             <div class="validation-section">
               {#if summary}
@@ -97,34 +98,41 @@
                   class="status-icon {summary.error > 0
                     ? 'status-invalid'
                     : 'status-valid'}"
-                  title={summary.error > 0 ? 'Invalid EPUB' : 'Valid EPUB'}
+                  title={summary.error > 0
+                    ? $t('Invalid EPUB')
+                    : $t('Valid EPUB')}
                 >
                   {summary.error > 0 ? '✕' : '✓'}
                 </span>
                 {#if summary.error === 0 && summary.warning === 0 && summary.info === 0}
-                  <span class="vsummary-clean">No issues</span>
+                  <span class="vsummary-clean">{$t('No issues')}</span>
                 {:else}
                   <span class="vsummary">
                     {#if summary.error > 0}
                       <span class="vchip error">
-                        {summary.error} error{summary.error === 1 ? '' : 's'}
+                        {summary.error === 1
+                          ? $t('{n} error', { n: summary.error })
+                          : $t('{n} errors', { n: summary.error })}
                       </span>
                     {/if}
                     {#if summary.warning > 0}
                       <span class="vchip warning">
-                        {summary.warning} warning{summary.warning === 1
-                          ? ''
-                          : 's'}
+                        {summary.warning === 1
+                          ? $t('{n} warning', { n: summary.warning })
+                          : $t('{n} warnings', { n: summary.warning })}
                       </span>
                     {/if}
                     {#if summary.info > 0}
-                      <span class="vchip info">{summary.info} info</span>
+                      <span class="vchip info"
+                        >{$t('{n} info', { n: summary.info })}</span
+                      >
                     {/if}
                   </span>
                 {/if}
               {:else}
-                <span class="status-icon status-unknown" title="Not validated"
-                  >–</span
+                <span
+                  class="status-icon status-unknown"
+                  title={$t('Not validated')}>–</span
                 >
               {/if}
 
@@ -132,41 +140,42 @@
                 <button
                   class="btn btn-secondary btn-sm"
                   onclick={() => onViewReport(epub)}
-                  title="View validation report"
+                  title={$t('View validation report')}
                 >
-                  Report
+                  {$t('Report')}
                 </button>
               {:else}
                 <button
                   class="btn btn-secondary btn-sm"
                   onclick={() => onValidate(epub)}
                   disabled={status?.isValidating || uploading}
-                  title="Validate EPUB"
+                  title={$t('Validate EPUB')}
                 >
-                  {status?.isValidating ? 'Validating...' : 'Validate'}
+                  {status?.isValidating ? $t('Validating...') : $t('Validate')}
                 </button>
               {/if}
             </div>
 
             {#if deleteConfirm === epub.name}
               <div class="delete-confirm">
-                <span>Confirm delete?</span>
+                <span>{$t('Confirm delete?')}</span>
                 <button
                   class="btn btn-danger btn-sm"
                   onclick={() => {
                     onDelete(epub);
                     deleteConfirm = null;
-                  }}>Yes</button
+                  }}>{$t('Yes')}</button
                 >
                 <button
                   class="btn btn-secondary btn-sm"
-                  onclick={() => (deleteConfirm = null)}>No</button
+                  onclick={() => (deleteConfirm = null)}>{$t('No')}</button
                 >
               </div>
             {:else}
               <button
                 class="btn btn-danger btn-sm"
-                onclick={() => (deleteConfirm = epub.name)}>Delete</button
+                onclick={() => (deleteConfirm = epub.name)}
+                >{$t('Delete')}</button
               >
             {/if}
           {/if}
