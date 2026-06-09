@@ -413,7 +413,7 @@
     padding-block: var(--space-1); /* More compact */
     padding-inline: var(--space-2) 0;
     border-block-end: 1px solid var(--color-border-default); /* Using logical properties and tokens */
-    background: var(--color-bg-primary); /* Using design tokens */
+    background: var(--color-bg-tertiary); /* Match .workspace-title-section */
     flex-shrink: 0;
     min-block-size: var(--touch-target-min); /* 44px - meets WCAG AA requirements even for header */
   }
