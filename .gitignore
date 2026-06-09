@@ -44,3 +44,8 @@ static/i18n-bundle.zip
 # TypeScript build artifacts
 *.tsbuildinfo
 vite.config.d.ts
+
+# Cloudflare Wrangler local state/cache (Pages Functions emulator)
+.wrangler/
+# Local-only Wrangler env vars (may contain secrets)
+.dev.vars
