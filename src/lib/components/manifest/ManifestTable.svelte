@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import PaneHeader from '../layout/PaneHeader.svelte';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
 
   type SortableFields = 'href' | 'size';
@@ -335,39 +336,32 @@
 </script>
 
 <div class="manifest-table-container">
-  <!-- Toolbar -->
-  <div class="manifest-toolbar" role="toolbar" aria-label={$t('Manifest actions')} tabindex="0">
-    <!-- Filter input -->
-    <div class="filter-section">
-      <label for="manifest-filter" class="filter-label">
-        {$t('Filter')}:
-      </label>
-      <div class="filter-input-container">
-        <input
-          id="manifest-filter"
-          type="text"
-          class="filter-input"
-          placeholder={$t('Filter by ID, path, or media type...')}
-          value={filterText}
-          oninput={handleFilterInput}
-          disabled={loading}
-        />
-        {#if filterText}
-          <button
-            type="button"
-            class="clear-filter-button"
-            aria-label={$t('Clear filter')}
-            onclick={handleClearFilter}
-          >
-            ×
-          </button>
-        {/if}
-      </div>
+  <!-- Left pane header: filter (main) + Load File (action). -->
+  <PaneHeader>
+    <div class="filter-input-container">
+      <input
+        id="manifest-filter"
+        type="text"
+        class="filter-input"
+        placeholder={$t('Filter by ID, path, or media type...')}
+        value={filterText}
+        oninput={handleFilterInput}
+        disabled={loading}
+        aria-label={$t('Filter')}
+      />
+      {#if filterText}
+        <button
+          type="button"
+          class="clear-filter-button"
+          aria-label={$t('Clear filter')}
+          onclick={handleClearFilter}
+        >
+          ×
+        </button>
+      {/if}
     </div>
-
-    <!-- Action buttons -->
-    {#if !readOnly}
-      <div class="action-buttons">
+    {#snippet actions()}
+      {#if !readOnly}
         <button
           type="button"
           class="action-button primary"
@@ -376,19 +370,18 @@
         >
           {$t('Load File')}
         </button>
-      </div>
-    {/if}
-
-    <!-- Hidden file input -->
-    <input
-      bind:this={fileInputRef}
-      type="file"
-      multiple
-      accept="*/*"
-      style="display: none;"
-      onchange={handleFileInputChange}
-    />
-  </div>
+      {/if}
+      <!-- Hidden file input -->
+      <input
+        bind:this={fileInputRef}
+        type="file"
+        multiple
+        accept="*/*"
+        style="display: none;"
+        onchange={handleFileInputChange}
+      />
+    {/snippet}
+  </PaneHeader>
 
   <!-- Table container -->
   <div class="table-container">
@@ -510,36 +503,10 @@
     background-color: var(--color-surface);
   }
 
-  .manifest-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    background-color: var(--color-surface-primary);
-    border-block-end: 1px solid var(--color-border-default);
-    position: relative;
-    min-height: 3rem;
-    flex-shrink: 0;
-  }
-
-  .filter-section {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex: 1;
-    max-width: 400px;
-  }
-
-  .filter-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-  }
-
   .filter-input-container {
     position: relative;
     flex: 1;
+    max-width: 28rem;
   }
 
   .filter-input {
@@ -591,11 +558,6 @@
   .clear-filter-button:focus {
     outline: none;
     color: var(--color-text-primary);
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 0.5rem;
   }
 
   .action-button {
@@ -846,20 +808,6 @@
 
   /* Responsive design */
   @media (max-width: 768px) {
-    .manifest-toolbar {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: stretch;
-    }
-
-    .filter-section {
-      max-width: none;
-    }
-
-    .action-buttons {
-      justify-content: center;
-    }
-
     .manifest-table {
       font-size: 0.8125rem;
     }

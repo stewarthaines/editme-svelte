@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { t } from '../../i18n';
+  import PaneHeader from '../layout/PaneHeader.svelte';
   import type { ManifestItem, SourceItem, ContentPreview } from '../../manifest/types';
   import type {
     WorkspaceService,
@@ -62,6 +63,12 @@
   // the one manifest property that targets an image rather than XHTML).
   const isImageItem = $derived(
     isManifestItem && (selectedItem as ManifestItem).mediaType.startsWith('image/')
+  );
+  // The selected item's path, shown as the right-pane header label.
+  const itemLabel = $derived(
+    (selectedItem as { href?: string; path?: string } | null)?.href ??
+      (selectedItem as { href?: string; path?: string } | null)?.path ??
+      ''
   );
 
   // Reseed the form whenever the selected item changes (not on our own edits).
@@ -470,10 +477,10 @@
     </div>
   {:else}
     <div class="preview-content">
-      <!-- Header with item info and actions -->
-      <div class="preview-header">
-        <!-- Action buttons moved to header -->
-        <div class="preview-actions">
+      <!-- Right pane header: item label (main) + Download/Delete (actions). -->
+      <PaneHeader>
+        <span class="preview-item-label" title={itemLabel}>{itemLabel}</span>
+        {#snippet actions()}
           <button type="button" class="btn btn-secondary" onclick={handleDownloadClick}>
             {$t('Download')}
           </button>
@@ -482,8 +489,8 @@
               {$t('Delete')}
             </button>
           {/if}
-        </div>
-      </div>
+        {/snippet}
+      </PaneHeader>
 
       {#if isManifestItem && !readOnly}
         <!-- Inline manifest-item editor (compact; saves on blur / toggle).
@@ -655,15 +662,13 @@
     flex-direction: column;
   }
 
-  .preview-header {
-    flex-shrink: 0;
-    padding: 1rem;
-    border-bottom: 1px solid var(--color-border-default);
-    background-color: var(--color-surface-secondary);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
+  .preview-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    direction: ltr;
   }
 
   .item-edit-form {
@@ -816,12 +821,5 @@
   .binary-info {
     font-size: 0.875rem;
     margin-top: 0.5rem;
-  }
-
-  .preview-actions {
-    flex-shrink: 0;
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start;
   }
 </style>
