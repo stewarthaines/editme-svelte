@@ -195,7 +195,7 @@ export class WorkspaceService {
    * OPF is re-stamped with a fresh identifier and a "(copy)" title so it is a
    * distinct EPUB. Returns the new workspace.
    */
-  async duplicateWorkspace(srcId: string): Promise<WorkspaceState> {
+  async duplicateWorkspace(srcId: string, title?: string): Promise<WorkspaceState> {
     const newId = this.generateWorkspaceId();
     await this.fileStorage.createWorkspace(newId);
 
@@ -206,10 +206,11 @@ export class WorkspaceService {
       await this.fileStorage.writeFile(newId, path, content);
     }
 
-    // Re-stamp identity on the copied OPF (the copy is its own EPUB).
+    // Re-stamp identity on the copied OPF (the copy is its own EPUB). Use the
+    // caller-supplied title, or default to "<title> (copy)".
     const copy = await this.loadWorkspace(newId);
     return await this.updateMetadata(copy, {
-      title: `${copy.opf.metadata.title} (copy)`,
+      title: title?.trim() || `${copy.opf.metadata.title} (copy)`,
       identifier: `urn:uuid:${crypto.randomUUID()}`,
     });
   }

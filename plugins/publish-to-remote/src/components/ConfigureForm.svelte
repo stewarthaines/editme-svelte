@@ -740,21 +740,31 @@
 
   .type-selector {
     text-align: center;
+    /* Query the pane width (not the viewport) so the grid reflows with the split. */
+    container-type: inline-size;
   }
 
   .type-selector h3 {
     margin-top: 0;
   }
 
-  .type-selector p {
-    color: var(--color-text-secondary);
-    margin-bottom: 20px;
+  /* Responsive grid: one row → 2×2 → single column as the pane narrows. */
+  .type-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
   }
 
-  .type-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
+  @container (max-width: 34rem) {
+    .type-buttons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (max-width: 17rem) {
+    .type-buttons {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .form-header {

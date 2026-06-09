@@ -44,7 +44,7 @@
   <div class="action-buttons">
     <button
       type="button"
-      class="action-button primary"
+      class="action-button"
       onclick={handleCreateNew}
       disabled={isLoading}
       aria-label={$t('Create a new minimal EPUB project')}
@@ -94,16 +94,32 @@
 </div>
 
 <style>
-  /* Flat, app-standard CTAs: 1px borders, no drop shadow, no icons. */
+  /* Query the pane width (not the viewport) so the grid reflows with the split. */
+  .workspace-action-bar {
+    container-type: inline-size;
+  }
+
+  /* Flat, app-standard CTAs — all identical. Responsive grid: one row → 2×2 →
+     single column as the pane narrows. */
   .action-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-2);
   }
 
+  @container (max-width: 34rem) {
+    .action-buttons {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (max-width: 17rem) {
+    .action-buttons {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   .action-button {
-    min-width: 14rem;
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
@@ -130,29 +146,8 @@
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
-  .action-button.primary {
-    border-color: var(--color-primary);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-  }
-
-  .action-button.primary:not(:disabled):hover {
-    border-color: var(--color-primary-hover);
-    background-color: var(--color-primary-hover);
-  }
-
   .action-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-
-  @media (max-width: 480px) {
-    .action-buttons {
-      align-items: stretch;
-    }
-
-    .action-button {
-      min-width: 0;
-    }
   }
 </style>

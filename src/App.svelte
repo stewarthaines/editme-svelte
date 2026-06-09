@@ -345,7 +345,11 @@
         epubFile = new File([blob], filename, { type: 'application/epub+zip' });
       } else {
         // No file or URL provided - show file picker
-        epubFile = await showFilePickerForEpub();
+        const picked = await showFilePickerForEpub();
+        // Cancelling the dialog is a normal user action, not an error — quietly
+        // do nothing.
+        if (!picked) return;
+        epubFile = picked;
       }
 
       // Generate unique workspace ID
@@ -400,25 +404,19 @@
     }
   };
 
-  // Helper function to show file picker
-  const showFilePickerForEpub = (): Promise<File> => {
-    return new Promise((resolve, reject) => {
+  // Show the native file picker; resolves the chosen file, or null when the user
+  // cancels / selects nothing (a no-op, not an error).
+  const showFilePickerForEpub = (): Promise<File | null> => {
+    return new Promise(resolve => {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.epub';
 
       input.onchange = event => {
-        const file = (event.target as HTMLInputElement).files?.[0];
-        if (file) {
-          resolve(file);
-        } else {
-          reject(new Error('No file selected'));
-        }
+        resolve((event.target as HTMLInputElement).files?.[0] ?? null);
       };
 
-      input.oncancel = () => {
-        reject(new Error('File selection cancelled'));
-      };
+      input.oncancel = () => resolve(null);
 
       input.click();
     });
@@ -836,7 +834,8 @@
           onCreateProject={handleCreateProject}
           {availableExtensions}
           onDeleteWorkspace={id => appState?.deleteWorkspace(id) ?? Promise.resolve()}
-          onDuplicateWorkspace={id => appState?.duplicateWorkspace(id) ?? Promise.resolve('')}
+          onDuplicateWorkspace={(id, title) =>
+            appState?.duplicateWorkspace(id, title) ?? Promise.resolve('')}
           onLoadWorkspace={id => appState?.loadWorkspace(id) ?? Promise.resolve()}
           onLoadWorkspaceDetails={id =>
             appState?.getWorkspaceRowDetails(id) ??

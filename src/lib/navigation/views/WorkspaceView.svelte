@@ -7,6 +7,7 @@
   import WorkspaceList from '../../components/workspace/WorkspaceList.svelte';
   import OPDSImportDialog from '../../components/workspace/OPDSImportDialog.svelte';
   import PaneHeader from '../../components/layout/PaneHeader.svelte';
+  import DuplicateProjectDialog from '../../components/workspace/DuplicateProjectDialog.svelte';
   import CreateProjectDialog, {
     type CreateProjectData,
   } from '../../components/workspace/CreateProjectDialog.svelte';
@@ -37,7 +38,7 @@
     /** Create a project from the new-project dialog and open its first chapter. */
     onCreateProject: (data: CreateProjectData) => Promise<void>;
     onDeleteWorkspace: (id: string) => Promise<void>;
-    onDuplicateWorkspace: (id: string) => Promise<string>;
+    onDuplicateWorkspace: (id: string, title?: string) => Promise<string>;
     onLoadWorkspace: (id: string) => Promise<void>;
     onLoadWorkspaceDetails: (id: string) => Promise<WorkspaceRowDetails>;
     onEpubImportRequested: (file?: File, sourceUrl?: string) => Promise<void>;
@@ -56,6 +57,7 @@
   let hasUnsavedChanges = $state(false);
   let showOpdsDialog = $state(false);
   let showCreateDialog = $state(false);
+  let showDuplicateDialog = $state(false);
 
   // Only text-format extensions (markup languages) are offered in the create dialog.
   const textFormats = $derived(availableExtensions.filter(e => e.textTransforms.length > 0));
@@ -155,21 +157,25 @@
     }
   };
 
-  // Duplicate the current project, then select the copy (staying on Projects).
-  const handleDuplicate = async () => {
+  // Open the duplicate dialog so the user can name the copy first.
+  const handleDuplicate = () => {
+    if (!currentWorkspaceId) return;
+    showDuplicateDialog = true;
+  };
+
+  // Pre-filled title for the duplicate dialog: "<current title> (copy)".
+  const duplicateDefaultTitle = $derived(`${currentProjectTitle ?? 'Untitled Project'} (copy)`);
+
+  // Confirm from the dialog: duplicate with the chosen title, then select the
+  // copy (staying on Projects).
+  const handleDuplicateConfirm = async (title: string) => {
     if (!currentWorkspaceId) return;
     try {
       loading = true;
-      const newId = await onDuplicateWorkspace(currentWorkspaceId);
+      const newId = await onDuplicateWorkspace(currentWorkspaceId, title);
       await loadWorkspaces();
       await setCurrentWorkspace(newId);
-    } catch (err) {
-      console.error('Failed to duplicate project:', err);
-      alert(
-        $t('Failed to duplicate project: {error}', {
-          error: err instanceof Error ? err.message : 'Unknown error',
-        })
-      );
+      showDuplicateDialog = false;
     } finally {
       loading = false;
     }
@@ -390,6 +396,14 @@
       defaultLanguage={$currentLocale}
       onCreate={handleCreateConfirm}
       onClose={() => (showCreateDialog = false)}
+    />
+  {/if}
+
+  {#if showDuplicateDialog}
+    <DuplicateProjectDialog
+      defaultTitle={duplicateDefaultTitle}
+      onDuplicate={handleDuplicateConfirm}
+      onClose={() => (showDuplicateDialog = false)}
     />
   {/if}
 </div>

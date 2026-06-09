@@ -34,6 +34,8 @@
     // Default to the most recently used feed, preserving the previous behaviour.
     url = savedFeeds[0]?.url ?? '';
     urlInput?.focus();
+    // Auto-fetch the latest feed so the dialog opens already populated.
+    if (url.trim()) fetchFeed();
   });
 
   // Load the feed picked from the saved-feeds dropdown.
