@@ -242,6 +242,87 @@ export default defineConfig({
         });
       },
     },
+    // Dev only: a same-origin WebDAV proxy at /dav, mirroring the Cloudflare
+    // Pages Function (functions/dav.ts) so the plugin's proxy path works under
+    // `npm run dev` exactly as in production. The request contract below
+    // (X-DAV-URL / X-DAV-Method + the forwarded header allowlist) matches the
+    // authoritative, tested guard in functions/_shared/dav-proxy-core.ts. The
+    // node project (tsconfig.node, composite) can't import across to functions/,
+    // so this dev shim is intentionally standalone and lenient — it allows http
+    // and local targets, since it only ever serves localhost. Keep the contract
+    // in sync with the shared core if you change the header names.
+    {
+      name: 'serve-dav-proxy-dev',
+      apply: 'serve',
+      configureServer(server) {
+        const FORWARD = ['authorization', 'depth', 'content-type', 'destination', 'overwrite'];
+        const METHODS = ['GET', 'HEAD', 'PUT', 'DELETE', 'PROPFIND', 'MKCOL', 'MOVE', 'COPY'];
+        const header = (
+          headers: Record<string, string | string[] | undefined>,
+          name: string
+        ): string | undefined => {
+          const v = headers[name];
+          return Array.isArray(v) ? v[0] : v;
+        };
+        server.middlewares.use('/dav', (req, res) => {
+          if (req.method === 'GET' || req.method === 'HEAD') {
+            res.statusCode = 204;
+            res.end();
+            return;
+          }
+          if (req.method !== 'POST') {
+            res.statusCode = 405;
+            res.end('Method Not Allowed');
+            return;
+          }
+          const method = (header(req.headers, 'x-dav-method') || '').toUpperCase();
+          if (!METHODS.includes(method)) {
+            res.statusCode = 400;
+            res.end('Missing or unsupported X-DAV-Method');
+            return;
+          }
+          let target: URL;
+          try {
+            target = new URL(header(req.headers, 'x-dav-url') || '');
+          } catch {
+            res.statusCode = 400;
+            res.end('Invalid target URL');
+            return;
+          }
+          if (target.protocol !== 'https:' && target.protocol !== 'http:') {
+            res.statusCode = 400;
+            res.end('Target must use http(s)');
+            return;
+          }
+          const forwarded: Record<string, string> = {};
+          for (const name of FORWARD) {
+            const v = header(req.headers, name);
+            if (v !== undefined) forwarded[name] = v;
+          }
+          const chunks: Buffer[] = [];
+          req.on('data', (chunk: Buffer) => chunks.push(chunk));
+          req.on('end', () => {
+            const body = chunks.length ? Buffer.concat(chunks) : undefined;
+            fetch(target.toString(), {
+              method,
+              headers: forwarded,
+              body,
+              redirect: 'manual',
+            })
+              .then(async upstream => {
+                res.statusCode = upstream.status;
+                const ct = upstream.headers.get('content-type');
+                if (ct) res.setHeader('content-type', ct);
+                res.end(Buffer.from(await upstream.arrayBuffer()));
+              })
+              .catch((err: unknown) => {
+                res.statusCode = 502;
+                res.end(`Proxy request failed: ${String(err)}`);
+              });
+          });
+        });
+      },
+    },
     // Bundle analysis plugins
     // visualizer({
     //   filename: 'dist/stats.html',

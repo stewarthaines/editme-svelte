@@ -23,6 +23,49 @@ function resourceUrl(creds: WebDAVRemoteConfig, objectKey: string): string {
   return `${stripTrailingSlash(creds.url)}/${encodeURIComponent(objectKey)}`;
 }
 
+const DAV_PROXY_PATH = '/dav';
+
+/**
+ * The same-origin proxy endpoint to route through, or null to go direct.
+ * Enabled by default when the app is served over http(s); disabled under
+ * file:// (standalone / Active-EPUB) and when the remote opts out. Routing
+ * through the proxy avoids CORS for servers that can't send CORS headers.
+ */
+function proxyTarget(creds: WebDAVRemoteConfig): string | null {
+  if (creds.routeViaProxy === false) return null;
+  if (
+    typeof location === 'undefined' ||
+    !location.protocol.startsWith('http')
+  ) {
+    return null;
+  }
+  return `${location.origin}${DAV_PROXY_PATH}`;
+}
+
+/**
+ * Issue a WebDAV request either directly or through the same-origin proxy.
+ * Direct: `fetch(target, { method })`. Proxied: `POST /dav` carrying the real
+ * target + method in X-DAV-* headers — browser->proxy is same-origin (no CORS),
+ * proxy->server is server-to-server (also no CORS).
+ */
+function davFetch(
+  creds: WebDAVRemoteConfig,
+  targetUrl: string,
+  method: string,
+  headers: Record<string, string>,
+  body?: BodyInit,
+): Promise<Response> {
+  const proxy = proxyTarget(creds);
+  if (!proxy) {
+    return fetch(targetUrl, { method, headers, body });
+  }
+  return fetch(proxy, {
+    method: 'POST',
+    headers: { ...headers, 'X-DAV-URL': targetUrl, 'X-DAV-Method': method },
+    body,
+  });
+}
+
 function httpError(op: string, status: number, statusText: string): string {
   if (status === 401) {
     return `${op} failed: authentication rejected (401). Check the username and password.`;
@@ -33,17 +76,29 @@ function httpError(op: string, status: number, statusText: string): string {
   return `${op} failed: ${status} ${statusText}`;
 }
 
-/** PUT via XHR so upload progress can be reported (mirrors s3-upload's xhrUpload). */
+/**
+ * PUT via XHR so upload progress can be reported (mirrors s3-upload's
+ * xhrUpload). When `proxy` is set, POST to it with the real target/method in
+ * X-DAV-* headers; the progress events still fire on the browser->proxy hop.
+ */
 function xhrPut(
   url: string,
+  proxy: string | null,
   headers: Record<string, string>,
   blob: Blob,
   onProgress: (percent: number) => void,
 ): Promise<{ ok: boolean; status: number; statusText: string }> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('PUT', url);
-    Object.entries(headers).forEach(([key, value]) =>
+    const sendHeaders: Record<string, string> = { ...headers };
+    if (proxy) {
+      xhr.open('POST', proxy);
+      sendHeaders['X-DAV-URL'] = url;
+      sendHeaders['X-DAV-Method'] = 'PUT';
+    } else {
+      xhr.open('PUT', url);
+    }
+    Object.entries(sendHeaders).forEach(([key, value]) =>
       xhr.setRequestHeader(key, value),
     );
     xhr.upload.onprogress = (e) => {
@@ -77,8 +132,8 @@ export async function uploadToWebDAV(
 
   try {
     const response = onProgress
-      ? await xhrPut(url, headers, blob, onProgress)
-      : await fetch(url, { method: 'PUT', headers, body: blob });
+      ? await xhrPut(url, proxyTarget(creds), headers, blob, onProgress)
+      : await davFetch(creds, url, 'PUT', headers, blob);
 
     if (!response.ok) {
       return {
@@ -104,15 +159,17 @@ export async function listWebDAVFiles(
     // canonically slash-terminated, and servers like Apache 301-redirect the
     // slash-less form — which a CORS preflight can't follow (it fails the
     // request). The slash keeps the PROPFIND (and its preflight) on one URL.
-    const response = await fetch(`${stripTrailingSlash(creds.url)}/`, {
-      method: 'PROPFIND',
-      headers: {
+    const response = await davFetch(
+      creds,
+      `${stripTrailingSlash(creds.url)}/`,
+      'PROPFIND',
+      {
         Authorization: basicAuth(creds.username, creds.password),
         Depth: '1',
         'Content-Type': 'application/xml; charset=utf-8',
       },
-      body: PROPFIND_BODY,
-    });
+      PROPFIND_BODY,
+    );
 
     if (!response.ok) {
       return {
@@ -169,10 +226,14 @@ export async function deleteWebDAVFile(
   objectKey: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(resourceUrl(creds, objectKey), {
-      method: 'DELETE',
-      headers: { Authorization: basicAuth(creds.username, creds.password) },
-    });
+    const response = await davFetch(
+      creds,
+      resourceUrl(creds, objectKey),
+      'DELETE',
+      {
+        Authorization: basicAuth(creds.username, creds.password),
+      },
+    );
 
     if (response.status === 404 || response.ok) {
       return { success: true };

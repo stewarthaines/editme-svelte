@@ -155,6 +155,52 @@ git push
 
 Enable GitHub Pages in repository settings.
 
+### Cloudflare Pages (with the WebDAV proxy)
+
+Cloudflare Pages serves the static build **and** runs the same-origin WebDAV
+proxy used by the publish-to-remote plugin, so it's the recommended host when
+you need WebDAV uploads to servers that don't (or can't) send CORS headers.
+
+**Project settings:**
+
+- **Build command:** `npm run build:i18n && npm run build:plugins`
+  (the main app builds first into `dist/`; `build:plugins` then assembles
+  `dist/plugins/`).
+- **Output directory:** `dist`
+- **Functions:** none to configure — Cloudflare auto-detects the `functions/`
+  directory at the repo root and deploys `functions/dav.ts` to the `/dav` route
+  on the same domain. Functions take precedence over static assets, so `/dav`
+  is never shadowed by the SPA fallback.
+
+**The WebDAV proxy (`functions/dav.ts`, route `/dav`):** the plugin POSTs to
+`/dav` (same origin → no CORS) and the Function re-issues the real WebDAV
+request server-to-server. Targets are validated by
+`functions/_shared/dav-proxy-core.ts` — **https only**, private/loopback/
+link-local/metadata hosts rejected. Credentials (the Basic-auth header) pass
+through the Function in memory only; they are never stored or logged.
+
+**Optional env var** — `DAV_PROXY_ALLOWED_HOSTS`: a comma-separated list of host
+suffixes (e.g. `nextcloud.example.com, dav.example.org`). When set, the proxy
+will only forward to matching hosts — recommended for any public/multi-user
+deployment. When unset, the built-in guards above apply but any public host is
+allowed.
+
+**Deploying from Codeberg:** Cloudflare's one-click Git integration supports
+GitHub/GitLab only. From a Codeberg repo, deploy via Wrangler in CI:
+
+```bash
+npm run build:i18n && npm run build:plugins
+npx wrangler pages deploy dist
+```
+
+> The proxy only exists on a Functions-capable host (Cloudflare Pages, Netlify,
+> Vercel). On plain static hosts (GitHub Pages, Codeberg Pages) there is no
+> `/dav` route; the plugin's capability probe detects this and defaults the
+> per-remote "Route through the app's proxy" toggle **off**, so WebDAV there
+> falls back to direct requests (which require server-side CORS). The proxy is
+> also unavailable in the standalone single-file and Active-EPUB (`file://`)
+> modes.
+
 ## Standalone Distribution
 
 ### Preparing for Download

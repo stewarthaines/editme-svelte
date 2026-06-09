@@ -7,6 +7,9 @@ import {
 } from './webdav-upload.js';
 import type { WebDAVRemoteConfig } from './types.js';
 
+// Direct mode for the bulk of the suite. Under jsdom `location` is http://…, so
+// the proxy would otherwise default on; routeViaProxy:false keeps these
+// assertions on the real server URL. Proxy routing is covered separately below.
 const creds: WebDAVRemoteConfig = {
   id: '1',
   name: 'dav',
@@ -14,6 +17,7 @@ const creds: WebDAVRemoteConfig = {
   url: 'https://dav.example.com/books',
   username: 'user',
   password: 'pass',
+  routeViaProxy: false,
 };
 
 afterEach(() => {
@@ -162,6 +166,73 @@ describe('deleteWebDAVFile', () => {
     const result = await deleteWebDAVFile(creds, 'book.epub');
     expect(result.success).toBe(false);
     expect(result.error).toContain('403');
+  });
+});
+
+describe('proxy routing (routeViaProxy)', () => {
+  const proxyCreds: WebDAVRemoteConfig = { ...creds, routeViaProxy: true };
+  const davUrl = `${location.origin}/dav`;
+
+  it('routes an upload (PUT) through the same-origin /dav proxy', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, status: 201, statusText: 'Created' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await uploadToWebDAV(
+      proxyCreds,
+      'book.epub',
+      new Blob(['data']),
+    );
+
+    expect(result.success).toBe(true);
+    // The public URL still points at the real server, not the proxy.
+    expect(result.url).toBe('https://dav.example.com/books/book.epub');
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(davUrl);
+    expect(init.method).toBe('POST');
+    expect(init.headers['X-DAV-URL']).toBe(
+      'https://dav.example.com/books/book.epub',
+    );
+    expect(init.headers['X-DAV-Method']).toBe('PUT');
+    // The original WebDAV headers ride along for the proxy to forward.
+    expect(init.headers.Authorization).toBe(`Basic ${btoa('user:pass')}`);
+  });
+
+  it('routes PROPFIND through the proxy, preserving Depth + target', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 207,
+      statusText: 'Multi-Status',
+      text: async () => '<d:multistatus xmlns:d="DAV:"></d:multistatus>',
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await listWebDAVFiles(proxyCreds);
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(davUrl);
+    expect(init.method).toBe('POST');
+    expect(init.headers['X-DAV-URL']).toBe('https://dav.example.com/books/');
+    expect(init.headers['X-DAV-Method']).toBe('PROPFIND');
+    expect(init.headers.Depth).toBe('1');
+  });
+
+  it('routes DELETE through the proxy', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, status: 204, statusText: 'No Content' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await deleteWebDAVFile(proxyCreds, 'book.epub');
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(davUrl);
+    expect(init.method).toBe('POST');
+    expect(init.headers['X-DAV-URL']).toBe(
+      'https://dav.example.com/books/book.epub',
+    );
+    expect(init.headers['X-DAV-Method']).toBe('DELETE');
   });
 });
 

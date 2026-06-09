@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import {
     loadGoogleScripts,
     authorizeGoogleDrive,
@@ -76,6 +77,25 @@
   });
   let previousBucketForAutoName = '';
   let pickedFolderName: string | null = $state(null);
+
+  // WebDAV: route through the app's same-origin /dav proxy (for servers without
+  // CORS). Kept out of `form` so the many wholesale `form = {...}` resets don't
+  // each need the field. `proxyAvailable` is probed once; new remotes default
+  // to using the proxy only when one is actually present on this host.
+  let routeViaProxy = $state(true);
+  let proxyAvailable = $state(false);
+
+  onMount(async () => {
+    try {
+      const res = await fetch(`${location.origin}/dav`, { method: 'GET' });
+      proxyAvailable = res.status === 204;
+    } catch {
+      proxyAvailable = false;
+    }
+    if (!editingRemote) {
+      routeViaProxy = proxyAvailable;
+    }
+  });
 
   let dbxBrowserPath: string = $state('');
   let dbxBrowserFolders: { name: string; path: string }[] = $state([]);
@@ -179,6 +199,7 @@
         password: remote.password,
         catalogFilename: remote.catalogFilename || '',
       };
+      routeViaProxy = remote.routeViaProxy !== false;
     }
   }
 
@@ -370,6 +391,7 @@
         password: form.password,
         publicUrlBase: form.publicUrlBase.trim() || undefined,
         catalogFilename: form.catalogFilename.trim() || undefined,
+        routeViaProxy,
       };
     }
     onStatus('Please select a remote type', 'error');
@@ -390,9 +412,15 @@
         <button class="btn-type" onclick={() => (remoteType = 's3-compatible')}>
           S3-Compatible
         </button>
-        <button class="btn-type" onclick={onConnectGoogleDrive}> Google Drive </button>
-        <button class="btn-type" onclick={() => (remoteType = 'dropbox')}> Dropbox </button>
-        <button class="btn-type" onclick={() => (remoteType = 'webdav')}> WebDAV </button>
+        <button class="btn-type" onclick={onConnectGoogleDrive}>
+          Google Drive
+        </button>
+        <button class="btn-type" onclick={() => (remoteType = 'dropbox')}>
+          Dropbox
+        </button>
+        <button class="btn-type" onclick={() => (remoteType = 'webdav')}>
+          WebDAV
+        </button>
       </div>
       {#if canCancel}
         <div class="form-actions">
@@ -722,6 +750,23 @@
       />
     </div>
 
+    <div class="proxy-toggle">
+      <label>
+        <input type="checkbox" bind:checked={routeViaProxy} />
+        Route uploads through the app's proxy (for servers without CORS)
+      </label>
+      <small class="field-note">
+        {#if routeViaProxy}
+          Requests go through this app's <code>/dav</code> endpoint; your WebDAV
+          credentials transit the app host.{#if !proxyAvailable}
+            No proxy was detected on this host, so this only works once the app
+            is deployed with the WebDAV proxy.{/if}
+        {:else}
+          Requests go straight to the server, which must send CORS headers.
+        {/if}
+      </small>
+    </div>
+
     <div class="form-actions">
       <button onclick={handleSave} class="btn btn-primary"
         >Save & Connect</button
@@ -882,5 +927,28 @@
 
   .browser-actions {
     margin-top: 12px;
+  }
+
+  .proxy-toggle {
+    margin-bottom: 16px;
+  }
+
+  .proxy-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .proxy-toggle input {
+    width: auto;
+  }
+
+  .proxy-toggle .field-note {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
   }
 </style>

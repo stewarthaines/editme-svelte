@@ -79,6 +79,13 @@ export interface WebDAVRemoteConfig {
   publicUrlBase?: string;
   /** OPDS catalog filename (defaults to catalog.xml when unset). */
   catalogFilename?: string;
+  /**
+   * Route requests through the app's same-origin `/dav` proxy (for WebDAV
+   * servers that don't send CORS headers). Defaults to on when the app is
+   * served over http(s) and a proxy is present; set false to talk to the
+   * server directly (keeps credentials off the app host, needs server CORS).
+   */
+  routeViaProxy?: boolean;
 }
 
 export type RemoteConfig =
