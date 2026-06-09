@@ -73,6 +73,12 @@ msgstr "Package the EPUB and open it in your favourite Reading System."
 msgid "about.cta.title"
 msgstr "Make your first book"
 
+#: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "about.disclaimer.summary"
+msgstr ""
+"This software is developed making extensive use of coding agents, "
+"specifically the Claude Code product from Anthropic."
+
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.epub.editor"
 msgstr ""
@@ -122,10 +128,6 @@ msgstr "Make ebooks anyone can read — right in your browser."
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.thirdparty.intro"
 msgstr "This application is built with the following open source libraries:"
-
-#: src/lib/navigation/views/ThirdPartyView.svelte
-msgid "about.thirdparty.license"
-msgstr "Third-party License"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.thirdparty.title"
@@ -267,6 +269,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced Mode required for extension management"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "AI Disclaimer"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1806,6 +1812,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "System"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "Technical Info"
 msgstr ""
 
 #: src/lib/components/metadata/SubjectEditor.svelte

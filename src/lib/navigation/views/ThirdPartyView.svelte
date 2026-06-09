@@ -38,35 +38,20 @@
       copyright: 'Copyright (c) 2021 ndesmic',
     },
   ];
-
-  const MIT_LICENSE_TEXT = `MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.`;
 </script>
 
 <div class="license-pane">
   <PaneHeader>
-    <span class="pane-title">{$t('about.license.title')}</span>
+    <span class="pane-title">{$t('Technical Info')}</span>
   </PaneHeader>
   <div class="license-pane-body">
+    <section class="disclaimer-section">
+      <h2>{$t('AI Disclaimer')}</h2>
+      <p class="disclaimer-summary">{$t('about.disclaimer.summary')}</p>
+    </section>
     <!-- The app's own license — primary. -->
     <section class="license-section">
+      <h2>{$t('about.license.title')}</h2>
       <p class="license-summary">{$t('about.license.summary')}</p>
       <p class="license-meta">
         {$t('about.attribution.content')} · {$t('about.version')}: {VERSION}
@@ -94,11 +79,6 @@ SOFTWARE.`;
             <p class="library-copyright">{library.copyright}</p>
           </div>
         {/each}
-      </div>
-
-      <div class="mit-license-section">
-        <h3>{$t('about.thirdparty.license')}: MIT</h3>
-        <pre class="license-text">{MIT_LICENSE_TEXT}</pre>
       </div>
     </section>
   </div>
@@ -132,6 +112,7 @@ SOFTWARE.`;
     margin-bottom: var(--space-5);
   }
 
+  .disclaimer-summary,
   .license-summary {
     font-size: var(--text-sm);
     line-height: 1.6;
