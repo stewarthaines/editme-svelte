@@ -19,6 +19,9 @@ const projectRoot = join(__dirname, '..');
 
 const locales = ['en', 'de', 'ka', 'ar', 'he', 'zh-Hant', 'ja'];
 
+/** Day-only stamp (YYYY-MM-DD) for .po headers — avoids per-build timestamp churn. */
+const dayStamp = () => new Date().toISOString().slice(0, 10);
+
 /**
  * Create a .po data structure from .pot template for a specific locale
  */
@@ -27,7 +30,7 @@ function initializePoFromPot(potData, locale) {
     headers: {
       ...potData.headers,
       Language: locale,
-      'PO-Revision-Date': new Date().toISOString(),
+      'PO-Revision-Date': dayStamp(),
       'Last-Translator': '',
       'Language-Team': '',
     },
@@ -55,7 +58,7 @@ function initializePoFromPot(potData, locale) {
  * Merge existing .po file with updated .pot template
  */
 function mergePoWithPot(existingPo, potData, locale) {
-  const now = new Date().toISOString();
+  const now = dayStamp();
 
   // Preserve existing translations
   const existingTranslations = new Map();
@@ -331,21 +334,22 @@ async function extractStrings() {
     console.log(`💬 Found ${extractedCommentsMap.size} translator comments`);
   }
 
-  // Post-process messages to convert absolute paths to relative paths
+  // Post-process references: make paths relative, drop line numbers, dedupe and
+  // sort. File-only, stable references avoid the churn that line-number shifts
+  // (and repeated uses within one file) would otherwise produce on every build.
   for (const message of allMessages) {
-    if (message.references) {
-      message.references = message.references.map(ref => {
-        // Convert absolute path to relative path
-        if (ref.startsWith(projectRoot)) {
-          return ref.substring(projectRoot.length + 1); // +1 to remove leading slash
-        }
-        return ref;
-      });
-    }
+    if (!message.references) continue;
+    const files = message.references.map(ref => {
+      const rel = ref.startsWith(projectRoot)
+        ? ref.substring(projectRoot.length + 1) // +1 to remove leading slash
+        : ref;
+      return rel.replace(/(:\d+)+$/, ''); // drop trailing :line (and :col if any)
+    });
+    message.references = [...new Set(files)].sort();
   }
 
   // Create .pot data structure using gettext-parser format
-  const now = new Date().toISOString();
+  const now = dayStamp();
   const potData = {
     headers: {
       'MIME-Version': '1.0',
