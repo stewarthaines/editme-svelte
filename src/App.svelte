@@ -120,7 +120,7 @@
         publish: $t('Publish'),
         settings: $t('Settings'),
       } as Record<string, string>
-    )[currentView] ?? 'EDITME'
+    )[currentView] ?? 'SEED.html'
   );
   let isExpanded = $derived($layoutStore.sidebar.isExpanded);
 
@@ -166,7 +166,7 @@
 
   // Dynamic window title based on workspace
   let windowTitle = $derived.by(() => {
-    return workspaceTitle ? `${workspaceTitle}` : 'EDITME';
+    return workspaceTitle ? `${workspaceTitle}` : 'SEED.html';
   });
 
   // Manifest item selection state
