@@ -11,6 +11,7 @@
     author: string;
     language: string;
     extension: ExtensionCatalogEntry | null;
+    generateCover: boolean;
   }
 
   let {
@@ -37,6 +38,7 @@
   // Pre-select the first available text format to nudge toward a transform
   // library; falls back to plain text when none are available.
   let selectedId = $state(untrack(() => textFormats[0]?.id ?? PLAIN));
+  let generateCover = $state(false);
   let creating = $state(false);
   let error = $state<string | null>(null);
 
@@ -59,6 +61,7 @@
         author: author.trim(),
         language,
         extension: textFormats.find(e => e.id === selectedId) ?? null,
+        generateCover,
       });
       // On success the app navigates into the new project and this dialog
       // unmounts; nothing more to do here.
@@ -122,6 +125,11 @@
           disabled={creating}
         />
       </div>
+
+      <label class="cover-option">
+        <input type="checkbox" bind:checked={generateCover} disabled={creating} />
+        {$t('Generate cover image')}
+      </label>
 
       <div class="create-field">
         <label class="create-label" for="create-language">{$t('Language')}</label>
@@ -321,6 +329,19 @@
   .create-radio-desc {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
+  }
+
+  .cover-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .cover-option input[type='checkbox'] {
+    flex-shrink: 0;
   }
 
   .create-error {

@@ -47,6 +47,7 @@
   import { createSpinePreviewManager } from './lib/transform/spine-preview-manager.js';
   import { addTransform } from './lib/settings/dom-transforms.js';
   import type { CreateProjectData } from './lib/components/workspace/CreateProjectDialog.svelte';
+  import { generateCoverSvg, generateCoverPng } from './lib/epub/cover-generator.js';
 
   // Extension manager instance
   let extensionManager = $state<ExtensionManager>();
@@ -125,27 +126,6 @@
   let isExpanded = $derived($layoutStore.sidebar.isExpanded);
 
   // Whether any packaged EPUBs exist in the OPFS /publish dir. Gates the Publish nav
-  // item — it's keyed to artifacts, not projects (you can have published epubs with
-  // no current project, or none despite having projects).
-  let hasPublishedEpubs = $state(false);
-  async function refreshHasPublishedEpubs(): Promise<void> {
-    try {
-      hasPublishedEpubs = (await publishService.listPublishedEpubs()).length > 0;
-    } catch {
-      hasPublishedEpubs = false;
-    }
-  }
-  // Re-check on first run and whenever the view changes (covers deletes done in the
-  // Publish view), plus right after a new epub is packaged.
-  $effect(() => {
-    void currentView;
-    void refreshHasPublishedEpubs();
-  });
-  $effect(() => {
-    const onPackaged = () => void refreshHasPublishedEpubs();
-    window.addEventListener('epub-packaged', onPackaged);
-    return () => window.removeEventListener('epub-packaged', onPackaged);
-  });
 
   let currentWorkspaceId = $derived(appState?.currentWorkspaceId);
   let selectedSpineItemId = $derived(appState?.selectedChapterId); // renamed in enhanced
@@ -525,6 +505,26 @@
       });
     }
 
+    if (data.generateCover && appState.workspace) {
+      const svg = generateCoverSvg(data.title, data.author);
+      // SVG — plain manifest item for vector-quality use (no cover-image property)
+      await fileStorage.writeTextFile(workspaceId, 'OEBPS/Images/cover.svg', svg);
+      appState.workspace = await workspaceService.addManifestItem(appState.workspace, {
+        id: 'cover-svg',
+        href: 'Images/cover.svg',
+        mediaType: 'image/svg+xml',
+      });
+      // PNG — rasterised thumbnail set as the EPUB cover-image
+      const pngBuffer = await generateCoverPng(svg);
+      await fileStorage.writeFile(workspaceId, 'OEBPS/Images/cover.png', pngBuffer);
+      appState.workspace = await workspaceService.addManifestItem(appState.workspace, {
+        id: 'cover-image',
+        href: 'Images/cover.png',
+        mediaType: 'image/png',
+        properties: ['cover-image'],
+      });
+    }
+
     if (data.extension) {
       await installCatalogExtension(workspaceId, data.extension);
     }
@@ -765,7 +765,6 @@
   <LayoutManager
     hasWorkspace={!!currentWorkspaceId}
     readOnly={isReadOnly}
-    {hasPublishedEpubs}
     {enabledPluginIds}
     currentWorkspace={currentWorkspaceState}
     {workspaceTitle}

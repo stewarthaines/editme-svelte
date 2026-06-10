@@ -25,7 +25,6 @@
     hasWorkspace?: boolean;
     /** Read-only EPUB: hide the add/import-chapter actions. */
     readOnly?: boolean;
-    hasPublishedEpubs?: boolean;
     enabledPluginIds?: string[];
     currentWorkspace?: any;
     workspaceTitle?: string;
@@ -46,7 +45,6 @@
     activeSection = 'workspace',
     hasWorkspace = false,
     readOnly = false,
-    hasPublishedEpubs = false,
     enabledPluginIds = [],
     currentWorkspace = null,
     workspaceTitle = undefined,
@@ -266,15 +264,13 @@
           {/if}
         {/if}
 
-        {@const disabled = section.id === 'publish' && !hasPublishedEpubs}
         {#if !isProjectNav(section.id) || !hideProjectNav}
           <button
             class="sidebar-section"
             class:active={activeSection === section.id}
             onclick={() => setSidebarSection(section.id)}
-            {disabled}
             aria-current={activeSection === section.id ? 'page' : undefined}
-            title={disabled ? $t('No published EPUBs yet') : sectionLabel(section)}
+            title={sectionLabel(section)}
           >
             <span class="section-icon">
               <Icon

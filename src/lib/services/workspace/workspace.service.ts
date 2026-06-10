@@ -55,6 +55,8 @@ export interface WorkspaceRowDetails {
   extensionIds?: string[];
   /** A regular EPUB (no SOURCE/ files) — viewable but not editable. */
   readOnly: boolean;
+  /** Raw bytes of the cover-image manifest item, if the workspace has one. */
+  coverImageData?: { buffer: ArrayBuffer; mediaType: string };
 }
 
 export interface ChapterContent {
@@ -737,9 +739,27 @@ export class WorkspaceService {
       // Extensions are optional — don't fail the row if they can't be loaded.
     }
 
-    // Derived from the file list we already fetched — no extra I/O, so the lazy
-    // row load isn't slowed.
-    return { fileCount: files.length, extensionIds, readOnly: workspaceIsReadOnly(files) };
+    // Find and load the cover-image (optional — failures are silently swallowed).
+    let coverImageData: WorkspaceRowDetails['coverImageData'];
+    try {
+      const opfPath = files.find(f => f.endsWith('.opf'));
+      if (opfPath) {
+        const opfXml = await this.fileStorage.readTextFile(id, opfPath);
+        const doc = new DOMParser().parseFromString(opfXml, 'application/xml');
+        const coverEl = doc.querySelector('[properties~="cover-image"]');
+        const href = coverEl?.getAttribute('href');
+        const mediaType = coverEl?.getAttribute('media-type') ?? 'image/png';
+        if (href) {
+          const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/'));
+          const buffer = await this.fileStorage.readFile(id, `${opfDir}/${href}`);
+          coverImageData = { buffer, mediaType };
+        }
+      }
+    } catch {
+      // Cover image is optional — don't fail the row.
+    }
+
+    return { fileCount: files.length, extensionIds, readOnly: workspaceIsReadOnly(files), coverImageData };
   }
 
   /**

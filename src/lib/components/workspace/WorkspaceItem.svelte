@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { onMount, onDestroy, untrack } from 'svelte';
   import { t } from '../../i18n';
   import type {
     WorkspaceInfo,
@@ -32,14 +32,23 @@
         : null
     )
   );
+  let coverUrl = $state<string | null>(null);
 
   onMount(async () => {
     if (details || !onLoadWorkspaceDetails) return;
     try {
       details = await onLoadWorkspaceDetails(workspace.id);
+      if (details.coverImageData) {
+        const { buffer, mediaType } = details.coverImageData;
+        coverUrl = URL.createObjectURL(new Blob([buffer], { type: mediaType }));
+      }
     } catch {
       // Row details are non-critical; leave them unshown on failure.
     }
+  });
+
+  onDestroy(() => {
+    if (coverUrl) URL.revokeObjectURL(coverUrl);
   });
 
   const handleSelect = () => {
@@ -87,6 +96,8 @@
             aria-label={$t('Error')}
             title={$t('Project has errors')}>⚠️</span
           >
+        {:else if coverUrl}
+          <img src={coverUrl} alt="" class="workspace-cover" aria-hidden="true" />
         {:else}
           <span class="workspace-icon" aria-hidden="true">📖</span>
         {/if}
@@ -237,6 +248,14 @@
   .workspace-icon {
     font-size: 1.5rem;
     display: block;
+  }
+
+  .workspace-cover {
+    display: block;
+    width: 2rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
   }
 
   .workspace-icon.error {

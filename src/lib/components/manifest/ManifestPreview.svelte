@@ -277,6 +277,10 @@
             previewUrl = URL.createObjectURL(blob);
             activeBlobUrl = previewUrl;
             contentType = 'image';
+            // SVG: also expose the source so the template can render both
+            if (manifestItem.mediaType === 'image/svg+xml') {
+              textContent = new TextDecoder('utf-8').decode(content);
+            }
           } else if (isAudio) {
             // Create blob URL for audio preview
             const blob = new Blob([content], { type: manifestItem.mediaType });
@@ -585,6 +589,11 @@
                 class="preview-image"
               />
             </div>
+            {#if contentPreview.mediaType === 'image/svg+xml' && contentPreview.textContent}
+              <div class="text-preview">
+                <pre class="text-content" dir="ltr">{contentPreview.textContent}</pre>
+              </div>
+            {/if}
           {:else if contentPreview.contentType === 'audio' && contentPreview.previewUrl}
             <div class="audio-preview">
               <audio controls class="preview-audio">
