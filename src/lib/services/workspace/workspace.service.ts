@@ -59,6 +59,18 @@ export interface WorkspaceRowDetails {
   coverImageData?: { buffer: ArrayBuffer; mediaType: string };
 }
 
+/**
+ * Cached row metadata — the lightweight, derived parts of WorkspaceRowDetails.
+ * Excludes the cover ArrayBuffer: only the resolved cover path + media type are
+ * kept, and the bytes are re-read on demand so the cache stays memory-flat.
+ */
+interface CachedRowMeta {
+  fileCount: number;
+  extensionIds?: string[];
+  readOnly: boolean;
+  cover?: { path: string; mediaType: string };
+}
+
 export interface ChapterContent {
   id: string;
   href: string;
@@ -140,8 +152,53 @@ import { RESERVED_WORKSPACE_IDS } from '../../workspace/types.js';
 export class WorkspaceService {
   private extensionManager: ExtensionManager;
 
+  // container.xml → rootfilePath is immutable per workspace; cache permanently.
+  private pathInfoCache = new Map<string, WorkspacePathInfo>();
+
+  // OPF-mtime-validated cache of the Projects-list data. The shared mtime token
+  // means a single OPF write invalidates both the summary and the row metadata.
+  private summaryCache = new Map<
+    string,
+    { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta }
+  >();
+
   constructor(private fileStorage: FileStorageAPI) {
     this.extensionManager = new ExtensionManager(fileStorage);
+  }
+
+  /**
+   * Resolve pathInfo (cached) and the current OPF mtime, returning a cache slot
+   * for this workspace. A changed mtime drops the stale slot so callers rebuild.
+   */
+  private async cacheSlot(
+    id: string
+  ): Promise<{ pathInfo: WorkspacePathInfo; slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta } }> {
+    const pathInfo = await this.getWorkspacePathInfo(id);
+    let opfMtime = 0;
+    try {
+      opfMtime = (
+        await this.fileStorage.getFileInfo(id, pathInfo.rootfilePath)
+      ).lastModified.getTime();
+    } catch {
+      // Leave 0 → never matches a stored mtime, so the slot always rebuilds.
+    }
+    let slot = this.summaryCache.get(id);
+    if (!slot || slot.opfMtime !== opfMtime) {
+      slot = { opfMtime };
+      this.summaryCache.set(id, slot);
+    }
+    return { pathInfo, slot };
+  }
+
+  /** Drop cached data for one workspace (or all when no id is given). */
+  invalidateWorkspaceCache(id?: string): void {
+    if (id) {
+      this.pathInfoCache.delete(id);
+      this.summaryCache.delete(id);
+    } else {
+      this.pathInfoCache.clear();
+      this.summaryCache.clear();
+    }
   }
 
   /**
@@ -332,6 +389,7 @@ export class WorkspaceService {
   async deleteWorkspace(id: string): Promise<void> {
     try {
       await this.fileStorage.deleteWorkspace(id);
+      this.invalidateWorkspaceCache(id);
     } catch (error) {
       // Don't throw for non-existent workspaces (idempotent operation)
       if (error instanceof Error && !error.message.includes('not found')) {
@@ -697,20 +755,21 @@ export class WorkspaceService {
    * lazily per row via getWorkspaceRowDetails so the list renders fast.
    */
   async getWorkspaceInfo(id: string): Promise<WorkspaceInfo> {
-    const pathInfo = await this.getWorkspacePathInfo(id);
+    const { pathInfo, slot } = await this.cacheSlot(id);
+    if (slot.info) return slot.info;
+
     const opfContent = await this.fileStorage.readTextFile(id, pathInfo.rootfilePath);
     const metadata = OPFUtils.parseOPFMetadataFromString(opfContent);
 
-    // Get OPF file modification time for the workspace last-modified timestamp.
-    let lastModified: Date;
-    try {
-      const opfFileInfo = await this.fileStorage.getFileInfo(id, pathInfo.rootfilePath);
-      lastModified = opfFileInfo.lastModified;
-    } catch (_error) {
-      lastModified = metadata.modifiedDate ? new Date(metadata.modifiedDate) : new Date();
-    }
+    // The cache slot carries the OPF mtime (0 when getFileInfo failed); reuse it
+    // for last-modified, falling back to the metadata date when unavailable.
+    const lastModified = slot.opfMtime
+      ? new Date(slot.opfMtime)
+      : metadata.modifiedDate
+        ? new Date(metadata.modifiedDate)
+        : new Date();
 
-    return {
+    slot.info = {
       id,
       title: metadata.title,
       language: primaryLanguage(metadata),
@@ -719,6 +778,7 @@ export class WorkspaceService {
       hasError: false,
       epubVersion: '3.0',
     };
+    return slot.info;
   }
 
   /**
@@ -727,39 +787,68 @@ export class WorkspaceService {
    * is rendered.
    */
   async getWorkspaceRowDetails(id: string): Promise<WorkspaceRowDetails> {
-    const files = await this.fileStorage.listFiles(id);
+    const { slot } = await this.cacheSlot(id);
 
-    let extensionIds: string[] | undefined;
-    try {
-      const extensions = await this.extensionManager.listWorkspaceExtensions(id);
-      if (extensions.length > 0) {
-        extensionIds = extensions.map(ext => ext.name);
-      }
-    } catch {
-      // Extensions are optional — don't fail the row if they can't be loaded.
-    }
+    // Rebuild the heavy, derived metadata on a miss (directory scan, extensions,
+    // OPF parse to locate the cover). The cover's resolved path is kept; its
+    // bytes are not, so the cache stays memory-flat.
+    if (!slot.rowMeta) {
+      const files = await this.fileStorage.listFiles(id);
 
-    // Find and load the cover-image (optional — failures are silently swallowed).
-    let coverImageData: WorkspaceRowDetails['coverImageData'];
-    try {
-      const opfPath = files.find(f => f.endsWith('.opf'));
-      if (opfPath) {
-        const opfXml = await this.fileStorage.readTextFile(id, opfPath);
-        const doc = new DOMParser().parseFromString(opfXml, 'application/xml');
-        const coverEl = doc.querySelector('[properties~="cover-image"]');
-        const href = coverEl?.getAttribute('href');
-        const mediaType = coverEl?.getAttribute('media-type') ?? 'image/png';
-        if (href) {
-          const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/'));
-          const buffer = await this.fileStorage.readFile(id, `${opfDir}/${href}`);
-          coverImageData = { buffer, mediaType };
+      let extensionIds: string[] | undefined;
+      try {
+        const extensions = await this.extensionManager.listWorkspaceExtensions(id);
+        if (extensions.length > 0) {
+          extensionIds = extensions.map(ext => ext.name);
         }
+      } catch {
+        // Extensions are optional — don't fail the row if they can't be loaded.
       }
-    } catch {
-      // Cover image is optional — don't fail the row.
+
+      let cover: CachedRowMeta['cover'];
+      try {
+        const opfPath = files.find(f => f.endsWith('.opf'));
+        if (opfPath) {
+          const opfXml = await this.fileStorage.readTextFile(id, opfPath);
+          const doc = new DOMParser().parseFromString(opfXml, 'application/xml');
+          const coverEl = doc.querySelector('[properties~="cover-image"]');
+          const href = coverEl?.getAttribute('href');
+          const mediaType = coverEl?.getAttribute('media-type') ?? 'image/png';
+          if (href) {
+            const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/'));
+            cover = { path: `${opfDir}/${href}`, mediaType };
+          }
+        }
+      } catch {
+        // Cover image is optional — don't fail the row.
+      }
+
+      slot.rowMeta = {
+        fileCount: files.length,
+        extensionIds,
+        readOnly: workspaceIsReadOnly(files),
+        cover,
+      };
     }
 
-    return { fileCount: files.length, extensionIds, readOnly: workspaceIsReadOnly(files), coverImageData };
+    // Read the cover bytes fresh from the cached path each call (always current,
+    // and nothing large held in the cache).
+    let coverImageData: WorkspaceRowDetails['coverImageData'];
+    if (slot.rowMeta.cover) {
+      try {
+        const buffer = await this.fileStorage.readFile(id, slot.rowMeta.cover.path);
+        coverImageData = { buffer, mediaType: slot.rowMeta.cover.mediaType };
+      } catch {
+        // Cover went missing since it was discovered — omit it.
+      }
+    }
+
+    return {
+      fileCount: slot.rowMeta.fileCount,
+      extensionIds: slot.rowMeta.extensionIds,
+      readOnly: slot.rowMeta.readOnly,
+      coverImageData,
+    };
   }
 
   /**
@@ -840,6 +929,9 @@ export class WorkspaceService {
   }
 
   private async getWorkspacePathInfo(workspaceId: string): Promise<WorkspacePathInfo> {
+    // container.xml → rootfilePath never changes for a workspace; serve cached.
+    const cached = this.pathInfoCache.get(workspaceId);
+    if (cached) return cached;
     try {
       const containerXml = await this.fileStorage.readTextFile(
         workspaceId,
@@ -854,18 +946,17 @@ export class WorkspaceService {
       const rootfilePath = result.rootfilePath!;
       const lastSlashIndex = rootfilePath.lastIndexOf('/');
 
+      let pathInfo: WorkspacePathInfo;
       if (lastSlashIndex === -1) {
-        return {
-          rootfilePath,
-          basePath: '',
-          opfFileName: rootfilePath,
-        };
+        pathInfo = { rootfilePath, basePath: '', opfFileName: rootfilePath };
+      } else {
+        const basePath = rootfilePath.substring(0, lastSlashIndex);
+        const opfFileName = rootfilePath.substring(lastSlashIndex + 1);
+        pathInfo = { rootfilePath, basePath, opfFileName };
       }
 
-      const basePath = rootfilePath.substring(0, lastSlashIndex);
-      const opfFileName = rootfilePath.substring(lastSlashIndex + 1);
-
-      return { rootfilePath, basePath, opfFileName };
+      this.pathInfoCache.set(workspaceId, pathInfo);
+      return pathInfo;
     } catch (error) {
       throw new WorkspaceServiceError(
         `Failed to parse workspace container.xml: ${error instanceof Error ? error.message : 'Unknown error'}`,
