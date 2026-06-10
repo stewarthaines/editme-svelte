@@ -1,16 +1,72 @@
 <script lang="ts">
   import { t } from '../../i18n';
-  import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceState,
+    WorkspaceService,
+  } from '../../services/workspace/workspace.service.js';
   import type { EPUBMetadata } from '../../epub/opf-utils.js';
 
   interface Props {
     workspace: WorkspaceState;
     focusedField?: keyof EPUBMetadata | null;
+    readOnly?: boolean;
+    workspaceService?: WorkspaceService;
+    onGenerateCover?: () => Promise<void>;
   }
 
-  let { workspace, focusedField = null }: Props = $props();
+  let {
+    workspace,
+    focusedField = null,
+    readOnly = false,
+    workspaceService,
+    onGenerateCover,
+  }: Props = $props();
 
   let metadata = $derived(workspace?.opf?.metadata);
+  let generating = $state(false);
+
+  // The current cover-image, loaded from storage as a blob URL. Re-runs whenever
+  // the workspace changes (e.g. after Generate replaces appState.workspace).
+  let coverUrl = $state<string | null>(null);
+  $effect(() => {
+    const ws = workspace;
+    const svc = workspaceService;
+    const item = ws?.opf?.manifest?.find(m => m.properties?.includes('cover-image'));
+    if (!ws || !svc || !item) {
+      coverUrl = null;
+      return;
+    }
+
+    let stale = false;
+    let url: string | null = null;
+    const fullPath = ws.pathInfo.basePath ? `${ws.pathInfo.basePath}/${item.href}` : item.href;
+    svc
+      .readFile(ws.id, fullPath)
+      .then(buffer => {
+        if (stale) return;
+        url = URL.createObjectURL(new Blob([buffer], { type: item.mediaType || 'image/png' }));
+        coverUrl = url;
+      })
+      .catch(() => {
+        if (!stale) coverUrl = null;
+      });
+
+    return () => {
+      stale = true;
+      if (url) URL.revokeObjectURL(url);
+      coverUrl = null;
+    };
+  });
+
+  async function handleGenerate() {
+    if (generating || !onGenerateCover) return;
+    generating = true;
+    try {
+      await onGenerateCover();
+    } finally {
+      generating = false;
+    }
+  }
 </script>
 
 <div class="simple-metadata-view">
@@ -55,6 +111,29 @@
           <div class="field-value identifier">{metadata.identifier || $t('Not specified')}</div>
         </div>
       </div>
+
+      {#if coverUrl}
+        <div class="cover-current">
+          <div class="field-label">{$t('Cover')}</div>
+          <img src={coverUrl} alt={$t('Current cover image')} class="cover-image" />
+        </div>
+      {/if}
+
+      {#if onGenerateCover && !readOnly}
+        <div class="cover-action">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            disabled={generating}
+            onclick={handleGenerate}
+          >
+            {generating ? $t('Generating…') : $t('Generate cover image')}
+          </button>
+          <p class="cover-hint">
+            {$t('Creates a new cover from the current title and author.')}
+          </p>
+        </div>
+      {/if}
     </div>
   {:else}
     <div class="no-content">
@@ -138,6 +217,39 @@
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     word-break: break-all;
+  }
+
+  .cover-current {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* don't stretch the cover across the cross axis */
+    gap: var(--space-2);
+    margin-block-start: var(--space-4);
+    padding: var(--space-3);
+  }
+
+  .cover-image {
+    width: auto;
+    height: auto;
+    max-height: 40vh;
+    max-width: 50%;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .cover-action {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-block-start: var(--space-5);
+    padding-block-start: var(--space-4);
+    border-block-start: 1px solid var(--color-border-default);
+  }
+
+  .cover-hint {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
   }
 
   .no-content {

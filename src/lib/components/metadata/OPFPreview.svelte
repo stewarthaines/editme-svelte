@@ -4,7 +4,10 @@
   import { OPFUtils } from '../../epub/opf-utils.js';
   import SimpleMetadataView from './SimpleMetadataView.svelte';
   import PaneHeader from '../layout/PaneHeader.svelte';
-  import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
+  import type {
+    WorkspaceState,
+    WorkspaceService,
+  } from '../../services/workspace/workspace.service.js';
   import type { EPUBMetadata } from '../../epub/opf-utils.js';
 
   interface Props {
@@ -12,9 +15,20 @@
     focusedField?: keyof EPUBMetadata | null;
     tabFields?: string[];
     isAdvancedMode?: boolean;
+    readOnly?: boolean;
+    workspaceService?: WorkspaceService;
+    onGenerateCover?: () => Promise<void>;
   }
 
-  let { workspace, focusedField = null, tabFields = [], isAdvancedMode = false }: Props = $props();
+  let {
+    workspace,
+    focusedField = null,
+    tabFields = [],
+    isAdvancedMode = false,
+    readOnly = false,
+    workspaceService,
+    onGenerateCover,
+  }: Props = $props();
 
   let highlightedContent = $state<string>('');
   let error = $state<string | null>(null);
@@ -92,7 +106,13 @@
     {/if}
   </div>
 {:else}
-  <SimpleMetadataView {workspace} {focusedField} />
+  <SimpleMetadataView
+    {workspace}
+    {focusedField}
+    {readOnly}
+    {workspaceService}
+    {onGenerateCover}
+  />
 {/if}
 
 <style>

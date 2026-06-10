@@ -554,6 +554,57 @@
     }
   };
 
+  // Generate a cover from the metadata view: make a fresh SVG + PNG from the
+  // current title/author and add them as NEW manifest items (existing files are
+  // never overwritten — collision-resolved to a shared cover/cover-1/... stem).
+  // The new PNG becomes the cover-image; the property is moved off any prior
+  // holder so exactly one cover remains.
+  const handleGenerateCover = async (): Promise<void> => {
+    if (!appState?.workspace || isReadOnly) return;
+    const ws0 = appState.workspace;
+    const meta = ws0.opf.metadata;
+    const title = meta.title ?? '';
+    const author = meta.creator?.[0]?.name ?? '';
+    const base = ws0.pathInfo.basePath; // e.g. "OEBPS"
+
+    // Shared, non-colliding stem so the .svg/.png pair always matches.
+    const taken = new Set(ws0.opf.manifest.map(m => m.href.toLowerCase()));
+    let stem = 'cover';
+    let n = 0;
+    while (taken.has(`images/${stem}.svg`) || taken.has(`images/${stem}.png`)) {
+      stem = `cover-${++n}`;
+    }
+    const svgHref = `Images/${stem}.svg`;
+    const pngHref = `Images/${stem}.png`;
+
+    const svg = generateCoverSvg(title, author);
+    const pngBuffer = await generateCoverPng(svg);
+
+    // 1) Strip cover-image from any current holder (the new PNG takes over).
+    let ws = ws0;
+    for (const item of ws.opf.manifest) {
+      if (item.properties?.includes('cover-image')) {
+        ws = await workspaceService.updateManifestItem(ws, item.id, {
+          properties: item.properties.filter(p => p !== 'cover-image'),
+        });
+      }
+    }
+    // 2) Write + add the SVG (plain image), then the PNG (cover-image). Omit
+    //    `id` so addManifestItem auto-resolves a unique manifest id.
+    await fileStorage.writeTextFile(ws.id, `${base}/${svgHref}`, svg);
+    ws = await workspaceService.addManifestItem(ws, {
+      href: svgHref,
+      mediaType: 'image/svg+xml',
+    });
+    await fileStorage.writeFile(ws.id, `${base}/${pngHref}`, pngBuffer);
+    ws = await workspaceService.addManifestItem(ws, {
+      href: pngHref,
+      mediaType: 'image/png',
+      properties: ['cover-image'],
+    });
+    appState.workspace = ws;
+  };
+
   // Install a catalog extension into a project (the orchestration mirrored from
   // SettingsView): copy files, load libs, then adopt its text transform / append
   // its DOM transforms, and register any EPUB assets. Used by the create flow.
@@ -955,6 +1006,9 @@
           focusedField={focusedMetadataField}
           tabFields={activeMetadataTabFields}
           isAdvancedMode={appState?.isAdvancedMode ?? false}
+          readOnly={isReadOnly}
+          {workspaceService}
+          onGenerateCover={handleGenerateCover}
         />
       {:else if currentView === 'manifest' && initialized && currentWorkspaceState}
         <ManifestPreview

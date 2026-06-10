@@ -267,11 +267,10 @@
           let previewUrl: string | undefined;
           let contentType: 'text' | 'image' | 'audio' | 'video' | 'binary';
 
-          if (isText) {
-            const decoder = new TextDecoder('utf-8');
-            textContent = decoder.decode(content);
-            contentType = 'text';
-          } else if (isImage) {
+          // Image is checked before text: SVG matches both (its media type
+          // contains "xml"), and we want the rendered preview, plus the source
+          // shown beneath it.
+          if (isImage) {
             // Create blob URL for image preview
             const blob = new Blob([content], { type: manifestItem.mediaType });
             previewUrl = URL.createObjectURL(blob);
@@ -281,6 +280,10 @@
             if (manifestItem.mediaType === 'image/svg+xml') {
               textContent = new TextDecoder('utf-8').decode(content);
             }
+          } else if (isText) {
+            const decoder = new TextDecoder('utf-8');
+            textContent = decoder.decode(content);
+            contentType = 'text';
           } else if (isAudio) {
             // Create blob URL for audio preview
             const blob = new Blob([content], { type: manifestItem.mediaType });

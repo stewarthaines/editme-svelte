@@ -63,9 +63,9 @@ export async function generateCoverPng(svgString: string, maxDim = 512): Promise
   const w = Math.round(SVG_W * scale);
   const h = Math.round(SVG_H * scale);
 
-  // Inject explicit pixel dimensions so the browser knows how large to rasterise.
-  const sized = svgString.replace('<svg ', `<svg width="${w}" height="${h}" `);
-  const blob = new Blob([sized], { type: 'image/svg+xml;charset=utf-8' });
+  // The source SVG carries its own width/height (600×900), so the loaded image
+  // has a defined intrinsic size; drawImage scales it to the target w×h below.
+  const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
   try {
@@ -124,7 +124,7 @@ export function generateCoverSvg(title: string, author: string): string {
     ? `\n  <text x="300" y="830" font-family="Georgia,'Times New Roman',serif" font-size="${authorFontSize}" fill="rgba(255,255,255,0.7)" text-anchor="middle" font-style="italic">${xmlEscape(safeAuthor)}</text>`
     : '';
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
   <rect width="600" height="900" fill="${bg}"/>
   <text y="${firstLineY}" font-family="Georgia,'Times New Roman',serif" font-size="${fontSize}" fill="white" text-anchor="middle">
 ${tspans}
