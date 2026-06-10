@@ -53,6 +53,32 @@
   // Component state using $state()
   let workspaces = $state<WorkspaceInfo[]>([]);
   let loading = $state(false);
+  let currentCoverUrl = $state<string | null>(null);
+
+  // Load cover image whenever the selected project changes.
+  $effect(() => {
+    const id = currentWorkspaceId;
+    currentCoverUrl = null;
+    if (!id) return;
+
+    let stale = false;
+    let blobUrl: string | null = null;
+
+    void onLoadWorkspaceDetails(id)
+      .then(d => {
+        if (stale || !d.coverImageData) return;
+        blobUrl = URL.createObjectURL(
+          new Blob([d.coverImageData.buffer], { type: d.coverImageData.mediaType })
+        );
+        currentCoverUrl = blobUrl;
+      })
+      .catch(() => {});
+
+    return () => {
+      stale = true;
+      if (blobUrl) { URL.revokeObjectURL(blobUrl); currentCoverUrl = null; }
+    };
+  });
   let error = $state<string | null>(null);
   let hasUnsavedChanges = $state(false);
   let showOpdsDialog = $state(false);
@@ -380,6 +406,15 @@
               {currentProjectTitle}
               onDuplicateRequested={currentWorkspaceId ? handleDuplicate : undefined}
             />
+            {#if currentCoverUrl}
+              <div class="cover-display">
+                <img
+                  src={currentCoverUrl}
+                  alt={currentProjectTitle ?? ''}
+                  class="cover-preview"
+                />
+              </div>
+            {/if}
           </div>
         </div>
       </Pane>
@@ -480,6 +515,20 @@
   .indicator-icon {
     font-size: var(--text-base);
     flex-shrink: 0;
+  }
+
+  .cover-display {
+    display: flex;
+    justify-content: center;
+    padding-block-start: var(--space-8);
+  }
+
+  .cover-preview {
+    max-height: 40vh;
+    max-width: 50%;
+    width: auto;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   }
 
   /* Mobile adjustments */
