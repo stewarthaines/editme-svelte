@@ -1005,6 +1005,7 @@
           {publishService}
           pluginUrl={publishPluginUrl}
           projectId={currentWorkspaceId ?? 'publish'}
+          activeIdentifier={currentWorkspaceState?.opf?.metadata?.identifier}
         />
       {:else if currentView === 'settings' && appState}
         <SettingsView

@@ -10,6 +10,7 @@
   let {
     epubs,
     meta,
+    activeFilenames,
     remoteObjects,
     epubValidationStatus,
     uploading,
@@ -23,6 +24,7 @@
   }: {
     epubs: File[];
     meta: Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>;
+    activeFilenames: Set<string>;
     remoteObjects: S3Object[];
     epubValidationStatus: Map<
       string,
@@ -59,7 +61,7 @@
       {@const status = epubValidationStatus.get(epub.name)}
       {@const summary = status?.report ? summarizeReport(status.report) : null}
       {@const m = meta.get(epub.name)}
-      <div class="epub-item">
+      <div class="epub-item" class:current={activeFilenames.has(epub.name)}>
         {#if m?.thumbnailUrl}
           <img
             src={m.thumbnailUrl}
@@ -220,6 +222,12 @@
     background: var(--color-surface-secondary);
     border-radius: 4px;
     gap: 8px 16px;
+  }
+
+  /* The currently-open project. */
+  .epub-item.current {
+    outline: 2px solid var(--color-button-primary-bg);
+    outline-offset: -2px;
   }
 
   .epub-cover {

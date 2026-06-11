@@ -17,6 +17,9 @@ export type ContextMessage = {
   // The active locale's dictionary (English source → localized). Optional for
   // back-compat; the plugin falls back to the English source string when absent.
   messages?: Record<string, string>;
+  // The open project's dc:identifier (urn:uuid); used to outline the matching
+  // published rows. Absent → no row highlighted.
+  activeIdentifier?: string;
 };
 
 // plugin → main: ask the host to open the editor resource at `path` (e.g. a

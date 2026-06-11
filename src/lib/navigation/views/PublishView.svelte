@@ -17,9 +17,16 @@
     pluginUrl?: string | null;
     /** Identifier echoed to the plugin in its `init` message. */
     projectId?: string;
+    /** The open project's dc:identifier, for outlining its published row(s). */
+    activeIdentifier?: string;
   }
 
-  let { publishService, pluginUrl = null, projectId = 'publish' }: Props = $props();
+  let {
+    publishService,
+    pluginUrl = null,
+    projectId = 'publish',
+    activeIdentifier = undefined,
+  }: Props = $props();
 
   let pluginFrame = $state<HTMLIFrameElement | null>(null);
 
@@ -126,16 +133,17 @@
     // own UI from the shared catalog (no plugin-side bundle/pipeline).
     const messages = i18nService.getCatalogs()[$currentLocale]?.messages ?? {};
     frameWindow.postMessage(
-      createContextMessage($themeStore.current, $currentLocale, dir, messages),
+      createContextMessage($themeStore.current, $currentLocale, dir, messages, activeIdentifier),
       targetOrigin
     );
   }
 
-  // Re-send context whenever the theme, locale, or direction changes, so the
-  // iframe tracks the app live — no reload, no lost plugin state.
+  // Re-send context whenever the theme, locale, direction, or active project
+  // changes, so the iframe tracks the app live — no reload, no lost plugin state.
   $effect(() => {
     if (!pluginUrl) return;
-    // Touch each store so the effect re-runs on change.
+    // Touch each value so the effect re-runs on change.
+    void activeIdentifier;
     void $themeStore.current;
     void $currentLocale;
     void $documentDirection;
@@ -207,7 +215,7 @@
           </thead>
           <tbody>
             {#each epubs as epub (epub.filename)}
-              <tr>
+              <tr class:current={!!activeIdentifier && epub.identifier === activeIdentifier}>
                 <td class="cover">
                   {#if coverUrls[epub.filename]}
                     <img src={coverUrls[epub.filename]} alt="" class="cover-thumb" aria-hidden="true" />
@@ -331,6 +339,16 @@
 
   .epub-table .name {
     word-break: break-word;
+  }
+
+  /* Active project: tint the row and add a left accent (box-shadow avoids the
+     table layout shift a border would cause). */
+  .epub-table tr.current td {
+    background-color: var(--color-bg-accent);
+  }
+
+  .epub-table tr.current td:first-child {
+    box-shadow: inset 3px 0 0 var(--color-interactive-primary);
   }
 
   .epub-table .cover {

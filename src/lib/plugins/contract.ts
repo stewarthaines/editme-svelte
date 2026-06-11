@@ -87,6 +87,12 @@ export interface ContextMessage {
    * bundle. Optional for back-compat; absent → the plugin shows English source.
    */
   messages?: Record<string, string>;
+  /**
+   * The currently-open project's dc:identifier (urn:uuid), so the plugin can
+   * outline the matching published rows. Optional / back-compat; absent → no
+   * row is highlighted.
+   */
+  activeIdentifier?: string;
 }
 
 /** plugin → main, inserts a plain string at the active textarea's cursor. */
@@ -121,9 +127,10 @@ export function createContextMessage(
   theme: 'light' | 'dark',
   locale: string,
   dir: 'ltr' | 'rtl',
-  messages?: Record<string, string>
+  messages?: Record<string, string>,
+  activeIdentifier?: string
 ): ContextMessage {
-  return { type: 'context', theme, locale, dir, messages };
+  return { type: 'context', theme, locale, dir, messages, activeIdentifier };
 }
 
 /** Runtime guard: is this an `init` message carrying a usable directory handle? */

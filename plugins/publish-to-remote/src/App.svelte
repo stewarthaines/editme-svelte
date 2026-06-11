@@ -3,7 +3,7 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, translate } from './i18n.js';
-  import { dirHandle } from './store.js';
+  import { dirHandle, activeIdentifier } from './store.js';
   import { readRemotes, writeRemotes, readSidecars, pngDataUri } from './opfs.js';
   import {
     uploadFile,
@@ -63,11 +63,25 @@
 
   let remoteObjects: S3Object[] = $state([]);
   let localEpubs: File[] = $state([]);
-  // Per-local-epub sidecar metadata (title/author + inlined thumbnail), keyed by
-  // `<base>.epub`. Rebuilt on each local reload.
+  // Per-local-epub sidecar metadata (title/author + inlined thumbnail + the
+  // publication identifier), keyed by `<base>.epub`. Rebuilt on each reload.
   let localMeta = $state<
-    Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>
+    Map<
+      string,
+      { title?: string; authors?: string[]; thumbnailUrl?: string; identifier?: string }
+    >
   >(new Map());
+
+  // Filenames whose sidecar identifier matches the open project — these rows get
+  // the "active" outline. Local epub filenames equal remote object keys, so this
+  // one set drives both lists.
+  const activeFilenames = $derived(
+    new Set(
+      [...localMeta]
+        .filter(([, m]) => m.identifier && m.identifier === $activeIdentifier)
+        .map(([key]) => key),
+    ),
+  );
 
   // Hosted thumbnail URL per remote epub key, derived from the listing: each
   // epub's sibling `<base>.thumb.png` resolved to its public URL.
@@ -175,13 +189,14 @@
       const sidecars = await readSidecars($dirHandle);
       const meta = new Map<
         string,
-        { title?: string; authors?: string[]; thumbnailUrl?: string }
+        { title?: string; authors?: string[]; thumbnailUrl?: string; identifier?: string }
       >();
       for (const [key, m] of sidecars) {
         meta.set(key, {
           title: m.title,
           authors: m.authors,
           thumbnailUrl: m.thumbnailBytes ? pngDataUri(m.thumbnailBytes) : undefined,
+          identifier: m.identifier,
         });
       }
       localMeta = meta;
@@ -587,6 +602,7 @@
               <LocalEpubList
                 epubs={localEpubs}
                 meta={localMeta}
+                {activeFilenames}
                 {remoteObjects}
                 {epubValidationStatus}
                 {uploading}
@@ -635,6 +651,7 @@
                 <RemoteFileList
                   objects={remoteObjects}
                   thumbnailUrls={remoteThumbUrls}
+                  {activeFilenames}
                   {googleAuthRequired}
                   {onCopyUrl}
                   onDelete={onDeleteObject}

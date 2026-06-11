@@ -6,12 +6,14 @@
   let {
     objects,
     thumbnailUrls,
+    activeFilenames,
     googleAuthRequired,
     onCopyUrl,
     onDelete,
   }: {
     objects: S3Object[];
     thumbnailUrls: Map<string, string>;
+    activeFilenames: Set<string>;
     googleAuthRequired: boolean;
     onCopyUrl: (key: string, fileId?: string) => void;
     onDelete: (key: string) => void;
@@ -33,7 +35,7 @@
 {:else}
   <div class="remote-list">
     {#each visibleObjects as obj (obj.key)}
-      <div class="remote-item">
+      <div class="remote-item" class:current={activeFilenames.has(obj.key)}>
         {#if thumbnailUrls.get(obj.key)}
           <img
             src={thumbnailUrls.get(obj.key)}
@@ -104,6 +106,12 @@
 
   .remote-item:last-child {
     border-bottom: none;
+  }
+
+  /* The currently-open project. */
+  .remote-item.current {
+    outline: 2px solid var(--color-button-primary-bg);
+    outline-offset: -2px;
   }
 
   .remote-cover {

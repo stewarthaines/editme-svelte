@@ -8,7 +8,7 @@
 import { mount } from 'svelte';
 import App from './App.svelte';
 import './styles.css';
-import { dirHandle } from './store.js';
+import { dirHandle, activeIdentifier } from './store.js';
 import { setPluginMessages } from './i18n.js';
 import type { ContextMessage, InitMessage, MainToPlugin } from './types.js';
 
@@ -36,6 +36,8 @@ function handleContext(message: ContextMessage) {
   root.dir = message.dir;
   // Feed the active locale's dictionary to the plugin's `t` store.
   setPluginMessages(message.messages ?? {});
+  // Track the open project so its published rows can be outlined.
+  activeIdentifier.set(message.activeIdentifier);
 }
 
 function handleInit(message: InitMessage) {

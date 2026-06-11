@@ -18,6 +18,8 @@ export interface PublishedEpub {
   /** From the sidecar `<base>.json`, when present. */
   title?: string;
   authors?: string[];
+  /** The publication's dc:identifier, for matching the active project. */
+  identifier?: string;
   /** Cover thumbnail bytes from `<base>.thumb.png`, when present. */
   coverImageData?: { buffer: ArrayBuffer; mediaType: string };
 }
@@ -41,11 +43,13 @@ export class PublishService {
       // Enrich from the sidecars written at packaging time (best-effort).
       let title: string | undefined;
       let authors: string[] | undefined;
+      let identifier: string | undefined;
       try {
         const json = await this.fileStorage.readTextFile(PUBLISH_WORKSPACE_ID, `${base}.json`);
         const sidecar = JSON.parse(json) as PublishSidecar;
         title = sidecar.title;
         authors = sidecar.authors;
+        identifier = sidecar.identifier;
       } catch {
         // No sidecar — plain filename row.
       }
@@ -64,6 +68,7 @@ export class PublishService {
         lastModified: info.lastModified,
         title,
         authors,
+        identifier,
         coverImageData,
       });
     }
