@@ -9,6 +9,7 @@
 
   let {
     epubs,
+    meta,
     remoteObjects,
     epubValidationStatus,
     uploading,
@@ -21,6 +22,7 @@
     onDelete,
   }: {
     epubs: File[];
+    meta: Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>;
     remoteObjects: S3Object[];
     epubValidationStatus: Map<
       string,
@@ -56,9 +58,27 @@
       {@const overwrite = wouldOverwrite(epub)}
       {@const status = epubValidationStatus.get(epub.name)}
       {@const summary = status?.report ? summarizeReport(status.report) : null}
+      {@const m = meta.get(epub.name)}
       <div class="epub-item">
+        {#if m?.thumbnailUrl}
+          <img
+            src={m.thumbnailUrl}
+            alt=""
+            class="epub-cover"
+            aria-hidden="true"
+            onerror={(e) =>
+              ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+          />
+        {/if}
         <div class="epub-info">
-          <FileName name={epub.name} />
+          {#if m?.title}
+            <span class="epub-title">{m.title}</span>
+          {:else}
+            <FileName name={epub.name} />
+          {/if}
+          {#if m?.authors && m.authors.length > 0}
+            <span class="epub-author">{m.authors.join(', ')}</span>
+          {/if}
           <span class="epub-size">({(epub.size / 1024).toFixed(0)} KB)</span>
         </div>
         <div class="epub-actions">
@@ -202,14 +222,36 @@
     gap: 8px 16px;
   }
 
+  .epub-cover {
+    flex-shrink: 0;
+    width: 32px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+
   /* Takes the available width; when the row is too narrow for the actions, they
      wrap to the next line and the name (middle-ellipsised) gets the full width. */
   .epub-info {
     flex: 1 1 220px;
     min-width: 0;
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 2px 8px;
     align-items: baseline;
+  }
+
+  .epub-title {
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .epub-author {
+    font-size: 12px;
+    color: var(--color-text-secondary);
   }
 
   .epub-size {

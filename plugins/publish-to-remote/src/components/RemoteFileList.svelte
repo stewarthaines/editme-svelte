@@ -5,27 +5,45 @@
 
   let {
     objects,
+    thumbnailUrls,
     googleAuthRequired,
     onCopyUrl,
     onDelete,
   }: {
     objects: S3Object[];
+    thumbnailUrls: Map<string, string>;
     googleAuthRequired: boolean;
     onCopyUrl: (key: string, fileId?: string) => void;
     onDelete: (key: string) => void;
   } = $props();
 
   let deleteConfirmKey: string | null = $state(null);
+
+  // Hide the uploaded cover thumbnails (.png) from the list; they remain on the
+  // remote to back the OPDS covers. Books and catalog.xml stay visible.
+  const visibleObjects = $derived(
+    objects.filter((o) => !o.key.toLowerCase().endsWith('.png')),
+  );
 </script>
 
 {#if googleAuthRequired}
   <p class="empty-message">{$t('Connect to Google Drive to view files.')}</p>
-{:else if objects.length === 0}
+{:else if visibleObjects.length === 0}
   <p class="empty-message">{$t('Bucket is empty')}</p>
 {:else}
   <div class="remote-list">
-    {#each objects as obj (obj.key)}
+    {#each visibleObjects as obj (obj.key)}
       <div class="remote-item">
+        {#if thumbnailUrls.get(obj.key)}
+          <img
+            src={thumbnailUrls.get(obj.key)}
+            alt=""
+            class="remote-cover"
+            aria-hidden="true"
+            onerror={(e) =>
+              ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+          />
+        {/if}
         <div class="remote-info">
           <FileName name={obj.key} />
           <span class="remote-meta">
@@ -86,6 +104,14 @@
 
   .remote-item:last-child {
     border-bottom: none;
+  }
+
+  .remote-cover {
+    flex-shrink: 0;
+    width: 32px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 3px;
   }
 
   /* Same responsive pattern as the local list: name takes the width and

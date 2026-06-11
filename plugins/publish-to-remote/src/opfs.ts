@@ -86,6 +86,17 @@ export async function readSidecars(
   return map;
 }
 
+/** A `data:image/png;base64,…` URI for raw PNG bytes (no blob-URL lifecycle). */
+export function pngDataUri(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const CHUNK = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  }
+  return `data:image/png;base64,${btoa(binary)}`;
+}
+
 /**
  * Credential persistence in OPFS root (shared across all projects)
  */

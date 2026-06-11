@@ -27,6 +27,25 @@
   let loading = $state(true);
   let error = $state<string | null>(null);
 
+  // Cover thumbnail blob URLs, keyed by filename. Rebuilt (and revoked) whenever
+  // the list reloads.
+  let coverUrls = $state<Record<string, string>>({});
+  $effect(() => {
+    const created: string[] = [];
+    const map: Record<string, string> = {};
+    for (const epub of epubs) {
+      if (epub.coverImageData) {
+        const url = URL.createObjectURL(
+          new Blob([epub.coverImageData.buffer], { type: epub.coverImageData.mediaType })
+        );
+        map[epub.filename] = url;
+        created.push(url);
+      }
+    }
+    coverUrls = map;
+    return () => created.forEach(u => URL.revokeObjectURL(u));
+  });
+
   async function load() {
     loading = true;
     error = null;
@@ -179,6 +198,7 @@
         <table class="epub-table">
           <thead>
             <tr>
+              <th class="cover" aria-label={$t('Cover')}></th>
               <th>{$t('Name')}</th>
               <th class="num">{$t('Size')}</th>
               <th class="num">{$t('Modified')}</th>
@@ -188,19 +208,34 @@
           <tbody>
             {#each epubs as epub (epub.filename)}
               <tr>
-                <td class="name">{epub.filename}</td>
+                <td class="cover">
+                  {#if coverUrls[epub.filename]}
+                    <img src={coverUrls[epub.filename]} alt="" class="cover-thumb" aria-hidden="true" />
+                  {/if}
+                </td>
+                <td class="name">
+                  <span class="name-title">{epub.title || epub.filename}</span>
+                  {#if epub.authors && epub.authors.length > 0}
+                    <span class="name-author">{epub.authors.join(', ')}</span>
+                  {/if}
+                </td>
                 <td class="num">{formatSize(epub.size)}</td>
                 <td class="num">{formatDate(epub.lastModified)}</td>
                 <td class="actions">
-                  <button
-                    class="btn btn-secondary btn-sm"
-                    onclick={() => handleDownload(epub.filename)}
-                  >
-                    {$t('Download')}
-                  </button>
-                  <button class="btn btn-danger btn-sm" onclick={() => handleDelete(epub.filename)}>
-                    {$t('Delete')}
-                  </button>
+                  <div class="action-buttons">
+                    <button
+                      class="btn btn-secondary btn-sm"
+                      onclick={() => handleDownload(epub.filename)}
+                    >
+                      {$t('Download')}
+                    </button>
+                    <button
+                      class="btn btn-danger btn-sm"
+                      onclick={() => handleDelete(epub.filename)}
+                    >
+                      {$t('Delete')}
+                    </button>
+                  </div>
                 </td>
               </tr>
             {/each}
@@ -271,6 +306,7 @@
     padding: var(--space-2) var(--space-3);
     border-bottom: 1px solid var(--color-border-default);
     text-align: left;
+    vertical-align: middle;
   }
 
   .epub-table th {
@@ -284,13 +320,43 @@
   }
 
   .epub-table .actions {
-    display: flex;
-    gap: var(--space-2);
-    justify-content: flex-end;
+    text-align: right;
     white-space: nowrap;
+  }
+
+  .action-buttons {
+    display: inline-flex;
+    gap: var(--space-2);
   }
 
   .epub-table .name {
     word-break: break-word;
+  }
+
+  .epub-table .cover {
+    inline-size: 2rem;
+    padding-inline-end: 0;
+  }
+
+  .cover-thumb {
+    display: block;
+    inline-size: 2rem;
+    block-size: 3rem;
+    /* Override the global `img { max-width: 100% }`, which would otherwise shrink
+       the cover to the cell's padded content width and crop it via object-fit. */
+    max-inline-size: none;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+  }
+
+  .name-title {
+    display: block;
+    font-weight: 600;
+  }
+
+  .name-author {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
   }
 </style>

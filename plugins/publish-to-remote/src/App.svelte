@@ -4,7 +4,7 @@
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, translate } from './i18n.js';
   import { dirHandle } from './store.js';
-  import { readRemotes, writeRemotes, readSidecars } from './opfs.js';
+  import { readRemotes, writeRemotes, readSidecars, pngDataUri } from './opfs.js';
   import {
     uploadFile,
     listFiles,
@@ -63,6 +63,26 @@
 
   let remoteObjects: S3Object[] = $state([]);
   let localEpubs: File[] = $state([]);
+  // Per-local-epub sidecar metadata (title/author + inlined thumbnail), keyed by
+  // `<base>.epub`. Rebuilt on each local reload.
+  let localMeta = $state<
+    Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>
+  >(new Map());
+
+  // Hosted thumbnail URL per remote epub key, derived from the listing: each
+  // epub's sibling `<base>.thumb.png` resolved to its public URL.
+  const remoteThumbUrls = $derived.by(() => {
+    const m = new Map<string, string>();
+    if (!activeRemote) return m;
+    const byKey = new Map(remoteObjects.map((o) => [o.key, o]));
+    for (const o of remoteObjects) {
+      if (!o.key.toLowerCase().endsWith('.epub')) continue;
+      const thumbKey = o.key.replace(/\.epub$/i, '.thumb.png');
+      const thumb = byKey.get(thumbKey);
+      if (thumb) m.set(o.key, getPublicUrl(activeRemote, thumbKey, thumb.fileId));
+    }
+    return m;
+  });
   let uploading = $state(false);
   let uploadProgress: number | null = $state(null);
   let uploadingEpubName: string | null = $state(null);
@@ -150,6 +170,21 @@
         files.push(await fileHandle.getFile());
       }
       localEpubs = files;
+
+      // Sidecar metadata (title/author + thumbnail) to enrich the local rows.
+      const sidecars = await readSidecars($dirHandle);
+      const meta = new Map<
+        string,
+        { title?: string; authors?: string[]; thumbnailUrl?: string }
+      >();
+      for (const [key, m] of sidecars) {
+        meta.set(key, {
+          title: m.title,
+          authors: m.authors,
+          thumbnailUrl: m.thumbnailBytes ? pngDataUri(m.thumbnailBytes) : undefined,
+        });
+      }
+      localMeta = meta;
 
       for (const file of files) {
         let report = await loadValidationReport(file.name);
@@ -551,6 +586,7 @@
             <div class="pane-body">
               <LocalEpubList
                 epubs={localEpubs}
+                meta={localMeta}
                 {remoteObjects}
                 {epubValidationStatus}
                 {uploading}
@@ -598,6 +634,7 @@
 
                 <RemoteFileList
                   objects={remoteObjects}
+                  thumbnailUrls={remoteThumbUrls}
                   {googleAuthRequired}
                   {onCopyUrl}
                   onDelete={onDeleteObject}
