@@ -117,3 +117,23 @@ export interface S3Object {
   lastModified: string;
   fileId?: string;
 }
+
+// Rich metadata for an OPDS entry, read from the per-EPUB `<base>.json` sidecar
+// written by the host at packaging time. Mirrors the host's PublishSidecar
+// (the plugin builds separately, so the type is redeclared here), plus the
+// thumbnail resolved to an inline data: URI.
+export interface CatalogEntryMeta {
+  title?: string;
+  authors?: string[];
+  description?: string;
+  language?: string;
+  publisher?: string;
+  issued?: string;
+  identifier?: string;
+  subjects?: string[];
+  /** Raw bytes of the sibling `<base>.thumb.png`, uploaded to the remote so the
+   *  feed can reference a resolvable URL (most OPDS clients ignore data: URIs). */
+  thumbnailBytes?: ArrayBuffer;
+  /** Resolvable URL of the hosted thumbnail, set once uploaded. */
+  thumbnailUrl?: string;
+}

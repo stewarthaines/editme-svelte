@@ -2,7 +2,12 @@
  * OPFS utilities for finding and reading the EPUB file, and managing credentials
  */
 
-import type { RemoteConfig, RemotesStore, S3Credentials } from './types.js';
+import type {
+  RemoteConfig,
+  RemotesStore,
+  S3Credentials,
+  CatalogEntryMeta,
+} from './types.js';
 
 const CREDENTIALS_FILENAME = 'credentials.json';
 const REMOTES_FILENAME = 'remotes.json';
@@ -39,6 +44,46 @@ export async function getEpubBlob(
   if (!epubHandle) return null;
   const file = await readEpubFile(epubHandle);
   return file;
+}
+
+/**
+ * Read the per-EPUB OPDS sidecars written by the host at packaging time. Each
+ * `<base>.json` describes one publication; its sibling `<base>.thumb.png` (when
+ * present) is inlined as a data: URI. Returns a map keyed by the epub filename
+ * (`<base>.epub`) so callers can match remote objects by key. Best-effort: a
+ * malformed or missing sidecar is skipped, not fatal.
+ */
+export async function readSidecars(
+  dirHandle: FileSystemDirectoryHandle,
+): Promise<Map<string, CatalogEntryMeta>> {
+  const map = new Map<string, CatalogEntryMeta>();
+
+  // Collect file handles by name first so we can pair `.json` with `.thumb.png`.
+  const byName = new Map<string, FileSystemFileHandle>();
+  for await (const entry of dirHandle.values()) {
+    if (entry.kind === 'file') byName.set(entry.name, entry as FileSystemFileHandle);
+  }
+
+  for (const [name, handle] of byName) {
+    if (!name.endsWith('.json')) continue;
+    const base = name.replace(/\.json$/i, '');
+    try {
+      const text = await (await handle.getFile()).text();
+      const meta = JSON.parse(text) as CatalogEntryMeta & { thumbnail?: string };
+
+      const thumbName = meta.thumbnail || `${base}.thumb.png`;
+      const thumbHandle = byName.get(thumbName);
+      if (thumbHandle) {
+        meta.thumbnailBytes = await (await thumbHandle.getFile()).arrayBuffer();
+      }
+      delete meta.thumbnail;
+      map.set(`${base}.epub`, meta);
+    } catch {
+      // Skip unreadable / malformed sidecars.
+    }
+  }
+
+  return map;
 }
 
 /**

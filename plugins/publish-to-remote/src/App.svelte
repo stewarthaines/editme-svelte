@@ -4,7 +4,7 @@
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, translate } from './i18n.js';
   import { dirHandle } from './store.js';
-  import { readRemotes, writeRemotes } from './opfs.js';
+  import { readRemotes, writeRemotes, readSidecars } from './opfs.js';
   import {
     uploadFile,
     listFiles,
@@ -308,6 +308,15 @@
     if (!$dirHandle) return;
     try {
       await $dirHandle.removeEntry(epub.name);
+      // Remove the OPDS sidecars (metadata JSON + thumbnail), if any.
+      const base = epub.name.replace(/\.epub$/i, '');
+      for (const sidecar of [`${base}.json`, `${base}.thumb.png`]) {
+        try {
+          await $dirHandle.removeEntry(sidecar);
+        } catch {
+          // Sidecar may not exist — ignore.
+        }
+      }
       await deleteValidationReport(epub.name);
       clearLatestReport(epub.name);
       epubValidationStatus.delete(epub.name);
@@ -470,7 +479,35 @@
       } else if (activeRemote.type === 'webdav') {
         feedUrl = getPublicUrl(activeRemote, catalogName);
       }
-      const xml = generateOpdsFeed(activeRemote, remoteObjects, feedUrl);
+      // Enrich entries with cover + metadata from local sidecars (matched to
+      // remote objects by filename). Absent sidecars degrade to filename-only.
+      const metaByKey = $dirHandle ? await readSidecars($dirHandle) : new Map();
+
+      // Host each cover thumbnail on the remote and attach its resolvable URL —
+      // OPDS clients (Cantook etc.) render hosted images, not data: URIs. Only
+      // for epubs actually present on the remote; reuse an already-uploaded
+      // thumbnail rather than re-uploading every time.
+      const existing = new Map(remoteObjects.map((o) => [o.key, o]));
+      for (const [epubKey, meta] of metaByKey) {
+        if (!meta.thumbnailBytes || !existing.has(epubKey)) continue;
+        const thumbKey = `${epubKey.replace(/\.epub$/i, '')}.thumb.png`;
+        const already = existing.get(thumbKey);
+        if (already) {
+          meta.thumbnailUrl = getPublicUrl(activeRemote, thumbKey, already.fileId);
+        } else {
+          const blob = new Blob([meta.thumbnailBytes], { type: 'image/png' });
+          const res = await uploadFile(activeRemote, thumbKey, blob, 'image/png');
+          if (res.success) meta.thumbnailUrl = res.url || getPublicUrl(activeRemote, thumbKey);
+        }
+        delete meta.thumbnailBytes;
+      }
+
+      const xml = generateOpdsFeed(
+        activeRemote,
+        remoteObjects,
+        feedUrl,
+        metaByKey,
+      );
       const result = await uploadTextFile(activeRemote, catalogName, xml);
       if (result.success) {
         showStatus(

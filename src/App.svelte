@@ -48,6 +48,7 @@
   import { addTransform } from './lib/settings/dom-transforms.js';
   import type { CreateProjectData } from './lib/components/workspace/CreateProjectDialog.svelte';
   import { generateCoverSvg, generateCoverPng } from './lib/epub/cover-generator.js';
+  import { writePublishSidecar } from './lib/services/publish/publish-sidecar.js';
 
   // Extension manager instance
   let extensionManager = $state<ExtensionManager>();
@@ -672,6 +673,22 @@
       const result = await epubPackager.packageEPUB(workspaceId);
 
       if (result.success && result.blob && result.filename) {
+        // Write a publish sidecar (metadata JSON + cover thumbnail) next to the
+        // packaged epub so the publish plugin can build rich OPDS entries.
+        // Best-effort: never let a sidecar failure break packaging.
+        try {
+          const cover = (await workspaceService.getWorkspaceRowDetails(workspaceId))
+            .coverImageData;
+          await writePublishSidecar(
+            fileStorage,
+            cover,
+            navWorkspace.opf.metadata,
+            result.filename
+          );
+        } catch (sidecarError) {
+          console.warn('Failed to write publish sidecar:', sidecarError);
+        }
+
         // Take the user to the Publish view to see the newly packaged epub.
         // (No-op if already there; its onMount load picks up the new file when
         // navigating in fresh.)

@@ -9,6 +9,7 @@
 
 import type { FileStorageAPI } from '../../storage/index.js';
 import { PUBLISH_WORKSPACE_ID } from '../../workspace/types.js';
+import { deletePublishSidecar } from './publish-sidecar.js';
 
 export interface PublishedEpub {
   filename: string;
@@ -48,6 +49,8 @@ export class PublishService {
    */
   async deletePublishedEpub(filename: string): Promise<void> {
     await this.fileStorage.deleteFile(PUBLISH_WORKSPACE_ID, filename);
+    // Remove the OPDS sidecar (metadata JSON + thumbnail), if any.
+    await deletePublishSidecar(this.fileStorage, filename);
   }
 
   /**
