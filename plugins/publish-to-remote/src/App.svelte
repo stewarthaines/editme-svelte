@@ -98,7 +98,13 @@
       if (!o.key.toLowerCase().endsWith('.epub')) continue;
       const thumbKey = o.key.replace(/\.epub$/i, '.thumb.png');
       const thumb = byKey.get(thumbKey);
-      if (thumb) m.set(o.key, getPublicUrl(activeRemote, thumbKey, thumb.fileId));
+      if (thumb) {
+        // Cache-bust by the file's modified time so an updated cover shows
+        // immediately instead of the browser's cached image (same URL).
+        const url = getPublicUrl(activeRemote, thumbKey, thumb.fileId);
+        const v = encodeURIComponent(thumb.lastModified);
+        m.set(o.key, url + (url.includes('?') ? '&' : '?') + 'v=' + v);
+      }
     }
     return m;
   });
@@ -594,14 +600,11 @@
         // Only host thumbnails for epubs that are selected and on the remote.
         if (!meta.thumbnailBytes || !existing.has(epubKey) || !selectedKeys.has(epubKey)) continue;
         const thumbKey = `${epubKey.replace(/\.epub$/i, '')}.thumb.png`;
-        const already = existing.get(thumbKey);
-        if (already) {
-          meta.thumbnailUrl = getPublicUrl(activeRemote, thumbKey, already.fileId);
-        } else {
-          const blob = new Blob([meta.thumbnailBytes], { type: 'image/png' });
-          const res = await uploadFile(activeRemote, thumbKey, blob, 'image/png');
-          if (res.success) meta.thumbnailUrl = res.url || getPublicUrl(activeRemote, thumbKey);
-        }
+        // Always (re)upload so a regenerated cover replaces the old remote
+        // thumbnail (thumbnails are small; correctness over a saved request).
+        const blob = new Blob([meta.thumbnailBytes], { type: 'image/png' });
+        const res = await uploadFile(activeRemote, thumbKey, blob, 'image/png');
+        if (res.success) meta.thumbnailUrl = res.url || getPublicUrl(activeRemote, thumbKey);
         delete meta.thumbnailBytes;
       }
 
