@@ -14,6 +14,13 @@
     showSwatch?: boolean;
     onInput: (hue: number) => void;
   } = $props();
+
+  // Build the track from the actual (muted, OKLCH) cover colours so the slider
+  // previews the real palette rather than a vivid rainbow that doesn't match.
+  const trackGradient = `linear-gradient(to right, ${Array.from(
+    { length: 13 },
+    (_, i) => coverBackgroundColor(i * 30),
+  ).join(', ')})`;
 </script>
 
 <div class="hue-selector">
@@ -29,6 +36,7 @@
     step="1"
     {value}
     {disabled}
+    style="background: {trackGradient}"
     aria-label={$t('Cover background hue')}
     oninput={e => onInput(Number(e.currentTarget.value))}
   />
@@ -49,8 +57,8 @@
     border-radius: var(--radius-sm);
   }
 
-  /* Full-spectrum rainbow track so it reads as a hue picker; the swatch shows
-     the actual (muted) cover color. */
+  /* The track gradient (the actual muted cover palette) is set inline from
+     coverBackgroundColor; the swatch shows the currently-selected colour. */
   .hue-slider {
     flex: 1;
     min-inline-size: 0;
@@ -58,16 +66,6 @@
     appearance: none;
     block-size: 0.75rem;
     border-radius: var(--radius-sm);
-    background: linear-gradient(
-      to right,
-      hsl(0, 100%, 50%),
-      hsl(60, 100%, 50%),
-      hsl(120, 100%, 50%),
-      hsl(180, 100%, 50%),
-      hsl(240, 100%, 50%),
-      hsl(300, 100%, 50%),
-      hsl(360, 100%, 50%)
-    );
     cursor: pointer;
   }
 

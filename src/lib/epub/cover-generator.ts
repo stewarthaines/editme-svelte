@@ -16,9 +16,45 @@ export function titleHue(title: string): number {
   return h % 360;
 }
 
+// The cover background is generated in OKLCH (a perceptually-uniform space) at
+// fixed lightness and chroma, so every hue comes out at the same perceived
+// darkness and the same gentle, muted saturation — a harmonious ribbon of deep
+// "book-cover" tones rather than HSL's uneven, sometimes garish sweep. The hue
+// is the only user-facing parameter. (Tweak these two constants to taste.)
+const COVER_OKLCH_L = 0.5;
+const COVER_OKLCH_C = 0.15;
+
+/** OKLCH (L 0–1, chroma, hue°) → sRGB hex, clamped to the sRGB gamut. */
+function oklchToHex(L: number, C: number, hueDeg: number): string {
+  const h = (hueDeg * Math.PI) / 180;
+  const a = C * Math.cos(h);
+  const b = C * Math.sin(h);
+
+  // OKLab → linear sRGB (Björn Ottosson's coefficients).
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+  const r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const bl = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+
+  // Linear → gamma sRGB, clamped to [0,1] (simple gamut clamp).
+  const channel = (x: number) => {
+    const c = x <= 0 ? 0 : x >= 1 ? 1 : x;
+    const g8 = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+    return Math.round(g8 * 255)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${channel(r)}${channel(g)}${channel(bl)}`;
+}
+
 /** The cover background color for a given hue. Shared with the UI swatch. */
 export function coverBackgroundColor(hue: number): string {
-  return `hsl(${hue}, 50%, 28%)`;
+  return oklchToHex(COVER_OKLCH_L, COVER_OKLCH_C, hue);
 }
 
 function xmlEscape(s: string): string {
