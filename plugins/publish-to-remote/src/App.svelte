@@ -63,6 +63,9 @@
   );
 
   let remoteObjects: S3Object[] = $state([]);
+  // True while the active remote's file list is being (re)fetched, so the list
+  // can show "Loading…" instead of the previous remote's stale files.
+  let loadingObjects = $state(false);
   // Remote epub keys selected for inclusion in the catalog. Initialised once per
   // remote (from the existing catalog, or all epubs as a fallback).
   let selectedKeys = $state<Set<string>>(new Set());
@@ -236,6 +239,15 @@
   async function refreshObjectList(remote?: RemoteConfig) {
     const target = remote || activeRemote;
     if (!target) return;
+    loadingObjects = true;
+    try {
+      await refreshObjectListInner(target);
+    } finally {
+      loadingObjects = false;
+    }
+  }
+
+  async function refreshObjectListInner(target: RemoteConfig) {
     const result = await listFiles(target);
     if (result.error === 'GOOGLE_AUTH_REQUIRED') {
       googleAuthRequired = true;
@@ -513,6 +525,10 @@
     const remote = remotesStore.remotes.find((r) => r.id === remoteId);
     if (!remote) return;
     remotesStore = { ...remotesStore, activeRemoteId: remoteId };
+    // Drop the previous remote's files immediately (and show "Loading…") so the
+    // list never shows another remote's contents while the switch resolves.
+    remoteObjects = [];
+    loadingObjects = true;
     await writeRemotes(remotesStore);
     await refreshObjectList(remote);
   }
@@ -716,6 +732,7 @@
                   {onToggleAllEpubs}
                   {googleAuthRequired}
                   {onCopyUrl}
+                  loading={loadingObjects}
                   onDelete={onDeleteObject}
                 />
 

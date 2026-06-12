@@ -13,6 +13,7 @@
     googleAuthRequired,
     onCopyUrl,
     onDelete,
+    loading = false,
   }: {
     objects: S3Object[];
     thumbnailUrls: Map<string, string>;
@@ -23,6 +24,8 @@
     googleAuthRequired: boolean;
     onCopyUrl: (key: string, fileId?: string) => void;
     onDelete: (key: string) => void;
+    /** True while the remote's file list is being (re)fetched. */
+    loading?: boolean;
   } = $props();
 
   let deleteConfirmKey: string | null = $state(null);
@@ -43,6 +46,8 @@
 
 {#if googleAuthRequired}
   <p class="empty-message">{$t('Connect to Google Drive to view files.')}</p>
+{:else if loading && visibleObjects.length === 0}
+  <p class="empty-message">{$t('Loading…')}</p>
 {:else if visibleObjects.length === 0}
   <p class="empty-message">{$t('Bucket is empty')}</p>
 {:else}
