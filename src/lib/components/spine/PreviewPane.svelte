@@ -83,6 +83,9 @@
   // Non-reactive: the content string last paginated, used to detect edits while
   // Print is active (undefined = not yet paginated this Print session).
   let printRenderedContent: string | undefined = undefined;
+  // The chapter id that content belonged to, so switching chapters re-renders
+  // (rather than just marking the old chapter stale).
+  let printRenderedChapterId: string | null | undefined = undefined;
   let printSafetyTimer: ReturnType<typeof setTimeout> | undefined;
 
   interface AxeViolation {
@@ -435,21 +438,25 @@
   $effect(() => {
     const device = selectedDevice;
     const content = xhtmlContent;
+    const chapter = chapterId;
     if (device !== 'print') {
       // Leaving (or never on) print: reset its session state and render plainly.
       printRenderedContent = undefined;
+      printRenderedChapterId = undefined;
       printStale = false;
       printPaginating = false;
       clearTimeout(printSafetyTimer);
       updatePreviewContent(content);
       return;
     }
-    if (printRenderedContent === undefined) {
-      // First switch to Print: paginate now.
+    if (printRenderedContent === undefined || chapter !== printRenderedChapterId) {
+      // First switch to Print, or the chapter changed: paginate the new content
+      // now (a chapter switch should show the new chapter, not a stale badge —
+      // even with unsaved edits to the chapter we're leaving).
       writePagedDoc(content);
     } else if (content !== printRenderedContent) {
-      // Edited while Print is active: mark stale (re-paginating per keystroke is
-      // too heavy); the author refreshes on demand.
+      // Same chapter edited while Print is active: mark stale (re-paginating per
+      // keystroke is too heavy); the author refreshes on demand.
       printStale = true;
     }
   });
@@ -651,6 +658,7 @@
     printPaginating = true;
     printStale = false;
     printRenderedContent = content;
+    printRenderedChapterId = chapterId;
     // Print output has a different DOM than the live preview; don't carry over
     // scroll anchors or auto-run axe against Paged.js wrapper elements.
     pendingScrollRestore = null;
