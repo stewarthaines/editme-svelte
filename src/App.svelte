@@ -726,14 +726,8 @@
         // packaged epub so the publish plugin can build rich OPDS entries.
         // Best-effort: never let a sidecar failure break packaging.
         try {
-          const cover = (await workspaceService.getWorkspaceRowDetails(workspaceId))
-            .coverImageData;
-          await writePublishSidecar(
-            fileStorage,
-            cover,
-            navWorkspace.opf.metadata,
-            result.filename
-          );
+          const cover = (await workspaceService.getWorkspaceRowDetails(workspaceId)).coverImageData;
+          await writePublishSidecar(fileStorage, cover, navWorkspace.opf.metadata, result.filename);
         } catch (sidecarError) {
           console.warn('Failed to write publish sidecar:', sidecarError);
         }
@@ -926,7 +920,7 @@
               : $t('Package EPUB')}
           >
             <Package size={18} aria-hidden="true" />
-            <span class="package-label">{$t('Package EPUB')}</span>
+            <span class="package-label">{$t('EPUB')}</span>
           </button>
           {#if canGeneratePdf}
             <button
