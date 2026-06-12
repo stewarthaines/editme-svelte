@@ -34,15 +34,35 @@
   const PLAIN = 'plain';
   const DEFAULT_TITLE = 'Untitled Book Project';
 
-  // The dialog is mounted fresh each time it opens, so these props seed the form's
+  // Remembered across sessions: repeat authors don't re-type, and the cover toggle
+  // keeps the user's last choice (defaulting ON the first time).
+  const LS_AUTHOR = 'editme_new_project_author';
+  const LS_GENERATE_COVER = 'editme_new_project_generate_cover';
+  const readPref = (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  };
+  const writePref = (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      /* localStorage unavailable (private mode / disabled) — non-fatal */
+    }
+  };
+
+  // The dialog is mounted fresh each time it opens, so these seed the form's
   // initial values once; untrack makes that intent explicit (no reactive capture).
   let title = $state(DEFAULT_TITLE);
-  let author = $state('');
+  let author = $state(readPref(LS_AUTHOR) ?? '');
   let language = $state(untrack(() => defaultLanguage));
   // Pre-select the first available text format to nudge toward a transform
   // library; falls back to plain text when none are available.
   let selectedId = $state(untrack(() => textFormats[0]?.id ?? PLAIN));
-  let generateCover = $state(false);
+  // Default ON the first time; afterwards follow the user's last committed choice.
+  let generateCover = $state(readPref(LS_GENERATE_COVER) !== 'false');
   // null = follow the title-derived hue; a number = explicit user choice.
   let coverHue = $state<number | null>(null);
   const effectiveHue = $derived(coverHue ?? titleHue(title.trim() || DEFAULT_TITLE));
@@ -63,6 +83,10 @@
     creating = true;
     error = null;
     try {
+      // Remember these for the next New Project dialog (persist before onCreate,
+      // which navigates into the project and unmounts this dialog).
+      writePref(LS_AUTHOR, author.trim());
+      writePref(LS_GENERATE_COVER, String(generateCover));
       await onCreate({
         title: title.trim() || DEFAULT_TITLE,
         author: author.trim(),

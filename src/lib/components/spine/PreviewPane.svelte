@@ -357,7 +357,22 @@
   };
 
   // Component state
-  let selectedDevice = $state('desktop');
+  // Remember the chosen preview device across spine items and sessions. Restored
+  // value is validated against the presets (and the onMount guard below drops a
+  // stale 'print' under file://); falls back to 'desktop'.
+  const PREVIEW_DEVICE_KEY = 'editme_preview_device';
+  const restoredDevice = (() => {
+    try {
+      return localStorage.getItem(PREVIEW_DEVICE_KEY);
+    } catch {
+      return null;
+    }
+  })();
+  let selectedDevice = $state(
+    restoredDevice && DEVICE_PRESETS.some(d => d.id === restoredDevice)
+      ? restoredDevice
+      : 'desktop'
+  );
   let deviceOrientation = $state<'portrait' | 'landscape'>('portrait');
   let showSource = $state(false);
   let previewIframe: HTMLIFrameElement | undefined = $state();
@@ -386,6 +401,15 @@
     }
 
     return groups;
+  });
+
+  // Persist the selected preview device whenever it changes.
+  $effect(() => {
+    try {
+      localStorage.setItem(PREVIEW_DEVICE_KEY, selectedDevice);
+    } catch {
+      /* localStorage unavailable — non-fatal */
+    }
   });
 
   // Page-size CSS token → short dropdown label.
