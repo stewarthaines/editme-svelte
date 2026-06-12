@@ -615,8 +615,17 @@
           content: '', // Empty for text files (handled by store)
         };
 
-        // Remove conditional bypass - text store should handle content loading
-        console.warn('restoreOrInitializePaneContent bypassed loadFileIntoPane for text content');
+        // Create the file-backed store so the editor textarea is populated with
+        // the chapter's source and edits persist/transform. Without this, a fresh
+        // project's first spine item shows a blank editor and drops keystrokes
+        // ("No file store available for input") until a reload runs the
+        // saved-config path. Mirrors restorePaneState's store creation.
+        const store = await getOrCreateFileStore(textFile, workspace.id, workspaceService);
+        if (store) {
+          pane1Store = store;
+        } else {
+          console.error('❌ Failed to create file store for default text pane:', textFile.path);
+        }
 
         // Persist the default configuration
         persistPaneConfiguration();
