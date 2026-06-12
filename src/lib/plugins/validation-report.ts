@@ -27,6 +27,12 @@ export interface ValidationMessage {
 
 export interface ValidationReport {
   filename: string;
+  /**
+   * The validated EPUB's package identifier (dc:identifier), so the spine editor
+   * only surfaces this report for the matching project. Absent on older/legacy
+   * reports — which therefore don't match any project until re-validated.
+   */
+  identifier?: string;
   isValid: boolean;
   timestamp: number;
   errorCount: number;

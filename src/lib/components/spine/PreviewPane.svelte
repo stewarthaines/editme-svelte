@@ -39,6 +39,7 @@
     onPreviewClick = null,
     chapterId = null,
     printSettings = undefined,
+    projectIdentifier = null,
   }: {
     xhtmlContent?: string;
     isTransforming?: boolean;
@@ -53,6 +54,9 @@
     chapterId?: string | null;
     /** Project print settings, applied to the Paged.js print preview's @page. */
     printSettings?: PrintSettings;
+    /** Current project's package identifier (dc:identifier) — the epubcheck report
+     *  is only surfaced when it was produced for this same project. */
+    projectIdentifier?: string | null;
   } = $props();
 
   /** Format the transform's execution time for the status indicator. */
@@ -112,8 +116,17 @@
   // opens from a toolbar button and its open/closed state survives chapter hops.
   let validationReport = $state(readValidationReport());
   let validationPanelOpen = $state(false);
+  // Only surface a report that was produced for THIS project. The report is a
+  // single global localStorage entry shared across projects, so without this an
+  // unrelated project's report (and its colliding chapter ids) would leak in.
+  // Requires a known project identifier on both sides (never matches on undefined).
+  const validationReportMatches = $derived(
+    !!projectIdentifier && validationReport?.identifier === projectIdentifier
+  );
   const validationChapterCount = $derived(
-    validationReport ? messagesForChapter(validationReport, chapterId).length : 0
+    validationReport && validationReportMatches
+      ? messagesForChapter(validationReport, chapterId).length
+      : 0
   );
 
   $effect(() => {
@@ -1138,8 +1151,9 @@
         </button>
       {/if}
 
-      <!-- Validation report (epubcheck), opened like the accessibility panel. -->
-      {#if validationReport}
+      <!-- Validation report (epubcheck), opened like the accessibility panel.
+           Only shown when the report belongs to the current project. -->
+      {#if validationReport && validationReportMatches}
         <button
           type="button"
           class="a11y-check"
@@ -1231,7 +1245,7 @@
   {/if}
 
   <!-- Validation report reference (shares this band with the a11y panel) -->
-  {#if validationPanelOpen && validationReport}
+  {#if validationPanelOpen && validationReport && validationReportMatches}
     <ChapterValidationPanel
       report={validationReport}
       {chapterId}

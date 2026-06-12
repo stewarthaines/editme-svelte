@@ -335,7 +335,9 @@
     });
 
     try {
-      const report = await validateEpub(epub);
+      // Stamp the validated EPUB's identifier so the host's spine editor only
+      // surfaces this report for the matching project.
+      const report = await validateEpub(epub, localMeta.get(epub.name)?.identifier);
       await saveValidationReport(report);
       // Mirror to the host so the spine editor's reference panel can read it.
       publishLatestReport(report);

@@ -1117,6 +1117,7 @@
             onNavigate={handleNavigationClick}
             chapterId={spinePreviewData.spineItemId}
             printSettings={appState?.epubSettings?.print}
+            projectIdentifier={currentWorkspaceState?.opf?.metadata?.identifier}
           />
         {:else}
           <div class="placeholder-content">

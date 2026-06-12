@@ -2,6 +2,9 @@ import { EpubCheck } from '@likecoin/epubcheck-ts';
 
 export interface ValidationReport {
   filename: string;
+  /** Validated EPUB's package identifier (dc:identifier), so the host's spine
+   *  editor only surfaces this report for the matching project. */
+  identifier?: string;
   isValid: boolean;
   timestamp: number;
   errorCount: number;
@@ -43,7 +46,10 @@ export function summarizeReport(report: ValidationReport): ValidationSummary {
   return summary;
 }
 
-export async function validateEpub(file: File): Promise<ValidationReport> {
+export async function validateEpub(
+  file: File,
+  identifier?: string,
+): Promise<ValidationReport> {
   const buffer = await file.arrayBuffer();
 
   try {
@@ -68,6 +74,7 @@ export async function validateEpub(file: File): Promise<ValidationReport> {
 
     return {
       filename: file.name,
+      identifier,
       isValid: result.valid,
       timestamp: Date.now(),
       // Use epubcheck's own counts so fatal errors are included.
@@ -78,6 +85,7 @@ export async function validateEpub(file: File): Promise<ValidationReport> {
   } catch (error) {
     return {
       filename: file.name,
+      identifier,
       isValid: false,
       timestamp: Date.now(),
       errorCount: 1,
