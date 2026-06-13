@@ -16,6 +16,7 @@
     workspaceService,
     advancedMode = true,
     readOnly = false,
+    refreshToken = 0,
     onItemSelect,
     onWorkspaceUpdate,
   }: {
@@ -24,6 +25,8 @@
     advancedMode?: boolean;
     /** Read-only EPUB: no upload/delete. */
     readOnly?: boolean;
+    /** Bump to force a reload of the file list (e.g. after a SOURCE/data delete). */
+    refreshToken?: number;
     onItemSelect?: (event: {
       item: ManifestItem | SourceItem | any;
       type: 'manifest' | 'source' | 'opf';
@@ -231,8 +234,10 @@
   // Load manifest when component mounts or dependencies change
   onMount(loadManifest);
 
-  // React to workspace changes (e.g., after delete/add operations)
+  // React to workspace changes (e.g., after delete/add operations) and to an
+  // explicit refresh nudge (SOURCE/data deletes don't change the workspace ref).
   $effect(() => {
+    void refreshToken;
     if (workspace) {
       loadManifest();
     }

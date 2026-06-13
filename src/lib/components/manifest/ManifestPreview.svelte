@@ -15,6 +15,7 @@
     workspaceService = undefined,
     onWorkspaceUpdate = undefined,
     onItemDelete,
+    onSourceDelete,
     readOnly = false,
   }: {
     selectedItem?: ManifestItem | SourceItem | any | null;
@@ -25,6 +26,8 @@
     workspaceService?: WorkspaceService;
     onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
     onItemDelete?: (detail: { itemId: string }) => void;
+    /** Delete a transform-created SOURCE/data/ file (not in the OPF manifest). */
+    onSourceDelete?: (detail: { path: string }) => void;
     /** Read-only EPUB: no edit fields, no delete. */
     readOnly?: boolean;
   } = $props();
@@ -395,9 +398,20 @@
     }
   };
 
+  // A SOURCE/data/ file (created by a transform script) is the only SOURCE item
+  // we allow deleting here — chapter text, settings and scripts stay protected.
+  const isDeletableSource = $derived(
+    selectedItemType === 'source' &&
+      !!selectedItem &&
+      typeof (selectedItem as SourceItem).path === 'string' &&
+      (selectedItem as SourceItem).path.startsWith('SOURCE/data/')
+  );
+
   const handleDeleteClick = () => {
-    if (selectedItem && selectedItemType === 'manifest') {
+    if (selectedItemType === 'manifest' && selectedItem) {
       onItemDelete?.({ itemId: (selectedItem as ManifestItem).id });
+    } else if (isDeletableSource) {
+      onSourceDelete?.({ path: (selectedItem as SourceItem).path });
     }
   };
 
@@ -491,7 +505,7 @@
           <button type="button" class="btn btn-secondary" onclick={handleDownloadClick}>
             {$t('Download')}
           </button>
-          {#if selectedItemType === 'manifest' && !readOnly}
+          {#if (selectedItemType === 'manifest' || isDeletableSource) && !readOnly}
             <button type="button" class="btn btn-danger" onclick={handleDeleteClick}>
               {$t('Delete')}
             </button>

@@ -158,6 +158,9 @@
   // Manifest item selection state
   let selectedManifestItem = $state<any>(null);
   let selectedManifestItemType = $state<'manifest' | 'source' | 'opf' | null>(null);
+  // Bumped to make the manifest table reload its SOURCE file list after a
+  // SOURCE/data/ file is deleted (such deletes don't change content.opf).
+  let manifestRefreshToken = $state(0);
 
   // Navigation preview state
   let navigationPreviewContent = $state<string | null>(null);
@@ -301,6 +304,32 @@
     } catch (error) {
       console.error('Failed to delete manifest item:', error);
       // Could add a toast notification here in the future
+    }
+  };
+
+  // Delete a transform-created SOURCE/data/ file. Unlike manifest items these
+  // aren't in content.opf, so we delete the file directly and nudge the table to
+  // reload its SOURCE list (its workspace reference is unchanged).
+  const handleSourceFileDelete = async (detail: { path: string }) => {
+    if (!currentWorkspaceState || isReadOnly) return;
+
+    const name = detail.path.split('/').pop() || detail.path;
+    if (!confirm($t('Delete {name}? This cannot be undone.', { name }))) return;
+
+    try {
+      await workspaceService.deleteSourceFile(currentWorkspaceState, detail.path);
+
+      if (
+        selectedManifestItemType === 'source' &&
+        selectedManifestItem &&
+        selectedManifestItem.path === detail.path
+      ) {
+        selectedManifestItem = null;
+        selectedManifestItemType = null;
+      }
+      manifestRefreshToken += 1;
+    } catch (error) {
+      console.error('Failed to delete SOURCE file:', error);
     }
   };
 
@@ -991,6 +1020,7 @@
             {workspaceService}
             advancedMode={appState.isAdvancedMode}
             readOnly={isReadOnly}
+            refreshToken={manifestRefreshToken}
             onItemSelect={handleManifestItemSelect}
             onWorkspaceUpdate={updatedWorkspace => {
               if (appState) appState.workspace = updatedWorkspace;
@@ -1092,6 +1122,7 @@
           {workspaceService}
           readOnly={isReadOnly}
           onItemDelete={handleManifestItemDelete}
+          onSourceDelete={handleSourceFileDelete}
           onWorkspaceUpdate={updatedWorkspace => {
             if (appState) appState.workspace = updatedWorkspace;
           }}

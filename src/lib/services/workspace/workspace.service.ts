@@ -19,6 +19,7 @@ import {
   workspaceIsReadOnly,
 } from '../../source/source-utils.js';
 import type { SourceItem } from '../../manifest/types.js';
+import { resolveSourceWritePath } from '../../transform/transform-broker.js';
 import { getBrowserLocale } from '../../i18n/locale-config.js';
 
 // Service-specific types
@@ -1199,6 +1200,25 @@ export class WorkspaceService {
         workspace.id
       );
     }
+  }
+
+  /**
+   * Delete a transform-created data file under SOURCE/data/. Scoped to exactly
+   * the area transform scripts may write (see resolveSourceWritePath / the ctx
+   * broker), so chapter text, settings.json, transform scripts and extensions
+   * can't be removed through this path. SOURCE/ files aren't in the OPF manifest,
+   * so this touches storage only and leaves content.opf untouched.
+   */
+  async deleteSourceFile(workspace: WorkspaceState, path: string): Promise<void> {
+    const safePath = resolveSourceWritePath(path);
+    if (!safePath) {
+      throw new WorkspaceServiceError(
+        `Refusing to delete file outside SOURCE/data/: ${path}`,
+        'INVALID_SOURCE_DELETE',
+        workspace.id
+      );
+    }
+    await this.fileStorage.deleteFile(workspace.id, safePath);
   }
 
   /**
