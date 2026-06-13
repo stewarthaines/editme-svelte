@@ -40,6 +40,18 @@ section.pdf-chapter:first-of-type {
   break-before: avoid;
 }
 
+/*
+  When a cover page is prepended (PDF export), it consumes counter `page 1` but
+  shows no number — so restart numbering on the first chapter, making the first
+  content page "1". The adjacency selector scopes this to the cover-present case:
+  without a cover there is no `.pdf-cover` sibling and numbering is untouched.
+  (Paged.js `counter-reset: page N` makes that page show N; if the export shows 0
+  or 2 instead of 1, flip the value — see patches/paged.polyfill.md.)
+*/
+section.pdf-cover + section.pdf-chapter {
+  counter-reset: page 1;
+}
+
 /* Keep headings with the text that follows; avoid stranded lines. */
 h1,
 h2,
