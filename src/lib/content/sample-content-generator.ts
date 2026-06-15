@@ -182,7 +182,9 @@ export class SampleContentGenerator {
 
     return [
       {
-        id: 'chapter1',
+        // Zero-padded two digits to match auto-numbered chapters added later
+        // (generateUniqueChapterId → chapterNN), so the first chapter is chapter01.
+        id: 'chapter01',
         title: this.translate(locale, 'sample.chapter1.title'),
         content: this.translate(locale, 'sample.chapter1.content'),
         linear: true,
