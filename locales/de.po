@@ -22,76 +22,76 @@ msgstr ".. (nach oben)"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "· validated {ago}"
-msgstr ""
+msgstr "· validiert {ago}"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{count} accessibility issues"
-msgstr ""
+msgstr "{count} Barrierefreiheitsprobleme"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count} days ago"
-msgstr ""
+msgstr "vor {count} Tagen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "{count} Warnings"
-msgstr ""
+msgstr "{count} Warnungen"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count}h ago"
-msgstr ""
+msgstr "vor {count} Std."
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count}w ago"
-msgstr ""
+msgstr "vor {count} Wo."
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "{done}/{total} addressed"
-msgstr ""
+msgstr "{done}/{total} behoben"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{key} deleted"
-msgstr ""
+msgstr "{key} gelöscht"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} error"
-msgstr ""
+msgstr "{n} Fehler"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} errors"
-msgstr ""
+msgstr "{n} Fehler"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} info"
-msgstr ""
+msgstr "{n} Info"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} warning"
-msgstr ""
+msgstr "{n} Warnung"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{n} warnings"
-msgstr ""
+msgstr "{n} Warnungen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name} gelöscht"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} uploaded successfully"
-msgstr ""
+msgstr "{name} erfolgreich hochgeladen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name}: {errors} errors, {warnings} warnings"
-msgstr ""
+msgstr "{name}: {errors} Fehler, {warnings} Warnungen"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "{path} (line {line}, col {col})"
-msgstr ""
+msgstr "{path} (Zeile {line}, Spalte {col})"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "{path} (line {line})"
-msgstr ""
+msgstr "{path} (Zeile {line})"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "← Back"
@@ -251,7 +251,7 @@ msgstr "Barrierefreiheits-API"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility check (axe-core) — re-runs as you edit while open"
-msgstr ""
+msgstr "Barrierefreiheitsprüfung (axe-core) – wird bei Änderungen erneut ausgeführt, solange geöffnet"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Accessibility features"
@@ -259,7 +259,7 @@ msgstr "Barrierefreiheitsmerkmale"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility issues"
-msgstr ""
+msgstr "Barrierefreiheitsprobleme"
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Actions"
@@ -332,7 +332,7 @@ msgstr "Rolle hinzufügen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Add second editor pane"
-msgstr ""
+msgstr "Zweiten Editor-Bereich hinzufügen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add to project"
@@ -396,13 +396,13 @@ msgstr "Apple Books"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Approximate start position"
-msgstr ""
+msgstr "Ungefähre Startposition"
 
 #: src/lib/components/SpineSidebar.svelte
 msgid ""
 "Are you sure you want to delete chapter '{name}'? This will permanently "
 "delete the chapter and its source file."
-msgstr ""
+msgstr "Möchten Sie das Kapitel '{name}' wirklich löschen? Dadurch werden das Kapitel und seine Quelldatei dauerhaft gelöscht."
 
 #: src/App.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
@@ -411,7 +411,7 @@ msgstr "Möchten Sie dieses Element wirklich löschen?"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Audio Clip Editor"
-msgstr ""
+msgstr "Audioclip-Editor"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Audio Clip Template"
@@ -431,7 +431,7 @@ msgstr "Klassifikation (z. B. BISAC)"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Authorization failed: {error}"
-msgstr ""
+msgstr "Autorisierung fehlgeschlagen: {error}"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Auto"
@@ -501,15 +501,15 @@ msgstr "Katalog-Dateiname (optional)"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog update error: {error}"
-msgstr ""
+msgstr "Fehler bei der Katalogaktualisierung: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog update failed"
-msgstr ""
+msgstr "Katalogaktualisierung fehlgeschlagen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog updated: {url}"
-msgstr ""
+msgstr "Katalog aktualisiert: {url}"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Catalog URL"
@@ -541,13 +541,13 @@ msgstr "Kapitelinhalt"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Chapter title"
-msgstr ""
+msgstr "Kapiteltitel"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid ""
 "Chapter title — used in the content document <title>; defaults to the spine "
 "id"
-msgstr ""
+msgstr "Kapiteltitel – wird im <title> des Inhaltsdokuments verwendet; Standard ist die Spine-ID"
 
 #: src/lib/Sidebar.svelte
 msgid "Chapters"
@@ -559,7 +559,7 @@ msgstr "Geprüft:"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Checking…"
-msgstr ""
+msgstr "Wird geprüft…"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Clear filter"
@@ -575,7 +575,7 @@ msgstr "Klicken Sie auf eine beliebige Zeile in der Tabelle, um Details anzuzeig
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Clip label"
-msgstr ""
+msgstr "Clip-Bezeichnung"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
@@ -588,11 +588,11 @@ msgstr "Schließen"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close accessibility panel"
-msgstr ""
+msgstr "Barrierefreiheitsbereich schließen"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Close validation panel"
-msgstr ""
+msgstr "Validierungsbereich schließen"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
@@ -656,7 +656,7 @@ msgstr "Verbindung zum Speicher wird hergestellt..."
 
 #: src/lib/components/preview/ContentPreview.svelte
 msgid "Content Preview"
-msgstr ""
+msgstr "Inhaltsvorschau"
 
 #: src/App.svelte
 msgid "Content preview will appear here based on the current view"
@@ -694,7 +694,7 @@ msgstr "URL kopieren"
 msgid ""
 "Could not load the feed: {error}. The server may not allow cross-origin "
 "requests."
-msgstr ""
+msgstr "Der Feed konnte nicht geladen werden: {error}. Der Server erlaubt möglicherweise keine Cross-Origin-Anfragen."
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed."
@@ -776,7 +776,7 @@ msgstr "Derzeit geöffnet"
 
 #: src/lib/ThemeToggle.svelte
 msgid "dark"
-msgstr ""
+msgstr "dunkel"
 
 #: src/lib/ThemeToggle.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -801,27 +801,27 @@ msgstr "Löschen"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Delete \"{title}\"? This cannot be undone."
-msgstr ""
+msgstr "\"{title}\" löschen? Dies kann nicht rückgängig gemacht werden."
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete {filename}? This cannot be undone."
-msgstr ""
+msgstr "{filename} löschen? Dies kann nicht rückgängig gemacht werden."
 
 #: src/App.svelte
 msgid "Delete {name}? This cannot be undone."
-msgstr ""
+msgstr "{name} löschen? Dies kann nicht rückgängig gemacht werden."
 
 #: src/lib/components/SpineItem.svelte
 msgid "Delete chapter {name}"
-msgstr ""
+msgstr "Kapitel {name} löschen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Delete error: {error}"
-msgstr ""
+msgstr "Fehler beim Löschen: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Delete failed"
-msgstr ""
+msgstr "Löschen fehlgeschlagen"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Delete project"
@@ -829,7 +829,7 @@ msgstr "Projekt löschen"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Delete project: {title}"
-msgstr ""
+msgstr "Projekt löschen: {title}"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Demo Controls"
@@ -872,11 +872,11 @@ msgstr "Dropbox"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox app key not configured"
-msgstr ""
+msgstr "Dropbox-App-Schlüssel nicht konfiguriert"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox authorization failed: {error}"
-msgstr ""
+msgstr "Dropbox-Autorisierung fehlgeschlagen: {error}"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
@@ -889,7 +889,7 @@ msgstr "Projekt duplizieren"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Duplicate the current project: {name}"
-msgstr ""
+msgstr "Aktuelles Projekt duplizieren: {name}"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Duplicating…"
@@ -897,7 +897,7 @@ msgstr "Wird dupliziert…"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Duration"
-msgstr ""
+msgstr "Dauer"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "e.g. 2"
@@ -950,7 +950,7 @@ msgstr "Editor"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
-msgstr ""
+msgstr "Element"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Enable advanced editing features and additional controls for expert users."
@@ -987,11 +987,11 @@ msgid ""
 "Enter navigation content in plain text. Leave empty to auto-generate from "
 "chapter titles. Press Ctrl+Enter (Cmd+Enter on Mac) to save navigation "
 "content."
-msgstr ""
+msgstr "Geben Sie den Navigationsinhalt als reinen Text ein. Leer lassen, um ihn automatisch aus den Kapiteltiteln zu generieren. Drücken Sie Strg+Enter (Cmd+Enter auf dem Mac), um den Navigationsinhalt zu speichern."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Enter new ID for {item}:"
-msgstr ""
+msgstr "Neue ID für {item} eingeben:"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter publisher name"
@@ -1074,7 +1074,7 @@ msgstr "Element konnte nicht gelöscht werden"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to delete workspace: {error}"
-msgstr ""
+msgstr "Arbeitsbereich konnte nicht gelöscht werden: {error}"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Failed to duplicate project."
@@ -1086,7 +1086,7 @@ msgstr "XML-Vorschau konnte nicht erzeugt werden"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to import EPUB: {error}"
-msgstr ""
+msgstr "EPUB konnte nicht importiert werden: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to import extension"
@@ -1102,7 +1102,7 @@ msgstr "Inhaltsvorschau konnte nicht geladen werden"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Failed to load EPUBs: {error}"
-msgstr ""
+msgstr "EPUBs konnten nicht geladen werden: {error}"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to load manifest"
@@ -1118,7 +1118,7 @@ msgstr "Einstellungen konnten nicht geladen werden"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to open workspace: {error}"
-msgstr ""
+msgstr "Arbeitsbereich konnte nicht geöffnet werden: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to remove extension"
@@ -1130,11 +1130,11 @@ msgstr "Metadaten-Element konnte nicht entfernt werden"
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Failed to rename chapter ID: {error}"
-msgstr ""
+msgstr "Kapitel-ID konnte nicht umbenannt werden: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Failed to save config: {error}"
-msgstr ""
+msgstr "Konfiguration konnte nicht gespeichert werden: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to save EPUB settings"
@@ -1240,11 +1240,11 @@ msgstr "Google-Drive-Autorisierung erforderlich."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Drive credentials not configured"
-msgstr ""
+msgstr "Google-Drive-Anmeldedaten nicht konfiguriert"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Drive setup failed: {error}"
-msgstr ""
+msgstr "Google-Drive-Einrichtung fehlgeschlagen: {error}"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Hazards"
@@ -1252,7 +1252,7 @@ msgstr "Gefahren"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Hide Audio Clip Editor"
-msgstr ""
+msgstr "Audioclip-Editor ausblenden"
 
 #: src/lib/Sidebar.svelte
 msgid "Hide project sections"
@@ -1323,7 +1323,7 @@ msgstr "Seitenzahlen einschließen"
 
 #: src/App.svelte
 msgid "Initializing application..."
-msgstr ""
+msgstr "Anwendung wird initialisiert..."
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Initializing editor..."
@@ -1331,7 +1331,7 @@ msgstr "Editor wird initialisiert..."
 
 #: src/App.svelte
 msgid "Initializing transform engine..."
-msgstr ""
+msgstr "Transformations-Engine wird initialisiert..."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
@@ -1339,11 +1339,11 @@ msgstr "Wird initialisiert..."
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Insert Clip Directive"
-msgstr ""
+msgstr "Clip-Direktive einfügen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Insert clip directive at cursor position"
-msgstr ""
+msgstr "Clip-Direktive an der Cursorposition einfügen"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Invalid"
@@ -1379,7 +1379,7 @@ msgstr "iPhone SE (375×667)"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Item controls"
-msgstr ""
+msgstr "Element-Steuerung"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Just now"
@@ -1416,7 +1416,7 @@ msgstr "Layout"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "learn more"
-msgstr ""
+msgstr "mehr erfahren"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Left to Right"
@@ -1433,7 +1433,7 @@ msgstr "Lizenz"
 
 #: src/lib/ThemeToggle.svelte
 msgid "light"
-msgstr ""
+msgstr "hell"
 
 #: src/lib/ThemeToggle.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1446,7 +1446,7 @@ msgstr "Heller Text auf dunklem Cover"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Load clip data from selected text"
-msgstr ""
+msgstr "Clip-Daten aus ausgewähltem Text laden"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Load File"
@@ -1454,11 +1454,11 @@ msgstr "Datei laden"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Load from Selection"
-msgstr ""
+msgstr "Aus Auswahl laden"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Loading audio..."
-msgstr ""
+msgstr "Audio wird geladen..."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Loading extensions..."
@@ -1502,7 +1502,7 @@ msgstr "Spine-Elemente werden geladen…"
 
 #: src/lib/Sidebar.svelte
 msgid "Loading..."
-msgstr ""
+msgstr "Wird geladen..."
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
@@ -1537,7 +1537,7 @@ msgstr "Rand"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Message:"
-msgstr ""
+msgstr "Nachricht:"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
@@ -1570,11 +1570,11 @@ msgstr "Dicktengleich"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Move {id} down"
-msgstr ""
+msgstr "{id} nach unten verschieben"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Move {id} up"
-msgstr ""
+msgstr "{id} nach oben verschieben"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Move down"
@@ -1582,19 +1582,19 @@ msgstr "Nach unten"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time back 0.1 seconds"
-msgstr ""
+msgstr "Startzeit um 0,1 Sekunden zurücksetzen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time back 1 second"
-msgstr ""
+msgstr "Startzeit um 1 Sekunde zurücksetzen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time forward 0.1 seconds"
-msgstr ""
+msgstr "Startzeit um 0,1 Sekunden vorstellen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time forward 1 second"
-msgstr ""
+msgstr "Startzeit um 1 Sekunde vorstellen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Move up"
@@ -1602,7 +1602,7 @@ msgstr "Nach oben"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "n/a"
-msgstr ""
+msgstr "k. A."
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Name"
@@ -1627,15 +1627,15 @@ msgstr "Navigation (Inhaltsverzeichnis)"
 
 #: src/lib/components/outline/OutlineEditor.svelte
 msgid "Navigation content editor"
-msgstr ""
+msgstr "Navigationsinhalts-Editor"
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Navigation content will be auto-generated from your chapters..."
-msgstr ""
+msgstr "Der Navigationsinhalt wird automatisch aus Ihren Kapiteln generiert..."
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Navigation editor"
-msgstr ""
+msgstr "Navigations-Editor"
 
 #: src/App.svelte
 msgid "Navigation Preview"
@@ -1652,11 +1652,11 @@ msgstr "Nein"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No accessibility issues found"
-msgstr ""
+msgstr "Keine Barrierefreiheitsprobleme gefunden"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
-msgstr ""
+msgstr "Kein Inhalt"
 
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "No content available"
@@ -1709,13 +1709,13 @@ msgstr "Keine Projekte gefunden"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "No projects match your search for \"{query}\""
-msgstr ""
+msgstr "Keine Projekte entsprechen Ihrer Suche nach \"{query}\""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid ""
 "No proxy was detected on this host, so this only works once the app is "
 "deployed with the WebDAV proxy."
-msgstr ""
+msgstr "Auf diesem Host wurde kein Proxy erkannt, daher funktioniert dies erst, wenn die App mit dem WebDAV-Proxy bereitgestellt wird."
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "No spine item selected"
@@ -1731,7 +1731,7 @@ msgstr "Hier keine Unterordner"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "No validation issues in this chapter."
-msgstr ""
+msgstr "Keine Validierungsprobleme in diesem Kapitel."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "None"
@@ -1763,7 +1763,7 @@ msgstr "Öffnen Sie ein Projekt, um seine Einstellungen zu konfigurieren."
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Open project: {title}"
-msgstr ""
+msgstr "Projekt öffnen: {title}"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Open this chapter in the editor"
@@ -1781,7 +1781,7 @@ msgstr ""
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Optional label"
-msgstr ""
+msgstr "Optionale Bezeichnung"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Orientation"
@@ -1793,7 +1793,7 @@ msgstr "Ausrichtung:"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Other chapters with issues"
-msgstr ""
+msgstr "Andere Kapitel mit Problemen"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Overwrite?"
@@ -1837,11 +1837,11 @@ msgstr "Wird paginiert…"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 1 content"
-msgstr ""
+msgstr "Inhalt von Bereich 1"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 2 content"
-msgstr ""
+msgstr "Inhalt von Bereich 2"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Paper size for the exported PDF. Your stylesheet can override this."
@@ -1855,11 +1855,11 @@ msgstr "Passwort"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "password or app token"
-msgstr ""
+msgstr "Passwort oder App-Token"
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 msgid "Paste {name} license text here"
-msgstr ""
+msgstr "{name}-Lizenztext hier einfügen"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Path"
@@ -1883,23 +1883,23 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please fill all required fields"
-msgstr ""
+msgstr "Bitte füllen Sie alle Pflichtfelder aus"
 
 #: src/App.svelte
 msgid "Please refresh the page to try again."
-msgstr ""
+msgstr "Bitte laden Sie die Seite neu, um es erneut zu versuchen."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a folder"
-msgstr ""
+msgstr "Bitte wählen Sie einen Ordner aus"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a folder and authorize first"
-msgstr ""
+msgstr "Bitte wählen Sie zuerst einen Ordner aus und autorisieren Sie"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a remote type"
-msgstr ""
+msgstr "Bitte wählen Sie einen Remote-Typ aus"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Plugins"
@@ -2081,11 +2081,11 @@ msgstr "Den ausgewählten Feed aus der Liste entfernen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Removed {name}"
-msgstr ""
+msgstr "{name} entfernt"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Rename {item}"
-msgstr ""
+msgstr "{item} umbenennen"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Rendition Properties"
@@ -2101,13 +2101,13 @@ msgstr "Bericht"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Requests go straight to the server, which must send CORS headers."
-msgstr ""
+msgstr "Anfragen gehen direkt an den Server, der CORS-Header senden muss."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid ""
 "Requests go through this app’s /dav endpoint; your WebDAV credentials "
 "transit the app host."
-msgstr ""
+msgstr "Anfragen laufen über den /dav-Endpunkt dieser App; Ihre WebDAV-Anmeldedaten passieren den App-Host."
 
 #: src/lib/components/metadata/fields/DateMetadataField.svelte
 #: src/lib/components/metadata/fields/TextareaMetadataField.svelte
@@ -2283,11 +2283,11 @@ msgstr "Wählen Sie ein Element aus, um seinen Inhalt in der Vorschau anzuzeigen
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Select audio file"
-msgstr ""
+msgstr "Audiodatei auswählen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Select audio..."
-msgstr ""
+msgstr "Audio auswählen..."
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Select device preset"
@@ -2295,15 +2295,15 @@ msgstr "Gerätevoreinstellung auswählen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 1"
-msgstr ""
+msgstr "Datei für Bereich 1 auswählen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 2"
-msgstr ""
+msgstr "Datei für Bereich 2 auswählen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file..."
-msgstr ""
+msgstr "Datei auswählen..."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Select This Folder"
@@ -2311,7 +2311,7 @@ msgstr "Diesen Ordner auswählen"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Selected folder: {name}"
-msgstr ""
+msgstr "Ausgewählter Ordner: {name}"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Series"
@@ -2323,7 +2323,7 @@ msgstr "Serif"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Session expired — please reconnect"
-msgstr ""
+msgstr "Sitzung abgelaufen – bitte neu verbinden"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Set"
@@ -2348,11 +2348,11 @@ msgstr "Eine Seitenzahl am unteren Rand jeder Seite anzeigen."
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Show Audio Clip Editor"
-msgstr ""
+msgstr "Audioclip-Editor anzeigen"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show generated source"
-msgstr ""
+msgstr "Generierten Quelltext anzeigen"
 
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"
@@ -2360,19 +2360,19 @@ msgstr "Projektbereiche anzeigen"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show rendered preview"
-msgstr ""
+msgstr "Gerenderte Vorschau anzeigen"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Showing {filtered} of {total} workspaces"
-msgstr ""
+msgstr "{filtered} von {total} Arbeitsbereichen werden angezeigt"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Sign out error: {error}"
-msgstr ""
+msgstr "Fehler beim Abmelden: {error}"
 
 #: src/lib/Sidebar.svelte
 msgid "Simple EPUB Editor"
-msgstr ""
+msgstr "Simple EPUB Editor"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 #: src/lib/navigation/views/PublishView.svelte
@@ -2418,11 +2418,11 @@ msgstr "Doppelseite"
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Stack Trace"
-msgstr ""
+msgstr "Stacktrace"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Stage:"
-msgstr ""
+msgstr "Phase:"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for typical/common mobile phone or e-reader screen
@@ -2435,11 +2435,11 @@ msgstr "Das PDF mit dem Coverbild des Projekts als ganzseitigem Cover beginnen."
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Start time"
-msgstr ""
+msgstr "Startzeit"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Start typing in the editor to see your XHTML preview here."
-msgstr ""
+msgstr "Beginnen Sie im Editor zu tippen, um hier Ihre XHTML-Vorschau zu sehen."
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Status:"
@@ -2475,11 +2475,11 @@ msgstr "Zusammenfassung"
 
 #: src/lib/ThemeToggle.svelte
 msgid "Switch to {mode} theme"
-msgstr ""
+msgstr "Design auf {mode} umstellen"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Switch to single pane"
-msgstr ""
+msgstr "Zu Einzelbereich wechseln"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "System"
@@ -2493,13 +2493,13 @@ msgstr "Technische Informationen"
 msgid ""
 "Template for inserting audio clip directives. Use placeholders: <href>, "
 "<begin>, <end>, <label>, <rate>"
-msgstr ""
+msgstr "Vorlage zum Einfügen von Audioclip-Direktiven. Verwenden Sie Platzhalter: <href>, <begin>, <end>, <label>, <rate>"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid ""
 "Template for the exported .epub filename. Use placeholders: <title>, "
 "<author>, <date>. Empty placeholders (e.g. no author) collapse cleanly."
-msgstr ""
+msgstr "Vorlage für den Dateinamen des exportierten .epub. Verwenden Sie Platzhalter: <title>, <author>, <date>. Leere Platzhalter (z. B. kein Autor) werden sauber zusammengefasst."
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Term (e.g. FIC028000)"
@@ -2507,7 +2507,7 @@ msgstr "Begriff (z. B. FIC028000)"
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Text Content"
-msgstr ""
+msgstr "Textinhalt"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Text format"
@@ -2535,7 +2535,7 @@ msgstr "Design"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "This chapter"
-msgstr ""
+msgstr "Dieses Kapitel"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "This EPUB is read-only, so extensions can't be added."
@@ -2580,7 +2580,7 @@ msgstr "Heute"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Toggle device orientation"
-msgstr ""
+msgstr "Geräteausrichtung umschalten"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Toggle Empty State"
@@ -2588,7 +2588,7 @@ msgstr "Leeren Zustand umschalten"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Toggle orientation"
-msgstr ""
+msgstr "Ausrichtung umschalten"
 
 #: src/lib/Sidebar.svelte
 msgid "Toggle sidebar"
@@ -2596,35 +2596,35 @@ msgstr "Seitenleiste umschalten"
 
 #: src/lib/ThemeToggle.svelte
 msgid "Toggle theme"
-msgstr ""
+msgstr "Design umschalten"
 
 #: src/App.svelte
 msgid "Transform Engine Failed"
-msgstr ""
+msgstr "Transformations-Engine fehlgeschlagen"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform error"
-msgstr ""
+msgstr "Transformationsfehler"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform Error"
-msgstr ""
+msgstr "Transformationsfehler"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Transform Error ({stage})"
-msgstr ""
+msgstr "Transformationsfehler ({stage})"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform in progress"
-msgstr ""
+msgstr "Transformation läuft"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform successful"
-msgstr ""
+msgstr "Transformation erfolgreich"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transforming..."
-msgstr ""
+msgstr "Transformation läuft..."
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for e-reader devices designed for portable reading
@@ -2651,7 +2651,7 @@ msgstr "Ohne Titel"
 
 #: src/lib/Sidebar.svelte
 msgid "Untitled Project"
-msgstr ""
+msgstr "Unbenanntes Projekt"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Update Catalog"
@@ -2679,15 +2679,15 @@ msgstr "Hochladen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Upload error: {error}"
-msgstr ""
+msgstr "Upload-Fehler: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Upload failed"
-msgstr ""
+msgstr "Upload fehlgeschlagen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "URL copied to clipboard"
-msgstr ""
+msgstr "URL in die Zwischenablage kopiert"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Use the download button to access the file"
@@ -2699,7 +2699,7 @@ msgstr "Die eigenen Schriften der Publikation verwenden (nicht neu gestalten)"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "username"
-msgstr ""
+msgstr "Benutzername"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Username"
@@ -2727,27 +2727,27 @@ msgstr "Wird validiert..."
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Validation"
-msgstr ""
+msgstr "Validierung"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Validation error"
-msgstr ""
+msgstr "Validierungsfehler"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Validation failed: {error}"
-msgstr ""
+msgstr "Validierung fehlgeschlagen: {error}"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Validation issues for this chapter"
-msgstr ""
+msgstr "Validierungsprobleme für dieses Kapitel"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Validation report (epubcheck) for this chapter"
-msgstr ""
+msgstr "Validierungsbericht (epubcheck) für dieses Kapitel"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Validation Report: {filename}"
-msgstr ""
+msgstr "Validierungsbericht: {filename}"
 
 #: src/lib/components/metadata/MetadataTab.svelte
 msgid "validation.errorsCount"
@@ -2775,7 +2775,7 @@ msgstr "Viewport-Breite in Pixeln"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "warnings"
-msgstr ""
+msgstr "Warnungen"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Warnings:"
@@ -2803,7 +2803,7 @@ msgstr "Breit"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "XHTML Preview"
-msgstr ""
+msgstr "XHTML-Vorschau"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
