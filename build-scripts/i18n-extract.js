@@ -253,6 +253,9 @@ async function extractStrings() {
       /(?<!import\s+.*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match t('text') patterns in JavaScript contexts (not in imports or strings)
       /(?<!import\s+.*)\bt\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
+      // Match translate('text') / _('text') in JavaScript contexts (.svelte script blocks)
+      /(?<!import\s+.*)\btranslate\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
+      /(?<!import\s+.*)\b_\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
     ];
 
     // Function to filter out non-translatable strings
