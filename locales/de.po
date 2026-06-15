@@ -106,12 +106,12 @@ msgid "A generator is a script (exporting generateText(ctx, options)) that produ
 msgstr "Ein Generator ist ein Skript (das generateText(ctx, options) exportiert), das Quelltext erzeugt, der an der Cursorposition im Editor eingefügt wird."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
-msgid "A name is required."
-msgstr "Ein Name ist erforderlich."
+msgid "A generator with that name already exists."
+msgstr "Ein Generator mit diesem Namen existiert bereits."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
-msgid "A script file is required."
-msgstr "Eine Skriptdatei ist erforderlich."
+msgid "A name is required."
+msgstr "Ein Name ist erforderlich."
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
@@ -450,6 +450,7 @@ msgid "Bucket Name"
 msgstr "Bucket-Name"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
@@ -709,6 +710,10 @@ msgstr "Generator erstellen"
 msgid "Create New"
 msgstr "Neu erstellen"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Create scaffolds a starter generateText script (with your options documented) that you can edit from the chapter editor’s file menu."
+msgstr "„Erstellen“ legt ein generateText-Startskript an (mit dokumentierten Optionen), das Sie im Kapitel-Editor über das Dateimenü bearbeiten können."
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Create your first item using the buttons above"
 msgstr "Erstellen Sie Ihr erstes Element über die Schaltflächen oben"
@@ -923,8 +928,13 @@ msgid "Each row is one combination of modes that is enough on its own to read th
 msgstr "Jede Zeile ist eine Kombination von Modi, die für sich genommen ausreicht, um die gesamte Publikation zu lesen."
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Edit"
 msgstr "Bearbeiten"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Edit generator"
+msgstr "Generator bearbeiten"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Edition"
@@ -2228,6 +2238,10 @@ msgstr "Serifenlos"
 msgid "Save & Connect"
 msgstr "Speichern & verbinden"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Save changes"
+msgstr "Änderungen speichern"
+
 #: src/App.svelte
 msgid "Save the book as a PDF"
 msgstr "Das Buch als PDF speichern"
@@ -2243,10 +2257,6 @@ msgstr "Gespeicherte Feeds…"
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Saving…"
 msgstr "Wird gespeichert…"
-
-#: src/lib/components/settings/GeneratorSettings.svelte
-msgid "Script file"
-msgstr "Skriptdatei"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Scripts run top-to-bottom over the generated DOM, each applied to the previous one’s output."

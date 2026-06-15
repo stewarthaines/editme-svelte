@@ -106,11 +106,11 @@ msgid "A generator is a script (exporting generateText(ctx, options)) that produ
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
-msgid "A name is required."
+msgid "A generator with that name already exists."
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
-msgid "A script file is required."
+msgid "A name is required."
 msgstr ""
 
 #: src/App.svelte
@@ -450,6 +450,7 @@ msgid "Bucket Name"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
@@ -709,6 +710,10 @@ msgstr ""
 msgid "Create New"
 msgstr ""
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Create scaffolds a starter generateText script (with your options documented) that you can edit from the chapter editor’s file menu."
+msgstr ""
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Create your first item using the buttons above"
 msgstr ""
@@ -923,7 +928,12 @@ msgid "Each row is one combination of modes that is enough on its own to read th
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Edit"
+msgstr ""
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Edit generator"
 msgstr ""
 
 #: src/lib/components/metadata/TitleEditor.svelte
@@ -2228,6 +2238,10 @@ msgstr ""
 msgid "Save & Connect"
 msgstr ""
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Save changes"
+msgstr ""
+
 #: src/App.svelte
 msgid "Save the book as a PDF"
 msgstr ""
@@ -2242,10 +2256,6 @@ msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Saving…"
-msgstr ""
-
-#: src/lib/components/settings/GeneratorSettings.svelte
-msgid "Script file"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

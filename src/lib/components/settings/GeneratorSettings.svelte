@@ -13,6 +13,7 @@
   import {
     listGenerators,
     writeGenerator,
+    readGeneratorScript,
     deleteGenerator,
     type InstalledGenerator,
   } from '$lib/generators/generator-store.js';
@@ -47,10 +48,10 @@
 
   let name = $state('');
   let description = $state('');
-  let scriptFile = $state<File | null>(null);
   let optionRows = $state<OptionRow[]>([]);
   let saving = $state(false);
-  let fileInput = $state<HTMLInputElement>();
+  // Non-null while editing an existing generator (its id); null = creating a new one.
+  let editingId = $state<string | null>(null);
 
   const optionTypeLabels: { value: GeneratorOption['type']; label: string }[] = [
     { value: 'string', label: $t('Text') },
@@ -124,45 +125,133 @@
     return out;
   }
 
-  function onFileChange(event: Event): void {
-    scriptFile = (event.target as HTMLInputElement).files?.[0] ?? null;
+  /** Reconstruct editable option rows from a saved generator's options. */
+  function toOptionRows(options: GeneratorOption[]): OptionRow[] {
+    return options.map(o => ({
+      type: o.type,
+      name: o.name,
+      label: o.label,
+      placeholder: o.placeholder ?? '',
+      textDefault: o.type === 'boolean' || o.default == null ? '' : String(o.default),
+      boolDefault: o.type === 'boolean' ? Boolean(o.default) : false,
+      choices:
+        o.type === 'select'
+          ? (o.options ?? []).map(c => (c.value === c.label ? c.value : `${c.value}:${c.label}`)).join(', ')
+          : '',
+    }));
+  }
+
+  /** Load an existing generator into the form for editing (id stays fixed). */
+  function startEdit(gen: InstalledGenerator): void {
+    error = null;
+    editingId = gen.manifest.id;
+    name = gen.manifest.name;
+    description = gen.manifest.description ?? '';
+    optionRows = toOptionRows(gen.manifest.options);
+  }
+
+  /** JSDoc type for an option, from its form type. */
+  function jsdocType(type: GeneratorOption['type']): string {
+    if (type === 'boolean') return 'boolean';
+    if (type === 'number') return 'number';
+    return 'string';
+  }
+
+  /**
+   * Scaffold a starter generator script: the generateText signature, a comment
+   * describing ctx and the options the user defined, and a placeholder return. The
+   * author then edits it from the chapter editor's file dropdown.
+   */
+  function buildBoilerplate(
+    genName: string,
+    genDescription: string,
+    options: GeneratorOption[]
+  ): string {
+    const optionDocs = options.length
+      ? options.map(o => ` *   options.${o.name} (${jsdocType(o.type)}) — ${o.label}`).join('\n')
+      : ' *   (this generator has no options)';
+    const descBlock = genDescription ? ` * ${genDescription}\n *\n` : ' *\n';
+    return `/**
+ * Generator: ${genName}
+${descBlock} * Produces source text that is inserted at the editor caret. Return a string in
+ * your project's source format — it is run through the text transform afterwards.
+ *
+ * @param {object} ctx - read-only project context:
+ *   ctx.idref                       - id of the chapter this was invoked in
+ *   ctx.manifest                    - OPF manifest items: { id, href, mediaType, ... }
+ *   ctx.readManifestText(href)      - read a manifest item as text (async)
+ *   ctx.readSourceText(path)        - read a SOURCE/ file as text (async)
+ *   ctx.writeSourceText(path, text) - write a file under SOURCE/data/ (async)
+ * @param {object} options - values entered in the generator's form:
+${optionDocs}
+ * @returns {string} the text to insert
+ */
+function generateText(ctx, options) {
+  // Build and return the text to insert. This placeholder returns a greeting.
+  return 'Hello, world!';
+}
+`;
   }
 
   function resetForm(): void {
     name = '';
     description = '';
-    scriptFile = null;
     optionRows = [];
-    if (fileInput) fileInput.value = '';
+    editingId = null;
   }
 
-  async function handleCreate(): Promise<void> {
+  async function handleSave(): Promise<void> {
     if (!isAdvancedMode || saving) return;
     error = null;
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       error = $t('A name is required.');
       return;
     }
-    if (!scriptFile) {
-      error = $t('A script file is required.');
-      return;
-    }
+    const description_ = description.trim();
+    const options = buildOptions();
     saving = true;
     try {
-      const id = normalizeExtensionName(name.trim());
-      if (!id) {
-        error = $t('A name is required.');
-        return;
+      if (editingId) {
+        // Editing: update the manifest (name/description/options) but keep the
+        // existing script + id, so a hand-edited generateText isn't clobbered.
+        const existing = generators.find(g => g.manifest.id === editingId);
+        if (!existing) {
+          error = $t('A name is required.');
+          return;
+        }
+        const script = await readGeneratorScript(fileStorage, workspaceId, existing);
+        const manifest: GeneratorManifest = {
+          id: editingId,
+          name: trimmedName,
+          description: description_ || undefined,
+          script: existing.manifest.script,
+          options,
+        };
+        const buffer = new TextEncoder().encode(script).buffer as ArrayBuffer;
+        await writeGenerator(fileStorage, workspaceId, manifest, buffer);
+      } else {
+        // Creating: scaffold a fresh script — refuse to clobber an existing one.
+        const id = normalizeExtensionName(trimmedName);
+        if (!id) {
+          error = $t('A name is required.');
+          return;
+        }
+        if (generators.some(g => g.manifest.id === id)) {
+          error = $t('A generator with that name already exists.');
+          return;
+        }
+        const manifest: GeneratorManifest = {
+          id,
+          name: trimmedName,
+          description: description_ || undefined,
+          script: `${id}.js`,
+          options,
+        };
+        const boilerplate = buildBoilerplate(trimmedName, description_, options);
+        const buffer = new TextEncoder().encode(boilerplate).buffer as ArrayBuffer;
+        await writeGenerator(fileStorage, workspaceId, manifest, buffer);
       }
-      const manifest: GeneratorManifest = {
-        id,
-        name: name.trim(),
-        description: description.trim() || undefined,
-        script: scriptFile.name,
-        options: buildOptions(),
-      };
-      const buffer = await scriptFile.arrayBuffer();
-      await writeGenerator(fileStorage, workspaceId, manifest, buffer);
       resetForm();
       await refresh();
       onChanged?.();
@@ -209,14 +298,24 @@
               <span class="gs-item-desc">{g.manifest.description}</span>
             {/if}
           </div>
-          <button
-            type="button"
-            class="gs-remove"
-            onclick={() => handleRemove(g.manifest.id)}
-            disabled={!isAdvancedMode}
-          >
-            {$t('Remove')}
-          </button>
+          <div class="gs-item-actions">
+            <button
+              type="button"
+              class="gs-edit"
+              onclick={() => startEdit(g)}
+              disabled={!isAdvancedMode}
+            >
+              {$t('Edit')}
+            </button>
+            <button
+              type="button"
+              class="gs-remove"
+              onclick={() => handleRemove(g.manifest.id)}
+              disabled={!isAdvancedMode}
+            >
+              {$t('Remove')}
+            </button>
+          </div>
         </li>
       {/each}
     </ul>
@@ -224,7 +323,14 @@
 
   <!-- Create / overwrite -->
   <div class="gs-create" class:disabled={!isAdvancedMode}>
-    <h4>{$t('Add a generator')}</h4>
+    <h4>{editingId ? $t('Edit generator') : $t('Add a generator')}</h4>
+    {#if !editingId}
+      <p class="gs-help">
+        {$t(
+          'Create scaffolds a starter generateText script (with your options documented) that you can edit from the chapter editor’s file menu.'
+        )}
+      </p>
+    {/if}
     {#if !isAdvancedMode}
       <p class="advanced-mode-note">{$t('Advanced Mode required for extension management')}</p>
     {/if}
@@ -237,18 +343,6 @@
     <div class="gs-field">
       <label class="gs-label" for="gs-desc">{$t('Description')}</label>
       <input id="gs-desc" class="gs-input" bind:value={description} disabled={!isAdvancedMode} />
-    </div>
-
-    <div class="gs-field">
-      <label class="gs-label" for="gs-script">{$t('Script file')}</label>
-      <input
-        id="gs-script"
-        bind:this={fileInput}
-        type="file"
-        accept=".js"
-        onchange={onFileChange}
-        disabled={!isAdvancedMode}
-      />
     </div>
 
     <div class="gs-options">
@@ -335,13 +429,18 @@
     {/if}
 
     <div class="gs-actions">
+      {#if editingId}
+        <button type="button" class="gs-cancel" onclick={resetForm} disabled={saving}>
+          {$t('Cancel')}
+        </button>
+      {/if}
       <button
         type="button"
         class="gs-create-btn"
-        onclick={handleCreate}
+        onclick={handleSave}
         disabled={!isAdvancedMode || saving}
       >
-        {saving ? $t('Saving…') : $t('Create generator')}
+        {saving ? $t('Saving…') : editingId ? $t('Save changes') : $t('Create generator')}
       </button>
     </div>
   </div>
@@ -355,7 +454,8 @@
   }
 
   .gs-intro,
-  .gs-empty {
+  .gs-empty,
+  .gs-help {
     margin: 0;
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
@@ -458,15 +558,29 @@
     justify-content: space-between;
   }
 
+  /* Wrappable row so the fields stay inside the form container at any width. */
   .gs-option-row {
-    display: grid;
-    grid-template-columns: 7rem 1fr 1fr 1fr auto;
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--space-2);
     align-items: center;
   }
 
+  .gs-option-row .gs-input {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+
   .gs-type {
-    width: 100%;
+    flex: 0 0 7rem;
+  }
+
+  .gs-option-row .gs-check {
+    flex: 1 1 8rem;
+  }
+
+  .gs-option-row .gs-remove-row {
+    flex: 0 0 auto;
   }
 
   .gs-check {
@@ -502,8 +616,27 @@
     line-height: 1;
   }
 
+  .gs-item-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .gs-edit,
+  .gs-cancel {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-link);
+    background: none;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
   .gs-remove:disabled,
   .gs-add:disabled,
+  .gs-edit:disabled,
+  .gs-cancel:disabled,
   .gs-create-btn:disabled {
     opacity: 0.6;
     cursor: default;
