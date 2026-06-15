@@ -498,6 +498,10 @@ msgstr "Geprüft:"
 msgid "Checking…"
 msgstr "Wird geprüft…"
 
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Choose a generator"
+msgstr "Generator auswählen"
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Clear filter"
 msgstr "Filter löschen"
@@ -1153,8 +1157,14 @@ msgid "Generating navigation from chapters..."
 msgstr "Navigation wird aus Kapiteln erzeugt..."
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generating…"
 msgstr "Wird erzeugt…"
+
+#: src/lib/components/spine/EditorPane.svelte
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Generators"
+msgstr "Generatoren"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Get Started"
@@ -1183,6 +1193,10 @@ msgstr "Gefahren"
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Hide Audio Clip Editor"
 msgstr "Audioclip-Editor ausblenden"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Hide Generators"
+msgstr "Generatoren ausblenden"
 
 #: src/lib/Sidebar.svelte
 msgid "Hide project sections"
@@ -1266,6 +1280,10 @@ msgstr "Transformations-Engine wird initialisiert..."
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
 msgstr "Wird initialisiert..."
+
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Insert at cursor"
+msgstr "An Cursor einfügen"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Insert Clip Directive"
@@ -2247,6 +2265,10 @@ msgstr "Audioclip-Editor anzeigen"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show generated source"
 msgstr "Generierten Quelltext anzeigen"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show Generators"
+msgstr "Generatoren anzeigen"
 
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"

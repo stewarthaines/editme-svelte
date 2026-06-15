@@ -11,6 +11,14 @@
   import type { SpineItemWithSource } from '../../spine/types';
   import { readChapterMeta, writeChapterMeta } from '../../spine/chapter-metadata.js';
   import EditorPane from '../../components/spine/EditorPane.svelte';
+  import {
+    listGenerators,
+    readGeneratorScript,
+    readGeneratorValues,
+    writeGeneratorValues,
+    type GeneratorRunner,
+    type InstalledGenerator,
+  } from '$lib/generators/generator-store.js';
   // import PreviewPane from '../../components/spine/PreviewPane.svelte';
   import {
     createSpinePreviewManager,
@@ -123,6 +131,39 @@
   let currentContent: CurrentContent = {
     text: '',
   };
+
+  // Generators available in this project (discovered from SOURCE/generators/).
+  let availableGenerators = $state<InstalledGenerator[]>([]);
+
+  /** Re-scan the project for generators (after services + workspace are ready). */
+  async function refreshGenerators(): Promise<void> {
+    if (!fileStorage || !workspace) {
+      availableGenerators = [];
+      return;
+    }
+    try {
+      availableGenerators = await listGenerators(fileStorage, workspace.id);
+    } catch {
+      availableGenerators = [];
+    }
+  }
+
+  // What the editor's generator panel needs — runs through the preview manager so the
+  // generator gets the same brokered file-access ctx as a transform. Null/empty hides
+  // the Generators control.
+  let generatorRunner = $derived<GeneratorRunner | null>(
+    availableGenerators.length > 0 && workspace && previewManager
+      ? {
+          generators: availableGenerators,
+          run: async (gen, options) => {
+            const script = await readGeneratorScript(fileStorage, workspace.id, gen);
+            return previewManager.runGenerator(script, options);
+          },
+          loadValues: id => readGeneratorValues(fileStorage, workspace.id, id),
+          saveValues: (id, values) => writeGeneratorValues(fileStorage, workspace.id, id, values),
+        }
+      : null
+  );
 
   // Available files for editor pane dropdowns
   let availableFiles: Array<{
@@ -578,6 +619,9 @@
         // Existing preview manager - switch spine context
         await previewManager.switchToSpineItem(selectedItem.idref, selectedItem);
       }
+
+      // Discover the project's generators (for the editor's Generators panel).
+      await refreshGenerators();
 
       // Update current content reference
       currentContent = previewManager.getCurrentContent();
@@ -1410,6 +1454,7 @@
       {audioClipService}
       {workspaceService}
       {settingsService}
+      {generatorRunner}
     />
   </div>
 {:else}

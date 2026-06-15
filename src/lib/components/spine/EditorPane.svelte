@@ -23,6 +23,8 @@
   } from '$lib/services/workspace/workspace.service.js';
   import type { SettingsService } from '$lib/services/settings/settings.service.js';
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
+  import GeneratorPanel from '$lib/components/spine/GeneratorPanel.svelte';
+  import type { GeneratorRunner } from '$lib/generators/generator-store.js';
   import { t } from '$lib/i18n';
 
   // Props using Svelte 5 runes syntax
@@ -51,6 +53,7 @@
     chapterTitle = '',
     chapterTitlePlaceholder = '',
     onChapterTitleChange,
+    generatorRunner = null,
   }: {
     transformError?: TransformError | null;
     transformWarnings?: string[];
@@ -90,6 +93,8 @@
     /** Placeholder shown when no title is set — the spine item id it falls back to. */
     chapterTitlePlaceholder?: string;
     onChapterTitleChange?: (title: string) => void;
+    /** Available generators + how to run them; null/empty hides the Generators control. */
+    generatorRunner?: GeneratorRunner | null;
   } = $props();
 
   /**
@@ -104,6 +109,13 @@
    */
   function toggleAudioEditor(): void {
     audioEditorVisible = !audioEditorVisible;
+  }
+
+  /**
+   * Toggle the generators panel visibility
+   */
+  function toggleGeneratorPanel(): void {
+    generatorPanelVisible = !generatorPanelVisible;
   }
 
   /**
@@ -265,6 +277,15 @@
   // Audio clip editor state
   let audioEditorVisible = $state<boolean>(false);
   let textareaSelection = $state<{ start: number; end: number } | null>(null);
+
+  // Generators panel state
+  let generatorPanelVisible = $state<boolean>(false);
+  let hasGenerators = $derived(!!generatorRunner && generatorRunner.generators.length > 0);
+  // A text source pane is active (so inserting at the caret makes sense).
+  let textPaneActive = $derived(
+    (pane1SelectedFile === 'text' && editorMode === 'single') ||
+      (editorMode === 'dual' && (pane1SelectedFile === 'text' || pane2SelectedFile === 'text'))
+  );
 
   // Check if workspace has audio files (derived reactive)
   let hasAudioFiles = $derived(
@@ -521,8 +542,27 @@
           {$t('Audio Clip Editor')}
         </button>
       {/if}
+
+      {#if textPaneActive && hasGenerators}
+        <button
+          type="button"
+          class="generator-toggle-btn"
+          class:active={generatorPanelVisible}
+          onclick={toggleGeneratorPanel}
+          title={generatorPanelVisible ? $t('Hide Generators') : $t('Show Generators')}
+          aria-label={generatorPanelVisible ? $t('Hide Generators') : $t('Show Generators')}
+        >
+          {$t('Generators')}
+        </button>
+      {/if}
     </div>
   </div>
+
+  {#if generatorPanelVisible && generatorRunner && hasGenerators && textPaneActive}
+    <div class="generator-editor-panel">
+      <GeneratorPanel runner={generatorRunner} onInsert={insertClipDirective} />
+    </div>
+  {/if}
 
   <!-- Stacked editor panes -->
   <div class="editor-content">
@@ -825,6 +865,46 @@
 
   .audio-editor-panel {
     border-top: 1px solid var(--color-border-default);
+  }
+
+  /* The Generators toggle shares the toolbar button look; the panel itself
+     (GeneratorPanel) carries its own, fresher styling. */
+  .generator-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+    white-space: nowrap;
+  }
+
+  .generator-toggle-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-accent-primary);
+  }
+
+  .generator-toggle-btn:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .generator-toggle-btn.active {
+    background: var(--color-accent-primary);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent-primary);
+  }
+
+  .generator-editor-panel {
+    padding: var(--space-3);
+    border-top: 1px solid var(--color-border-default);
+    background: var(--color-bg-primary);
   }
 
   .textarea-container {

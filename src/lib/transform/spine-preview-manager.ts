@@ -158,6 +158,30 @@ export class SpinePreviewManager {
   }
 
   /**
+   * Run a generator on demand and return the produced source text (to insert at the
+   * editor caret). Supplies the same brokered file-access context as a transform run
+   * (workspace manifest + base path), scoped to the active chapter via spineItemId.
+   */
+  async runGenerator(script: string, options: Record<string, unknown>): Promise<string> {
+    let brokerContext: { basePath: string; manifest: ManifestItem[] } | undefined;
+    try {
+      const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
+      brokerContext = {
+        basePath: workspace.pathInfo.basePath,
+        manifest: workspace.opf.manifest,
+      };
+    } catch {
+      brokerContext = undefined;
+    }
+    return this.transformPipeline.executeGenerator(
+      script,
+      options,
+      this.spineItemId,
+      brokerContext
+    );
+  }
+
+  /**
    * Debounced rendering (300ms like the spike)
    */
   private debounceRender(): void {

@@ -61,6 +61,35 @@ export class SpineTransformPipeline {
   }
 
   /**
+   * Run a generator on demand and return the produced source text. The generator is
+   * a project-wide producer: it reads via the brokered ctx (manifest + SOURCE) and an
+   * `options` object, and returns text to insert at the editor caret. `idref` tells it
+   * which chapter it was invoked in. Extension globals (e.g. djot) are already loaded
+   * in the engine from the workspace switch, so no transform scripts are set here.
+   */
+  async executeGenerator(
+    script: string,
+    options: Record<string, unknown>,
+    idref?: string,
+    brokerContext?: Omit<TransformBrokerContext, 'workspaceId'>,
+    timeout = 5000
+  ): Promise<string> {
+    const context: TransformBrokerContext = {
+      workspaceId: this.workspaceId,
+      basePath: brokerContext?.basePath ?? '',
+      manifest: brokerContext?.manifest ?? [],
+    };
+    const result = await this.transformEngine.executeGenerator(
+      script,
+      options,
+      context,
+      idref,
+      timeout
+    );
+    return result.text;
+  }
+
+  /**
    * Read a transform script, retrying briefly. On a freshly downloaded/unpacked
    * EPUB the first preview can run before SOURCE/scripts has finished being
    * written; a short bounded retry lets the file appear instead of rendering

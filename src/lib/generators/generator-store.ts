@@ -28,6 +28,20 @@ export interface InstalledGenerator {
   scriptPath: string;
 }
 
+/**
+ * Everything the editor's generator panel needs, assembled by the spine view so the
+ * panel stays decoupled from storage + the transform engine.
+ */
+export interface GeneratorRunner {
+  generators: InstalledGenerator[];
+  /** Run a generator with the given option values → produced source text. */
+  run: (generator: InstalledGenerator, options: Record<string, unknown>) => Promise<string>;
+  /** Load the last-used option values for a generator (empty if none). */
+  loadValues: (id: string) => Promise<Record<string, unknown>>;
+  /** Persist the option values a user just ran with. */
+  saveValues: (id: string, values: Record<string, unknown>) => Promise<void>;
+}
+
 const MANIFEST_FILE = 'generator.json';
 const MANIFEST_SUFFIX = `/${MANIFEST_FILE}`;
 
@@ -97,6 +111,39 @@ export async function readGeneratorScript(
   generator: InstalledGenerator
 ): Promise<string> {
   return fileStorage.readTextFile(workspaceId, generator.scriptPath);
+}
+
+/**
+ * Last-used option values for a generator, so the invocation form pre-fills on next
+ * use. Stored under SOURCE/data/ (the conventional scratch area). Missing/unreadable
+ * → an empty object.
+ */
+export async function readGeneratorValues(
+  fileStorage: FileStorageAPI,
+  workspaceId: string,
+  id: string
+): Promise<Record<string, unknown>> {
+  try {
+    const text = await fileStorage.readTextFile(workspaceId, `SOURCE/data/generators/${id}.json`);
+    const parsed = JSON.parse(text);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Persist last-used option values for a generator (see readGeneratorValues). */
+export async function writeGeneratorValues(
+  fileStorage: FileStorageAPI,
+  workspaceId: string,
+  id: string,
+  values: Record<string, unknown>
+): Promise<void> {
+  await fileStorage.writeTextFile(
+    workspaceId,
+    `SOURCE/data/generators/${id}.json`,
+    JSON.stringify(values, null, 2)
+  );
 }
 
 /** Remove a generator directory and every file under it. */

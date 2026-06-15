@@ -153,13 +153,18 @@ export class TransformEngine {
       manifest: brokerContext.manifest,
     };
 
+    // Options often arrive as a Svelte $state proxy, which postMessage can't
+    // structured-clone (DataCloneError). The values are JSON-safe primitives, so a
+    // round-trip yields a plain, cloneable object.
+    const plainOptions = JSON.parse(JSON.stringify(options ?? {}));
+
     // The generator may await brokered file I/O, so allow the round-trip to outlast
     // the default — give it the generator timeout plus headroom (as executeTransform).
     const messageTimeout = Math.max(5000, timeout + 5000);
     try {
       return await this.sendMessage(
         'EXECUTE_GENERATOR',
-        { script, options, timeout, idref, transformCtx },
+        { script, options: plainOptions, timeout, idref, transformCtx },
         messageTimeout
       );
     } finally {

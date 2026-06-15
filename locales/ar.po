@@ -498,6 +498,10 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Choose a generator"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Clear filter"
 msgstr "🇸🇦 Clear filter"
@@ -1153,7 +1157,13 @@ msgid "Generating navigation from chapters..."
 msgstr ""
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generating…"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Generators"
 msgstr ""
 
 #: src/lib/navigation/views/WorkspaceView.svelte
@@ -1182,6 +1192,10 @@ msgstr ""
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Hide Audio Clip Editor"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Hide Generators"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
@@ -1265,6 +1279,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
+msgstr ""
+
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Insert at cursor"
 msgstr ""
 
 #: src/lib/components/audio/AudioClipEditor.svelte
@@ -2223,6 +2241,10 @@ msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show generated source"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show Generators"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
