@@ -24,6 +24,7 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/i18n';
   import type { AudioClipService, ClipData } from '$lib/audio/audio-clip.service.js';
   import type {
     WorkspaceService,
@@ -573,9 +574,9 @@
         class="audio-select"
         value={selectedAudioHref}
         onchange={handleAudioSelect}
-        aria-label="Select audio file"
+        aria-label={$t('Select audio file')}
       >
-        <option value="" disabled>Select audio...</option>
+        <option value="" disabled>{$t('Select audio...')}</option>
         {#each availableAudioFiles as file}
           <option value={file.href}>{file.id}</option>
         {/each}
@@ -595,13 +596,14 @@
         disabled={!audioDuration}
         oninput={handleRangeInput}
         onchange={handleRangeEnd}
-        aria-label="Approximate start position"
+        aria-label={$t('Approximate start position')}
       />
     </div>
 
     <!-- Start time controls group -->
     <div class="control-pair">
       <div class="control-group time-input-group">
+        <!-- i18n-ignore -->
         <input
           id="start-time"
           type="text"
@@ -611,7 +613,7 @@
           oninput={e => handleTimeInput('start', e)}
           onblur={e => handleTimeInput('start', e)}
           onkeydown={e => handleTimeKeydown('start', e)}
-          aria-label="Start time"
+          aria-label={$t('Start time')}
         />
       </div>
 
@@ -637,6 +639,7 @@
     <!-- Duration controls group -->
     <div class="control-pair">
       <div class="control-group time-input-group">
+        <!-- i18n-ignore -->
         <input
           id="duration"
           type="text"
@@ -646,7 +649,7 @@
           oninput={e => handleTimeInput('duration', e)}
           onblur={e => handleTimeInput('duration', e)}
           onkeydown={e => handleTimeKeydown('duration', e)}
-          aria-label="Duration"
+          aria-label={$t('Duration')}
         />
       </div>
 
@@ -676,7 +679,7 @@
           type="button"
           class="jog-btn"
           onclick={() => jogStartTime(-1)}
-          aria-label="Move start time back 1 second"
+          aria-label={$t('Move start time back 1 second')}
           title="-1s"
         >
           -1
@@ -685,7 +688,7 @@
           type="button"
           class="jog-btn"
           onclick={() => jogStartTime(-0.1)}
-          aria-label="Move start time back 0.1 seconds"
+          aria-label={$t('Move start time back 0.1 seconds')}
           title="-0.1s"
         >
           -0.1
@@ -694,7 +697,7 @@
           type="button"
           class="jog-btn"
           onclick={() => jogStartTime(0.1)}
-          aria-label="Move start time forward 0.1 seconds"
+          aria-label={$t('Move start time forward 0.1 seconds')}
           title="+0.1s"
         >
           +0.1
@@ -703,7 +706,7 @@
           type="button"
           class="jog-btn"
           onclick={() => jogStartTime(1)}
-          aria-label="Move start time forward 1 second"
+          aria-label={$t('Move start time forward 1 second')}
           title="+1s"
         >
           +1
@@ -717,8 +720,8 @@
       class="control-btn load-btn"
       disabled={!canLoadFromSelection}
       onclick={handleLoadFromSelection}
-      aria-label="Load clip data from selected text"
-      title="Load from Selection"
+      aria-label={$t('Load clip data from selected text')}
+      title={$t('Load from Selection')}
     >
       ↑
     </button>
@@ -729,8 +732,8 @@
       class="control-btn insert-btn primary-btn"
       disabled={!selectedAudioHref}
       onclick={handleInsertClip}
-      aria-label="Insert clip directive at cursor position"
-      title="Insert Clip Directive"
+      aria-label={$t('Insert clip directive at cursor position')}
+      title={$t('Insert Clip Directive')}
     >
       ➕
     </button>
@@ -742,9 +745,9 @@
         type="text"
         class="label-input"
         value={labelString}
-        placeholder="Optional label"
+        placeholder={$t('Optional label')}
         oninput={e => (labelString = (e.target as HTMLInputElement).value)}
-        aria-label="Clip label"
+        aria-label={$t('Clip label')}
       />
     </div>
   </div>
@@ -753,7 +756,7 @@
   {#if isLoading}
     <div class="loading-indicator">
       <div class="spinner"></div>
-      <span>Loading audio...</span>
+      <span>{$t('Loading audio...')}</span>
     </div>
   {/if}
 </div>

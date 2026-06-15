@@ -137,7 +137,7 @@
   </button>
 
   {#if showMoveButtons}
-    <div class="move-buttons" aria-label="Item controls">
+    <div class="move-buttons" aria-label={$t('Item controls')}>
       <button
         class="move-button"
         onclick={e => {
@@ -196,7 +196,7 @@
   {/if}
 
   {#if !compact && hasWarning}
-    <span class="error-indicator" aria-label="Validation error">⚠️</span>
+    <span class="error-indicator" aria-label={$t('Validation error')}>⚠️</span>
   {/if}
 </div>
 

@@ -713,7 +713,12 @@
     if (!currentWorkspaceState || pdfGenerating) return;
     pdfGenerating = true;
     try {
-      await exportPdf(currentWorkspaceState, fileStorage, workspaceService, appState?.epubSettings?.print);
+      await exportPdf(
+        currentWorkspaceState,
+        fileStorage,
+        workspaceService,
+        appState?.epubSettings?.print
+      );
     } catch (error) {
       console.error('PDF export failed:', error);
       if (appState) {
@@ -887,19 +892,19 @@
 
 {#if transformEngineError}
   <div class="error-state">
-    <h2>Transform Engine Failed</h2>
+    <h2>{$t('Transform Engine Failed')}</h2>
     <p>{transformEngineError}</p>
-    <p>Please refresh the page to try again.</p>
+    <p>{$t('Please refresh the page to try again.')}</p>
   </div>
 {:else if !transformEngineReady}
   <div class="loading-state">
     <div class="spinner"></div>
-    <p>Initializing transform engine...</p>
+    <p>{$t('Initializing transform engine...')}</p>
   </div>
 {:else if !appState}
   <div class="loading-state">
     <div class="spinner"></div>
-    <p>Initializing application...</p>
+    <p>{$t('Initializing application...')}</p>
   </div>
 {:else}
   <LayoutManager

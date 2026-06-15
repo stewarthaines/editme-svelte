@@ -1,6 +1,7 @@
 <script lang="ts">
   import { themeStore } from './stores/theme';
   import { Sun, Moon } from 'phosphor-svelte';
+  import { t } from '$lib/i18n';
 
   let {
     size = 'medium',
@@ -23,7 +24,7 @@
   class:theme-toggle--small={size === 'small'}
   class:theme-toggle--large={size === 'large'}
   onclick={handleToggle}
-  aria-label="Toggle theme"
+  aria-label={$t('Toggle theme')}
   title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
 >
   <span class="theme-toggle__icon" aria-hidden="true">

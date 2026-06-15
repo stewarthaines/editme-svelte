@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { t } from '$lib/i18n';
 
   // Component props
   let {
@@ -226,7 +227,7 @@
         bind:this={iframeElement}
         srcdoc={content}
         onload={handleIframeLoad}
-        title="Content Preview"
+        title={$t('Content Preview')}
       ></iframe>
     </div>
   </div>

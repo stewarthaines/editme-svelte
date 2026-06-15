@@ -385,9 +385,7 @@
     }
   })();
   let selectedDevice = $state(
-    restoredDevice && DEVICE_PRESETS.some(d => d.id === restoredDevice)
-      ? restoredDevice
-      : 'desktop'
+    restoredDevice && DEVICE_PRESETS.some(d => d.id === restoredDevice) ? restoredDevice : 'desktop'
   );
   let deviceOrientation = $state<'portrait' | 'landscape'>('portrait');
   let showSource = $state(false);
@@ -1096,22 +1094,22 @@
 
       <!-- Transform status (moved here from the editor pane header). -->
       {#if isTransforming}
-        <div class="status-indicator transforming" title="Transform in progress">
+        <div class="status-indicator transforming" title={$t('Transform in progress')}>
           <div class="status-spinner"></div>
-          <span>Transforming...</span>
+          <span>{$t('Transforming...')}</span>
         </div>
       {:else if transformError}
-        <div class="status-indicator error" title="Transform error">
+        <div class="status-indicator error" title={$t('Transform error')}>
           <span class="status-icon">⚠️</span>
-          <span>Error</span>
+          <span>{$t('Error')}</span>
         </div>
       {:else if transformWarnings.length > 0}
         <div class="status-indicator warning" title={`${transformWarnings.length} warnings`}>
           <span class="status-icon">⚠️</span>
-          <span>{transformWarnings.length} warnings</span>
+          <span>{transformWarnings.length} {$t('warnings')}</span>
         </div>
       {:else if xhtmlContent}
-        <div class="status-indicator success" title="Transform successful">
+        <div class="status-indicator success" title={$t('Transform successful')}>
           <span>{formatExecutionTime(executionTime)}</span>
         </div>
       {/if}
@@ -1142,7 +1140,7 @@
           onclick={toggleA11yPanel}
           disabled={!xhtmlContent}
           aria-pressed={a11yPanelOpen}
-          title="Accessibility check (axe-core) — re-runs as you edit while open"
+          title={$t('Accessibility check (axe-core) — re-runs as you edit while open')}
         >
           {a11yRunning ? 'Checking…' : 'Accessibility'}
           {#if !a11yRunning && a11yPanelOpen && a11yIssueCount !== null}
@@ -1160,7 +1158,7 @@
           class:active={validationPanelOpen}
           onclick={() => (validationPanelOpen = !validationPanelOpen)}
           aria-pressed={validationPanelOpen}
-          title="Validation report (epubcheck) for this chapter"
+          title={$t('Validation report (epubcheck) for this chapter')}
         >
           EpubCheck
           {#if validationChapterCount > 0}
@@ -1175,8 +1173,8 @@
           type="button"
           class="orientation-toggle"
           onclick={toggleOrientation}
-          title="Toggle orientation"
-          aria-label="Toggle device orientation"
+          title={$t('Toggle orientation')}
+          aria-label={$t('Toggle device orientation')}
         >
           {deviceOrientation === 'portrait' ? '▭' : '▯'}
         </button>
@@ -1206,7 +1204,7 @@
 
   <!-- Accessibility results panel (spike): plain-text violations, sorted by impact -->
   {#if a11yPanelOpen}
-    <div class="a11y-panel" role="region" aria-label="Accessibility issues">
+    <div class="a11y-panel" role="region" aria-label={$t('Accessibility issues')}>
       <div class="a11y-panel-header">
         <strong>
           {a11yViolations.length === 0
@@ -1217,8 +1215,8 @@
           type="button"
           class="a11y-panel-close"
           onclick={() => (a11yPanelOpen = false)}
-          aria-label="Close accessibility panel"
-          title="Close"
+          aria-label={$t('Close accessibility panel')}
+          title={$t('Close')}
         >
           ✕
         </button>
@@ -1233,8 +1231,11 @@
               <div class="a11y-detail">
                 <span class="a11y-help" title={v.description}>{v.help}</span>
                 <span class="a11y-meta">
-                  {v.nodes.length} element{v.nodes.length === 1 ? '' : 's'} ·
-                  <a href={v.helpUrl} target="_blank" rel="noopener noreferrer">learn more</a>
+                  {v.nodes.length}
+                  {$t('element')}{v.nodes.length === 1 ? '' : 's'} ·
+                  <a href={v.helpUrl} target="_blank" rel="noopener noreferrer"
+                    >{$t('learn more')}</a
+                  >
                 </span>
               </div>
             </li>
@@ -1281,12 +1282,12 @@
             {#if transformError}
               <div class="preview-error">
                 <div class="error-content">
-                  <h3>Transform Error</h3>
-                  <p><strong>Stage:</strong> {transformError.stage}</p>
-                  <p><strong>Message:</strong> {transformError.message}</p>
+                  <h3>{$t('Transform Error')}</h3>
+                  <p><strong>{$t('Stage:')}</strong> {transformError.stage}</p>
+                  <p><strong>{$t('Message:')}</strong> {transformError.message}</p>
                   {#if transformError.stack}
                     <details>
-                      <summary>Stack Trace</summary>
+                      <summary>{$t('Stack Trace')}</summary>
                       <pre class="error-stack">{transformError.stack}</pre>
                     </details>
                   {/if}
@@ -1296,15 +1297,15 @@
               <iframe
                 bind:this={previewIframe}
                 class="preview-iframe"
-                title="XHTML Preview"
+                title={$t('XHTML Preview')}
                 onload={handleIframeLoad}
               ></iframe>
             {:else}
               <div class="preview-empty">
                 <div class="empty-content">
                   <span class="empty-icon" aria-hidden="true">📝</span>
-                  <h3>No Content</h3>
-                  <p>Start typing in the editor to see your XHTML preview here.</p>
+                  <h3>{$t('No Content')}</h3>
+                  <p>{$t('Start typing in the editor to see your XHTML preview here.')}</p>
                 </div>
               </div>
             {/if}

@@ -492,6 +492,7 @@
 
     <div class="form-group">
       <label for="bucket">{$t('Bucket Name')}</label>
+      <!-- i18n-ignore -->
       <input
         id="bucket"
         type="text"
@@ -523,6 +524,7 @@
 
     <div class="form-group">
       <label for="region">{$t('Region (optional)')}</label>
+      <!-- i18n-ignore -->
       <input
         id="region"
         type="text"
@@ -543,6 +545,7 @@
 
     <div class="form-group">
       <label for="catalog-filename">{$t('Catalog Filename (optional)')}</label>
+      <!-- i18n-ignore -->
       <input
         id="catalog-filename"
         type="text"
@@ -739,7 +742,7 @@
       <input
         id="webdav-username"
         type="text"
-        placeholder="username"
+        placeholder={$t('username')}
         bind:value={form.username}
       />
     </div>
@@ -749,7 +752,7 @@
       <input
         id="webdav-password"
         type="password"
-        placeholder="password or app token"
+        placeholder={$t('password or app token')}
         bind:value={form.password}
       />
     </div>
@@ -768,6 +771,7 @@
       <label for="webdav-catalog-filename"
         >{$t('Catalog Filename (optional)')}</label
       >
+      <!-- i18n-ignore -->
       <input
         id="webdav-catalog-filename"
         type="text"

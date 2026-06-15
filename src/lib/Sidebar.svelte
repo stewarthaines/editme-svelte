@@ -185,7 +185,7 @@
     </button>
 
     {#if isExpanded}
-      <h2 class="sidebar-title">Simple EPUB Editor</h2>
+      <h2 class="sidebar-title">{$t('Simple EPUB Editor')}</h2>
       <div class="header-actions">
         <ThemeToggle size="small" showLabel={false} />
       </div>
@@ -222,7 +222,7 @@
                     {#if extensions.length > 0 || extensionsLoading}
                       <span class="workspace-extensions">
                         {#if extensionsLoading}
-                          Loading...
+                          {$t('Loading...')}
                         {:else}
                           {extensions.map(ext => ext.name).join(', ')}
                         {/if}

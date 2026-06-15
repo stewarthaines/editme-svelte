@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { t } from '$lib/i18n';
   import type { TextEditorStore } from '../../stores/index.js';
   import './outline-editor.css';
 
@@ -51,7 +52,7 @@
     value={currentContent}
     {placeholder}
     oninput={handleTextareaInput}
-    aria-label="Navigation content editor"
+    aria-label={$t('Navigation content editor')}
     aria-describedby="editor-help"
     spellcheck="false"
     aria-multiline="true"
@@ -59,7 +60,8 @@
 
   <!-- Hidden help text for screen readers -->
   <div id="editor-help" class="sr-only">
-    Enter navigation content in plain text. Leave empty to auto-generate from chapter titles. Press
-    Ctrl+Enter (Cmd+Enter on Mac) to save navigation content.
+    {$t(
+      'Enter navigation content in plain text. Leave empty to auto-generate from chapter titles. Press Ctrl+Enter (Cmd+Enter on Mac) to save navigation content.'
+    )}
   </div>
 </div>

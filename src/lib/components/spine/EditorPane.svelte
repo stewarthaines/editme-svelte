@@ -23,6 +23,7 @@
   } from '$lib/services/workspace/workspace.service.js';
   import type { SettingsService } from '$lib/services/settings/settings.service.js';
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
+  import { t } from '$lib/i18n';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -446,9 +447,9 @@
     class="file-selector"
     value={pane1SelectedFile}
     onchange={e => handleFileSelect(1, e)}
-    aria-label="Select file for pane 1"
+    aria-label={$t('Select file for pane 1')}
   >
-    <option value="" disabled>Select file...</option>
+    <option value="" disabled>{$t('Select file...')}</option>
     {#each availableFiles1 as file}
       <option value={file.value}>{file.label}</option>
     {/each}
@@ -464,8 +465,8 @@
     value={chapterTitle}
     placeholder={chapterTitlePlaceholder}
     onchange={e => onChapterTitleChange?.((e.currentTarget as HTMLInputElement).value)}
-    aria-label="Chapter title"
-    title="Chapter title — used in the content document <title>; defaults to the spine id"
+    aria-label={$t('Chapter title')}
+    title={$t('Chapter title — used in the content document <title>; defaults to the spine id')}
   />
 {/snippet}
 
@@ -515,7 +516,7 @@
           title={audioEditorVisible ? 'Hide Audio Clip Editor' : 'Show Audio Clip Editor'}
           aria-label={audioEditorVisible ? 'Hide Audio Clip Editor' : 'Show Audio Clip Editor'}
         >
-          Audio Clip Editor
+          {$t('Audio Clip Editor')}
         </button>
       {/if}
     </div>
@@ -533,9 +534,9 @@
                 class="file-selector"
                 value={pane2SelectedFile}
                 onchange={e => handleFileSelect(2, e)}
-                aria-label="Select file for pane 2"
+                aria-label={$t('Select file for pane 2')}
               >
-                <option value="" disabled>Select file...</option>
+                <option value="" disabled>{$t('Select file...')}</option>
                 {#each availableFiles2 as file}
                   <option value={file.value}>{file.label}</option>
                 {/each}
@@ -571,7 +572,7 @@
               spellcheck={pane2SelectedFile === 'text'}
               autocomplete="off"
               autocapitalize="off"
-              aria-label="Pane 2 content"
+              aria-label={$t('Pane 2 content')}
               dir={shouldUseLtrDirection(pane2SelectedFile) ? 'ltr' : undefined}
             ></textarea>
             {#if pane2Error}
@@ -613,7 +614,7 @@
             spellcheck={pane1SelectedFile === 'text'}
             autocomplete="off"
             autocapitalize="off"
-            aria-label="Pane 1 content"
+            aria-label={$t('Pane 1 content')}
             dir={shouldUseLtrDirection(pane1SelectedFile) ? 'ltr' : undefined}
           ></textarea>
           {#if pane1Error}
@@ -632,12 +633,12 @@
     <div class="error-display">
       <div class="error-header">
         <span class="error-icon" aria-hidden="true">🚨</span>
-        <strong>Transform Error ({transformError.stage})</strong>
+        <strong>{$t('Transform Error ({stage})', { stage: transformError.stage })}</strong>
       </div>
       <div class="error-message">{transformError.message}</div>
       {#if transformError.stack}
         <details class="error-stack">
-          <summary>Stack Trace</summary>
+          <summary>{$t('Stack Trace')}</summary>
           <pre>{transformError.stack}</pre>
         </details>
       {/if}
@@ -649,7 +650,7 @@
     <div class="warnings-display">
       <div class="warnings-header">
         <span class="warning-icon" aria-hidden="true">⚠️</span>
-        <strong>{transformWarnings.length} Warnings</strong>
+        <strong>{$t('{count} Warnings', { count: transformWarnings.length })}</strong>
       </div>
       <ul class="warnings-list">
         {#each transformWarnings as warning}

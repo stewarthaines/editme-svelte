@@ -11,6 +11,7 @@
 -->
 
 <script lang="ts">
+  import { t } from '$lib/i18n';
   import { SvelteSet } from 'svelte/reactivity';
   import {
     readAddressedIndices,
@@ -80,18 +81,19 @@
   }
 </script>
 
-<div class="vpanel" role="region" aria-label="Validation issues for this chapter">
+<div class="vpanel" role="region" aria-label={$t('Validation issues for this chapter')}>
   <div class="vpanel-header">
-    <strong>Validation</strong>
+    <strong>{$t('Validation')}</strong>
     <span class="vpanel-meta-inline">
-      {report.filename} · validated {validatedAgo(report.timestamp)}
+      {report.filename}
+      {$t('· validated {ago}', { ago: validatedAgo(report.timestamp) })}
     </span>
     <button
       type="button"
       class="vpanel-close"
       onclick={() => onClose?.()}
-      aria-label="Close validation panel"
-      title="Close"
+      aria-label={$t('Close validation panel')}
+      title={$t('Close')}
     >
       ✕
     </button>
@@ -99,14 +101,16 @@
 
   <div class="vpanel-body">
     <div class="vpanel-section-head">
-      <strong>This chapter</strong>
+      <strong>{$t('This chapter')}</strong>
       {#if thisChapter.length > 0}
-        <span class="vpanel-progress">{addressed}/{thisChapter.length} addressed</span>
+        <span class="vpanel-progress"
+          >{$t('{done}/{total} addressed', { done: addressed, total: thisChapter.length })}</span
+        >
       {/if}
     </div>
 
     {#if thisChapter.length === 0}
-      <p class="vpanel-empty">No validation issues in this chapter.</p>
+      <p class="vpanel-empty">{$t('No validation issues in this chapter.')}</p>
     {:else}
       <ul class="vpanel-list">
         {#each thisChapter as { msg, index } (index)}
@@ -132,7 +136,7 @@
 
     {#if others.length > 0}
       <div class="vpanel-section-head">
-        <strong>Other chapters with issues</strong>
+        <strong>{$t('Other chapters with issues')}</strong>
       </div>
       <ul class="vpanel-others">
         {#each others as c (c.chapterId)}

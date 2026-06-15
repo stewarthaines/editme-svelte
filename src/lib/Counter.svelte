@@ -6,5 +6,6 @@
 </script>
 
 <button onclick={increment}>
+  <!-- i18n-ignore: starter demo component -->
   count is {count}
 </button>

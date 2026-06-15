@@ -238,21 +238,21 @@ async function extractStrings() {
     // Use regex to find translation patterns in Svelte templates
     const patterns = [
       // Match {$t('text')} patterns (template expressions)
-      /\{\s*\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /\{\s*\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match {t('text')} patterns (template expressions)
-      /\{\s*t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /\{\s*t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match $t('text') patterns in attributes (but not import statements)
-      /(?:=\s*|\{\s*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /(?:=\s*|\{\s*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match t('text') patterns in attributes (but not import statements)
-      /(?:=\s*|\{\s*)t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /(?:=\s*|\{\s*)t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match {_('text')} patterns
-      /\{\s*_\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /\{\s*_\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match {translate('text')} patterns
-      /\{\s*translate\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /\{\s*translate\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match $t('text') patterns in JavaScript contexts (not in imports or strings)
-      /(?<!import\s+.*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /(?<!import\s+.*)\$t\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
       // Match t('text') patterns in JavaScript contexts (not in imports or strings)
-      /(?<!import\s+.*)\bt\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*\)/g,
+      /(?<!import\s+.*)\bt\s*\(\s*(["'])((?:\\.|(?!\1).)*?)\1\s*[,)]/g,
     ];
 
     // Function to filter out non-translatable strings

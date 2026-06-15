@@ -408,7 +408,7 @@
 <div
   class="outline-view"
   role="group"
-  aria-label="Navigation editor"
+  aria-label={$t('Navigation editor')}
   onkeydown={handleKeyboardSave}
 >
   <!-- Screen reader announcements -->
@@ -433,7 +433,7 @@
   {:else}
     <OutlineEditor
       editorStore={outlineStore}
-      placeholder="Navigation content will be auto-generated from your chapters..."
+      placeholder={$t('Navigation content will be auto-generated from your chapters...')}
       onContentChanged={handleEditorContentChanged}
     />
   {/if}
