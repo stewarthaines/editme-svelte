@@ -11,6 +11,7 @@
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
   import type { TransformEngine } from '../../infrastructure/transform-engine.js';
   import ExtensionItem from '../../components/extensions/ExtensionItem.svelte';
+  import GeneratorSettings from '../../components/settings/GeneratorSettings.svelte';
   import PaneHeader from '../../components/layout/PaneHeader.svelte';
   import {
     addTransform,
@@ -994,6 +995,15 @@
                   </ul>
                 {/if}
               </section>
+
+              <!-- Generator Management -->
+              {#if workspaceId}
+                <GeneratorSettings
+                  {workspaceId}
+                  {isAdvancedMode}
+                  onChanged={() => onSettingsChanged?.()}
+                />
+              {/if}
             {:else if loading}
               <p class="loading-message">{$t('Loading settings…')}</p>
             {:else}

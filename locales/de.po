@@ -101,6 +101,18 @@ msgstr "← Zurück"
 msgid "1 day ago"
 msgstr "vor 1 Tag"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "A generator is a script (exporting generateText(ctx, options)) that produces source text to insert at the editor caret."
+msgstr "Ein Generator ist ein Skript (das generateText(ctx, options) exportiert), das Quelltext erzeugt, der an der Cursorposition im Editor eingefügt wird."
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "A name is required."
+msgstr "Ein Name ist erforderlich."
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "A script file is required."
+msgstr "Eine Skriptdatei ist erforderlich."
+
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "About"
@@ -231,6 +243,10 @@ msgstr "DOM-Transformation hinzufügen"
 msgid "Add a DOM transform…"
 msgstr "DOM-Transformation hinzufügen…"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Add a generator"
+msgstr "Generator hinzufügen"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add a library and its suggested DOM transform to the current project; then enable the transform under Project Settings."
 msgstr "Fügen Sie dem aktuellen Projekt eine Bibliothek und ihre vorgeschlagene DOM-Transformation hinzu; aktivieren Sie die Transformation anschließend unter den Projekteinstellungen."
@@ -262,6 +278,10 @@ msgstr "Weiteren Titel hinzufügen"
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Add Language"
 msgstr "Sprache hinzufügen"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Add option"
+msgstr "Option hinzufügen"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Add Remote"
@@ -315,6 +335,7 @@ msgstr "Erweitert"
 msgid "Advanced Mode"
 msgstr "Erweiterter Modus"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced Mode required for extension management"
 msgstr "Für die Erweiterungsverwaltung ist der erweiterte Modus erforderlich"
@@ -490,6 +511,10 @@ msgstr "Kapiteltitel – wird im <title> des Inhaltsdokuments verwendet; Standar
 msgid "Chapters"
 msgstr "Kapitel"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Checkbox"
+msgstr "Kontrollkästchen"
+
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Checked:"
 msgstr "Geprüft:"
@@ -497,6 +522,10 @@ msgstr "Geprüft:"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Checking…"
 msgstr "Wird geprüft…"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Choices"
+msgstr "Auswahlmöglichkeiten"
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Choose a generator"
@@ -672,6 +701,10 @@ msgstr "Ein neues minimales EPUB-Projekt erstellen"
 msgid "Create an EPUB Now"
 msgstr "Jetzt ein EPUB erstellen"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Create generator"
+msgstr "Generator erstellen"
+
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Create New"
 msgstr "Neu erstellen"
@@ -731,9 +764,18 @@ msgid "Dark text on a light cover"
 msgstr "Dunkler Text auf hellem Cover"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Default"
 msgstr "Standard"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Default on"
+msgstr "Standardmäßig aktiviert"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Default value"
+msgstr "Standardwert"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
@@ -780,6 +822,7 @@ msgstr "Demo-Steuerung"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -820,6 +863,10 @@ msgstr "Dropbox-App-Schlüssel nicht konfiguriert"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox authorization failed: {error}"
 msgstr "Dropbox-Autorisierung fehlgeschlagen: {error}"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Dropdown"
+msgstr "Auswahlliste"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
@@ -1161,6 +1208,7 @@ msgstr "Navigation wird aus Kapiteln erzeugt..."
 msgid "Generating…"
 msgstr "Wird erzeugt…"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generators"
@@ -1333,6 +1381,14 @@ msgstr "Element-Steuerung"
 msgid "Just now"
 msgstr "Gerade eben"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Key"
+msgstr "Schlüssel"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Label"
+msgstr "Beschriftung"
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Landscape"
@@ -1453,6 +1509,7 @@ msgid "Loading..."
 msgstr "Wird geladen..."
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Loading…"
@@ -1552,6 +1609,7 @@ msgstr "Nach oben"
 msgid "n/a"
 msgstr "k. A."
 
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Name"
 msgstr "Name"
@@ -1626,6 +1684,10 @@ msgstr "In diesem Feed wurden keine EPUBs gefunden."
 msgid "No extensions installed."
 msgstr "Keine Erweiterungen installiert."
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "No generators defined."
+msgstr "Keine Generatoren definiert."
+
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "No issues"
 msgstr "Keine Probleme"
@@ -1699,6 +1761,10 @@ msgstr "Nicht angegeben"
 msgid "Not validated"
 msgstr "Nicht validiert"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Number"
+msgstr "Zahl"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
 msgstr "Öffnen Sie ein Projekt, um Erweiterungen hinzuzufügen"
@@ -1719,6 +1785,18 @@ msgstr "Dieses Kapitel im Editor öffnen"
 msgid "OPF source preview"
 msgstr "OPF-Quellvorschau"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Option key"
+msgstr "Optionsschlüssel"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Option label"
+msgstr "Optionsbeschriftung"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Option type"
+msgstr "Optionstyp"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Optional features available when the app is served over HTTP."
 msgstr "Optionale Funktionen, die verfügbar sind, wenn die App über HTTP bereitgestellt wird."
@@ -1726,6 +1804,10 @@ msgstr "Optionale Funktionen, die verfügbar sind, wenn die App über HTTP berei
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Optional label"
 msgstr "Optionale Bezeichnung"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Options"
+msgstr "Optionen"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Orientation"
@@ -1992,6 +2074,7 @@ msgstr "Remote:"
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 #: src/lib/components/metadata/IdentifierEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Remove"
@@ -2000,6 +2083,10 @@ msgstr "Entfernen"
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Remove language"
 msgstr "Sprache entfernen"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Remove option"
+msgstr "Option entfernen"
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 msgid "Remove role"
@@ -2152,6 +2239,14 @@ msgstr "Gespeicherte Feeds"
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Saved feeds…"
 msgstr "Gespeicherte Feeds…"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Saving…"
+msgstr "Wird gespeichert…"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Script file"
+msgstr "Skriptdatei"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Scripts run top-to-bottom over the generated DOM, each applied to the previous one’s output."
@@ -2416,6 +2511,10 @@ msgstr "Vorlage für den Dateinamen des exportierten .epub. Verwenden Sie Platzh
 msgid "Term (e.g. FIC028000)"
 msgstr "Begriff (z. B. FIC028000)"
 
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "Text"
+msgstr "Text"
+
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Text Content"
 msgstr "Textinhalt"
@@ -2645,6 +2744,10 @@ msgstr "Validierungsbericht: {filename}"
 #: src/lib/components/metadata/MetadataTab.svelte
 msgid "validation.errorsCount"
 msgstr "{count} Fehler"
+
+#: src/lib/components/settings/GeneratorSettings.svelte
+msgid "value:Label, value:Label"
+msgstr "Wert:Beschriftung, Wert:Beschriftung"
 
 #: src/App.svelte
 msgid "View type"
