@@ -282,6 +282,66 @@ ${inject}</body>
 }
 
 /**
+ * Open the top-level print window synchronously — must be called inside the click
+ * gesture so it isn't blocked as a pop-up. We paginate in this window and give it a
+ * "Save as PDF" button the user taps, rather than a hidden iframe we print for them:
+ * a parent printing a child iframe fails on Android, and a programmatic print() fails
+ * on Android Chrome too — a user-driven tap is the one path that works everywhere.
+ * Shows a placeholder while the caller builds the document. Throws if blocked.
+ */
+function openPdfWindow(): Window {
+  const win = window.open('', '_blank');
+  if (!win) {
+    throw new Error('Could not open the print window. Allow pop-ups for this site to save as PDF.');
+  }
+  win.document.write(
+    '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Preparing…</title></head>' +
+      '<body style="font:16px system-ui,sans-serif;color:#444;padding:2rem">Preparing your PDF…</body></html>'
+  );
+  return win;
+}
+
+/**
+ * Resolve the document's OPFS-relative assets to blob URLs and write it into the
+ * already-open print window. The window is same-origin with this opener (about:blank
+ * inherits our origin), so it can load our blob URLs. Hands off: keeps the blob URLs
+ * alive until the user closes the print window (detached watcher), so the app isn't
+ * blocked and the user can print/retry until they close it. Shared by the full-book
+ * and per-chapter exports. On a pre-hand-off error the blobs are freed and the error
+ * propagates (the caller closes the window).
+ */
+async function writePaginatedDocument(
+  win: Window,
+  master: string,
+  ctx: { fileStorage: FileStorageAPI; basePath: string; workspaceId: string }
+): Promise<void> {
+  let blobManager: BlobURLManager | undefined = new BlobURLManager({
+    fileStorage: ctx.fileStorage,
+    basePath: ctx.basePath,
+    maxBlobURLs: 2000,
+  });
+  blobManager.setActiveWorkspace(ctx.workspaceId);
+  try {
+    const finalDoc = await blobManager.processXHTMLForPreview(master);
+    const manager = blobManager;
+    blobManager = undefined; // ownership passes to the close-watcher below
+    win.document.open();
+    win.document.write(finalDoc);
+    win.document.close();
+    const poll = setInterval(() => {
+      if (win.closed) {
+        clearInterval(poll);
+        manager.cleanup();
+      }
+    }, 1000);
+  } finally {
+    // Only fires on the error path; a successful hand-off transfers ownership of the
+    // blob URLs to the close-watcher (blobManager is undefined by then).
+    blobManager?.cleanup();
+  }
+}
+
+/**
  * Build the combined, paginated document and trigger the print → Save as PDF
  * flow. Resolves once the print dialog has been dismissed.
  */
@@ -291,22 +351,7 @@ export async function exportPdf(
   workspaceService: WorkspaceService,
   print?: PrintSettings
 ): Promise<void> {
-  // Open the print window synchronously — inside the click gesture, so it isn't
-  // blocked as a pop-up. We paginate in this top-level window and give it a
-  // "Save as PDF" button the user taps to print, rather than a hidden iframe we
-  // print for them: a parent printing a child iframe fails on Android, and a
-  // programmatic print() fails on Android Chrome too — a user-driven tap is the
-  // one path that works everywhere. Show a placeholder while we build the document.
-  const win = window.open('', '_blank');
-  if (!win) {
-    throw new Error('Could not open the print window. Allow pop-ups for this site to save as PDF.');
-  }
-  win.document.write(
-    '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Preparing…</title></head>' +
-      '<body style="font:16px system-ui,sans-serif;color:#444;padding:2rem">Preparing your PDF…</body></html>'
-  );
-
-  let blobManager: BlobURLManager | undefined;
+  const win = openPdfWindow();
   try {
     const chapters = await workspaceService.loadAllLinearChapterContents(workspace);
     if (chapters.length === 0) throw new Error('No chapters to export.');
@@ -345,34 +390,11 @@ export async function exportPdf(
       afterMode: 'print-button',
     });
 
-    // Resolve OPFS-relative assets (images, stylesheets, fonts) to blob URLs so they
-    // render in the print window. It's same-origin with this opener (about:blank
-    // inherits our origin), so it can load our blob URLs — as the old iframe did.
-    blobManager = new BlobURLManager({
+    await writePaginatedDocument(win, master, {
       fileStorage,
       basePath: workspace.pathInfo.basePath,
-      maxBlobURLs: 2000,
+      workspaceId: workspace.id,
     });
-    blobManager.setActiveWorkspace(workspace.id);
-    const finalDoc = await blobManager.processXHTMLForPreview(master);
-
-    // Write the paginated document into the window. Paged.js paginates it and the
-    // window shows its own "Save as PDF" button; the user taps it to print. Hand
-    // off here — keep the asset blob URLs alive until the user closes the print
-    // window, then revoke them. This watcher runs detached so the app's "Preparing"
-    // state clears now rather than blocking while the print window stays open. The
-    // user can print/retry as many times as they like until they close it.
-    const manager = blobManager;
-    blobManager = undefined; // ownership passes to the close-watcher below
-    win.document.open();
-    win.document.write(finalDoc);
-    win.document.close();
-    const poll = setInterval(() => {
-      if (win.closed) {
-        clearInterval(poll);
-        manager.cleanup();
-      }
-    }, 1000);
   } catch (error) {
     try {
       win.close();
@@ -380,9 +402,52 @@ export async function exportPdf(
       // window already gone
     }
     throw error;
-  } finally {
-    // Only fires on the error path; a successful hand-off transfers ownership of the
-    // blob URLs to the close-watcher (blobManager is undefined by then).
-    blobManager?.cleanup();
+  }
+}
+
+/**
+ * Build a single chapter's paginated document and open the same "Save as PDF" window
+ * as the full export — just this chapter, no cover. Page size / margin / page numbers
+ * honour the project's print settings. Backs the spine preview's per-chapter
+ * "Chapter PDF" footer. Must be invoked synchronously from a click (it opens the window).
+ */
+export async function exportChapterPdf(
+  workspace: WorkspaceState,
+  fileStorage: FileStorageAPI,
+  workspaceService: WorkspaceService,
+  chapterId: string,
+  print?: PrintSettings
+): Promise<void> {
+  const win = openPdfWindow();
+  try {
+    const [chapter] = await workspaceService.loadChapterContents(workspace, [chapterId]);
+    if (!chapter) throw new Error('Chapter not found.');
+    const wrapped = chapterToSection(chapter.xhtmlContent);
+    if (!wrapped) throw new Error('No readable chapter content.');
+
+    // Suggested PDF filename: book title + chapter id (no cover for a single chapter).
+    const meta = workspace.opf.metadata;
+    const docTitle = [meta.title?.trim() || 'Book', chapterId].filter(Boolean).join(' - ');
+
+    const master = buildPagedDocument([wrapped.section], {
+      title: docTitle,
+      stylesheetHrefs: wrapped.hrefs,
+      lang: wrapped.lang ?? meta.language?.[0],
+      print,
+      afterMode: 'print-button',
+    });
+
+    await writePaginatedDocument(win, master, {
+      fileStorage,
+      basePath: workspace.pathInfo.basePath,
+      workspaceId: workspace.id,
+    });
+  } catch (error) {
+    try {
+      win.close();
+    } catch {
+      // window already gone
+    }
+    throw error;
   }
 }

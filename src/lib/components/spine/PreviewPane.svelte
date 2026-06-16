@@ -26,7 +26,7 @@
   import { snippetAroundClick } from './preview-click.js';
   import { buildPagedDocument, chapterToSection, MARGIN_MM } from '$lib/pdf/pdf-export.js';
   import type { PrintSettings } from '$lib/services/settings/settings.service.js';
-  import { ArrowsClockwise } from 'phosphor-svelte';
+  import { ArrowsClockwise, FilePdf } from 'phosphor-svelte';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -40,6 +40,7 @@
     chapterId = null,
     printSettings = undefined,
     projectIdentifier = null,
+    onGeneratePdf = undefined,
   }: {
     xhtmlContent?: string;
     isTransforming?: boolean;
@@ -54,6 +55,9 @@
     chapterId?: string | null;
     /** Project print settings, applied to the Paged.js print preview's @page. */
     printSettings?: PrintSettings;
+    /** Generate a PDF of this one chapter. Provided only over http: (Paged.js needs
+     *  the origin); when set, the PDF device shows a "Chapter PDF" footer. */
+    onGeneratePdf?: (() => void) | undefined;
     /** Current project's package identifier (dc:identifier) — the epubcheck report
      *  is only surfaced when it was produced for this same project. */
     projectIdentifier?: string | null;
@@ -1317,6 +1321,18 @@
       </div>
     {/if}
   </div>
+
+  <!-- Per-chapter PDF: a footer (styled like the sidebar's EPUB/PDF footer) shown
+       when the PDF device is selected. The parent passes onGeneratePdf only over
+       http: (Paged.js needs the origin); opens a window with just this chapter. -->
+  {#if selectedDevice === 'print' && onGeneratePdf}
+    <div class="pdf-footer">
+      <button type="button" class="pdf-generate-button" onclick={() => onGeneratePdf?.()}>
+        <FilePdf size={18} aria-hidden="true" />
+        <span>{$t('Chapter PDF')}</span>
+      </button>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -1394,6 +1410,46 @@
 
   .a11y-count.clean {
     background: var(--color-success-text, #2e7d32);
+  }
+
+  /* Per-chapter PDF footer — mirrors the sidebar's EPUB/PDF footer
+     (.package-epub-section + the secondary .pdf-button), theme-aware via tokens. */
+  .pdf-footer {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-top: 1px solid var(--color-border-default);
+    background: var(--color-button-secondary-bg);
+  }
+
+  .pdf-generate-button {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 36px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+  }
+
+  .pdf-generate-button:hover {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+  }
+
+  .pdf-generate-button:focus-visible {
+    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
   }
 
   .a11y-panel {

@@ -55,7 +55,7 @@
     generateCoverPng,
     type CoverMode,
   } from './lib/epub/cover-generator.js';
-  import { exportPdf } from './lib/pdf/pdf-export.js';
+  import { exportPdf, exportChapterPdf } from './lib/pdf/pdf-export.js';
   import { writePublishSidecar } from './lib/services/publish/publish-sidecar.js';
 
   // Extension manager instance
@@ -741,6 +741,31 @@
     }
   };
 
+  // Generate a PDF of just the currently-previewed chapter (spine preview's PDF
+  // device banner). Same window/flow as the full export, minus the cover.
+  let chapterPdfGenerating = $state(false);
+  const handleGenerateChapterPdf = async () => {
+    const chapterId = spinePreviewData.spineItemId;
+    if (!currentWorkspaceState || !chapterId || chapterPdfGenerating) return;
+    chapterPdfGenerating = true;
+    try {
+      await exportChapterPdf(
+        currentWorkspaceState,
+        fileStorage,
+        workspaceService,
+        chapterId,
+        appState?.epubSettings?.print
+      );
+    } catch (error) {
+      console.error('Chapter PDF export failed:', error);
+      if (appState) {
+        appState.errorMessage = `PDF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    } finally {
+      chapterPdfGenerating = false;
+    }
+  };
+
   const handlePackageRequest = async (workspaceId: string) => {
     if (!currentWorkspaceState || isReadOnly) return;
 
@@ -1174,6 +1199,7 @@
             chapterId={spinePreviewData.spineItemId}
             printSettings={appState?.epubSettings?.print}
             projectIdentifier={currentWorkspaceState?.opf?.metadata?.identifier}
+            onGeneratePdf={canGeneratePdf ? handleGenerateChapterPdf : undefined}
           />
         {:else}
           <div class="placeholder-content">

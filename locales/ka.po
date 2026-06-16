@@ -524,6 +524,10 @@ msgstr ""
 msgid "Chapter Content"
 msgstr ""
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Chapter PDF"
+msgstr ""
+
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Chapter title"
 msgstr ""
@@ -1945,6 +1949,9 @@ msgid "Path"
 msgstr "🇬🇪 Path"
 
 #: src/App.svelte
+#: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/navigation/views/SettingsView.svelte
+#. Dropdown group label for the paginated PDF page preview
 msgid "PDF"
 msgstr ""
 
@@ -2028,7 +2035,6 @@ msgid "Preview Pane"
 msgstr "🇬🇪 Preview Pane"
 
 #: src/lib/components/spine/PreviewPane.svelte
-#: src/lib/navigation/views/SettingsView.svelte
 #. The paginated print-page preview option
 msgid "Print"
 msgstr ""
