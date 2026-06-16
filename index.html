@@ -5,9 +5,103 @@
     <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBQAAF/QA6OjoAKysrABwcH" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SEED.html</title>
+    <!--
+      Compatibility message styling. Plain, Safari-12-safe CSS only (no custom
+      properties / :is() / gap): this must render on browsers too old to run the
+      app. Hidden by default; the gate script below adds .compat-show on failure.
+    -->
+    <style>
+      #compat-warning { display: none; }
+      #compat-warning.compat-show {
+        display: block;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        margin: 0;
+        padding: 24px;
+        box-sizing: border-box;
+        overflow: auto;
+        background-color: #f7f7f7;
+        color: #1a1a1a;
+        font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+      }
+      #compat-warning .compat-inner {
+        max-width: 560px;
+        margin: 10vh auto 0 auto;
+        text-align: left;
+      }
+      #compat-warning h1 { font-size: 22px; margin: 0 0 12px 0; }
+      #compat-warning p { margin: 0 0 12px 0; }
+      #compat-warning ul { margin: 0 0 12px 20px; padding: 0; }
+      #compat-warning .compat-ua {
+        margin-top: 16px;
+        padding: 10px;
+        background-color: #ececec;
+        border-radius: 6px;
+        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+        font-size: 12px;
+        word-break: break-all;
+        color: #555;
+      }
+    </style>
   </head>
   <body>
+    <!--
+      Shown only when the gate script below detects a browser too old to run the
+      editor. Static English text (i18n isn't available before the app boots).
+    -->
+    <div id="compat-warning" role="alert" aria-live="assertive">
+      <div class="compat-inner">
+        <h1>This browser is too old for SEED.html</h1>
+        <p>
+          The SEED.html EPUB editor needs a recent browser. It relies on modern
+          JavaScript and the Compression Streams API to read, edit, and package
+          EPUB files, which this browser does not support.
+        </p>
+        <p>Please open SEED.html in one of the following:</p>
+        <ul>
+          <li>Safari on iOS or iPadOS 16.4 or newer (or macOS Safari 16.4+)</li>
+          <li>A recent version of Chrome, Edge, or Firefox</li>
+        </ul>
+        <p>Once you upgrade, reload this page to start editing.</p>
+        <div class="compat-ua">Detected browser: <span id="compat-ua"></span></div>
+      </div>
+    </div>
     <div id="app"></div>
+
+    <!--
+      Compatibility gate. CLASSIC script, ES5 only (var/function/typeof — no
+      let/const, arrow fns, optional chaining or template literals) so it parses on
+      Safari 12 (WebKit ~606). Classic scripts run synchronously during parse, while
+      the app's module script below is deferred and isolated: a SyntaxError in that
+      module (from the modern syntax it's built with) is reported separately and does
+      NOT stop this script. So on too-old browsers this still runs and shows the
+      message instead of a blank page.
+
+      The test is the app's true minimum capability — the Compression Streams API
+      (Safari/iOS 16.4+), used unconditionally for all EPUB zip handling. Browsers
+      that pass can run the editor; those that fail (incl. ones that mount but would
+      crash on the first EPUB) get one honest message up front.
+    -->
+    <script>
+      (function () {
+        var ua = (window.navigator && navigator.userAgent) || "";
+        var uaEl = document.getElementById("compat-ua");
+        if (uaEl) { uaEl.appendChild(document.createTextNode(ua)); }
+        var supported =
+          typeof window.CompressionStream !== "undefined" &&
+          typeof window.DecompressionStream !== "undefined";
+        if (!supported) {
+          var warn = document.getElementById("compat-warning");
+          var app = document.getElementById("app");
+          if (warn) { warn.className = "compat-show"; }
+          if (app) { app.style.display = "none"; }
+        }
+      })();
+    </script>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
