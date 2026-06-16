@@ -113,6 +113,21 @@ export const t = derived(
 );
 
 /**
+ * Reflect the active UI locale on the <html> element: the real `lang`/`dir`
+ * attributes (read by screen readers, hyphenation, `:lang()`, translation tools)
+ * plus the `data-*` hooks the stylesheets key off.
+ */
+function applyDocumentLocale(locale: string): void {
+  if (typeof document === 'undefined') return;
+  const el = document.documentElement;
+  const dir = isRTL(locale) ? 'rtl' : 'ltr';
+  el.lang = locale;
+  el.dir = dir;
+  el.setAttribute('data-dir', dir);
+  el.setAttribute('data-locale', locale);
+}
+
+/**
  * Initialize the i18n system
  */
 export async function initI18n(): Promise<void> {
@@ -144,11 +159,8 @@ export async function initI18n(): Promise<void> {
     const preferredLocale = getEnabledBrowserLocale();
     const initialLocale = catalogs[preferredLocale] ? preferredLocale : DEFAULT_LOCALE;
 
-    // Apply document direction using data attribute
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-dir', isRTL(initialLocale) ? 'rtl' : 'ltr');
-      document.documentElement.setAttribute('data-locale', initialLocale);
-    }
+    // Reflect the resolved locale on <html> (real lang/dir + data-* hooks).
+    applyDocumentLocale(initialLocale);
 
     i18nState.update(s => ({
       ...s,
@@ -161,6 +173,7 @@ export async function initI18n(): Promise<void> {
     console.error('Failed to initialize i18n:', error);
 
     // Fallback to English only
+    applyDocumentLocale(DEFAULT_LOCALE);
     i18nState.update(s => ({
       ...s,
       currentLocale: DEFAULT_LOCALE,
@@ -196,11 +209,8 @@ export async function setLocale(locale: string): Promise<void> {
     console.warn(`Translation catalog for ${locale} not loaded, falling back to English`);
   }
 
-  // Update document direction using data attribute
-  if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('data-dir', isRTL(locale) ? 'rtl' : 'ltr');
-    document.documentElement.setAttribute('data-locale', locale);
-  }
+  // Reflect the new locale on <html> (real lang/dir + data-* hooks).
+  applyDocumentLocale(locale);
 
   // Store preference
   if (typeof localStorage !== 'undefined') {

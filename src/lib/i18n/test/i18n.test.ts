@@ -215,6 +215,7 @@ describe('i18n runtime system', () => {
       await initI18n();
 
       expect(get(currentLocale)).toBe('en');
+      expect(globalThis.document?.documentElement.lang).toBe('en');
       expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
         'data-dir',
         'ltr'
@@ -258,6 +259,9 @@ describe('i18n runtime system', () => {
 
       expect(get(currentLocale)).toBe('de');
       expect(get(t)('Save')).toBe('Speichern');
+      // The real <html lang>/dir track the active UI locale, not just data-*.
+      expect(globalThis.document?.documentElement.lang).toBe('de');
+      expect(globalThis.document?.documentElement.dir).toBe('ltr');
     });
 
     it('should refuse to switch to a non-enabled locale and stay LTR', async () => {
