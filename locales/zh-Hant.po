@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-15\n"
-"PO-Revision-Date: 2026-06-15\n"
+"POT-Creation-Date: 2026-06-16\n"
+"PO-Revision-Date: 2026-06-16\n"
 "Language: zh-Hant\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -1795,6 +1795,10 @@ msgstr ""
 msgid "Open this chapter in the editor"
 msgstr ""
 
+#: src/lib/pdf/pdf-export.ts
+msgid "Opens your device's print dialog."
+msgstr ""
+
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "OPF source preview"
 msgstr ""
@@ -2220,6 +2224,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Save & Connect"
+msgstr ""
+
+#: src/lib/pdf/pdf-export.ts
+msgid "Save as PDF"
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte

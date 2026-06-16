@@ -5,10 +5,12 @@
  * Browser constraint: faithful @page pagination with selectable vector text is
  * only available via the browser's own renderer (window.print()); there is no
  * API to capture print output as a Blob. So this builds one document from the
- * chapters (in spine order), resolves OPFS assets to blob URLs, paginates it
- * with the vendored Paged.js polyfill in a hidden same-origin iframe, then
- * prints that iframe. HTTP-only (Paged.js is fetched from the app origin), like
- * the axe-core a11y check.
+ * chapters (in spine order), resolves OPFS assets to blob URLs, and opens it in a
+ * new same-origin window that paginates with the vendored Paged.js polyfill and
+ * offers a "Save as PDF" button the user taps to print. (A child iframe can't be
+ * printed reliably on Android, and a programmatic print() fails on Android Chrome,
+ * so the user's tap drives it.) HTTP-only (Paged.js is fetched from the app
+ * origin), like the axe-core a11y check.
  */
 
 import { BlobURLManager } from '../blob-url/blob-url-manager.js';
@@ -19,6 +21,7 @@ import type {
 } from '../services/workspace/workspace.service.js';
 import type { PrintSettings } from '../services/settings/settings.service.js';
 import type { ManifestItem } from '../epub/opf-utils.js';
+import { translate } from '../i18n/index.js';
 import printCss from '../../assets/universal/print.css?raw';
 
 function xmlEscape(s: string): string {
@@ -105,6 +108,35 @@ html { background: #f0f0f0; }
 }`;
 
 /**
+ * Screen-only chrome for the PDF export window: a fixed bar with the "Save as PDF"
+ * button the user taps to print. Hidden in `@media print` so it never appears in
+ * the output, and the body is padded down so the bar doesn't cover the first page.
+ * Colours are hard-coded — this standalone window has no app CSS variables.
+ */
+const PRINT_TOOLBAR_CSS = `
+@media screen {
+  body { padding-top: 56px; }
+  .pdf-export-bar {
+    position: fixed; inset: 0 0 auto 0; z-index: 2147483647;
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 16px; box-sizing: border-box;
+    background: #1a1a1a; color: #fff;
+    font: 14px system-ui, -apple-system, sans-serif;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+  .pdf-export-btn {
+    font: inherit; font-weight: 600;
+    padding: 8px 18px; border: 0; border-radius: 6px;
+    background: #2563eb; color: #fff; cursor: pointer;
+  }
+  .pdf-export-btn:active { background: #1d4ed8; }
+  .pdf-export-hint { opacity: 0.85; }
+}
+@media print {
+  .pdf-export-bar { display: none !important; }
+}`;
+
+/**
  * Parse one chapter's XHTML and return its `<body>` inner serialized inside a
  * `<section class="pdf-chapter">` (so it starts on a fresh page under print.css),
  * plus the stylesheet hrefs the chapter links and the source `<html>` language
@@ -164,6 +196,16 @@ export function buildPagedDocument(
     print?: PrintSettings;
     /** Add the on-screen page drop-shadow chrome (in-app preview only, not export). */
     previewChrome?: boolean;
+    /**
+     * What the document does once Paged.js finishes:
+     * - 'message' (default): post `doneMessage` to the parent (in-app preview).
+     * - 'print-button': add a screen-only "Save as PDF" toolbar whose button calls
+     *   window.print(). The PDF export opens this as its own top-level window; the
+     *   user's tap drives the print. We do NOT auto-print: a programmatic print
+     *   fails on Android Chrome ("There was a problem printing the page"), and a
+     *   single user-driven path is consistent across desktop, Android and iOS.
+     */
+    afterMode?: 'message' | 'print-button';
   } = {}
 ): string {
   const {
@@ -173,6 +215,7 @@ export function buildPagedDocument(
     lang,
     print,
     previewChrome = false,
+    afterMode = 'message',
   } = opts;
   const links = stylesheetHrefs
     .map(href => `<link rel="stylesheet" href="${href}" />`)
@@ -192,10 +235,33 @@ export function buildPagedDocument(
   // running heads as artifacts — otherwise a screen reader announces the page
   // number on every page. aria-hidden cascades to the .pagedjs_margin-content.
   const pagedSrc = new URL('paged.polyfill.js', document.baseURI).href;
+  // What runs at the end of the `after` hook (margin boxes now exist).
+  // - 'print-button': build the screen-only "Save as PDF" toolbar (its button calls
+  //   window.print() on this top-level window — the user's tap is the gesture
+  //   Android Chrome requires; we never call print() programmatically).
+  // - 'message': tell the parent preview iframe pagination is done.
+  // NB: this document is re-parsed as XHTML (processXHTMLForPreview) before it is
+  // written out, so the inline script must avoid raw &, < and > — built entirely
+  // via the DOM API, with labels embedded as JSON strings, for exactly that reason.
+  const afterTail =
+    afterMode === 'print-button'
+      ? // Inject the toolbar (and its CSS) here, in the `after` hook, not in <head>:
+        // Paged.js's polisher consumes the head stylesheet and drops @media screen
+        // rules, so anything added before pagination loses its styling. Built via the
+        // DOM API (no raw < > &) for the XHTML re-parse, labels embedded as JSON.
+        `try{var s=document.createElement('style');s.textContent=${JSON.stringify(PRINT_TOOLBAR_CSS)};document.head.appendChild(s);` +
+        `var b=document.createElement('div');b.className='pdf-export-bar';` +
+        `var k=document.createElement('button');k.type='button';k.className='pdf-export-btn';` +
+        `k.textContent=${JSON.stringify(translate('Save as PDF'))};` +
+        `k.addEventListener('click',function(){window.print();});b.appendChild(k);` +
+        `var h=document.createElement('span');h.className='pdf-export-hint';` +
+        `h.textContent=${JSON.stringify(translate("Opens your device's print dialog."))};` +
+        `b.appendChild(h);document.body.insertBefore(b,document.body.firstChild);}catch(e){}`
+      : `parent.postMessage('${doneMessage}','*');`;
   const inject =
     `<script>window.PagedConfig={auto:true,after:function(){` +
     `try{document.querySelectorAll('.pagedjs_margin').forEach(function(el){el.setAttribute('aria-hidden','true');});}catch(e){}` +
-    `parent.postMessage('${doneMessage}','*');}};</script>` +
+    `${afterTail}}};</script>` +
     `<script src="${pagedSrc}"></script>`;
   return `<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"${langAttr}>
@@ -225,83 +291,98 @@ export async function exportPdf(
   workspaceService: WorkspaceService,
   print?: PrintSettings
 ): Promise<void> {
-  const chapters = await workspaceService.loadAllLinearChapterContents(workspace);
-  if (chapters.length === 0) throw new Error('No chapters to export.');
-
-  // Concatenate each chapter's <body> (wrapped so it starts on a new page) and
-  // collect the stylesheet links the chapters reference (deduped) so the book's
-  // own styling carries through — works for app-created and imported EPUBs.
-  const stylesheetHrefs = new Set<string>();
-  const sections: string[] = [];
-
-  for (const chapter of chapters) {
-    const wrapped = chapterToSection(chapter.xhtmlContent);
-    if (!wrapped) continue; // skip a malformed chapter / one with no <body>
-    wrapped.hrefs.forEach(href => stylesheetHrefs.add(href));
-    sections.push(wrapped.section);
+  // Open the print window synchronously — inside the click gesture, so it isn't
+  // blocked as a pop-up. We paginate in this top-level window and give it a
+  // "Save as PDF" button the user taps to print, rather than a hidden iframe we
+  // print for them: a parent printing a child iframe fails on Android, and a
+  // programmatic print() fails on Android Chrome too — a user-driven tap is the
+  // one path that works everywhere. Show a placeholder while we build the document.
+  const win = window.open('', '_blank');
+  if (!win) {
+    throw new Error('Could not open the print window. Allow pop-ups for this site to save as PDF.');
   }
-  if (sections.length === 0) throw new Error('No readable chapter content.');
+  win.document.write(
+    '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Preparing…</title></head>' +
+      '<body style="font:16px system-ui,sans-serif;color:#444;padding:2rem">Preparing your PDF…</body></html>'
+  );
 
-  // Prepend the project's cover image as a full-bleed first page (Print setting,
-  // default on). The cover's relative href is resolved to a blob URL by the same
-  // asset pass below as the chapter images.
-  const coverHref = coverImageHref(workspace.opf.manifest, print);
-  if (coverHref) {
-    sections.unshift(`<section class="pdf-cover"><img src="${xmlEscape(coverHref)}" alt="" /></section>`);
-  }
-
-  // The print dialog suggests "<document title>.pdf", so name it after the book.
-  const meta = workspace.opf.metadata;
-  const author = meta.creator?.[0]?.name;
-  const docTitle = [meta.title?.trim() || 'Book', author?.trim()].filter(Boolean).join(' - ');
-
-  const master = buildPagedDocument(sections, {
-    title: docTitle,
-    stylesheetHrefs: [...stylesheetHrefs],
-    lang: meta.language?.[0],
-    print,
-  });
-
-  // Resolve OPFS-relative assets (images, stylesheets, fonts) to blob URLs so
-  // they render in the print iframe. A fresh manager so the live preview's
-  // registry is untouched; cleaned up after printing.
-  const blobManager = new BlobURLManager({
-    fileStorage,
-    basePath: workspace.pathInfo.basePath,
-    maxBlobURLs: 2000,
-  });
-  blobManager.setActiveWorkspace(workspace.id);
-  // The master already carries the Paged.js polyfill inject (an absolute app-origin
-  // src that asset resolution leaves alone); this resolves the OPFS-relative assets.
-  const finalDoc = await blobManager.processXHTMLForPreview(master);
-
-  // Hidden but laid-out (opacity:0, not display:none) so Paged.js can measure.
-  const iframe = document.createElement('iframe');
-  iframe.setAttribute('aria-hidden', 'true');
-  iframe.style.cssText =
-    'position:fixed;inset:0;width:100%;height:100%;border:0;opacity:0;pointer-events:none;z-index:-1;';
-  iframe.srcdoc = finalDoc;
-
+  let blobManager: BlobURLManager | undefined;
   try {
-    await new Promise<void>((resolve, reject) => {
-      const onMessage = (event: MessageEvent) => {
-        if (event.source !== iframe.contentWindow || event.data !== 'pdf-paged') return;
-        window.removeEventListener('message', onMessage);
-        clearTimeout(timer);
-        // print() blocks until the Save-as-PDF dialog is dismissed.
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        resolve();
-      };
-      const timer = setTimeout(() => {
-        window.removeEventListener('message', onMessage);
-        reject(new Error('PDF generation timed out.'));
-      }, 60000);
-      window.addEventListener('message', onMessage);
-      document.body.appendChild(iframe);
+    const chapters = await workspaceService.loadAllLinearChapterContents(workspace);
+    if (chapters.length === 0) throw new Error('No chapters to export.');
+
+    // Concatenate each chapter's <body> (wrapped so it starts on a new page) and
+    // collect the stylesheet links the chapters reference (deduped) so the book's
+    // own styling carries through — works for app-created and imported EPUBs.
+    const stylesheetHrefs = new Set<string>();
+    const sections: string[] = [];
+    for (const chapter of chapters) {
+      const wrapped = chapterToSection(chapter.xhtmlContent);
+      if (!wrapped) continue; // skip a malformed chapter / one with no <body>
+      wrapped.hrefs.forEach(href => stylesheetHrefs.add(href));
+      sections.push(wrapped.section);
+    }
+    if (sections.length === 0) throw new Error('No readable chapter content.');
+
+    // Prepend the project's cover image as a full-bleed first page (Print setting,
+    // default on). The cover's relative href is resolved to a blob URL by the asset
+    // pass below alongside the chapter images.
+    const coverHref = coverImageHref(workspace.opf.manifest, print);
+    if (coverHref) {
+      sections.unshift(`<section class="pdf-cover"><img src="${xmlEscape(coverHref)}" alt="" /></section>`);
+    }
+
+    // The print dialog suggests "<document title>.pdf", so name it after the book.
+    const meta = workspace.opf.metadata;
+    const author = meta.creator?.[0]?.name;
+    const docTitle = [meta.title?.trim() || 'Book', author?.trim()].filter(Boolean).join(' - ');
+
+    const master = buildPagedDocument(sections, {
+      title: docTitle,
+      stylesheetHrefs: [...stylesheetHrefs],
+      lang: meta.language?.[0],
+      print,
+      afterMode: 'print-button',
     });
+
+    // Resolve OPFS-relative assets (images, stylesheets, fonts) to blob URLs so they
+    // render in the print window. It's same-origin with this opener (about:blank
+    // inherits our origin), so it can load our blob URLs — as the old iframe did.
+    blobManager = new BlobURLManager({
+      fileStorage,
+      basePath: workspace.pathInfo.basePath,
+      maxBlobURLs: 2000,
+    });
+    blobManager.setActiveWorkspace(workspace.id);
+    const finalDoc = await blobManager.processXHTMLForPreview(master);
+
+    // Write the paginated document into the window. Paged.js paginates it and the
+    // window shows its own "Save as PDF" button; the user taps it to print. Hand
+    // off here — keep the asset blob URLs alive until the user closes the print
+    // window, then revoke them. This watcher runs detached so the app's "Preparing"
+    // state clears now rather than blocking while the print window stays open. The
+    // user can print/retry as many times as they like until they close it.
+    const manager = blobManager;
+    blobManager = undefined; // ownership passes to the close-watcher below
+    win.document.open();
+    win.document.write(finalDoc);
+    win.document.close();
+    const poll = setInterval(() => {
+      if (win.closed) {
+        clearInterval(poll);
+        manager.cleanup();
+      }
+    }, 1000);
+  } catch (error) {
+    try {
+      win.close();
+    } catch {
+      // window already gone
+    }
+    throw error;
   } finally {
-    iframe.remove();
-    blobManager.cleanup();
+    // Only fires on the error path; a successful hand-off transfers ownership of the
+    // blob URLs to the close-watcher (blobManager is undefined by then).
+    blobManager?.cleanup();
   }
 }
