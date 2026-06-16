@@ -2,7 +2,7 @@
   import { t, currentLocale, documentDirection, i18nService } from '$lib/i18n';
   import { themeStore } from '$lib/stores/theme';
   import PaneHeader from '$lib/components/layout/PaneHeader.svelte';
-  import { downloadBlob } from '$lib/zip/index.js';
+  import { saveBlob } from '$lib/zip/index.js';
   import type { PublishService, PublishedEpub } from '$lib/services/publish/publish.service.js';
   import {
     createInitMessage,
@@ -152,8 +152,14 @@
 
   async function handleDownload(filename: string) {
     try {
-      const blob = await publishService.getPublishedEpubBlob(filename);
-      downloadBlob(blob, filename);
+      // saveBlob opens the native Save dialog (when available) inside this click
+      // gesture, then lazily reads the epub bytes — so the file keeps its real name
+      // even on the standalone file:// build in Chrome. Falls back to a download.
+      await saveBlob(
+        filename,
+        () => publishService.getPublishedEpubBlob(filename),
+        'application/epub+zip'
+      );
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to download';
     }

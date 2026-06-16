@@ -3,6 +3,7 @@ import {
   bufferToStream,
   downloadArrayBuffer,
   downloadBlob,
+  saveBlob,
   streamToBlob,
   unixTimestampToDate,
   readString,
@@ -128,6 +129,73 @@ describe('ZIP Utils', () => {
       downloadBlob(new Blob(['test content']));
 
       expect(mockElement.download).toBe('download.x');
+    });
+  });
+
+  describe('saveBlob', () => {
+    let mockWrite: any;
+    let mockClose: any;
+    let mockCreateWritable: any;
+    let mockHandle: any;
+
+    beforeEach(() => {
+      mockWrite = vi.fn().mockResolvedValue(undefined);
+      mockClose = vi.fn().mockResolvedValue(undefined);
+      mockCreateWritable = vi.fn().mockResolvedValue({ write: mockWrite, close: mockClose });
+      mockHandle = { createWritable: mockCreateWritable };
+    });
+
+    afterEach(() => {
+      delete (window as any).showSaveFilePicker;
+      vi.restoreAllMocks();
+    });
+
+    it('uses showSaveFilePicker and writes the blob when available', async () => {
+      const picker = vi.fn().mockResolvedValue(mockHandle);
+      (window as any).showSaveFilePicker = picker;
+      const blob = new Blob(['epub bytes']);
+
+      await saveBlob('Book.epub', () => blob, 'application/epub+zip');
+
+      expect(picker).toHaveBeenCalledWith(expect.objectContaining({ suggestedName: 'Book.epub' }));
+      expect(mockCreateWritable).toHaveBeenCalled();
+      expect(mockWrite).toHaveBeenCalledWith(blob);
+      expect(mockClose).toHaveBeenCalled();
+    });
+
+    it('resolves silently when the user cancels (AbortError), without reading the blob', async () => {
+      const abort = Object.assign(new Error('cancelled'), { name: 'AbortError' });
+      (window as any).showSaveFilePicker = vi.fn().mockRejectedValue(abort);
+      const getBlob = vi.fn(() => new Blob(['x']));
+
+      await expect(saveBlob('Book.epub', getBlob)).resolves.toBeUndefined();
+      expect(getBlob).not.toHaveBeenCalled();
+    });
+
+    it('falls back to an anchor download when the picker is unavailable', async () => {
+      vi.useFakeTimers();
+      const mockClick = vi.fn();
+      vi.spyOn(document, 'createElement').mockReturnValue({
+        href: '',
+        download: '',
+        rel: '',
+        click: mockClick,
+        remove: vi.fn(),
+      } as any);
+      vi.spyOn(document.body, 'appendChild').mockImplementation((el: any) => el);
+      const createObjectURL = vi.fn(() => 'blob:mock-url');
+      global.URL.createObjectURL = createObjectURL;
+      window.URL.createObjectURL = createObjectURL;
+      global.URL.revokeObjectURL = vi.fn();
+      window.URL.revokeObjectURL = vi.fn();
+      const blob = new Blob(['x']);
+
+      await saveBlob('Book.epub', () => blob);
+
+      expect(createObjectURL).toHaveBeenCalledWith(blob);
+      expect(mockClick).toHaveBeenCalled();
+      vi.runAllTimers();
+      vi.useRealTimers();
     });
   });
 

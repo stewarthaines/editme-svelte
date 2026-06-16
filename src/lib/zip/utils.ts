@@ -44,6 +44,57 @@ export function downloadBlob(blob: Blob, fileName: string = 'download.x'): void 
 }
 
 /**
+ * Save a Blob to disk, letting the user choose the location via the File System
+ * Access API (`showSaveFilePicker`) when available, falling back to `downloadBlob`
+ * (the `<a download>` anchor) otherwise.
+ *
+ * This exists because the standalone file:// build in Chrome ignores the `<a
+ * download>` filename and saves the file under the blob's UUID with no extension;
+ * the picker preserves the real name. The picker is Chrome/Edge-only — Safari and
+ * Firefox take the anchor fallback.
+ *
+ * `getBlob` is lazy so the picker can open inside the click gesture *before* any
+ * async work (reading the blob) consumes it. A user cancel (AbortError) resolves
+ * silently; any other picker failure falls back to the anchor download.
+ */
+export async function saveBlob(
+  fileName: string,
+  getBlob: () => Blob | Promise<Blob>,
+  mimeType: string = 'application/octet-stream'
+): Promise<void> {
+  const showSaveFilePicker = (
+    window as unknown as {
+      showSaveFilePicker?: (opts: unknown) => Promise<FileSystemFileHandle>;
+    }
+  ).showSaveFilePicker;
+
+  if (typeof showSaveFilePicker === 'function') {
+    const ext = fileName.includes('.') ? `.${fileName.split('.').pop()}` : '';
+    let handle: FileSystemFileHandle | null = null;
+    try {
+      handle = await showSaveFilePicker({
+        suggestedName: fileName,
+        types: ext ? [{ accept: { [mimeType]: [ext] } }] : undefined,
+      });
+    } catch (err) {
+      if ((err as { name?: string } | null)?.name === 'AbortError') return; // user cancelled
+      handle = null; // any other picker failure → fall back to the anchor download
+    }
+    if (handle) {
+      const writable = await handle.createWritable();
+      try {
+        await writable.write(await getBlob());
+      } finally {
+        await writable.close();
+      }
+      return;
+    }
+  }
+
+  downloadBlob(await getBlob(), fileName);
+}
+
+/**
  * Converts a ReadableStream to a Blob
  */
 export async function streamToBlob(stream: ReadableStream, type?: string): Promise<Blob> {
