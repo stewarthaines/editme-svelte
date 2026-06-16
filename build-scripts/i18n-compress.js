@@ -14,6 +14,7 @@ import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { zip, strToU8 } from 'fflate';
+import { ENABLED_LOCALES } from './enabled-locales.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,9 +30,12 @@ async function compressTranslations() {
     // Ensure static directory exists
     await fs.mkdir(join(projectRoot, 'static'), { recursive: true });
 
-    // Read all .json files from locales directory
+    // Read .json files from the locales directory, but only bundle the shipped
+    // locales — a defensive filter so a stale catalog (e.g. a previously-generated
+    // ja.json) can never leak into the bundle.
+    const enabledFiles = new Set(ENABLED_LOCALES.map(code => `${code}.json`));
     const files = await fs.readdir(localesDir);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    const jsonFiles = files.filter(file => file.endsWith('.json') && enabledFiles.has(file));
 
     if (jsonFiles.length === 0) {
       throw new Error('No JSON translation files found in locales directory');

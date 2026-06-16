@@ -25,7 +25,7 @@
   import { CaretUp, CaretDown, X } from 'phosphor-svelte';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, currentLocale, setLocale } from '../../i18n';
-  import { LOCALE_CONFIGS } from '../../i18n/locale-config.js';
+  import { LOCALE_CONFIGS, isLocaleEnabled } from '../../i18n/locale-config.js';
   import { themeStore } from '../../stores/theme.js';
   import type { PluginManifestEntry } from '../../plugins/contract';
   import type { ExtensionCatalogEntry } from '../../extensions/extension-catalog';
@@ -521,7 +521,9 @@
   // App settings: theme (light/dark/system) and locale, backed by the global stores
   // the app already uses (the sidebar quick-toggle shares the theme store).
   const themeChoice = $derived($themeStore.isSystem ? 'system' : $themeStore.current);
-  const locales = Object.values(LOCALE_CONFIGS);
+  // Only shipped locales appear in the picker; the rest are scaffolded but not yet
+  // genuinely translated (see ENABLED_LOCALES in locale-config).
+  const locales = Object.values(LOCALE_CONFIGS).filter(l => isLocaleEnabled(l.code));
 
   function handleThemeChange(value: string): void {
     if (value === 'system') {

@@ -87,7 +87,7 @@ The build process creates a single `index.html` file (~2-3MB) with all assets in
 - Multi-device preview (iPhone, iPad, Pixel phone variants)
 - Extensible transform scripts loaded from EPUB manifest
 - Accessibility-focused design
-- Reactive internationalization system with 7 languages and RTL support
+- Reactive internationalization system with RTL support (English + German shipped; 5 more scaffolded but not enabled — see `ENABLED_LOCALES`)
 
 ### Code Style Preferences
 
@@ -153,7 +153,7 @@ Complete browser-native ZIP implementation for EPUB workflows. See `src/lib/zip/
 
 ### Internationalization (i18n) System
 
-Complete reactive internationalization system supporting 7 languages with instant locale switching. **Location**: All i18n code is in `src/lib/i18n/` with API documentation.
+Reactive internationalization system with instant locale switching. The framework targets seven languages, but only locales with a genuine reviewed translation are shipped/enabled (currently English + German); the rest are scaffolded but kept out of the bundle and picker via `ENABLED_LOCALES`. **Location**: All i18n code is in `src/lib/i18n/` with API documentation.
 
 **Usage Patterns:**
 

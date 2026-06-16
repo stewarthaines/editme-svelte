@@ -150,12 +150,13 @@ describe('i18n runtime system', () => {
       expect(get(t)('Nonexistent key')).toBe('Nonexistent key');
     });
 
-    it('should translate to Arabic when locale is set', async () => {
+    it('should ignore a switch to a non-enabled locale (Arabic) and stay on English', async () => {
+      // Arabic is scaffolded but not enabled (no genuine translation shipped), so
+      // setLocale must refuse it rather than surface a placeholder/English-stub UI.
       await setLocale('ar');
 
-      expect(get(t)('Save')).toBe('حفظ');
-      expect(get(t)('Cancel')).toBe('إلغاء');
-      expect(get(t)('Delete')).toBe('حذف');
+      expect(get(currentLocale)).toBe('en');
+      expect(get(t)('Save')).toBe('Save');
     });
   });
 
@@ -205,20 +206,22 @@ describe('i18n runtime system', () => {
       expect(get(t)('Save')).toBe('Save'); // Fallback English
     });
 
-    it('should set document direction for RTL locale', async () => {
+    it('should ignore a non-enabled browser locale (Arabic) and use English/LTR', async () => {
+      // An Arabic browser must not auto-select the not-yet-translated ar catalog.
       mockNavigator.languages = ['ar-SA', 'ar'];
       mockLoader.needsUpdate.mockResolvedValue(false);
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
       await initI18n();
 
+      expect(get(currentLocale)).toBe('en');
       expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
         'data-dir',
-        'rtl'
+        'ltr'
       );
       expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
         'data-locale',
-        'ar'
+        'en'
       );
     });
 
@@ -257,15 +260,11 @@ describe('i18n runtime system', () => {
       expect(get(t)('Save')).toBe('Speichern');
     });
 
-    it('should update document direction for RTL locale', async () => {
-      await setLocale('ar');
+    it('should refuse to switch to a non-enabled locale and stay LTR', async () => {
+      await setLocale('ar'); // not enabled
 
-      expect(get(currentLocale)).toBe('ar');
-      expect(get(documentDirection)).toBe('rtl');
-      expect(globalThis.document?.documentElement.setAttribute).toHaveBeenCalledWith(
-        'data-dir',
-        'rtl'
-      );
+      expect(get(currentLocale)).toBe('en');
+      expect(get(documentDirection)).toBe('ltr');
     });
 
     it('should store locale preference', async () => {
@@ -287,16 +286,15 @@ describe('i18n runtime system', () => {
       await expect(setLocale('de')).rejects.toThrow('i18n system not initialized');
     });
 
-    it('should warn about missing catalog', async () => {
+    it('should warn and no-op when switching to a non-enabled locale', async () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
         /* silence */
       });
 
-      await setLocale('ja'); // Not in mock catalogs
+      await setLocale('ja'); // known but not enabled
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Translation catalog for ja not loaded')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('is not enabled'));
+      expect(get(currentLocale)).toBe('en');
 
       consoleSpy.mockRestore();
     });
@@ -318,18 +316,15 @@ describe('i18n runtime system', () => {
       expect(get(currentLocale)).toBe('de');
     });
 
-    it('should update documentDirection store for RTL', async () => {
+    it('should keep documentDirection LTR when a non-enabled RTL locale is attempted', async () => {
       expect(get(documentDirection)).toBe('ltr');
 
-      await setLocale('ar');
+      await setLocale('ar'); // not enabled — refused
 
-      expect(get(documentDirection)).toBe('rtl');
+      expect(get(documentDirection)).toBe('ltr');
     });
 
-    it('should update documentDirection store for LTR', async () => {
-      await setLocale('ar'); // Set to RTL first
-      expect(get(documentDirection)).toBe('rtl');
-
+    it('should keep documentDirection LTR across enabled locales', async () => {
       await setLocale('de');
 
       expect(get(documentDirection)).toBe('ltr');
@@ -344,16 +339,14 @@ describe('i18n runtime system', () => {
       await initI18n();
     });
 
-    it('should return available locales', () => {
+    it('should return only the enabled locales (English, German)', () => {
       const locales = getAvailableLocales();
+      const codes = locales.map(l => l.code).sort();
 
-      expect(locales).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ code: 'en', name: 'English' }),
-          expect.objectContaining({ code: 'de', name: 'Deutsch' }),
-          expect.objectContaining({ code: 'ar', name: 'العربية' }),
-        ])
-      );
+      expect(codes).toEqual(['de', 'en']);
+      // Scaffolded-but-not-enabled locales must not appear in the picker.
+      expect(codes).not.toContain('ar');
+      expect(codes).not.toContain('ja');
     });
 
     it('should return current locale config', () => {
@@ -368,15 +361,15 @@ describe('i18n runtime system', () => {
     });
 
     it('should return current locale config after switching', async () => {
-      await setLocale('ar');
+      await setLocale('de');
 
       const config = getCurrentLocaleConfig();
 
       expect(config).toEqual({
-        code: 'ar',
-        name: 'العربية',
-        direction: 'rtl',
-        englishName: 'Arabic',
+        code: 'de',
+        name: 'Deutsch',
+        direction: 'ltr',
+        englishName: 'German',
       });
     });
   });
@@ -412,21 +405,25 @@ describe('i18n runtime system', () => {
       expect(get(currentLocale)).toBe('en');
     });
 
-    it('should handle Traditional Chinese detection', async () => {
-      mockNavigator.languages = ['zh-TW']; // Taiwan
+    it('should fall back to English for a non-enabled browser locale (zh-TW)', async () => {
+      // zh-Hant is scaffolded but not enabled, so a Taiwan browser stays on English.
+      mockNavigator.languages = ['zh-TW'];
       mockLoader.needsUpdate.mockResolvedValue(false);
-      mockLoader.loadTranslations.mockResolvedValue({
-        ...mockTranslationCatalogs,
-        'zh-Hant': {
-          locale: 'zh-Hant',
-          messages: { Save: '儲存' },
-          headers: {},
-        },
-      });
+      mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
       await initI18n();
 
-      expect(get(currentLocale)).toBe('zh-Hant');
+      expect(get(currentLocale)).toBe('en');
+    });
+
+    it('should fall back to English for a non-enabled browser locale (Japanese)', async () => {
+      mockNavigator.languages = ['ja-JP', 'ja'];
+      mockLoader.needsUpdate.mockResolvedValue(false);
+      mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
+
+      await initI18n();
+
+      expect(get(currentLocale)).toBe('en');
     });
   });
 });

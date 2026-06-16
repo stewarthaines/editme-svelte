@@ -2,17 +2,32 @@
 
 ## Overview
 
-The EDITME EPUB editor supports 7 languages with reactive internationalization using Svelte stores and gettext-based translation workflow. The system provides automatic RTL layout support and compressed translation bundles optimized for EPUB embedding.
+The editor has a reactive internationalization system (Svelte stores + a gettext
+workflow) with automatic RTL support and compressed translation bundles optimized for
+EPUB embedding. The framework is built for seven languages, but **only locales with a
+genuine, reviewed translation are shipped** — see below.
 
-## Supported Languages
+## Languages
 
-- **English** (en) - Primary development language
-- **German** (de) - Deutsch
+**Shipped / enabled** (the single source of truth is `ENABLED_LOCALES` in
+`locale-config.ts`; only these are bundled, offered in the picker, and eligible for
+browser auto-detection):
+
+- **English** (en) - Primary development / source language
+- **German** (de) - Deutsch — complete, hand-reviewed
+
+**Scaffolded but not enabled** — display names, RTL flags, and `.po` files exist, but the
+translations are not yet done, so these are deliberately kept out of the bundle and the UI.
+A user whose browser is set to one of these falls back cleanly to English (never a
+half-translated/placeholder screen). Re-enable a locale by adding it to `ENABLED_LOCALES`
+(both the runtime list and `build-scripts/enabled-locales.js`) once a real translation is
+in place and reviewed:
+
 - **Arabic** (ar) - العربية (RTL)
 - **Hebrew** (he) - עברית (RTL)
 - **Japanese** (ja) - 日本語
 - **Georgian** (ka) - ქართული
-- **Chinese Traditional** (zh-TW) - 中文 (繁體)
+- **Chinese Traditional** (zh-Hant) - 中文 (繁體)
 
 ## Usage in Components
 

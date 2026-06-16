@@ -4,7 +4,13 @@
 
 import { writable, derived, get } from 'svelte/store';
 import type { I18nState, TranslationFunction, TranslationCatalog } from './types.js';
-import { LOCALE_CONFIGS, DEFAULT_LOCALE, getBrowserLocale, isRTL } from './locale-config.js';
+import {
+  LOCALE_CONFIGS,
+  DEFAULT_LOCALE,
+  getEnabledBrowserLocale,
+  isLocaleEnabled,
+  isRTL,
+} from './locale-config.js';
 import { createI18nLoader } from './loader.js';
 
 // Internal state store
@@ -132,8 +138,10 @@ export async function initI18n(): Promise<void> {
       catalogs.en = englishFallback;
     }
 
-    // Determine initial locale
-    const preferredLocale = getBrowserLocale();
+    // Determine initial locale. getEnabledBrowserLocale() only returns a shipped
+    // locale, so a Japanese/Arabic/… browser stays on English rather than loading a
+    // placeholder; the catalog check is a second guard (those catalogs aren't bundled).
+    const preferredLocale = getEnabledBrowserLocale();
     const initialLocale = catalogs[preferredLocale] ? preferredLocale : DEFAULT_LOCALE;
 
     // Apply document direction using data attribute
@@ -177,6 +185,13 @@ export async function setLocale(locale: string): Promise<void> {
     throw new Error(`Unsupported locale: ${locale}`);
   }
 
+  // Known but not shipped (no genuine translation yet): refuse to switch so a stale
+  // preference or a programmatic call can't surface placeholder/English-stub UI.
+  if (!isLocaleEnabled(locale)) {
+    console.warn(`Locale ${locale} is not enabled; ignoring switch.`);
+    return;
+  }
+
   if (!state.catalogs[locale]) {
     console.warn(`Translation catalog for ${locale} not loaded, falling back to English`);
   }
@@ -200,7 +215,10 @@ export async function setLocale(locale: string): Promise<void> {
  */
 export function getAvailableLocales() {
   const state = get(i18nState);
-  return Object.keys(state.locales).map(code => state.locales[code]);
+  // Only shipped locales — scaffolded-but-untranslated ones stay out of the picker.
+  return Object.keys(state.locales)
+    .filter(code => isLocaleEnabled(code))
+    .map(code => state.locales[code]);
 }
 
 /**

@@ -8,12 +8,15 @@ import po2json from 'po2json';
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { ENABLED_LOCALES } from './enabled-locales.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
-const locales = ['en', 'de', 'ka', 'ar', 'he', 'zh-Hant', 'ja'];
+// Only compile the shipped locales — scaffolded-but-untranslated .po files are skipped
+// so their (placeholder) catalogs never reach the bundle.
+const locales = ENABLED_LOCALES;
 
 async function convertPoFiles() {
   console.log('🔄 Converting .po files to .json...');

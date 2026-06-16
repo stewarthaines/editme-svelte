@@ -51,7 +51,25 @@ export const LOCALE_CONFIGS: Record<string, LocaleConfig> = {
 
 export const DEFAULT_LOCALE = 'en';
 
+/**
+ * Locales we actually ship to users. The others in LOCALE_CONFIGS are scaffolded
+ * (display names, RTL flags, .po files) but NOT yet genuinely translated, so they
+ * are kept out of the bundle, the language picker, and locale auto-detection — a
+ * not-enabled locale must never surface as broken/placeholder UI. Re-enable a code
+ * here once it has a real, reviewed translation bundled.
+ *
+ * Build-side mirror: build-scripts/enabled-locales.js — keep the two in sync.
+ */
+export const ENABLED_LOCALES = ['en', 'de'];
+
 export const RTL_LOCALES = ['ar', 'he'];
+
+/**
+ * Whether a locale is shipped/enabled (vs merely known/scaffolded).
+ */
+export function isLocaleEnabled(locale: string): boolean {
+  return ENABLED_LOCALES.includes(locale);
+}
 
 /**
  * Get locale configuration
@@ -100,4 +118,17 @@ export function getBrowserLocale(): string {
   }
 
   return DEFAULT_LOCALE;
+}
+
+/**
+ * The browser's preferred locale for the *UI*, restricted to enabled locales.
+ *
+ * Distinct from getBrowserLocale(): that one maps the browser language to any known
+ * locale (used to seed a new book's dc:language, which should reflect the user's real
+ * language). This one only returns a locale we actually ship, so a Japanese/Arabic/…
+ * browser falls back to English UI instead of a not-yet-translated catalog.
+ */
+export function getEnabledBrowserLocale(): string {
+  const preferred = getBrowserLocale();
+  return isLocaleEnabled(preferred) ? preferred : DEFAULT_LOCALE;
 }
