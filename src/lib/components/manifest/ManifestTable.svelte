@@ -294,7 +294,9 @@
   };
 
   const formatFileSize = (bytes: number | undefined) => {
-    if (!bytes) return '-';
+    // Distinguish an unknown size (undefined → '-') from a genuinely empty file
+    // (0 → '0 B'); a zero-byte file has a known size, it just happens to be empty.
+    if (bytes === undefined) return '-';
 
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = bytes;

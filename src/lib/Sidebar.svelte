@@ -112,10 +112,14 @@
   // When the publish-to-remote plugin is enabled, annotate the Publish item so
   // the user can see which plugin is driving it.
   const PUBLISH_PLUGIN_ID = 'publish-to-remote';
-  const sectionLabel = (section: { id: SidebarSection; label: string }) =>
+  const sectionLabel = (section: { id: SidebarSection; label: string }) => $t(section.label);
+  // The plugin driving an item is shown as a small second line below the label
+  // (like the project's text-format subtitle), not appended in parens — otherwise
+  // it wraps awkwardly in longer locales (e.g. de "Veröffentlichen (publish-to-remote)").
+  const sectionSubLabel = (section: { id: SidebarSection }) =>
     section.id === 'publish' && enabledPluginIds.includes(PUBLISH_PLUGIN_ID)
-      ? `${$t('Publish')} (${PUBLISH_PLUGIN_ID})`
-      : $t(section.label);
+      ? PUBLISH_PLUGIN_ID
+      : '';
 
   // The book title hosts a disclosure that collapses the project nav group.
   const PROJECT_NAV_IDS: SidebarSection[] = ['settings', 'metadata', 'manifest', 'navigation'];
@@ -265,12 +269,13 @@
         {/if}
 
         {#if !isProjectNav(section.id) || !hideProjectNav}
+          {@const subLabel = sectionSubLabel(section)}
           <button
             class="sidebar-section"
             class:active={activeSection === section.id}
             onclick={() => setSidebarSection(section.id)}
             aria-current={activeSection === section.id ? 'page' : undefined}
-            title={sectionLabel(section)}
+            title={subLabel ? `${sectionLabel(section)} (${subLabel})` : sectionLabel(section)}
           >
             <span class="section-icon">
               <Icon
@@ -280,7 +285,12 @@
               />
             </span>
             {#if isExpanded}
-              <span class="section-label">{sectionLabel(section)}</span>
+              <span class="section-label" class:section-label--stacked={subLabel}>
+                <span class="section-label-main">{sectionLabel(section)}</span>
+                {#if subLabel}
+                  <span class="section-label-sub">{subLabel}</span>
+                {/if}
+              </span>
             {/if}
           </button>
         {/if}
@@ -323,7 +333,7 @@
         />
         {#if isExpanded}
           <div class="spine-section-header workspace-title-section">
-            <span class="section-label">{spineSectionLabel} ({chapterCount})</span>
+            <span class="section-label">{spineSectionLabel}&nbsp;&nbsp;[ {chapterCount} ]</span>
             {#if !readOnly}
               <div class="spine-header-actions">
                 <button
@@ -444,7 +454,7 @@
     margin: 0; /* Simple reset */
     margin-inline-start: var(--space-2);
     font-size: var(--text-sm); /* Even smaller for compact look */
-    color: var(--color-text-secondary); /* Subdued like Craigslist */
+    color: var(--color-text-primary);
     flex: 1; /* Take remaining space */
   }
 
@@ -609,6 +619,29 @@
   .section-label {
     font-size: var(--text-base); /* Using typography tokens */
     font-weight: var(--font-normal);
+  }
+
+  /* Two-line nav label: the main label plus a smaller grey subtitle (the plugin
+     driving the item), mirroring the project title/subtitle just below it. */
+  .section-label--stacked {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .section-label-main {
+    line-height: 1.2;
+  }
+
+  .section-label-sub {
+    font-size: var(--text-xs);
+    line-height: 1.2;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Compact sidebar styling */

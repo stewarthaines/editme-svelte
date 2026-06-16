@@ -588,13 +588,18 @@
             <div class="preview-error">
               <p>{$t('Preview Error')}: {contentPreview.error}</p>
             </div>
-          {:else if contentPreview.contentType === 'text' && contentPreview.textContent}
+          {:else if contentPreview.contentType === 'text' && typeof contentPreview.textContent === 'string'}
             <div class="text-preview">
-              <pre
-                class="text-content"
-                dir={shouldUseLtrDirection(contentPreview.mediaType)
-                  ? 'ltr'
-                  : undefined}>{contentPreview.textContent}</pre>
+              {#if contentPreview.textContent.length === 0}
+                <!-- A 0-byte text file is empty, not binary — say so plainly. -->
+                <p class="empty-file-note">{$t('This file is empty.')}</p>
+              {:else}
+                <pre
+                  class="text-content"
+                  dir={shouldUseLtrDirection(contentPreview.mediaType)
+                    ? 'ltr'
+                    : undefined}>{contentPreview.textContent}</pre>
+              {/if}
             </div>
           {:else if contentPreview.contentType === 'image' && contentPreview.previewUrl}
             <div class="image-preview">
@@ -847,5 +852,11 @@
   .binary-info {
     font-size: 0.875rem;
     margin-top: 0.5rem;
+  }
+
+  .empty-file-note {
+    padding: 1rem;
+    font-style: italic;
+    color: var(--color-text-secondary);
   }
 </style>

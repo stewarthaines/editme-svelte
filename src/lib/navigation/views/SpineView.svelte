@@ -1426,12 +1426,6 @@
     <span class="error-icon">⚠️</span>
     <p>{error}</p>
   </div>
-{:else if !selectedItemId}
-  <div class="empty-state">
-    <div class="empty-icon">📚</div>
-    <h3>{$t('No spine item selected')}</h3>
-    <p>{$t('Select a spine item from the sidebar to start editing')}</p>
-  </div>
 {:else if selectedItem && readOnly}
   <!-- Read-only EPUB: the chapter renders in the preview pane; no editor here. -->
   <div class="readonly-notice">
@@ -1486,7 +1480,6 @@
   /* Loading, error, and empty states */
   .loading-state,
   .error-state,
-  .empty-state,
   .readonly-notice {
     display: flex;
     flex-direction: column;
@@ -1541,24 +1534,6 @@
 
   .error-state {
     color: var(--color-error-text);
-  }
-
-  .empty-icon {
-    font-size: 3rem;
-    opacity: 0.5;
-    margin-bottom: var(--space-4);
-  }
-
-  .empty-state h3 {
-    margin: 0 0 var(--space-2) 0;
-    font-size: var(--text-lg);
-    font-weight: var(--font-medium);
-  }
-
-  .empty-state p {
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
   }
 
   /* Spine editor wrapper for event handling */

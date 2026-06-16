@@ -125,6 +125,10 @@ msgstr "← Zurück"
 msgid "1 day ago"
 msgstr "vor 1 Tag"
 
+#: src/lib/components/SpineItem.svelte
+msgid "A book needs at least one chapter"
+msgstr "Ein Buch braucht mindestens ein Kapitel"
+
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "A generator is a script (exporting generateText(ctx, options)) that produces source text to insert at the editor caret."
 msgstr "Ein Generator ist ein Skript (das generateText(ctx, options) exportiert), das Quelltext erzeugt, der an der Cursorposition im Editor eingefügt wird."
@@ -1771,10 +1775,6 @@ msgstr "Keine Projekte entsprechen Ihrer Suche nach \"{query}\""
 msgid "No proxy was detected on this host, so this only works once the app is deployed with the WebDAV proxy."
 msgstr "Auf diesem Host wurde kein Proxy erkannt, daher funktioniert dies erst, wenn die App mit dem WebDAV-Proxy bereitgestellt wird."
 
-#: src/lib/navigation/views/SpineView.svelte
-msgid "No spine item selected"
-msgstr "Kein Spine-Element ausgewählt"
-
 #: src/lib/components/SpineSidebar.svelte
 msgid "No spine items yet"
 msgstr "Noch keine Spine-Elemente"
@@ -2341,10 +2341,6 @@ msgstr "Secret Access Key"
 msgid "Secret Key"
 msgstr "Secret Key"
 
-#: src/lib/navigation/views/SpineView.svelte
-msgid "Select a spine item from the sidebar to start editing"
-msgstr "Wählen Sie ein Spine-Element in der Seitenleiste aus, um mit der Bearbeitung zu beginnen"
-
 #: src/App.svelte
 msgid "Select a spine item to see the preview here"
 msgstr "Wählen Sie ein Spine-Element aus, um die Vorschau hier zu sehen"
@@ -2627,6 +2623,10 @@ msgstr "Dieses EPUB wurde nicht im Simple EPUB Editor erstellt und kann daher ni
 #: src/lib/navigation/views/SpineView.svelte
 msgid "This EPUB wasn't created in the Simple EPUB Editor, so its chapters can be viewed but not edited."
 msgstr "Dieses EPUB wurde nicht im Simple EPUB Editor erstellt, daher können seine Kapitel angezeigt, aber nicht bearbeitet werden."
+
+#: src/lib/components/manifest/ManifestPreview.svelte
+msgid "This file is empty."
+msgstr "Diese Datei ist leer."
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/metadata/TitleEditor.svelte

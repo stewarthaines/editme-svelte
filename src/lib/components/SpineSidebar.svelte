@@ -306,6 +306,10 @@
   async function handleDeleteItem(itemId: string) {
     if (!workspace || readOnly) return;
 
+    // A book needs at least one chapter. The delete control is disabled on the only
+    // remaining item; guard here too so no other caller can empty the spine.
+    if (spineItems.length <= 1) return;
+
     const confirmed = window.confirm(
       $t(
         "Are you sure you want to delete chapter '{name}'? This will permanently delete the chapter and its source file.",
@@ -317,6 +321,9 @@
 
     try {
       isLoading = true;
+
+      // Remember where the deleted item sat so we can select its neighbour after.
+      const deletedIndex = spineItems.findIndex(spineItem => spineItem.id === itemId);
       const result = await spineService.deleteChapter(workspace, itemId);
 
       // Update workspace state
@@ -325,17 +332,21 @@
         onWorkspaceUpdate(workspace);
       }
 
-      // If deleted item was selected, clear selection by dispatching event
-      if (selectedItemId === itemId) {
+      // Reload spine items with updated workspace
+      spineItems = await spineService.loadSpineItems(workspace);
+
+      // If the deleted item was selected, move selection to its nearest neighbour
+      // (the item that slid into its slot, or the new last one) so the editor stays
+      // populated rather than dropping to an empty state. The guard above guarantees
+      // at least one item remains.
+      if (selectedItemId === itemId && spineItems.length > 0) {
+        const next = spineItems[Math.min(deletedIndex, spineItems.length - 1)];
         const event = new CustomEvent('select-spine-item', {
-          detail: { itemId: null },
+          detail: { itemId: next.id },
           bubbles: true,
         });
         window.dispatchEvent(event);
       }
-
-      // Reload spine items with updated workspace
-      spineItems = await spineService.loadSpineItems(workspace);
     } catch (error) {
       console.error('Failed to delete chapter:', error);
       // Could add error notification here
@@ -412,6 +423,7 @@
             compact={!isExpanded}
             isFirstItem={index === 0}
             isLastItem={index === spineItems.length - 1}
+            isOnlyItem={spineItems.length === 1}
             onSelect={() => handleSelectItem(item.id)}
             onMoveUp={async () => await handleMoveUp(index)}
             onMoveDown={async () => await handleMoveDown(index)}

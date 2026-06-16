@@ -13,6 +13,8 @@
     dragHandleProps?: Record<string, any>;
     isFirstItem?: boolean;
     isLastItem?: boolean;
+    /** The only chapter in the book — deletion is disabled (a book needs one). */
+    isOnlyItem?: boolean;
     onSelect: () => void;
     onMoveUp: () => Promise<void>;
     onMoveDown: () => Promise<void>;
@@ -30,6 +32,7 @@
     dragHandleProps = {},
     isFirstItem = false,
     isLastItem = false,
+    isOnlyItem = false,
     onSelect,
     onMoveUp,
     onMoveDown,
@@ -155,8 +158,13 @@
           e.stopPropagation();
           onDelete();
         }}
-        aria-label={$t('Delete chapter {name}', { name: item.id })}
-        title={$t('Delete chapter {name}', { name: item.id })}
+        disabled={isOnlyItem}
+        aria-label={isOnlyItem
+          ? $t('A book needs at least one chapter')
+          : $t('Delete chapter {name}', { name: item.id })}
+        title={isOnlyItem
+          ? $t('A book needs at least one chapter')
+          : $t('Delete chapter {name}', { name: item.id })}
       >
         ✕
       </button>
