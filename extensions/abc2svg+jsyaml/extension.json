@@ -1,0 +1,64 @@
+{
+  "id": "abc2svg+jsyaml",
+  "name": "abc2svg+jsyaml",
+  "description": "abc2svg is a set of ECMAscript files that handle the ABC music notation. JS-YAML is an implementation of YAML, a human-friendly data serialization language.",
+  "url": "https://chiselapp.com/user/moinejf/repository/abc2svg/doc/trunk/README.md",
+  "license": "LICENSE.txt",
+  "assets": [
+    {
+      "file": "themes/responsive.js",
+      "target": "Scripts/responsive.js",
+      "media": "application/javascript"
+    },
+    {
+      "file": "themes/Bravura.woff2",
+      "target": "Fonts/Bravura.woff2",
+      "media": "application/font-woff"
+    },
+    {
+      "file": "themes/font.css",
+      "target": "Styles/abc-font.css",
+      "media": "text/css"
+    }
+  ],
+  "scripts": [
+    "abc2svg-1.js",
+    "js-yaml.min.js"
+  ],
+  "generators": [
+    {
+      "id": "abc-sample",
+      "name": "ABC Sample",
+      "description": "Insert a sample of ABC notation with yaml frontmatter specifying rendering options.",
+      "script": "abc-sample.js",
+      "options": [
+        {
+          "type": "select",
+          "name": "format",
+          "label": "Plain text wrapper",
+          "default": "markdown",
+          "options": [
+            {
+              "value": "markdown",
+              "label": "Markdown"
+            },
+            {
+              "value": "textile",
+              "label": "Textile"
+            }
+          ]
+        },
+        {
+          "type": "boolean",
+          "name": "include_scales",
+          "label": "Include multiple scale classes",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "domTransforms": [
+    "transformABC.js"
+  ],
+  "textTransforms": []
+}
