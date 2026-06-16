@@ -22,7 +22,7 @@ SEED.html is distributed under the terms of the MIT license. It is free to use, 
 
 1. **Web Application** - Access at [stewarthaines.com](https://stewarthaines.com/epub) for immediate use
 2. **Downloadable HTML** - Save locally from the above site for offline authoring
-3. **Embedded in EPUBs** - The SEED.html app can be added to an EPUB as a manifest item, so it travels with the book for the life of that artifact
+3. **Embedded in EPUBs** - The SEED.html app can be added to an EPUB as a non-manifest item, so it travels with the book for the life of that artifact
 
 See [USER_GUIDE.md](./USER_GUIDE.md) for detailed usage instructions.
 

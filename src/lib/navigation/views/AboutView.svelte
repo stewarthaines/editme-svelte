@@ -142,7 +142,7 @@
             <rect x="288" y="55" width="76" height="50" rx="5" />
             <line x1="300" y1="55" x2="300" y2="105" />
             <rect class="inner" x="322" y="68" width="30" height="20" rx="3" />
-            <text x="326" y="124" class="lbl center">EPUB+SEED</text>
+            <text x="326" y="124" class="lbl center">EPUB+SEED.zip</text>
           </g>
 
           <!-- Output 2: PDF — a portrait page with a folded corner, one-way -->
