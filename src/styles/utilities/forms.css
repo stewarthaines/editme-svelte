@@ -272,9 +272,11 @@
 
 /* Button variants */
 .btn-primary {
+  /* Theme-aware surface (the raw neutral-100/-400 are fixed light values, which
+     made primary buttons render light-grey in dark mode). */
   color: var(--color-text-primary);
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-neutral-400);
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border-strong);
 }
 
 .btn-primary:hover {
