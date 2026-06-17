@@ -68,7 +68,7 @@
       {#if searchQuery}
         <button
           type="button"
-          class="clear-search"
+          class="btn btn-icon clear-search"
           onclick={clearSearch}
           aria-label={$t('Clear search')}
         >
@@ -95,7 +95,7 @@
         <p class="no-results-description">
           {$t('No projects match your search for "{query}"', { query: searchQuery })}
         </p>
-        <button type="button" class="clear-search-button" onclick={clearSearch}>
+        <button type="button" class="btn btn-secondary" onclick={clearSearch}>
           {$t('Clear search')}
         </button>
       </div>
@@ -155,7 +155,7 @@
 
   .search-input:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--color-interactive-primary);
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
@@ -163,6 +163,7 @@
     color: var(--color-text-tertiary);
   }
 
+  /* Overlay the shared .btn .btn-icon inside the search field; positioning only. */
   .clear-search {
     position: absolute;
     top: 50%;
@@ -170,22 +171,6 @@
     transform: translateY(-50%);
     width: 24px;
     height: 24px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-tertiary);
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .clear-search:hover {
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
   }
 
   .list-content {
@@ -249,22 +234,6 @@
   .no-results-description {
     margin: 0 0 var(--space-4) 0;
     font-size: var(--text-base);
-  }
-
-  .clear-search-button {
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-md);
-    background-color: transparent;
-    color: var(--color-primary);
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-  }
-
-  .clear-search-button:hover {
-    background-color: var(--color-primary);
-    color: var(--color-surface);
   }
 
   .workspace-grid {

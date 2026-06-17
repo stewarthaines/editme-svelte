@@ -65,7 +65,7 @@
   >
     <header class="dup-header">
       <h2 id="dup-dialog-title">{$t('Duplicate Project')}</h2>
-      <button type="button" class="dup-close" onclick={onClose} aria-label={$t('Close')}
+      <button type="button" class="btn btn-icon" onclick={onClose} aria-label={$t('Close')}
         ><X size={16} aria-hidden="true" /></button
       >
     </header>
@@ -87,12 +87,12 @@
     {/if}
 
     <footer class="dup-footer">
-      <button type="button" class="dup-btn-secondary" onclick={onClose} disabled={duplicating}>
+      <button type="button" class="btn btn-secondary" onclick={onClose} disabled={duplicating}>
         {$t('Cancel')}
       </button>
       <button
         type="button"
-        class="dup-btn-primary"
+        class="btn btn-primary"
         onclick={duplicate}
         disabled={duplicating || !title.trim()}
       >
@@ -140,22 +140,6 @@
     font-weight: 600;
   }
 
-  .dup-close {
-    background: transparent;
-    border: none;
-    color: var(--color-text-secondary);
-    font-size: var(--text-lg);
-    cursor: pointer;
-    line-height: 1;
-    padding: var(--space-1);
-    border-radius: var(--radius-xs);
-  }
-
-  .dup-close:hover {
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-  }
-
   .dup-field {
     display: flex;
     flex-direction: column;
@@ -195,37 +179,5 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--space-2);
-  }
-
-  .dup-btn-secondary {
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .dup-btn-secondary:not(:disabled):hover {
-    border-color: var(--color-border-hover);
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
-  }
-
-  .dup-btn-primary {
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .dup-btn-primary:disabled,
-  .dup-btn-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

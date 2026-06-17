@@ -129,7 +129,7 @@
   >
     <header class="create-header">
       <h2 id="create-dialog-title">{$t('New Project')}</h2>
-      <button type="button" class="create-close" onclick={onClose} aria-label={$t('Close')}>
+      <button type="button" class="btn btn-icon" onclick={onClose} aria-label={$t('Close')}>
         <X size={16} aria-hidden="true" />
       </button>
     </header>
@@ -218,10 +218,10 @@
     </div>
 
     <footer class="create-footer">
-      <button type="button" class="create-btn-secondary" onclick={onClose} disabled={creating}>
+      <button type="button" class="btn btn-secondary" onclick={onClose} disabled={creating}>
         {$t('Cancel')}
       </button>
-      <button type="button" class="create-btn-primary" onclick={create} disabled={creating}>
+      <button type="button" class="btn btn-primary" onclick={create} disabled={creating}>
         {creating ? $t('Creating…') : $t('Create')}
       </button>
     </footer>
@@ -282,22 +282,6 @@
     margin: 0;
     font-size: var(--text-lg);
     font-weight: 600;
-  }
-
-  .create-close {
-    background: transparent;
-    border: none;
-    color: var(--color-text-secondary);
-    font-size: var(--text-lg);
-    cursor: pointer;
-    line-height: 1;
-    padding: var(--space-1);
-    border-radius: var(--radius-xs);
-  }
-
-  .create-close:hover {
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
   }
 
   .create-field {
@@ -391,37 +375,5 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--space-2);
-  }
-
-  .create-btn-secondary {
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .create-btn-secondary:not(:disabled):hover {
-    border-color: var(--color-border-hover);
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
-  }
-
-  .create-btn-primary {
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .create-btn-primary:disabled,
-  .create-btn-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 </style>

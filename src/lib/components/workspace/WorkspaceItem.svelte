@@ -150,12 +150,12 @@
     <div class="workspace-actions">
       <button
         type="button"
-        class="delete-button"
+        class="btn btn-danger"
         onclick={handleDeleteRequest}
         aria-label={$t('Delete project: {title}', { title: workspace.title })}
         title={$t('Delete project')}
       >
-        <span aria-hidden="true">🗑️</span>
+        {$t('Delete')}
       </button>
     </div>
   {/if}
@@ -210,12 +210,12 @@
 
   .workspace-select:focus-visible {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--color-interactive-primary);
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   .workspace-item.current {
-    border-color: var(--color-primary);
+    border-color: var(--color-interactive-primary);
     background-color: var(--color-primary-surface);
   }
 
@@ -297,8 +297,8 @@
     font-size: var(--text-xs);
     font-weight: 500;
     padding: 2px var(--space-1);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
+    background-color: var(--color-interactive-primary);
+    color: var(--color-on-accent);
     border-radius: var(--radius-xs);
     flex-shrink: 0;
   }
@@ -355,34 +355,6 @@
     display: flex;
     gap: var(--space-2);
     flex-shrink: 0;
-  }
-
-  .delete-button {
-    min-width: 44px; /* Accessibility: min touch target */
-    min-height: 44px;
-    padding: var(--space-2);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-secondary);
-    color: var(--color-text-secondary);
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .delete-button:hover {
-    border-color: var(--color-error);
-    background-color: var(--color-error-surface);
-    color: var(--color-error);
-  }
-
-  .delete-button:focus-visible {
-    outline: none;
-    border-color: var(--color-error);
-    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
   }
 
   /* Mobile adjustments */

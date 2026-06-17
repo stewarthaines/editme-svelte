@@ -159,7 +159,7 @@
   >
     <header class="opds-header">
       <h2 id="opds-dialog-title">{$t('Import from Catalog')}</h2>
-      <button type="button" class="opds-close" onclick={onClose} aria-label={$t('Close')}
+      <button type="button" class="btn btn-icon" onclick={onClose} aria-label={$t('Close')}
         ><X size={16} aria-hidden="true" /></button
       >
     </header>
@@ -179,7 +179,7 @@
       </select>
       <button
         type="button"
-        class="opds-remove-btn"
+        class="btn btn-secondary"
         onclick={removeSelected}
         disabled={!isSaved || loading || importing}
         aria-label={$t('Remove the selected feed from the list')}
@@ -201,7 +201,7 @@
       />
       <button
         type="button"
-        class="opds-fetch-btn"
+        class="btn btn-primary"
         onclick={fetchFeed}
         disabled={!url.trim() || loading || importing}
       >
@@ -299,22 +299,6 @@
     font-weight: 600;
   }
 
-  .opds-close {
-    background: transparent;
-    border: none;
-    color: var(--color-text-secondary);
-    font-size: var(--text-lg);
-    cursor: pointer;
-    line-height: 1;
-    padding: var(--space-1);
-    border-radius: var(--radius-xs);
-  }
-
-  .opds-close:hover {
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-  }
-
   .opds-saved-row {
     display: flex;
     gap: var(--space-2);
@@ -332,28 +316,6 @@
     font-size: var(--text-sm);
   }
 
-  .opds-remove-btn {
-    flex: 0 0 auto;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .opds-remove-btn:not(:disabled):hover {
-    border-color: var(--color-border-hover);
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
-  }
-
-  .opds-remove-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
   .opds-url-row {
     display: flex;
     gap: var(--space-2);
@@ -369,22 +331,6 @@
     color: var(--color-text-primary);
     font-family: inherit;
     font-size: var(--text-sm);
-  }
-
-  .opds-fetch-btn {
-    flex: 0 0 auto;
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-primary);
-    color: var(--color-surface);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .opds-fetch-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   .opds-error {
