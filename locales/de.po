@@ -356,12 +356,9 @@ msgid "Additional title"
 msgstr "Zusätzlicher Titel"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced"
 msgstr "Erweitert"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Advanced Mode"
-msgstr "Erweiterter Modus"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -976,17 +973,9 @@ msgstr "Generator bearbeiten"
 msgid "Edition"
 msgstr "Ausgabe"
 
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Editor"
-msgstr "Editor"
-
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
 msgstr "Element"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Enable advanced editing features and additional controls for expert users."
-msgstr "Aktiviert erweiterte Bearbeitungsfunktionen und zusätzliche Steuerelemente für erfahrene Benutzer."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Endpoint URL"
@@ -1823,14 +1812,6 @@ msgstr "Zahl"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "OAuth Client ID"
 msgstr "OAuth-Client-ID"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Off"
-msgstr "Aus"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "On"
-msgstr "Ein"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"

@@ -356,11 +356,8 @@ msgid "Additional title"
 msgstr ""
 
 #: src/lib/components/metadata/MetadataEditor.svelte
-msgid "Advanced"
-msgstr ""
-
 #: src/lib/navigation/views/SettingsView.svelte
-msgid "Advanced Mode"
+msgid "Advanced"
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
@@ -976,16 +973,8 @@ msgstr ""
 msgid "Edition"
 msgstr ""
 
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Editor"
-msgstr ""
-
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
-msgstr ""
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Enable advanced editing features and additional controls for expert users."
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -1822,14 +1811,6 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "OAuth Client ID"
-msgstr ""
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Off"
-msgstr ""
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "On"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

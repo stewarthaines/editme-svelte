@@ -530,9 +530,6 @@
       p.margin === 'narrow' ? $t('Narrow') : p.margin === 'wide' ? $t('Wide') : $t('Normal');
     return `${size} · ${margin}`;
   });
-  const editorSummary = $derived(
-    `${$t('Advanced Mode')}: ${isAdvancedMode ? $t('On') : $t('Off')}`
-  );
   const epubSummary = $derived.by(() => {
     const tt = epubSettings?.text_transform ? transformLabel(epubSettings.text_transform).name : '';
     const n = epubSettings?.dom_transforms?.length ?? 0;
@@ -690,6 +687,19 @@
         <div class="settings-pane">
           <PaneHeader>
             <span class="pane-title">{$t('Project Settings')}</span>
+            {#snippet actions()}
+              {#if canEditSettings}
+                <label class="advanced-toggle">
+                  <span>{$t('Advanced')}</span>
+                  <input
+                    type="checkbox"
+                    checked={isAdvancedMode}
+                    onchange={handleAdvancedModeChange}
+                    disabled={loading || readOnly}
+                  />
+                </label>
+              {/if}
+            {/snippet}
           </PaneHeader>
           <div class="settings-pane-body">
             {#if canEditSettings}
@@ -785,30 +795,6 @@
                   </div>
                 </SettingsSection>
               {/if}
-
-              <SettingsSection
-                title={$t('Editor')}
-                summary={editorSummary}
-                name="project-settings"
-                open={projectFirstOpen === 'editor'}
-              >
-                <div class="setting-group">
-                  <label class="setting-label">
-                    <input
-                      type="checkbox"
-                      checked={isAdvancedMode}
-                      onchange={handleAdvancedModeChange}
-                      disabled={loading || readOnly}
-                    />
-                    <span class="setting-text">{$t('Advanced Mode')}</span>
-                  </label>
-                  <p class="setting-description">
-                    {$t(
-                      'Enable advanced editing features and additional controls for expert users.'
-                    )}
-                  </p>
-                </div>
-              </SettingsSection>
 
               <!-- EPUB Settings -->
               {#if canEditEPUBSettings && isAdvancedMode}
@@ -1054,6 +1040,21 @@
     font-size: var(--text-base);
     font-weight: 600;
     color: var(--color-text-primary);
+  }
+
+  /* Advanced-mode toggle relocated into the Project Settings pane header. */
+  .advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .advanced-toggle input {
+    cursor: pointer;
   }
 
   .no-workspace-message,
