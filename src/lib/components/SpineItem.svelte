@@ -148,7 +148,7 @@
   {#if showMoveButtons}
     <div class="move-buttons" aria-label={$t('Item controls')}>
       <button
-        class="move-button"
+        class="btn btn-icon btn-icon-sm"
         onclick={e => {
           e.stopPropagation();
           onRenameId();
@@ -159,7 +159,7 @@
         <PencilSimple size={14} aria-hidden="true" />
       </button>
       <button
-        class="move-button delete-button"
+        class="btn btn-icon btn-icon-sm delete-button"
         onclick={e => {
           e.stopPropagation();
           onDelete();
@@ -175,7 +175,7 @@
         <Trash size={14} aria-hidden="true" />
       </button>
       <button
-        class="move-button"
+        class="btn btn-icon btn-icon-sm"
         onclick={e => {
           e.stopPropagation();
           onMoveUp();
@@ -191,7 +191,7 @@
         <ArrowUp size={14} aria-hidden="true" />
       </button>
       <button
-        class="move-button"
+        class="btn btn-icon btn-icon-sm"
         onclick={e => {
           e.stopPropagation();
           onMoveDown();
@@ -349,40 +349,12 @@
     z-index: 1;
   }
 
-  .move-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    inline-size: 28px;
-    block-size: 28px;
-    border: none;
-    background: var(--color-bg-primary);
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    transition: all var(--duration-fast) ease;
-  }
-
-  .move-button:hover:not(:disabled) {
-    background: var(--color-interactive-secondary-hover);
-    color: var(--color-text-primary);
-  }
-
-  .move-button:focus-visible {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
-    outline-offset: var(--focus-ring-offset);
-  }
-
-  .move-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    color: var(--color-text-tertiary);
-  }
-
+  /* Destructive delete keeps a red hover instead of the shared azure
+     (component-scoped, so it overrides .btn-icon:hover). */
   .delete-button:hover:not(:disabled) {
-    background: var(--color-danger);
-    color: var(--color-bg-primary);
+    background: var(--color-button-danger-bg);
+    border-color: var(--color-button-danger-bg);
+    color: var(--color-on-accent);
   }
 
   /* High contrast mode */

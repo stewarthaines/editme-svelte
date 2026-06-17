@@ -177,7 +177,7 @@
 <aside class="sidebar" class:collapsed={!isExpanded}>
   <div class="sidebar-header">
     <button
-      class="sidebar-toggle"
+      class="btn btn-icon btn-icon-lg sidebar-toggle"
       onclick={toggleSidebar}
       aria-expanded={isExpanded}
       aria-label={$t('Toggle sidebar')}
@@ -426,29 +426,6 @@
   }
 
   /* Flat icon button — matches the Chapters .append-button-nav reference. */
-  .sidebar-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    inline-size: var(--touch-target-min);
-    block-size: var(--touch-target-min);
-    border: none;
-    background: transparent;
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    transition: all var(--duration-fast) ease;
-  }
-
-  .sidebar-toggle:hover {
-    background: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-  }
-
-  .sidebar-toggle:focus-visible {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus); /* Using accessibility tokens */
-    outline-offset: var(--focus-ring-offset);
-  }
 
   .sidebar-title {
     margin: 0; /* Simple reset */
