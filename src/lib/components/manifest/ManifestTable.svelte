@@ -3,7 +3,7 @@
   import PaneHeader from '../layout/PaneHeader.svelte';
   import { SOURCE_ARCHIVE_NAME } from '../../source/index.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
-  import { X } from 'phosphor-svelte';
+  import { X, CaretRight } from 'phosphor-svelte';
 
   type SortableFields = 'href' | 'size';
 
@@ -441,7 +441,9 @@
                     aria-expanded={!collapsed}
                     onclick={() => toggleGroup(group.key)}
                   >
-                    <span class="disclosure" aria-hidden="true">▸</span>
+                    <span class="disclosure" aria-hidden="true">
+                      <CaretRight size={14} />
+                    </span>
                     <span class="separator-label">{group.label}</span>
                   </button>
                 </td>
@@ -719,7 +721,9 @@
     align-items: center;
     gap: 0.4rem;
     width: 100%;
-    padding: 0.35rem 0.75rem;
+    /* Match the data rows' vertical padding (.manifest-table td) so the heading
+       row sits at the same height. */
+    padding: 0.5rem 0.75rem;
     background: none;
     border: none;
     cursor: pointer;
@@ -733,11 +737,8 @@
   }
 
   .disclosure {
-    display: inline-block;
-    font-size: 1.4rem;
-    /* Tight line box so the larger glyph paints big without inflating the
-       compact heading row. */
-    line-height: 0.6;
+    display: inline-flex;
+    align-items: center;
     color: var(--color-text-secondary);
     transition: transform 0.15s ease;
   }
