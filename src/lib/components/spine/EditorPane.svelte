@@ -25,6 +25,8 @@
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
   import GeneratorPanel from '$lib/components/spine/GeneratorPanel.svelte';
   import type { GeneratorRunner } from '$lib/generators/generator-store.js';
+  import { isRtlLanguage } from '$lib/epub/language-direction.js';
+  import { primaryLanguage } from '$lib/epub/opf-utils.js';
   import { t } from '$lib/i18n';
 
   // Props using Svelte 5 runes syntax
@@ -239,17 +241,16 @@
     return 'syntax-text';
   }
 
+  // Right-to-left book → edit prose right-to-left. Prose surfaces (the chapter text
+  // and title) follow the book's language; code/style files always stay LTR.
+  const bookIsRtl = $derived(isRtlLanguage(primaryLanguage(workspace?.opf?.metadata)));
+
   /**
-   * Determine if file type should use LTR direction (for code syntax)
+   * Editing direction for a pane: prose ('text') follows the book; everything
+   * else (css/js/transform/generator) stays left-to-right.
    */
-  function shouldUseLtrDirection(fileType: string): boolean {
-    return (
-      fileType.includes('css') ||
-      fileType.includes('javascript') ||
-      fileType.includes('js') ||
-      fileType.includes('transform') ||
-      fileType.includes('generator')
-    );
+  function paneDir(fileType: string): 'rtl' | 'ltr' {
+    return fileType === 'text' ? (bookIsRtl ? 'rtl' : 'ltr') : 'ltr';
   }
 
   /**
@@ -487,6 +488,7 @@
     value={chapterTitle}
     placeholder={chapterTitlePlaceholder}
     onchange={e => onChapterTitleChange?.((e.currentTarget as HTMLInputElement).value)}
+    dir={bookIsRtl ? 'rtl' : 'ltr'}
     aria-label={$t('Chapter title')}
     title={$t('Chapter title — used in the content document <title>; defaults to the spine id')}
   />
@@ -616,7 +618,7 @@
               autocomplete="off"
               autocapitalize="off"
               aria-label={$t('Pane 2 content')}
-              dir={shouldUseLtrDirection(pane2SelectedFile) ? 'ltr' : undefined}
+              dir={paneDir(pane2SelectedFile)}
             ></textarea>
             {#if pane2Error}
               <div class="pane-error-overlay">
@@ -658,7 +660,7 @@
             autocomplete="off"
             autocapitalize="off"
             aria-label={$t('Pane 1 content')}
-            dir={shouldUseLtrDirection(pane1SelectedFile) ? 'ltr' : undefined}
+            dir={paneDir(pane1SelectedFile)}
           ></textarea>
           {#if pane1Error}
             <div class="pane-error-overlay">
