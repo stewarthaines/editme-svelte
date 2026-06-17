@@ -574,8 +574,8 @@
   }
 
   .append-button-nav:hover {
-    background: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
+    background: var(--color-hover-accent);
+    color: var(--color-on-accent);
   }
 
   .append-button-nav:focus-visible {

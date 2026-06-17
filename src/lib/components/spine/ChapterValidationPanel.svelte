@@ -91,7 +91,7 @@
     </span>
     <button
       type="button"
-      class="vpanel-close"
+      class="btn btn-icon"
       onclick={() => onClose?.()}
       aria-label={$t('Close validation panel')}
       title={$t('Close')}
@@ -176,16 +176,6 @@
     padding: var(--space-2) var(--space-3);
     background: var(--color-bg-secondary);
     border-bottom: 1px solid var(--color-border-default);
-  }
-
-  .vpanel-close {
-    flex-shrink: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
-    padding: 0 var(--space-1);
   }
 
   .vpanel-meta-inline {

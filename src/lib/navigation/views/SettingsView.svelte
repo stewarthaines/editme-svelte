@@ -626,11 +626,7 @@
             </SettingsSection>
 
             {#if availablePlugins.length > 0}
-              <SettingsSection
-                title={$t('Plugins')}
-                summary={pluginsSummary}
-                name="app-settings"
-              >
+              <SettingsSection title={$t('Plugins')} summary={pluginsSummary} name="app-settings">
                 <p class="setting-description plugins-intro">
                   {$t('Optional features available when the app is served over HTTP.')}
                 </p>
@@ -875,7 +871,7 @@
                             <div class="dom-transform-actions">
                               <button
                                 type="button"
-                                class="icon-btn"
+                                class="btn btn-icon"
                                 onclick={() => moveDomTransform(i, -1)}
                                 disabled={i === 0 || epubLoading}
                                 aria-label={$t('Move up')}
@@ -885,7 +881,7 @@
                               </button>
                               <button
                                 type="button"
-                                class="icon-btn"
+                                class="btn btn-icon"
                                 onclick={() => moveDomTransform(i, 1)}
                                 disabled={i === (epubSettings?.dom_transforms.length ?? 0) - 1 ||
                                   epubLoading}
@@ -896,7 +892,7 @@
                               </button>
                               <button
                                 type="button"
-                                class="icon-btn"
+                                class="btn btn-icon"
                                 onclick={() => removeDomTransform(i)}
                                 disabled={epubLoading}
                                 aria-label={$t('Remove')}
@@ -1222,29 +1218,6 @@
     display: flex;
     gap: 0.25rem;
     flex-shrink: 0;
-  }
-
-  .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.25rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface-primary);
-    color: var(--color-text-secondary);
-    cursor: pointer;
-  }
-
-  .icon-btn:not(:disabled):hover {
-    border-color: var(--color-border-hover);
-    background: var(--color-surface-hover);
-    color: var(--color-text-primary);
-  }
-
-  .icon-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 
   .extension-import {

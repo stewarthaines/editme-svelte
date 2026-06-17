@@ -1151,7 +1151,7 @@
         </strong>
         <button
           type="button"
-          class="a11y-panel-close"
+          class="btn btn-icon"
           onclick={() => (a11yPanelOpen = false)}
           aria-label={$t('Close accessibility panel')}
           title={$t('Close')}
@@ -1258,7 +1258,11 @@
        http: (Paged.js needs the origin); opens a window with just this chapter. -->
   {#if selectedDevice === 'print' && onGeneratePdf}
     <div class="pdf-footer">
-      <button type="button" class="btn btn-secondary pdf-generate-button" onclick={() => onGeneratePdf?.()}>
+      <button
+        type="button"
+        class="btn btn-secondary pdf-generate-button"
+        onclick={() => onGeneratePdf?.()}
+      >
         <FilePdf size={18} aria-hidden="true" />
         <span>{$t('Chapter PDF')}</span>
       </button>
@@ -1320,14 +1324,20 @@
     gap: var(--space-1);
   }
 
+  .a11y-check:hover:not(:disabled) {
+    color: var(--color-on-accent);
+    background: var(--color-hover-accent);
+    border-color: var(--color-hover-accent);
+  }
+
   .a11y-check:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
   .a11y-check.active {
-    border-color: var(--color-primary, #0074d9);
-    background: var(--color-bg-tertiary, var(--color-bg-secondary));
+    border-color: var(--color-accent);
+    background: var(--color-bg-tertiary);
   }
 
   .a11y-count {
@@ -1379,15 +1389,6 @@
     padding: var(--space-2) var(--space-3);
     background: var(--color-bg-secondary);
     border-bottom: 1px solid var(--color-border-default);
-  }
-
-  .a11y-panel-close {
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
-    padding: 0 var(--space-1);
   }
 
   .a11y-list {
@@ -1465,7 +1466,8 @@
   }
 
   .orientation-toggle:hover {
-    background: var(--color-bg-hover);
+    color: var(--color-on-accent);
+    background: var(--color-hover-accent);
   }
 
   .orientation-toggle:focus {
@@ -1489,7 +1491,8 @@
   }
 
   .print-refresh:hover {
-    background: var(--color-bg-hover);
+    color: var(--color-on-accent);
+    background: var(--color-hover-accent);
   }
 
   .print-refresh:focus {
@@ -1522,7 +1525,8 @@
   }
 
   .view-toggle:hover {
-    background: var(--color-bg-hover);
+    color: var(--color-on-accent);
+    background: var(--color-hover-accent);
   }
 
   .view-toggle.active {
