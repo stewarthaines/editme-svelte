@@ -7,6 +7,7 @@
   import FileName from './FileName.svelte';
   import { formatFileSize } from '../format.js';
   import { t } from '../i18n.js';
+  import { XCircle, CheckCircle } from 'phosphor-svelte';
 
   let {
     epubs,
@@ -121,7 +122,11 @@
                     ? $t('Invalid EPUB')
                     : $t('Valid EPUB')}
                 >
-                  {summary.error > 0 ? '✕' : '✓'}
+                  {#if summary.error > 0}
+                    <XCircle size={14} aria-hidden="true" />
+                  {:else}
+                    <CheckCircle size={14} aria-hidden="true" />
+                  {/if}
                 </span>
                 {#if summary.error === 0 && summary.warning === 0 && summary.info === 0}
                   <span class="vsummary-clean">{$t('No issues')}</span>

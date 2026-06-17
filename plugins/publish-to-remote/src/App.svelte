@@ -3,6 +3,7 @@
   import { SvelteMap } from 'svelte/reactivity';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, translate } from './i18n.js';
+  import { X } from 'phosphor-svelte';
   import { dirHandle, activeIdentifier } from './store.js';
   import { readRemotes, writeRemotes, readSidecars, pngDataUri } from './opfs.js';
   import {
@@ -758,7 +759,7 @@
       <button
         class="status-toast-close"
         aria-label={$t('Dismiss')}
-        onclick={() => (statusMessage = null)}>×</button
+        onclick={() => (statusMessage = null)}><X size={16} aria-hidden="true" /></button
       >
     </div>
   {/if}

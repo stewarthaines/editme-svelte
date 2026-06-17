@@ -117,10 +117,6 @@ msgstr ""
 msgid "{path} (line {line})"
 msgstr ""
 
-#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
-msgid "← Back"
-msgstr ""
-
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "1 day ago"
 msgstr ""
@@ -444,6 +440,10 @@ msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Available when running online"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Back"
 msgstr ""
 
 #: src/lib/components/metadata/MetadataEditor.svelte

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ValidationReport } from '../epub-validation.js';
   import { t, translate } from '../i18n.js';
+  import { X } from 'phosphor-svelte';
 
   let {
     report,
@@ -57,7 +58,9 @@
         <h3>
           {$t('Validation Report: {filename}', { filename: report.filename })}
         </h3>
-        <button class="btn btn-icon" onclick={onClose}>✕</button>
+        <button class="btn btn-icon" onclick={onClose} aria-label={$t('Close')}>
+          <X size={16} aria-hidden="true" />
+        </button>
       </div>
       <div class="modal-body">
         <div class="report-summary">

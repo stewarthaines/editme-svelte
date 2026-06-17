@@ -7,6 +7,7 @@
     pickGoogleDriveFolder,
   } from '../google-drive.js';
   import { authorizeDropbox, listDropboxFolders } from '../dropbox.js';
+  import { ArrowLeft } from 'phosphor-svelte';
   import type { RemoteConfig, DropboxRemoteConfig } from '../types.js';
 
   const S3_PRESETS = {
@@ -472,9 +473,10 @@
     </div>
   {:else if remoteType === 's3-compatible'}
     <div class="form-header">
-      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >{$t('← Back')}</button
-      >
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {$t('Back')}
+      </button>
       <h3>{$t('S3-Compatible Storage')}</h3>
     </div>
 
@@ -587,9 +589,10 @@
     </div>
   {:else if remoteType === 'google-drive'}
     <div class="form-header">
-      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >{$t('← Back')}</button
-      >
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {$t('Back')}
+      </button>
       <h3>{$t('Google Drive')}</h3>
     </div>
 
@@ -664,9 +667,10 @@
     {/if}
   {:else if remoteType === 'dropbox'}
     <div class="form-header">
-      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >{$t('← Back')}</button
-      >
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {$t('Back')}
+      </button>
       <h3>{$t('Dropbox')}</h3>
     </div>
 
@@ -782,9 +786,10 @@
     {/if}
   {:else if remoteType === 'webdav'}
     <div class="form-header">
-      <button class="btn btn-link" onclick={() => (remoteType = 'none')}
-        >{$t('← Back')}</button
-      >
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {$t('Back')}
+      </button>
       <h3>{$t('WebDAV Storage')}</h3>
     </div>
 
