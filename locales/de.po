@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-16\n"
-"PO-Revision-Date: 2026-06-16\n"
+"POT-Creation-Date: 2026-06-17\n"
+"PO-Revision-Date: 2026-06-17\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -408,10 +408,6 @@ msgstr "Möchten Sie dieses Element wirklich löschen?"
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Audio Clip Editor"
 msgstr "Audioclip-Editor"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Audio Clip Template"
-msgstr "Audioclip-Vorlage"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Author"
@@ -2583,10 +2579,6 @@ msgstr "System"
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Technical Info"
 msgstr "Technische Informationen"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Template for inserting audio clip directives. Use placeholders: <href>, <begin>, <end>, <label>, <rate>"
-msgstr "Vorlage zum Einfügen von Audioclip-Direktiven. Verwenden Sie Platzhalter: <href>, <begin>, <end>, <label>, <rate>"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Template for the exported .epub filename. Use placeholders: <title>, <author>, <date>. Empty placeholders (e.g. no author) collapse cleanly."

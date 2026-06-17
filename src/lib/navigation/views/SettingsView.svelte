@@ -211,41 +211,6 @@
     }
   }
 
-  // Handle audio clip template change
-  async function handleAudioTemplateChange(event: Event): Promise<void> {
-    if (!workspaceId || !epubSettings) return;
-
-    const target = event.target as HTMLInputElement;
-    const newTemplate = target.value;
-
-    // Validate template
-    const validation = settingsService.validateEPUBSettings({ audio_clip_template: newTemplate });
-    if (!validation.isValid) {
-      error = validation.errors[0] || 'Invalid template format';
-      return;
-    }
-
-    // Optimistic update
-    const updatedSettings: EPUBSettings = {
-      ...epubSettings,
-      audio_clip_template: newTemplate,
-    };
-
-    epubSettings = updatedSettings;
-
-    try {
-      await settingsService.saveEPUBSettings(workspaceId, updatedSettings);
-      onSettingsChanged?.();
-    } catch (err) {
-      error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
-      // Revert optimistic update
-      epubSettings = {
-        ...epubSettings,
-        audio_clip_template: epubSettings.audio_clip_template,
-      };
-    }
-  }
-
   // Handle packaged-filename template change
   async function handleFilenameTemplateChange(event: Event): Promise<void> {
     if (!workspaceId || !epubSettings) return;
@@ -869,27 +834,6 @@
                     <p class="setting-description">
                       {$t(
                         'Template for the exported .epub filename. Use placeholders: <title>, <author>, <date>. Empty placeholders (e.g. no author) collapse cleanly.'
-                      )}
-                    </p>
-                  </div>
-
-                  <div class="setting-group">
-                    <label for="audio-clip-template" class="setting-label-text">
-                      {$t('Audio Clip Template')}
-                    </label>
-                    <!-- i18n-ignore: literal djot directive syntax, not prose -->
-                    <input
-                      id="audio-clip-template"
-                      type="text"
-                      class="template-input"
-                      value={epubSettings?.audio_clip_template || ''}
-                      placeholder=":clip[label]&#123;src=href begin=begin end=end&#125;"
-                      onblur={handleAudioTemplateChange}
-                      disabled={epubLoading}
-                    />
-                    <p class="setting-description">
-                      {$t(
-                        'Template for inserting audio clip directives. Use placeholders: <href>, <begin>, <end>, <label>, <rate>'
                       )}
                     </p>
                   </div>
