@@ -11,6 +11,7 @@
     DEFAULT_CATALOG_FEED,
     type SavedFeed,
   } from '../../opds/saved-feeds.js';
+  import { X } from 'phosphor-svelte';
 
   let {
     onImport,
@@ -158,7 +159,9 @@
   >
     <header class="opds-header">
       <h2 id="opds-dialog-title">{$t('Import from Catalog')}</h2>
-      <button type="button" class="opds-close" onclick={onClose} aria-label={$t('Close')}>✕</button>
+      <button type="button" class="opds-close" onclick={onClose} aria-label={$t('Close')}
+        ><X size={16} aria-hidden="true" /></button
+      >
     </header>
 
     <div class="opds-saved-row">

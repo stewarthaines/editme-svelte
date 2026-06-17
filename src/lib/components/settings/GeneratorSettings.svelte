@@ -19,6 +19,7 @@
   } from '$lib/generators/generator-store.js';
   import type { GeneratorManifest, GeneratorOption } from '$lib/extensions/extension-catalog.js';
   import SettingsSection from './SettingsSection.svelte';
+  import { X } from 'phosphor-svelte';
 
   let {
     workspaceId,
@@ -94,7 +95,15 @@
   function addOption(): void {
     optionRows = [
       ...optionRows,
-      { type: 'string', name: '', label: '', placeholder: '', textDefault: '', boolDefault: false, choices: '' },
+      {
+        type: 'string',
+        name: '',
+        label: '',
+        placeholder: '',
+        textDefault: '',
+        boolDefault: false,
+        choices: '',
+      },
     ];
   }
 
@@ -152,7 +161,9 @@
       boolDefault: o.type === 'boolean' ? Boolean(o.default) : false,
       choices:
         o.type === 'select'
-          ? (o.options ?? []).map(c => (c.value === c.label ? c.value : `${c.value}:${c.label}`)).join(', ')
+          ? (o.options ?? [])
+              .map(c => (c.value === c.label ? c.value : `${c.value}:${c.label}`))
+              .join(', ')
           : '',
     }));
   }
@@ -299,167 +310,168 @@ function generateText(ctx, options) {
       )}
     </p>
 
-  <!-- Existing generators -->
-  {#if loading}
-    <p>{$t('Loading…')}</p>
-  {:else if generators.length === 0}
-    <p class="gs-empty">{$t('No generators defined.')}</p>
-  {:else}
-    <ul class="gs-list">
-      {#each generators as g (g.manifest.id)}
-        <li class="gs-item">
-          <div class="gs-item-text">
-            <span class="gs-item-name">{g.manifest.name}</span>
-            {#if g.manifest.description}
-              <span class="gs-item-desc">{g.manifest.description}</span>
-            {/if}
-          </div>
-          <div class="gs-item-actions">
-            <button
-              type="button"
-              class="gs-edit"
-              onclick={() => startEdit(g)}
-              disabled={!isAdvancedMode}
-            >
-              {$t('Edit')}
-            </button>
-            <button
-              type="button"
-              class="gs-remove"
-              onclick={() => handleRemove(g.manifest.id)}
-              disabled={!isAdvancedMode}
-            >
-              {$t('Remove')}
-            </button>
-          </div>
-        </li>
-      {/each}
-    </ul>
-  {/if}
-
-  <!-- Create / overwrite -->
-  <div class="gs-create" class:disabled={!isAdvancedMode}>
-    <h4>{editingId ? $t('Edit generator') : $t('Add a generator')}</h4>
-    {#if !editingId}
-      <p class="gs-help">
-        {$t(
-          'Create scaffolds a starter generateText script (with your options documented) that you can edit from the chapter editor’s file menu.'
-        )}
-      </p>
-    {/if}
-    {#if !isAdvancedMode}
-      <p class="advanced-mode-note">{$t('Advanced Mode required for extension management')}</p>
+    <!-- Existing generators -->
+    {#if loading}
+      <p>{$t('Loading…')}</p>
+    {:else if generators.length === 0}
+      <p class="gs-empty">{$t('No generators defined.')}</p>
+    {:else}
+      <ul class="gs-list">
+        {#each generators as g (g.manifest.id)}
+          <li class="gs-item">
+            <div class="gs-item-text">
+              <span class="gs-item-name">{g.manifest.name}</span>
+              {#if g.manifest.description}
+                <span class="gs-item-desc">{g.manifest.description}</span>
+              {/if}
+            </div>
+            <div class="gs-item-actions">
+              <button
+                type="button"
+                class="gs-edit"
+                onclick={() => startEdit(g)}
+                disabled={!isAdvancedMode}
+              >
+                {$t('Edit')}
+              </button>
+              <button
+                type="button"
+                class="gs-remove"
+                onclick={() => handleRemove(g.manifest.id)}
+                disabled={!isAdvancedMode}
+              >
+                {$t('Remove')}
+              </button>
+            </div>
+          </li>
+        {/each}
+      </ul>
     {/if}
 
-    <div class="gs-field">
-      <label class="gs-label" for="gs-name">{$t('Name')}</label>
-      <input id="gs-name" class="gs-input" bind:value={name} disabled={!isAdvancedMode} />
-    </div>
+    <!-- Create / overwrite -->
+    <div class="gs-create" class:disabled={!isAdvancedMode}>
+      <h4>{editingId ? $t('Edit generator') : $t('Add a generator')}</h4>
+      {#if !editingId}
+        <p class="gs-help">
+          {$t(
+            'Create scaffolds a starter generateText script (with your options documented) that you can edit from the chapter editor’s file menu.'
+          )}
+        </p>
+      {/if}
+      {#if !isAdvancedMode}
+        <p class="advanced-mode-note">{$t('Advanced Mode required for extension management')}</p>
+      {/if}
 
-    <div class="gs-field">
-      <label class="gs-label" for="gs-desc">{$t('Description')}</label>
-      <input id="gs-desc" class="gs-input" bind:value={description} disabled={!isAdvancedMode} />
-    </div>
-
-    <div class="gs-options">
-      <div class="gs-options-head">
-        <span class="gs-label">{$t('Options')}</span>
-        <button type="button" class="gs-add" onclick={addOption} disabled={!isAdvancedMode}>
-          {$t('Add option')}
-        </button>
+      <div class="gs-field">
+        <label class="gs-label" for="gs-name">{$t('Name')}</label>
+        <input id="gs-name" class="gs-input" bind:value={name} disabled={!isAdvancedMode} />
       </div>
 
-      {#each optionRows as row, i (i)}
-        <div class="gs-option-row">
-          <select
-            class="gs-input gs-type"
-            value={row.type}
-            onchange={e => patchOption(i, { type: e.currentTarget.value as GeneratorOption['type'] })}
-            aria-label={$t('Option type')}
-            disabled={!isAdvancedMode}
-          >
-            {#each optionTypeLabels as ot (ot.value)}
-              <option value={ot.value}>{ot.label}</option>
-            {/each}
-          </select>
-          <input
-            class="gs-input"
-            placeholder={$t('Key')}
-            value={row.name}
-            oninput={e => patchOption(i, { name: e.currentTarget.value })}
-            aria-label={$t('Option key')}
-            disabled={!isAdvancedMode}
-          />
-          <input
-            class="gs-input"
-            placeholder={$t('Label')}
-            value={row.label}
-            oninput={e => patchOption(i, { label: e.currentTarget.value })}
-            aria-label={$t('Option label')}
-            disabled={!isAdvancedMode}
-          />
-          {#if row.type === 'boolean'}
-            <label class="gs-check">
-              <input
-                type="checkbox"
-                checked={row.boolDefault}
-                onchange={e => patchOption(i, { boolDefault: e.currentTarget.checked })}
-                disabled={!isAdvancedMode}
-              />
-              <span>{$t('Default on')}</span>
-            </label>
-          {:else if row.type === 'select'}
-            <input
-              class="gs-input"
-              placeholder={$t('value:Label, value:Label')}
-              value={row.choices}
-              oninput={e => patchOption(i, { choices: e.currentTarget.value })}
-              aria-label={$t('Choices')}
-              disabled={!isAdvancedMode}
-            />
-          {:else}
-            <input
-              class="gs-input"
-              placeholder={$t('Default')}
-              value={row.textDefault}
-              oninput={e => patchOption(i, { textDefault: e.currentTarget.value })}
-              aria-label={$t('Default value')}
-              disabled={!isAdvancedMode}
-            />
-          {/if}
-          <button
-            type="button"
-            class="gs-remove gs-remove-row"
-            onclick={() => removeOption(i)}
-            aria-label={$t('Remove option')}
-            disabled={!isAdvancedMode}
-          >
-            ×
+      <div class="gs-field">
+        <label class="gs-label" for="gs-desc">{$t('Description')}</label>
+        <input id="gs-desc" class="gs-input" bind:value={description} disabled={!isAdvancedMode} />
+      </div>
+
+      <div class="gs-options">
+        <div class="gs-options-head">
+          <span class="gs-label">{$t('Options')}</span>
+          <button type="button" class="gs-add" onclick={addOption} disabled={!isAdvancedMode}>
+            {$t('Add option')}
           </button>
         </div>
-      {/each}
-    </div>
 
-    {#if error}
-      <p class="gs-error" role="alert">{error}</p>
-    {/if}
+        {#each optionRows as row, i (i)}
+          <div class="gs-option-row">
+            <select
+              class="gs-input gs-type"
+              value={row.type}
+              onchange={e =>
+                patchOption(i, { type: e.currentTarget.value as GeneratorOption['type'] })}
+              aria-label={$t('Option type')}
+              disabled={!isAdvancedMode}
+            >
+              {#each optionTypeLabels as ot (ot.value)}
+                <option value={ot.value}>{ot.label}</option>
+              {/each}
+            </select>
+            <input
+              class="gs-input"
+              placeholder={$t('Key')}
+              value={row.name}
+              oninput={e => patchOption(i, { name: e.currentTarget.value })}
+              aria-label={$t('Option key')}
+              disabled={!isAdvancedMode}
+            />
+            <input
+              class="gs-input"
+              placeholder={$t('Label')}
+              value={row.label}
+              oninput={e => patchOption(i, { label: e.currentTarget.value })}
+              aria-label={$t('Option label')}
+              disabled={!isAdvancedMode}
+            />
+            {#if row.type === 'boolean'}
+              <label class="gs-check">
+                <input
+                  type="checkbox"
+                  checked={row.boolDefault}
+                  onchange={e => patchOption(i, { boolDefault: e.currentTarget.checked })}
+                  disabled={!isAdvancedMode}
+                />
+                <span>{$t('Default on')}</span>
+              </label>
+            {:else if row.type === 'select'}
+              <input
+                class="gs-input"
+                placeholder={$t('value:Label, value:Label')}
+                value={row.choices}
+                oninput={e => patchOption(i, { choices: e.currentTarget.value })}
+                aria-label={$t('Choices')}
+                disabled={!isAdvancedMode}
+              />
+            {:else}
+              <input
+                class="gs-input"
+                placeholder={$t('Default')}
+                value={row.textDefault}
+                oninput={e => patchOption(i, { textDefault: e.currentTarget.value })}
+                aria-label={$t('Default value')}
+                disabled={!isAdvancedMode}
+              />
+            {/if}
+            <button
+              type="button"
+              class="gs-remove gs-remove-row"
+              onclick={() => removeOption(i)}
+              aria-label={$t('Remove option')}
+              disabled={!isAdvancedMode}
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          </div>
+        {/each}
+      </div>
 
-    <div class="gs-actions">
-      {#if editingId}
-        <button type="button" class="gs-cancel" onclick={resetForm} disabled={saving}>
-          {$t('Cancel')}
-        </button>
+      {#if error}
+        <p class="gs-error" role="alert">{error}</p>
       {/if}
-      <button
-        type="button"
-        class="gs-create-btn"
-        onclick={handleSave}
-        disabled={!isAdvancedMode || saving}
-      >
-        {saving ? $t('Saving…') : editingId ? $t('Save changes') : $t('Create generator')}
-      </button>
+
+      <div class="gs-actions">
+        {#if editingId}
+          <button type="button" class="gs-cancel" onclick={resetForm} disabled={saving}>
+            {$t('Cancel')}
+          </button>
+        {/if}
+        <button
+          type="button"
+          class="gs-create-btn"
+          onclick={handleSave}
+          disabled={!isAdvancedMode || saving}
+        >
+          {saving ? $t('Saving…') : editingId ? $t('Save changes') : $t('Create generator')}
+        </button>
+      </div>
     </div>
-  </div>
   </div>
 </SettingsSection>
 

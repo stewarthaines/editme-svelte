@@ -21,6 +21,7 @@
     type ValidationReport,
     type ValidationMessage,
   } from '$lib/plugins/validation-report';
+  import { X } from 'phosphor-svelte';
 
   let {
     report,
@@ -95,7 +96,7 @@
       aria-label={$t('Close validation panel')}
       title={$t('Close')}
     >
-      ✕
+      <X size={16} aria-hidden="true" />
     </button>
   </div>
 

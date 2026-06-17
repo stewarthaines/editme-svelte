@@ -46,6 +46,7 @@
     clearAllTextEditorStores,
   } from '../../stores/text-editor-store.js';
   import type { TextEditorStore } from '../../stores/index.js';
+  import { Lock } from 'phosphor-svelte';
 
   // Element reference for event binding
   let spineViewElement = $state<HTMLElement>();
@@ -441,7 +442,7 @@
           const name = basename(transformPath).replace(/\.js$/, '');
           files.push({
             value: `transform-${ext ? `${name}-${ext}` : name}`,
-            label: ext ? `Transform: ${name} (${ext})` : `Transform: ${name}`,
+            label: ext ? `JS: ${name} (${ext})` : `JS: ${name}`,
             path: transformPath,
             href: transformPath, // transform files don't have manifest hrefs
             type: 'transform',
@@ -1429,7 +1430,7 @@
 {:else if selectedItem && readOnly}
   <!-- Read-only EPUB: the chapter renders in the preview pane; no editor here. -->
   <div class="readonly-notice">
-    <div class="readonly-icon" aria-hidden="true">🔒</div>
+    <div class="readonly-icon" aria-hidden="true"><Lock size={40} aria-hidden="true" /></div>
     <h3>{$t('Read-only chapter')}</h3>
     <p>
       {$t(

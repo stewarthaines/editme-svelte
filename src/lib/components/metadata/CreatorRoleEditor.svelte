@@ -3,6 +3,7 @@
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import type { Creator, EPUBMetadata, CreatorMetadataFields } from '../../epub/opf-utils';
   import { marcLabel, marcSelectOptions } from '../../epub/marc-relators';
+  import { X } from 'phosphor-svelte';
 
   interface Props {
     field: CreatorMetadataFields;
@@ -108,7 +109,7 @@
             disabled={saving}
             aria-label={$t('Remove')}
           >
-            ×
+            <X size={14} aria-hidden="true" />
           </button>
         </div>
 
@@ -124,7 +125,7 @@
                   disabled={saving}
                   aria-label={$t('Remove role')}
                 >
-                  ×
+                  <X size={14} aria-hidden="true" />
                 </button>
               </span>
             {/each}

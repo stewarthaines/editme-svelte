@@ -19,6 +19,7 @@
   import type { BlobURLManager } from '$lib/blob-url';
   import type { ExtensionManager } from '$lib/extensions';
   import type { SettingsService } from '$lib/services/settings/settings.service';
+  import { Lock } from 'phosphor-svelte';
 
   // Props interface using clean service architecture
   interface Props {
@@ -467,7 +468,7 @@
   <div class="outline-body">
     {#if readOnly}
       <div class="readonly-notice">
-        <div class="readonly-icon" aria-hidden="true">🔒</div>
+        <div class="readonly-icon" aria-hidden="true"><Lock size={40} aria-hidden="true" /></div>
         <h3>{$t('Read-only navigation')}</h3>
         <p>
           {$t(

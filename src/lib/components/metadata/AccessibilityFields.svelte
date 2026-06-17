@@ -14,6 +14,7 @@
     CONFORMANCE_OPTIONS,
     type VocabOption,
   } from '../../epub/accessibility-vocab';
+  import { X } from 'phosphor-svelte';
 
   interface Props {
     metadata?: EPUBMetadata;
@@ -190,7 +191,7 @@
                 disabled={saving}
                 aria-label={$t('Remove')}
               >
-                ×
+                <X size={14} aria-hidden="true" />
               </button>
             </div>
           {/each}

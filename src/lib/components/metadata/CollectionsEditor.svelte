@@ -3,6 +3,7 @@
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import type { EPUBMetadata, CollectionEntry } from '../../epub/opf-utils';
+  import { X } from 'phosphor-svelte';
 
   interface Props {
     collections?: CollectionEntry[];
@@ -46,7 +47,7 @@
         disabled={saving}
         aria-label={$t('Remove')}
       >
-        ×
+        <X size={14} aria-hidden="true" />
       </button>
     </div>
 

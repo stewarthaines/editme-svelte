@@ -6,6 +6,7 @@
     WorkspaceInfo,
     WorkspaceRowDetails,
   } from '../../services/workspace/workspace.service.js';
+  import { X } from 'phosphor-svelte';
 
   let {
     workspaces = [],
@@ -71,7 +72,7 @@
           onclick={clearSearch}
           aria-label={$t('Clear search')}
         >
-          ×
+          <X size={14} aria-hidden="true" />
         </button>
       {/if}
     </div>

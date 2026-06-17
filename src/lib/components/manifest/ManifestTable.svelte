@@ -3,6 +3,7 @@
   import PaneHeader from '../layout/PaneHeader.svelte';
   import { SOURCE_ARCHIVE_NAME } from '../../source/index.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
+  import { X } from 'phosphor-svelte';
 
   type SortableFields = 'href' | 'size';
 
@@ -359,7 +360,7 @@
           aria-label={$t('Clear filter')}
           onclick={handleClearFilter}
         >
-          ×
+          <X size={14} aria-hidden="true" />
         </button>
       {/if}
     </div>

@@ -2,6 +2,7 @@
   import { t } from '../../i18n';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import { toSubject, type EPUBMetadata, type SubjectEntry } from '../../epub/opf-utils';
+  import { X } from 'phosphor-svelte';
 
   interface Props {
     subjects?: (string | SubjectEntry)[];
@@ -63,7 +64,7 @@
           disabled={saving}
           aria-label={$t('Remove subject')}
         >
-          ×
+          <X size={14} aria-hidden="true" />
         </button>
       </div>
 

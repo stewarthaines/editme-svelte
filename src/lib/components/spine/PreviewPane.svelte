@@ -26,7 +26,7 @@
   import { snippetAroundClick } from './preview-click.js';
   import { buildPagedDocument, chapterToSection, MARGIN_MM } from '$lib/pdf/pdf-export.js';
   import type { PrintSettings } from '$lib/services/settings/settings.service.js';
-  import { ArrowsClockwise, FilePdf, DeviceRotate } from 'phosphor-svelte';
+  import { ArrowsClockwise, FilePdf, DeviceRotate, X } from 'phosphor-svelte';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -1156,7 +1156,7 @@
           aria-label={$t('Close accessibility panel')}
           title={$t('Close')}
         >
-          ✕
+          <X size={16} aria-hidden="true" />
         </button>
       </div>
       {#if a11yViolations.length > 0}

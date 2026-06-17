@@ -5,6 +5,7 @@
   import { titleHue } from '../../epub/cover-generator';
   import HueSelector from '../HueSelector.svelte';
   import type { ExtensionCatalogEntry } from '../../extensions/extension-catalog';
+  import { X } from 'phosphor-svelte';
 
   // The data the create flow needs; `extension` is the chosen text-format
   // extension, or null for plain text.
@@ -129,7 +130,7 @@
     <header class="create-header">
       <h2 id="create-dialog-title">{$t('New Project')}</h2>
       <button type="button" class="create-close" onclick={onClose} aria-label={$t('Close')}>
-        ✕
+        <X size={16} aria-hidden="true" />
       </button>
     </header>
 
@@ -164,11 +165,7 @@
       </label>
 
       {#if generateCover}
-        <HueSelector
-          value={effectiveHue}
-          disabled={creating}
-          onInput={h => (coverHue = h)}
-        />
+        <HueSelector value={effectiveHue} disabled={creating} onInput={h => (coverHue = h)} />
       {/if}
 
       <div class="create-field">

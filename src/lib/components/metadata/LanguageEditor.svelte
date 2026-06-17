@@ -2,6 +2,7 @@
   import { t, currentLocale } from '../../i18n';
   import { COMMON_LANGUAGES, languageDisplayName } from '../../epub/bcp47';
   import type { EPUBMetadata } from '../../epub/opf-utils';
+  import { X } from 'phosphor-svelte';
 
   interface Props {
     languages?: string[];
@@ -68,7 +69,7 @@
             disabled={saving}
             aria-label={$t('Remove language')}
           >
-            ×
+            <X size={14} aria-hidden="true" />
           </button>
         </div>
         {#if getFieldError(`language[${index}]`)}

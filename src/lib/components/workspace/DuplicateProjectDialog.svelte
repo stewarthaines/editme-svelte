@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte';
   import { t } from '../../i18n';
+  import { X } from 'phosphor-svelte';
 
   let {
     defaultTitle,
@@ -64,7 +65,9 @@
   >
     <header class="dup-header">
       <h2 id="dup-dialog-title">{$t('Duplicate Project')}</h2>
-      <button type="button" class="dup-close" onclick={onClose} aria-label={$t('Close')}>✕</button>
+      <button type="button" class="dup-close" onclick={onClose} aria-label={$t('Close')}
+        ><X size={16} aria-hidden="true" /></button
+      >
     </header>
 
     <div class="dup-field">
