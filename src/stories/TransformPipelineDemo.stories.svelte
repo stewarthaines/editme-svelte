@@ -1,6 +1,6 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within, userEvent } from '@storybook/test';
+  import { within, userEvent } from 'storybook/test';
   import TransformPipelineDemo from './TransformPipelineDemo.svelte';
 
   const { Story } = defineMeta({

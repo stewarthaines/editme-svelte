@@ -1,6 +1,6 @@
 <script context="module">
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within, userEvent } from '@storybook/test';
+  import { within, userEvent } from 'storybook/test';
   import ContentPreviewDemo from './ContentPreviewDemo.svelte';
 
   const { Story } = defineMeta({

@@ -9,7 +9,7 @@
 
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within, userEvent } from '@storybook/test';
+  import { within, userEvent } from 'storybook/test';
   // Update this import to match your demo component
   import BackendFeatureDemo from './BackendFeatureDemo.template.svelte';
 

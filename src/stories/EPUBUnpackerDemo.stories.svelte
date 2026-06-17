@@ -10,7 +10,7 @@
 
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within, userEvent } from '@storybook/test';
+  import { within, userEvent } from 'storybook/test';
   import EPUBUnpackerDemo from './EPUBUnpackerDemo.svelte';
 
   const { Story } = defineMeta({
