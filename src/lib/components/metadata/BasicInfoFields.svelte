@@ -271,6 +271,9 @@
   }
 
   .group-title {
+    display: block;
+    width: 100%;
+    margin-block-end: var(--space-2);
     font-size: 1.05rem;
     font-weight: 500;
     color: var(--color-text-primary);
