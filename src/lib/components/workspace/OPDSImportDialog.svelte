@@ -6,6 +6,8 @@
     loadSavedFeeds,
     upsertSavedFeed,
     removeSavedFeed,
+    loadSelectedFeedUrl,
+    saveSelectedFeedUrl,
     DEFAULT_CATALOG_FEED,
     type SavedFeed,
   } from '../../opds/saved-feeds.js';
@@ -39,9 +41,15 @@
 
   onMount(() => {
     savedFeeds = loadSavedFeeds();
-    // Default to the most recently used feed, falling back to the built-in
-    // catalog when the user hasn't saved any of their own yet.
-    url = savedFeeds[0]?.url ?? DEFAULT_CATALOG_FEED.url;
+    // Re-open on the feed the user last loaded (sticky across opens), as long as it's
+    // still available. Otherwise fall back to the most recent saved feed, then the
+    // built-in catalog.
+    const remembered = loadSelectedFeedUrl();
+    const available = new Set([DEFAULT_CATALOG_FEED.url, ...savedFeeds.map(f => f.url)]);
+    url =
+      remembered && available.has(remembered)
+        ? remembered
+        : (savedFeeds[0]?.url ?? DEFAULT_CATALOG_FEED.url);
     urlInput?.focus();
     // Auto-fetch the latest feed so the dialog opens already populated.
     if (url.trim()) fetchFeed();
@@ -77,6 +85,9 @@
       const feed = parseOpdsFeed(xml, target);
       books = feed.books;
       hasFetched = true;
+
+      // Remember this as the selected feed so the dialog re-opens on it next time.
+      saveSelectedFeedUrl(target);
 
       // Auto-remember this feed (most-recent first), labelled by its title.
       // The built-in catalog is pinned separately, so it's never stored.

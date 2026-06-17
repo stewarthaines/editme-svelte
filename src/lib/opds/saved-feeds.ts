@@ -11,6 +11,7 @@ export interface SavedFeed {
 }
 
 const STORAGE_KEY = 'editme_opds_feeds';
+const SELECTED_KEY = 'editme_opds_selected_feed';
 
 /**
  * A built-in catalog pinned to the top of the feed list. It is not persisted to
@@ -55,6 +56,29 @@ export function upsertSavedFeed(url: string, title?: string): SavedFeed[] {
 /** Remove the feed with the given URL. */
 export function removeSavedFeed(url: string): SavedFeed[] {
   return persist(loadSavedFeeds().filter(f => f.url !== url));
+}
+
+/**
+ * The URL of the feed the user last loaded, so the import dialog re-opens on the
+ * same selection instead of resetting. Returns null when nothing is remembered.
+ */
+export function loadSelectedFeedUrl(): string | null {
+  try {
+    const v = localStorage.getItem(SELECTED_KEY);
+    return v && v.trim() ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Remember the currently-selected feed URL (best-effort). */
+export function saveSelectedFeedUrl(url: string): void {
+  try {
+    const trimmed = url.trim();
+    if (trimmed) localStorage.setItem(SELECTED_KEY, trimmed);
+  } catch {
+    // Persistence is best-effort.
+  }
 }
 
 function persist(feeds: SavedFeed[]): SavedFeed[] {
