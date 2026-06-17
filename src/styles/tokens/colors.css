@@ -198,6 +198,12 @@
      split handle on hover/drag). Mirrors the publish-to-remote plugin. */
   --color-accent: #0074d9;
 
+  /* Azure button-hover fill + its foreground. --color-hover-accent is tuned so
+     white text on it passes WCAG AA in both themes (the pane resizer keeps the
+     lighter --color-accent; it carries no text). */
+  --color-hover-accent: #0074d9;
+  --color-on-accent: var(--color-white);
+
   /* High contrast mode support (system colors) */
   --color-forced-bg: Canvas;
   --color-forced-text: CanvasText;

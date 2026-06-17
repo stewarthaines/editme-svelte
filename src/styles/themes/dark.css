@@ -127,6 +127,11 @@
      publish-to-remote plugin's pane split handle). */
   --color-accent: #4aa3ff;
 
+  /* Azure button-hover fill — darker than --color-accent so white text passes
+     AA (~5.3:1; the resizer's lighter accent carries no text). */
+  --color-hover-accent: #0a6cc2;
+  --color-on-accent: var(--color-white);
+
   /* Error and validation colors (WCAG AA compliant on dark) */
   --color-error-text: #fca5a5; /* 4.5:1 contrast on dark */
   --color-error-bg: var(--color-error-950);
