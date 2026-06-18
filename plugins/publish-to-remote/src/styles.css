@@ -70,6 +70,8 @@ button {
   /* Unified button-hover fill + white foreground (mirrors core; AA-safe). */
   --color-hover-accent: #0074d9;
   --color-on-accent: #ffffff;
+  /* Light azure tint for the active/selected indicator (left bar + this fill). */
+  --color-bg-active: color-mix(in srgb, var(--color-accent) 16%, transparent);
 
   /* Status: info / success / warning / error (bg + border + text) */
   --color-info-bg: #e8f1ff;

@@ -179,8 +179,8 @@
 
   /* The currently-open project. */
   .remote-item.current {
-    outline: 2px solid var(--color-button-primary-bg);
-    outline-offset: -2px;
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: var(--color-bg-active);
   }
 
   .remote-cover {
