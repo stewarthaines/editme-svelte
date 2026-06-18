@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import SettingsSection from '../settings/SettingsSection.svelte';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import type { Creator, EPUBMetadata, CreatorMetadataFields } from '../../epub/opf-utils';
   import { marcLabel, marcSelectOptions } from '../../epub/marc-relators';
@@ -72,9 +73,7 @@
   const focus = () => onfieldFocus?.(new CustomEvent('fieldFocus', { detail: { field } }));
 </script>
 
-<fieldset class="field-group">
-  <legend class="group-title" tabindex="-1">{legend}</legend>
-
+<SettingsSection title={legend} name={`meta-${field}`} open>
   <div class="creator-list">
     {#each creators as creator, index (index)}
       <div class="creator-item">
@@ -151,32 +150,9 @@
       {addLabel}
     </button>
   </div>
-</fieldset>
+</SettingsSection>
 
 <style>
-  /* Mirror the canonical metadata fieldset styling (see AdvancedFields.svelte
-     "Subjects") so Creators/Contributors match the rest of the editor. */
-  .field-group {
-    margin-block-end: 1rem;
-    background-color: var(--color-bg-tertiary);
-    border: 1px solid var(--color-border-default);
-    border-radius: 0.5rem;
-    padding: var(--space-3);
-  }
-
-  .field-group:last-child {
-    margin-block-end: 0;
-  }
-
-  .group-title {
-    display: block;
-    width: 100%;
-    margin-block-end: var(--space-2);
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
-  }
-
   .creator-list {
     display: flex;
     flex-direction: column;

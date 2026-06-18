@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import SettingsSection from '../settings/SettingsSection.svelte';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import DateMetadataField from './fields/DateMetadataField.svelte';
   import CreatorRoleEditor from './CreatorRoleEditor.svelte';
@@ -65,9 +66,7 @@
 <div class="advanced-fields">
   <div class="form-columns">
     <div class="column">
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Publication')}</legend>
-
+      <SettingsSection title={$t('Publication')} name="meta-publication" open>
         <TextMetadataField
           id="publisher"
           label={$t('Publisher')}
@@ -110,12 +109,10 @@
           onblur={e => handleFieldSave('type', e.value)}
           onfocus={() => handleFieldFocus('type')}
         />
-      </fieldset>
+      </SettingsSection>
 
       {#if showAdditionalInfo}
-        <fieldset class="field-group">
-          <legend class="group-title" tabindex="-1">{$t('Additional Information')}</legend>
-
+        <SettingsSection title={$t('Additional Information')} name="meta-additional" open>
           {#if showSource}
             <TextMetadataField
               id="source"
@@ -167,12 +164,11 @@
               onfocus={() => handleFieldFocus('format')}
             />
           {/if}
-        </fieldset>
+        </SettingsSection>
       {/if}
 
       {#if showAppleBooks}
-        <fieldset class="field-group">
-          <legend class="group-title" tabindex="-1">{$t('Apple Books')}</legend>
+        <SettingsSection title={$t('Apple Books')} name="meta-apple-books" open>
           <label class="checkbox-row">
             <input
               type="checkbox"
@@ -183,14 +179,12 @@
             />
             <span>{$t('Use the publication’s own fonts (do not re-style)')}</span>
           </label>
-        </fieldset>
+        </SettingsSection>
       {/if}
     </div>
 
     <div class="column">
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Subjects')}</legend>
-
+      <SettingsSection title={$t('Subjects')} name="meta-subjects" open>
         <SubjectEditor
           subjects={metadata.subject}
           {saving}
@@ -199,7 +193,7 @@
           {onfieldSave}
           {onfieldFocus}
         />
-      </fieldset>
+      </SettingsSection>
 
       <CreatorRoleEditor
         field="contributor"
@@ -217,8 +211,7 @@
       />
 
       {#if showCollections}
-        <fieldset class="field-group">
-          <legend class="group-title" tabindex="-1">{$t('Collections')}</legend>
+        <SettingsSection title={$t('Collections')} name="meta-collections" open>
           <CollectionsEditor
             collections={metadata.collections}
             {saving}
@@ -226,7 +219,7 @@
             {onfieldSave}
             {onfieldFocus}
           />
-        </fieldset>
+        </SettingsSection>
       {/if}
     </div>
   </div>
@@ -253,27 +246,9 @@
 
   .column {
     min-width: 0; /* Allow flex item to shrink */
-  }
-
-  .field-group {
-    margin-block-end: 2rem;
-    background-color: var(--color-bg-tertiary);
-    border: 1px solid var(--color-border-default);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-  }
-
-  .field-group:last-child {
-    margin-block-end: 0;
-  }
-
-  .group-title {
-    display: block;
-    width: 100%;
-    margin-block-end: var(--space-2);
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 
   .checkbox-row {

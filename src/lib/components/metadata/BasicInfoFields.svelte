@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import SettingsSection from '../settings/SettingsSection.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
   import ViewportField from './fields/ViewportField.svelte';
@@ -92,9 +93,7 @@
 <div class="basic-info-fields" tabindex="-1">
   <div class="form-columns" tabindex="-1">
     <div class="column" tabindex="-1">
-      <fieldset class="field-group" tabindex="-1">
-        <legend class="group-title" tabindex="-1">{$t('Essential Information')}</legend>
-
+      <SettingsSection title={$t('Essential Information')} name="meta-essential" open>
         <TitleEditor
           title={metadata.title || ''}
           titleFileAs={metadata.titleFileAs}
@@ -129,7 +128,7 @@
           {onfieldFocus}
           {ongenerateIdentifier}
         />
-      </fieldset>
+      </SettingsSection>
 
       <CreatorRoleEditor
         field="creator"
@@ -148,9 +147,7 @@
     </div>
 
     <div class="column">
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Description')}</legend>
-
+      <SettingsSection title={$t('Description')} name="meta-description" open>
         <TextareaMetadataField
           id="description"
           label={undefined}
@@ -162,11 +159,9 @@
           onblur={e => handleFieldSave('description', e.value)}
           onfocus={() => handleFieldFocus('description')}
         />
-      </fieldset>
+      </SettingsSection>
 
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Rendition Properties')}</legend>
-
+      <SettingsSection title={$t('Rendition Properties')} name="meta-rendition" open>
         <SelectMetadataField
           id="renditionLayout"
           label={$t('Layout')}
@@ -229,7 +224,7 @@
             onfocus={() => handleFieldFocus('renditionViewport')}
           />
         {/if}
-      </fieldset>
+      </SettingsSection>
     </div>
   </div>
 </div>
@@ -254,28 +249,11 @@
     }
   }
 
+  /* Each column stacks its SettingsSection groups with consistent spacing. */
   .column {
     min-width: 0; /* Allow flex item to shrink */
-  }
-
-  .field-group {
-    margin-block-end: 2rem;
-    background-color: var(--color-bg-tertiary);
-    border: 1px solid var(--color-border-default);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-  }
-
-  .field-group:last-child {
-    margin-block-end: 0;
-  }
-
-  .group-title {
-    display: block;
-    width: 100%;
-    margin-block-end: var(--space-2);
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 </style>

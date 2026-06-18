@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import SettingsSection from '../settings/SettingsSection.svelte';
   import TextMetadataField from './fields/TextMetadataField.svelte';
   import TextareaMetadataField from './fields/TextareaMetadataField.svelte';
   import SelectMetadataField from './fields/SelectMetadataField.svelte';
@@ -133,8 +134,7 @@
   selected: string[] | undefined,
   field: string
 )}
-  <fieldset class="field-group">
-    <legend class="group-title" tabindex="-1">{legend}</legend>
+  <SettingsSection title={legend} name={`meta-${field}`} open>
     <div class="checkbox-grid">
       {#each options as opt (opt.value)}
         <label class="checkbox-item">
@@ -149,7 +149,7 @@
         </label>
       {/each}
     </div>
-  </fieldset>
+  </SettingsSection>
 {/snippet}
 
 <div class="accessibility-fields">
@@ -160,8 +160,7 @@
       {@render checkboxGroup($t('Access modes'), ACCESS_MODES, metadata.accessMode, 'accessMode')}
 
       {#if showSufficient}
-        <fieldset class="field-group">
-          <legend class="group-title" tabindex="-1">{$t('Sufficient access modes')}</legend>
+        <SettingsSection title={$t('Sufficient access modes')} name="meta-sufficient" open>
           <p class="field-hint">
             {$t(
               'Each row is one combination of modes that is enough on its own to read the whole publication.'
@@ -199,11 +198,10 @@
           <button type="button" class="btn btn-secondary" onclick={addSet} disabled={saving}>
             {$t('Add a sufficient set')}
           </button>
-        </fieldset>
+        </SettingsSection>
       {/if}
 
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Conformance')}</legend>
+      <SettingsSection title={$t('Conformance')} name="meta-conformance" open>
         <SelectMetadataField
           id="accessibilityConformance"
           label={$t('Conformance level')}
@@ -212,11 +210,10 @@
           onblur={e => save('accessibilityConformance', e.value)}
           onfocus={() => focus('accessibilityConformance' as keyof EPUBMetadata)}
         />
-      </fieldset>
+      </SettingsSection>
 
       {#if showCertification}
-        <fieldset class="field-group">
-          <legend class="group-title" tabindex="-1">{$t('Certification')}</legend>
+        <SettingsSection title={$t('Certification')} name="meta-certification" open>
           <TextMetadataField
             id="accessibilityCertifiedBy"
             label={$t('Certified by')}
@@ -241,7 +238,7 @@
             onblur={e => save('accessibilityCertifierReport', e.value)}
             onfocus={() => focus('accessibilityCertifierReport' as keyof EPUBMetadata)}
           />
-        </fieldset>
+        </SettingsSection>
       {/if}
     </div>
 
@@ -279,8 +276,7 @@
         )}
       {/if}
 
-      <fieldset class="field-group">
-        <legend class="group-title" tabindex="-1">{$t('Summary')}</legend>
+      <SettingsSection title={$t('Summary')} name="meta-summary" open>
         <TextareaMetadataField
           id="accessibilitySummary"
           value={metadata.accessibilitySummary || ''}
@@ -290,7 +286,7 @@
           onblur={e => save('accessibilitySummary', e.value)}
           onfocus={() => focus('accessibilitySummary')}
         />
-      </fieldset>
+      </SettingsSection>
     </div>
   </div>
 </div>
@@ -316,27 +312,9 @@
 
   .column {
     min-width: 0;
-  }
-
-  .field-group {
-    margin-block-end: 1rem;
-    background-color: var(--color-bg-tertiary);
-    border: 1px solid var(--color-border-default);
-    border-radius: 0.5rem;
-    padding: var(--space-3);
-  }
-
-  .field-group:last-child {
-    margin-block-end: 0;
-  }
-
-  .group-title {
-    display: block;
-    width: 100%;
-    margin-block-end: var(--space-2);
-    font-size: 1.05rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .checkbox-grid {
