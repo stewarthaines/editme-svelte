@@ -284,14 +284,10 @@
     z-index: 1; /* Ensure focus ring appears above other elements */
   }
 
+  /* Selected item: the shared azure left-bar + tint convention. */
   .spine-item.selected {
-    background: var(--color-bg-primary); /* White background */
-    border-top: 1px solid var(--color-border-default);
-    border-bottom: 1px solid var(--color-border-default);
-    margin-inline-start: calc(var(--space-2) * -1); /* Extend to left edge */
-    margin-inline-end: 0; /* Extend to right edge */
-    padding-inline-start: calc(var(--space-2) * 2); /* Compensate for left negative margin */
-    padding-inline-end: var(--space-2); /* Normal right padding */
+    background: var(--color-bg-active);
+    box-shadow: inset 3px 0 0 var(--color-accent);
   }
 
   .spine-item.compact {
@@ -301,11 +297,6 @@
     min-block-size: var(
       --touch-target-min
     ); /* 44px - maintain accessibility even in compact mode */
-  }
-
-  .spine-item.compact.selected {
-    margin-inline: 0; /* Don't extend in compact mode */
-    padding-inline: var(--space-1); /* Keep original padding */
   }
 
   .spine-item.compact .chapter-id {

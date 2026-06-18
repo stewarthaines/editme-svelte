@@ -506,17 +506,13 @@
     z-index: 1; /* Ensure focus ring appears above */
   }
 
-  /* High specificity for Craigslist-style visual connection */
+  /* Active item: the shared azure left-bar + tint convention. High specificity
+     to override the base .sidebar-section link styling. */
   :global(.sidebar .sidebar-section.active) {
-    background: var(--color-bg-primary) !important; /* White background like main content */
     color: var(--color-text-primary) !important;
     font-weight: var(--font-normal) !important;
-    border-top: 1px solid var(--color-border-default) !important;
-    border-bottom: 1px solid var(--color-border-default) !important;
-    border-right: 1px solid var(--color-bg-primary) !important; /* Hide the right border to connect */
-    margin-inline-end: -1px !important; /* Extend past the sidebar border */
-    position: relative !important;
-    z-index: 1 !important; /* Ensure it appears above the sidebar border */
+    background: var(--color-bg-active) !important;
+    box-shadow: inset 3px 0 0 var(--color-accent) !important;
   }
 
   :global(.sidebar .sidebar-section.active .section-label) {
