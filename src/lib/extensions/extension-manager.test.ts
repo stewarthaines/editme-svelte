@@ -54,8 +54,8 @@ describe('ExtensionManager.importCatalogExtension', () => {
       'LICENSE.txt': 'LICENSE',
       'extension.json': '{"id":"prism"}',
     };
-    const fetchImpl = vi.fn(async (url: string) => {
-      const file = url.split('/').pop() as string;
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const file = String(input).split('/').pop() as string;
       return { ok: true, arrayBuffer: async () => enc.encode(bodies[file]).buffer } as Response;
     });
 
@@ -99,8 +99,8 @@ describe('ExtensionManager.importCatalogExtension', () => {
       'figures-LICENSE.txt': 'GENLIC',
       'extension.json': '{"id":"djot-figures"}',
     };
-    const fetchImpl = vi.fn(async (url: string) => {
-      const file = url.split('/').pop() as string;
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const file = String(input).split('/').pop() as string;
       return { ok: true, arrayBuffer: async () => enc.encode(bodies[file]).buffer } as Response;
     });
 
@@ -136,8 +136,8 @@ describe('ExtensionManager.importCatalogExtension', () => {
       'extension.json': '{"id":"highlight"}',
       'default.css': 'CSS',
     };
-    const fetchImpl = vi.fn(async (url: string) => {
-      const file = url.split('/').pop() as string;
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const file = String(input).split('/').pop() as string;
       return { ok: true, arrayBuffer: async () => enc.encode(bodies[file]).buffer } as Response;
     });
 
@@ -165,11 +165,12 @@ describe('ExtensionManager.importCatalogExtension', () => {
       scripts: ['abc2svg-1.js', 'js-yaml.min.js'],
       domTransforms: ['transformAbc.js'],
       textTransforms: [],
+      generators: [],
       assets: [{ file: 'fonts/music.woff', target: 'Fonts/music.woff', media: 'font/woff' }],
       licenses: ['LICENSE.txt', 'abc2svg-LICENSE.txt', 'js-yaml-LICENSE.txt', 'font-LICENSE.txt'],
     };
-    const fetchImpl = vi.fn(async (url: string) => {
-      const file = url.split('/').pop() as string;
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
+      const file = String(input).split('/').pop() as string;
       return { ok: true, arrayBuffer: async () => enc.encode(file).buffer } as Response;
     });
 
@@ -202,6 +203,7 @@ describe('ExtensionManager.importCatalogExtension', () => {
       scripts: ['lib.js'],
       domTransforms: [],
       textTransforms: [],
+      generators: [],
       assets: [{ file: 'x.css', target: '../escape.css' }],
       licenses: [],
     };
@@ -224,6 +226,7 @@ describe('ExtensionManager.getExtensionChapterText', () => {
     scripts: ['djot.js'],
     domTransforms: [],
     textTransforms: ['transformDjot.js'],
+    generators: [],
     assets: [],
     licenses: [],
   };
