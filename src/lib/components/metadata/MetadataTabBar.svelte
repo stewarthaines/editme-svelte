@@ -86,6 +86,7 @@
     display: flex;
     flex: 1;
     min-width: 0;
+    align-self: stretch; /* full header height so tabs reach the bottom edge */
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;

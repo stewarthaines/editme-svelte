@@ -36,6 +36,9 @@
     gap: var(--space-2);
     flex: 1;
     min-width: 0;
+    /* Fill the header height so full-height children (e.g. the metadata tab bar)
+       can reach the bottom edge; inline content stays centred via align-items. */
+    align-self: stretch;
   }
 
   .pane-header__actions {

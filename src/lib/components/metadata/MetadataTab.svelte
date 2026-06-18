@@ -52,15 +52,18 @@
 </button>
 
 <style>
+  /* Full-height tab. Non-selected = blue link text (clickable); hover = solid
+     azure + white; selected = black text + an azure bar on the TOP edge and a
+     white background that connects down to the pane content. */
   .metadata-tab {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 1rem;
     border: none;
-    border-block-end: 2px solid transparent;
+    border-block-start: 3px solid transparent;
     background-color: transparent;
-    color: var(--color-text-secondary);
+    color: var(--color-text-link);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -68,21 +71,20 @@
     white-space: nowrap;
   }
 
-  .metadata-tab:hover:not(.disabled) {
-    color: var(--color-text-primary);
-    background-color: var(--color-surface-hover);
+  .metadata-tab:hover:not(.disabled):not(.active) {
+    color: var(--color-on-accent);
+    background-color: var(--color-hover-accent);
   }
 
   .metadata-tab:focus-visible {
     outline: none;
     box-shadow: inset 0 0 0 2px var(--color-focus-ring);
-    border-radius: var(--radius-sm);
   }
 
   .metadata-tab.active {
-    color: var(--color-interactive-primary);
-    border-block-end-color: var(--color-interactive-primary);
-    background-color: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    border-block-start-color: var(--color-accent);
+    background-color: var(--color-bg-primary);
   }
 
   .metadata-tab.has-errors {
@@ -90,7 +92,7 @@
   }
 
   .metadata-tab.has-errors.active {
-    border-block-end-color: var(--color-error);
+    border-block-start-color: var(--color-error);
   }
 
   .metadata-tab.disabled {
