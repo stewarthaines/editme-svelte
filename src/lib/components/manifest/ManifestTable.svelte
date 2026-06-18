@@ -635,7 +635,7 @@
     color: var(--color-on-accent);
   }
 
-  .manifest-row:hover:not(.selected) :is(.item-href, .property-tag) {
+  .manifest-row:hover:not(.selected) :is(.item-href, .property-tag, .size-cell) {
     color: var(--color-on-accent);
   }
 
@@ -643,13 +643,15 @@
     background-color: rgba(255, 255, 255, 0.22);
   }
 
-  .manifest-row:focus:not(.selected) {
+  /* Keyboard focus only (:focus-visible) so a mouse click that selects a row
+     shows just the left-bar + tint, not a full outline box. */
+  .manifest-row:focus-visible:not(.selected) {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
     background-color: var(--color-surface-hover);
   }
 
-  .manifest-row.selected:focus {
+  .manifest-row.selected:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
   }
