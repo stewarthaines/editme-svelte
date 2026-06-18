@@ -286,7 +286,7 @@
 
   /* Selected item: the shared azure left-bar + tint convention. */
   .spine-item.selected {
-    background: var(--color-bg-active);
+    background: var(--color-bg-primary);
     box-shadow: inset 3px 0 0 var(--color-accent);
   }
 

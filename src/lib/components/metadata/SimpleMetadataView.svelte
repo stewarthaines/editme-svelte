@@ -153,11 +153,7 @@
       {#if previewUrl || coverUrl}
         <div class="cover-current">
           <div class="field-label">{$t('Cover')}</div>
-          <img
-            src={previewUrl ?? coverUrl}
-            alt={$t('Current cover image')}
-            class="cover-image"
-          />
+          <img src={previewUrl ?? coverUrl} alt={$t('Current cover image')} class="cover-image" />
         </div>
       {/if}
 
@@ -169,10 +165,9 @@
                 type="button"
                 class="cover-theme-option"
                 class:active={coverMode === m}
-                style="background: {coverBackgroundColor(
-                  effectiveHue,
+                style="background: {coverBackgroundColor(effectiveHue, m)}; color: {coverTextColor(
                   m
-                )}; color: {coverTextColor(m)}"
+                )}"
                 aria-pressed={coverMode === m}
                 title={m === 'dark'
                   ? $t('Light text on a dark cover')
@@ -257,6 +252,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+  }
+
+  .preview-body .field-row {
+    gap: 0;
+    padding: var(--space-1);
   }
 
   .field-row {

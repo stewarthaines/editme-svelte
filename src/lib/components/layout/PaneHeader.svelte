@@ -21,12 +21,12 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    /* Match the sidebar header: its 44px touch-target row + 4px block padding +
-       1px border ≈ 53px, and its --color-bg-tertiary grey, so all top bars align. */
-    min-height: calc(var(--touch-target-min) + var(--space-2) + 1px);
+    /* Match the sidebar header: 44px touch-target row + 4px×2 block padding ≈
+       52px, on the same --color-bg-tertiary grey, so all top bars align (neither
+       carries a bottom border any more). */
+    min-height: calc(var(--touch-target-min) + var(--space-2));
     padding: 0 var(--space-3);
     background: var(--color-bg-tertiary);
-    border-bottom: 1px solid var(--color-border-default);
     box-sizing: border-box;
   }
 

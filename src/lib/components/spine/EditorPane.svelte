@@ -28,7 +28,7 @@
   import { isRtlLanguage } from '$lib/epub/language-direction.js';
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
   import { t } from '$lib/i18n';
-  import { Columns, Square } from 'phosphor-svelte';
+  import { RowsIcon, SquareIcon } from 'phosphor-svelte';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -524,9 +524,9 @@
       >
         <span class="toggle-icon" aria-hidden="true">
           {#if editorMode === 'single'}
-            <Columns size={16} />
+            <RowsIcon size={16} />
           {:else}
-            <Square size={16} />
+            <SquareIcon size={16} />
           {/if}
         </span>
       </button>
@@ -871,7 +871,8 @@
   }
 
   .generator-toggle-btn:hover {
-    background: var(--color-bg-hover);
+    color: var(--color-on-accent);
+    background: var(--color-hover-accent);
     border-color: var(--color-accent-primary);
   }
 
@@ -902,8 +903,7 @@
     width: 100%;
     height: 100%;
     padding: var(--space-3);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-md);
+    border: none;
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
     font-family: var(--font-mono);
@@ -914,7 +914,6 @@
   }
 
   .content-textarea:focus {
-    border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus);
   }
 
