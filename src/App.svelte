@@ -1040,6 +1040,7 @@
             Promise.resolve({ fileCount: 0, readOnly: false })}
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
+          advancedMode={appState?.isAdvancedMode ?? false}
           onWorkspaceOpened={() => {
             // Workspace opened
           }}
@@ -1105,6 +1106,7 @@
             contentService={appState.getContentService()}
             audioClipService={appState.getAudioClipService()}
             readOnly={isReadOnly}
+            advancedMode={appState.isAdvancedMode}
             onPreviewUpdate={handleSpinePreviewUpdate}
           />
         {:else}
@@ -1422,5 +1424,4 @@
     outline-offset: var(--focus-ring-offset);
     box-shadow: none;
   }
-
 </style>

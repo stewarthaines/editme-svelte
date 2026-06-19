@@ -959,64 +959,66 @@
                 </SettingsSection>
               {/if}
 
-              <!-- Extension Management -->
-              <SettingsSection
-                title={$t('Extensions')}
-                summary={extensionsSummary}
-                name="project-settings"
-                persistKey="settings-project-extensions"
-              >
-                <!-- Import Extension -->
-                <div class="extension-import" class:disabled={!isAdvancedMode}>
-                  <label for="extension-file">
-                    {$t('Import JavaScript Extension')}: {$t(
-                      'Please copy license text into the License field below to comply with open source requirements.'
-                    )}
-                  </label>
-                  <input
-                    id="extension-file"
-                    type="file"
-                    accept=".js"
-                    onchange={handleExtensionImport}
-                    disabled={extensionsLoading}
-                  />
-                  {#if !isAdvancedMode}
-                    <p class="advanced-mode-note">
-                      {$t('Advanced Mode required for extension management')}
-                    </p>
+              {#if isAdvancedMode}
+                <!-- Extension Management -->
+                <SettingsSection
+                  title={$t('Extensions')}
+                  summary={extensionsSummary}
+                  name="project-settings"
+                  persistKey="settings-project-extensions"
+                >
+                  <!-- Import Extension -->
+                  <div class="extension-import" class:disabled={!isAdvancedMode}>
+                    <label for="extension-file">
+                      {$t('Import JavaScript Extension')}: {$t(
+                        'Please copy license text into the License field below to comply with open source requirements.'
+                      )}
+                    </label>
+                    <input
+                      id="extension-file"
+                      type="file"
+                      accept=".js"
+                      onchange={handleExtensionImport}
+                      disabled={extensionsLoading}
+                    />
+                    {#if !isAdvancedMode}
+                      <p class="advanced-mode-note">
+                        {$t('Advanced Mode required for extension management')}
+                      </p>
+                    {/if}
+                  </div>
+
+                  <!-- Extensions List -->
+                  {#if extensionsLoading}
+                    <p>{$t('Loading extensions...')}</p>
+                  {:else if extensions.length === 0}
+                    <p>{$t('No extensions installed.')}</p>
+                  {:else}
+                    <ul class="extensions-list">
+                      {#each extensions as extension}
+                        {#if workspaceId}
+                          <ExtensionItem
+                            {extension}
+                            {workspaceId}
+                            {isAdvancedMode}
+                            {extensionManager}
+                            onRemove={() => handleExtensionRemoval(extension.name)}
+                          />
+                        {/if}
+                      {/each}
+                    </ul>
                   {/if}
-                </div>
+                </SettingsSection>
 
-                <!-- Extensions List -->
-                {#if extensionsLoading}
-                  <p>{$t('Loading extensions...')}</p>
-                {:else if extensions.length === 0}
-                  <p>{$t('No extensions installed.')}</p>
-                {:else}
-                  <ul class="extensions-list">
-                    {#each extensions as extension}
-                      {#if workspaceId}
-                        <ExtensionItem
-                          {extension}
-                          {workspaceId}
-                          {isAdvancedMode}
-                          {extensionManager}
-                          onRemove={() => handleExtensionRemoval(extension.name)}
-                        />
-                      {/if}
-                    {/each}
-                  </ul>
+                <!-- Generator Management -->
+                {#if workspaceId}
+                  <GeneratorSettings
+                    {workspaceId}
+                    {isAdvancedMode}
+                    group="project-settings"
+                    onChanged={() => onSettingsChanged?.()}
+                  />
                 {/if}
-              </SettingsSection>
-
-              <!-- Generator Management -->
-              {#if workspaceId}
-                <GeneratorSettings
-                  {workspaceId}
-                  {isAdvancedMode}
-                  group="project-settings"
-                  onChanged={() => onSettingsChanged?.()}
-                />
               {/if}
             {:else if loading}
               <p class="loading-message">{$t('Loading settings…')}</p>

@@ -29,6 +29,7 @@
     onWorkspaceOpened,
     onWorkspaceChanged,
     currentWorkspaceId = null,
+    advancedMode = false,
   }: {
     onListWorkspaces: () => Promise<WorkspaceInfo[]>;
     /** Open the (app-owned) new-project dialog. */
@@ -42,6 +43,8 @@
     onWorkspaceOpened?: (workspaceId: string) => void;
     onWorkspaceChanged?: (workspaceId: string | null) => void;
     currentWorkspaceId?: string | null;
+    /** Advanced mode unlocks typing an arbitrary catalog URL in the import dialog. */
+    advancedMode?: boolean;
   } = $props();
 
   // Component state using $state()
@@ -430,7 +433,11 @@
   </div>
 
   {#if showOpdsDialog}
-    <OPDSImportDialog onImport={handleOpdsImport} onClose={() => (showOpdsDialog = false)} />
+    <OPDSImportDialog
+      {advancedMode}
+      onImport={handleOpdsImport}
+      onClose={() => (showOpdsDialog = false)}
+    />
   {/if}
 
   {#if showDuplicateDialog}

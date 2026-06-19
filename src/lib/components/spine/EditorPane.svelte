@@ -36,6 +36,7 @@
     transformWarnings = [],
     availableFiles1 = [],
     availableFiles2 = [],
+    advancedMode = false,
     editorMode = 'single',
     pane1SelectedFile = '',
     pane2SelectedFile = '',
@@ -72,6 +73,9 @@
       path: string;
       type: 'text' | 'css' | 'javascript' | 'transform';
     }>;
+    /** Basic mode hides JavaScript/transform entries from the file dropdowns —
+        JS isn't exposed as editable there. */
+    advancedMode?: boolean;
     editorMode?: 'single' | 'dual';
     pane1SelectedFile?: string;
     pane2SelectedFile?: string;
@@ -99,6 +103,16 @@
     /** Available generators + how to run them; null/empty hides the Generators control. */
     generatorRunner?: GeneratorRunner | null;
   } = $props();
+
+  // Basic mode hides JavaScript and transform-script entries (the "JS:" options),
+  // so JavaScript isn't offered as editable; text and CSS stay.
+  const isEditableInBasicMode = (type: string) => type !== 'javascript' && type !== 'transform';
+  const visibleFiles1 = $derived(
+    advancedMode ? availableFiles1 : availableFiles1.filter(f => isEditableInBasicMode(f.type))
+  );
+  const visibleFiles2 = $derived(
+    advancedMode ? availableFiles2 : availableFiles2.filter(f => isEditableInBasicMode(f.type))
+  );
 
   /**
    * Toggle between single and dual pane mode
@@ -474,7 +488,7 @@
     aria-label={$t('Select file for pane 1')}
   >
     <option value="" disabled>{$t('Select file...')}</option>
-    {#each availableFiles1 as file}
+    {#each visibleFiles1 as file}
       <option value={file.value}>{file.label}</option>
     {/each}
   </select>
@@ -587,7 +601,7 @@
                 aria-label={$t('Select file for pane 2')}
               >
                 <option value="" disabled>{$t('Select file...')}</option>
-                {#each availableFiles2 as file}
+                {#each visibleFiles2 as file}
                   <option value={file.value}>{file.label}</option>
                 {/each}
               </select>

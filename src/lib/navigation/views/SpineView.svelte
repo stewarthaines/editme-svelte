@@ -61,6 +61,7 @@
     selectedItemId = null,
     transformEngine = null as any,
     readOnly = false,
+    advancedMode = false,
     onPreviewUpdate,
   }: {
     workspace: WorkspaceState;
@@ -72,6 +73,8 @@
     transformEngine: TransformEngine;
     /** Read-only EPUB: preview the stored XHTML, no editor, no writes. */
     readOnly?: boolean;
+    /** Basic mode hides JavaScript/transform entries from the file dropdown. */
+    advancedMode?: boolean;
     onPreviewUpdate?: (detail: {
       xhtmlContent: string;
       isTransforming: boolean;
@@ -1445,6 +1448,7 @@
       bind:this={editorPaneRef}
       {availableFiles1}
       {availableFiles2}
+      {advancedMode}
       transformError={$transformError}
       transformWarnings={$transformWarnings}
       editorMode={paneState.mode}

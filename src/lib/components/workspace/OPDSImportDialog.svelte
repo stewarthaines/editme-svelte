@@ -17,9 +17,13 @@
   let {
     onImport,
     onClose,
+    advancedMode = false,
   }: {
     onImport: (sourceUrl: string) => Promise<void>;
     onClose: () => void;
+    /** Advanced mode reveals the free-form catalog URL + Fetch; basic mode is
+        limited to the built-in/saved feeds in the dropdown. */
+    advancedMode?: boolean;
   } = $props();
 
   let url = $state('');
@@ -34,9 +38,7 @@
 
   // A feed can be removed only if it's one of the user's own saved feeds — never
   // the pinned built-in catalogs, even if an old copy lingers in localStorage.
-  const canRemove = $derived(
-    !isBuiltinFeed(url) && savedFeeds.some(f => f.url === url.trim())
-  );
+  const canRemove = $derived(!isBuiltinFeed(url) && savedFeeds.some(f => f.url === url.trim()));
 
   // The dropdown always leads with the built-in catalogs (pinned, not removable),
   // followed by the user's own saved feeds (most-recent first, deduped).
@@ -195,26 +197,30 @@
       </button>
     </div>
 
-    <div class="opds-url-row">
-      <input
-        bind:this={urlInput}
-        bind:value={url}
-        type="url"
-        class="opds-url-input"
-        placeholder={$t('https://example.com/catalog.xml')}
-        aria-label={$t('Catalog URL')}
-        onkeydown={handleUrlKeydown}
-        disabled={loading || importing}
-      />
-      <button
-        type="button"
-        class="btn btn-primary"
-        onclick={fetchFeed}
-        disabled={!url.trim() || loading || importing}
-      >
-        {loading ? $t('Loading…') : $t('Fetch')}
-      </button>
-    </div>
+    <!-- Advanced mode only: fetch an arbitrary catalog URL. Basic mode sticks to
+         the built-in/saved feeds in the dropdown above. -->
+    {#if advancedMode}
+      <div class="opds-url-row">
+        <input
+          bind:this={urlInput}
+          bind:value={url}
+          type="url"
+          class="opds-url-input"
+          placeholder={$t('https://example.com/catalog.xml')}
+          aria-label={$t('Catalog URL')}
+          onkeydown={handleUrlKeydown}
+          disabled={loading || importing}
+        />
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick={fetchFeed}
+          disabled={!url.trim() || loading || importing}
+        >
+          {loading ? $t('Loading…') : $t('Fetch')}
+        </button>
+      </div>
+    {/if}
 
     {#if error}
       <p class="opds-error" role="alert">{error}</p>
