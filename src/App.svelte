@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Package, FilePdf } from 'phosphor-svelte';
+  import { Package } from 'phosphor-svelte';
   import LayoutManager from './lib/LayoutManager.svelte';
   import { navigationStore } from './lib/navigation';
   import AboutView from './lib/navigation/views/AboutView.svelte';
@@ -1009,19 +1009,8 @@
               : $t('Package EPUB')}
           >
             <Package size={18} aria-hidden="true" />
-            <span class="package-label">{$t('EPUB')}</span>
+            <span class="package-label">{$t('Package EPUB')}</span>
           </button>
-          {#if canGeneratePdf}
-            <button
-              class="package-epub-button pdf-button"
-              onclick={handleGeneratePdf}
-              disabled={pdfGenerating}
-              title={$t('Save the book as a PDF')}
-            >
-              <FilePdf size={18} aria-hidden="true" />
-              <span class="package-label">{pdfGenerating ? $t('Preparing…') : $t('PDF')}</span>
-            </button>
-          {/if}
         </div>
       {/if}
     {/snippet}
@@ -1138,6 +1127,8 @@
           {enabledPluginIds}
           {availableExtensions}
           readOnly={isReadOnly}
+          onGeneratePdf={canGeneratePdf ? handleGeneratePdf : undefined}
+          {pdfGenerating}
           onExtensionAssets={handleExtensionAssets}
           onTogglePlugin={(id, enabled) => {
             appState?.getSettingsService().setPluginEnabled(id, enabled);
@@ -1432,23 +1423,4 @@
     box-shadow: none;
   }
 
-  /* PDF is the secondary action next to the primary "Package EPUB" CTA. */
-  .pdf-button,
-  :global([data-theme='dark']) .pdf-button {
-    background-color: transparent;
-    border-color: var(--color-border-default);
-    color: var(--color-text-secondary);
-  }
-
-  .pdf-button:hover:not(:disabled),
-  :global([data-theme='dark']) .pdf-button:hover:not(:disabled) {
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-border-hover);
-    color: var(--color-text-primary);
-  }
-
-  /* Collapsed sidebar is too narrow for two side-by-side buttons — stack them. */
-  :global(.sidebar.collapsed) .package-epub-section {
-    flex-direction: column;
-  }
 </style>

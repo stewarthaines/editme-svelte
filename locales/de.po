@@ -1051,7 +1051,6 @@ msgid "Enter title"
 msgstr "Titel eingeben"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
-#: src/App.svelte
 msgid "EPUB"
 msgstr "EPUB"
 
@@ -1255,6 +1254,10 @@ msgstr "Erzeugen"
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Generate cover image"
 msgstr "Coverbild erzeugen"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Generate PDF"
+msgstr "PDF erstellen"
 
 #: src/App.svelte
 msgid "Generating navigation from chapters..."
@@ -1980,7 +1983,6 @@ msgstr "{name}-Lizenztext hier einfügen"
 msgid "Path"
 msgstr "Pfad"
 
-#: src/App.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #. Dropdown group label for the paginated PDF page preview
@@ -2042,7 +2044,7 @@ msgstr "Position"
 msgid "Pre-paginated"
 msgstr "Vorpaginiert"
 
-#: src/App.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Preparing…"
 msgstr "Wird vorbereitet…"
 
@@ -2328,10 +2330,6 @@ msgstr "Als PDF speichern"
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Save changes"
 msgstr "Änderungen speichern"
-
-#: src/App.svelte
-msgid "Save the book as a PDF"
-msgstr "Das Buch als PDF speichern"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Saved feeds"
