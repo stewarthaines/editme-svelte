@@ -687,7 +687,7 @@
      padding (the toggle button supplies its own compact padding). */
   .manifest-table td.separator-cell {
     padding: 0;
-    border-bottom: 2px solid var(--color-border-strong);
+    border-bottom: 1px solid var(--color-border-strong);
     border-top: 1px solid var(--color-border-default);
   }
 
