@@ -128,9 +128,7 @@
   // The Publish tab is only useful once there's something to publish — a packaged
   // EPUB, or the publish-to-remote plugin enabled. Otherwise it's an empty page,
   // so hide it (notably on first run, before any EPUB has been packaged).
-  const publishVisible = $derived(
-    hasPackagedEpubs || enabledPluginIds.includes(PUBLISH_PLUGIN_ID)
-  );
+  const publishVisible = $derived(hasPackagedEpubs || enabledPluginIds.includes(PUBLISH_PLUGIN_ID));
 
   // The book title hosts a disclosure that collapses the project nav group.
   const PROJECT_NAV_IDS: SidebarSection[] = ['settings', 'metadata', 'manifest', 'navigation'];
@@ -353,7 +351,7 @@
                   aria-label={$t('Import text files as chapters')}
                   title={$t('Import text files as chapters')}
                 >
-                  <FileArrowUp size={14} aria-hidden="true" />
+                  <FileArrowUp size={16} aria-hidden="true" />
                 </button>
                 <button
                   class="append-button-nav"
@@ -428,8 +426,6 @@
   .sidebar-header {
     display: flex;
     align-items: center;
-    padding-block: var(--space-1); /* More compact */
-    padding-inline: var(--space-2) 0;
     background: var(--color-bg-tertiary); /* Match .workspace-title-section */
     flex-shrink: 0;
     min-block-size: var(--touch-target-min); /* 44px - meets WCAG AA requirements even for header */

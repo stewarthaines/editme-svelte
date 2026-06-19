@@ -229,7 +229,7 @@
     align-items: center;
     gap: var(--space-2);
     /* Match the sidebar/pane header height + grey (see PaneHeader) so top bars align. */
-    min-height: calc(var(--touch-target-min) + var(--space-2) + 1px);
+    min-height: var(--touch-target-min);
     padding: 0 var(--space-3);
     background: var(--color-bg-tertiary);
     border-bottom: 1px solid var(--color-border-default);

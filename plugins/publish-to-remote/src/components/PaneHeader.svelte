@@ -21,12 +21,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    /* Match the core app's sidebar/pane header height (53px) + grey, so all top
+    /* Match the core app's sidebar/pane header height (44px) + grey, so all top
        bars align (the plugin hardcodes spacing rather than the --space tokens). */
-    min-height: 53px;
+    min-height: 44px;
     padding: 0 12px;
     background: var(--color-bg-tertiary);
-    border-bottom: 1px solid var(--color-border-default);
     box-sizing: border-box;
   }
 

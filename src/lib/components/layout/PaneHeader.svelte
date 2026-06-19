@@ -21,10 +21,10 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    /* Match the sidebar header: 44px touch-target row + 4px×2 block padding ≈
-       52px, on the same --color-bg-tertiary grey, so all top bars align (neither
-       carries a bottom border any more). */
-    min-height: calc(var(--touch-target-min) + var(--space-2));
+    /* Match the sidebar header: a 44px touch-target row (no block padding) on the
+       same --color-bg-tertiary grey, so all top bars align (neither carries a
+       bottom border any more). */
+    min-height: var(--touch-target-min);
     padding: 0 var(--space-3);
     background: var(--color-bg-tertiary);
     box-sizing: border-box;
