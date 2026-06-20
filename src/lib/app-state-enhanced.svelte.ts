@@ -229,10 +229,6 @@ export class EnhancedAppState {
     return this.workspaceSettings?.draft_id || 0;
   }
 
-  get isAdvancedMode(): boolean {
-    return this.workspaceSettings?.editor?.advanced_mode ?? false;
-  }
-
   // Infrastructure access for components
   getTransformEngine(): TransformEngine {
     return this.transformEngine;

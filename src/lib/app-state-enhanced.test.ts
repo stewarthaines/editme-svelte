@@ -163,13 +163,13 @@ vi.mock('./services/settings/settings.service.js', () => ({
     loadWorkspaceSettings: vi.fn().mockResolvedValue({
       bust_cache: false,
       draft_id: 0,
-      editor: { preview_delay_ms: 500, advanced_mode: false },
+      editor: { preview_delay_ms: 500 },
     }),
     saveWorkspaceSettings: vi.fn().mockResolvedValue(undefined),
     getDefaultWorkspaceSettings: vi.fn().mockReturnValue({
       bust_cache: false,
       draft_id: 0,
-      editor: { preview_delay_ms: 500, advanced_mode: false },
+      editor: { preview_delay_ms: 500 },
     }),
     loadEPUBSettings: vi.fn().mockResolvedValue({
       text_transform: 'SOURCE/scripts/transformText.js',

@@ -23,7 +23,6 @@ export interface WorkspaceSettings {
   draft_id: number;
   editor?: {
     preview_delay_ms: number; // 100-2000ms
-    advanced_mode: boolean;
   };
 }
 
@@ -251,7 +250,6 @@ export class SettingsService {
         draft_id: metadata.draft_id ?? defaults.draft_id,
         editor: {
           preview_delay_ms: metadata.editor?.preview_delay_ms ?? defaults.editor!.preview_delay_ms,
-          advanced_mode: metadata.editor?.advanced_mode ?? defaults.editor!.advanced_mode,
         },
       };
     } catch {
@@ -307,7 +305,6 @@ export class SettingsService {
       draft_id: 0,
       editor: {
         preview_delay_ms: 500,
-        advanced_mode: false,
       },
     };
   }

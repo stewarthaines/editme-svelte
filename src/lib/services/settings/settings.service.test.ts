@@ -174,7 +174,6 @@ describe('SettingsService Contract Tests', () => {
         draft_id: 5,
         editor: {
           preview_delay_ms: 1000,
-          advanced_mode: true,
         },
       };
 
@@ -201,7 +200,6 @@ describe('SettingsService Contract Tests', () => {
         draft_id: 0,
         editor: {
           preview_delay_ms: 500,
-          advanced_mode: false,
         },
       });
     });
@@ -211,7 +209,7 @@ describe('SettingsService Contract Tests', () => {
       const newSettings = {
         bust_cache: true,
         draft_id: 3,
-        editor: { preview_delay_ms: 800, advanced_mode: true },
+        editor: { preview_delay_ms: 800 },
       };
 
       mockFileStorage.readTextFile.mockResolvedValue(JSON.stringify(existingMetadata));
@@ -227,7 +225,7 @@ describe('SettingsService Contract Tests', () => {
             someOtherField: 'value',
             bust_cache: true,
             draft_id: 3,
-            editor: { preview_delay_ms: 800, advanced_mode: true },
+            editor: { preview_delay_ms: 800 },
           },
           null,
           2
@@ -321,7 +319,7 @@ describe('SettingsService Contract Tests', () => {
       const currentSettings = {
         bust_cache: false,
         draft_id: 2,
-        editor: { preview_delay_ms: 500, advanced_mode: false },
+        editor: { preview_delay_ms: 500 },
       };
 
       mockFileStorage.readTextFile.mockResolvedValue(JSON.stringify(currentSettings));
@@ -337,7 +335,7 @@ describe('SettingsService Contract Tests', () => {
           {
             bust_cache: false,
             draft_id: 3,
-            editor: { preview_delay_ms: 500, advanced_mode: false },
+            editor: { preview_delay_ms: 500 },
           },
           null,
           2
@@ -454,7 +452,6 @@ describe('SettingsService Contract Tests', () => {
         draft_id: 0,
         editor: {
           preview_delay_ms: 50, // Too low
-          advanced_mode: false,
         },
       };
 

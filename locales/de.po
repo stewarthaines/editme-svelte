@@ -352,14 +352,21 @@ msgid "Additional title"
 msgstr "Zusätzlicher Titel"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
-#: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced"
 msgstr "Erweitert"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Advanced mode"
+msgstr "Erweiterter Modus"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced Mode required for extension management"
 msgstr "Für die Erweiterungsverwaltung ist der erweiterte Modus erforderlich"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Advanced mode reveals power-user features across the app: extra metadata fields, individual source files, plugins and extensions, editable scripts, and custom catalog imports."
+msgstr "Der erweiterte Modus zeigt Profifunktionen in der gesamten App: zusätzliche Metadatenfelder, einzelne Quelldateien, Plugins und Erweiterungen, bearbeitbare Skripte und benutzerdefinierte Katalogimporte."
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
@@ -1180,10 +1187,6 @@ msgstr "EPUB-Einstellungen konnten nicht gespeichert werden"
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Failed to save metadata field"
 msgstr "Metadatenfeld konnte nicht gespeichert werden"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Failed to save settings"
-msgstr "Einstellungen konnten nicht gespeichert werden"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Failed to update item"

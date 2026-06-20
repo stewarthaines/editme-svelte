@@ -352,13 +352,20 @@ msgid "Additional title"
 msgstr ""
 
 #: src/lib/components/metadata/MetadataEditor.svelte
-#: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Advanced mode"
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced Mode required for extension management"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Advanced mode reveals power-user features across the app: extra metadata fields, individual source files, plugins and extensions, editable scripts, and custom catalog imports."
 msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
@@ -1179,10 +1186,6 @@ msgstr ""
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Failed to save metadata field"
-msgstr ""
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Failed to save settings"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestPreview.svelte

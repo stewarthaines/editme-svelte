@@ -29,6 +29,7 @@
   import OPFPreview from './lib/components/metadata/OPFPreview.svelte';
   import PreviewPane from './lib/components/spine/PreviewPane.svelte';
   import { layoutStore } from './lib/stores/layout';
+  import { advancedMode } from './lib/stores/advanced-mode';
   import { t, currentLocale } from './lib/i18n';
   import { EnhancedAppState } from './lib/app-state-enhanced.svelte.js';
   import { FileStorageAPI } from './lib/storage/index.js';
@@ -102,6 +103,18 @@
       hasPackagedEpubs = (await publishService.listPublishedEpubs()).length > 0;
     } catch {
       hasPackagedEpubs = false;
+    }
+  }
+
+  // Whether any project exists — gates the app-level Advanced mode toggle in
+  // Settings (you create a project first, then opt in). Refreshed on mount and
+  // whenever the workspace list changes (the `workspace-list-refresh` event).
+  let hasProjects = $state(false);
+  async function refreshHasProjects() {
+    try {
+      hasProjects = ((await appState?.listWorkspaces()) ?? []).length > 0;
+    } catch {
+      hasProjects = false;
     }
   }
 
@@ -415,6 +428,9 @@
 
       // Clear hash to clean up URL after successful import
       location.hash = '';
+
+      // A project now exists — refresh the Advanced-mode toggle's gate.
+      await refreshHasProjects();
     } catch (error) {
       console.error('Failed to import EPUB:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -611,6 +627,9 @@
     } else {
       navigationStore.navigateTo('metadata');
     }
+
+    // A project now exists — let the Advanced-mode toggle's gate know.
+    await refreshHasProjects();
   };
 
   // Generate a cover from the metadata view: make a fresh SVG + PNG from the
@@ -878,8 +897,10 @@
         enabledPluginIds = appState.getSettingsService().getEnabledPlugins();
         availableExtensions = await loadExtensionCatalog();
 
-        // Seed the Publish tab's visibility from any already-packaged EPUBs.
+        // Seed the Publish tab's visibility from any already-packaged EPUBs, and
+        // the Advanced-mode toggle's gate from whether any project exists.
         await refreshPackagedEpubs();
+        await refreshHasProjects();
 
         // Check hash after appState is fully ready
         if (window.location.hash) {
@@ -928,12 +949,14 @@
     window.addEventListener('clear-spine-selection', handleClearSpineSelection);
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('epub-packaged', refreshPackagedEpubs);
+    window.addEventListener('workspace-list-refresh', refreshHasProjects);
 
     return () => {
       window.removeEventListener('select-spine-item', handleSelectSpineItem);
       window.removeEventListener('clear-spine-selection', handleClearSpineSelection);
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('epub-packaged', refreshPackagedEpubs);
+      window.removeEventListener('workspace-list-refresh', refreshHasProjects);
       appState?.cleanup();
       transformEngine?.cleanup();
     };
@@ -1031,16 +1054,22 @@
         <WorkspaceView
           onListWorkspaces={() => appState?.listWorkspaces() ?? Promise.resolve([])}
           onCreateNewRequested={openCreateDialog}
-          onDeleteWorkspace={id => appState?.deleteWorkspace(id) ?? Promise.resolve()}
-          onDuplicateWorkspace={(id, title) =>
-            appState?.duplicateWorkspace(id, title) ?? Promise.resolve('')}
+          onDeleteWorkspace={async id => {
+            await (appState?.deleteWorkspace(id) ?? Promise.resolve());
+            await refreshHasProjects();
+          }}
+          onDuplicateWorkspace={async (id, title) => {
+            const newId = (await appState?.duplicateWorkspace(id, title)) ?? '';
+            await refreshHasProjects();
+            return newId;
+          }}
           onLoadWorkspace={id => appState?.loadWorkspace(id) ?? Promise.resolve()}
           onLoadWorkspaceDetails={id =>
             appState?.getWorkspaceRowDetails(id) ??
             Promise.resolve({ fileCount: 0, readOnly: false })}
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
-          advancedMode={appState?.isAdvancedMode ?? false}
+          advancedMode={$advancedMode}
           onWorkspaceOpened={() => {
             // Workspace opened
           }}
@@ -1053,7 +1082,7 @@
           <MetadataEditor
             bind:workspace={appState.workspace}
             {metadataService}
-            advancedMode={appState.isAdvancedMode}
+            advancedMode={$advancedMode}
             readOnly={isReadOnly}
             onMetadataChanged={handleMetadataChanged}
             onFieldFocus={handleMetadataFieldFocus}
@@ -1067,7 +1096,7 @@
           <ManifestContainer
             workspace={currentWorkspaceState}
             {workspaceService}
-            advancedMode={appState.isAdvancedMode}
+            advancedMode={$advancedMode}
             readOnly={isReadOnly}
             refreshToken={manifestRefreshToken}
             onItemSelect={handleManifestItemSelect}
@@ -1106,7 +1135,7 @@
             contentService={appState.getContentService()}
             audioClipService={appState.getAudioClipService()}
             readOnly={isReadOnly}
-            advancedMode={appState.isAdvancedMode}
+            advancedMode={$advancedMode}
             onPreviewUpdate={handleSpinePreviewUpdate}
           />
         {:else}
@@ -1129,6 +1158,7 @@
           {enabledPluginIds}
           {availableExtensions}
           readOnly={isReadOnly}
+          {hasProjects}
           onGeneratePdf={canGeneratePdf ? handleGeneratePdf : undefined}
           {pdfGenerating}
           onExtensionAssets={handleExtensionAssets}
@@ -1161,7 +1191,7 @@
           workspace={currentWorkspaceState}
           focusedField={focusedMetadataField}
           tabFields={activeMetadataTabFields}
-          isAdvancedMode={appState?.isAdvancedMode ?? false}
+          isAdvancedMode={$advancedMode}
           readOnly={isReadOnly}
           {workspaceService}
           onGenerateCover={handleGenerateCover}

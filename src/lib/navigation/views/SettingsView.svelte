@@ -27,6 +27,7 @@
   import { t, currentLocale, setLocale } from '../../i18n';
   import { LOCALE_CONFIGS, isLocaleEnabled } from '../../i18n/locale-config.js';
   import { themeStore } from '../../stores/theme.js';
+  import { advancedMode } from '../../stores/advanced-mode.js';
   import type { PluginManifestEntry } from '../../plugins/contract';
   import type { ExtensionCatalogEntry } from '../../extensions/extension-catalog';
 
@@ -50,6 +51,9 @@
     onExtensionAssets?: (assets: Array<{ target: string; media?: string }>) => Promise<void>;
     /** Read-only EPUB: advanced mode is locked and extensions can't be added. */
     readOnly?: boolean;
+    /** Whether any project exists — the app-level Advanced mode toggle only shows
+        once the project list is populated (create a project first, then opt in). */
+    hasProjects?: boolean;
     onSettingsChanged?: () => void;
     /** Generate a PDF of the whole book. Omitted when PDF export isn't available
         (e.g. the offline file:// build); the PDF section's button hides then. */
@@ -69,6 +73,7 @@
     onTogglePlugin,
     onExtensionAssets,
     readOnly = false,
+    hasProjects = false,
     onSettingsChanged,
     onGeneratePdf,
     pdfGenerating = false,
@@ -153,41 +158,6 @@
 
     loadExtensions();
   });
-
-  // Handle advanced mode toggle
-  async function handleAdvancedModeChange(event: Event): Promise<void> {
-    if (!workspaceId || !workspaceSettings || readOnly) return;
-
-    const target = event.target as HTMLInputElement;
-    const newAdvancedMode = target.checked;
-
-    // Optimistic update
-    const updatedSettings: WorkspaceSettings = {
-      ...workspaceSettings,
-      editor: {
-        preview_delay_ms: workspaceSettings.editor?.preview_delay_ms ?? 500,
-        advanced_mode: newAdvancedMode,
-      },
-    };
-
-    workspaceSettings = updatedSettings;
-
-    try {
-      await settingsService.saveWorkspaceSettings(workspaceId, updatedSettings);
-      // Notify parent that settings have changed
-      onSettingsChanged?.();
-    } catch (err) {
-      error = err instanceof Error ? err.message : $t('Failed to save settings');
-      // Revert optimistic update
-      workspaceSettings = {
-        ...workspaceSettings,
-        editor: {
-          preview_delay_ms: workspaceSettings.editor?.preview_delay_ms ?? 500,
-          advanced_mode: !newAdvancedMode,
-        },
-      };
-    }
-  }
 
   // Handle extension import
   async function handleExtensionImport(event: Event): Promise<void> {
@@ -420,8 +390,9 @@
     }
   }
 
-  // Derived states
-  const isAdvancedMode = $derived(workspaceSettings?.editor?.advanced_mode ?? false);
+  // Derived states. Advanced mode is a single app-level preference (the global
+  // store), no longer per-workspace.
+  const isAdvancedMode = $derived($advancedMode);
   // Extension ids already imported into the current project (dir name === id).
   const installedExtensionIds = $derived(new Set(extensions.map(e => e.name)));
 
@@ -631,6 +602,27 @@
                   {/each}
                 </select>
               </div>
+
+              <!-- Advanced mode: an app-wide preference, shown once at least one
+                   project exists (create a project first, then opt in). -->
+              {#if hasProjects}
+                <div class="setting-group">
+                  <p class="setting-description setting-description--lead">
+                    {$t(
+                      'Advanced mode reveals power-user features across the app: extra metadata fields, individual source files, plugins and extensions, editable scripts, and custom catalog imports.'
+                    )}
+                  </p>
+                  <label class="setting-label">
+                    <input
+                      type="checkbox"
+                      checked={$advancedMode}
+                      onchange={e =>
+                        advancedMode.set((e.currentTarget as HTMLInputElement).checked)}
+                    />
+                    <span class="setting-text">{$t('Advanced mode')}</span>
+                  </label>
+                </div>
+              {/if}
             </SettingsSection>
 
             {#if isAdvancedMode && availablePlugins.length > 0}
@@ -697,19 +689,6 @@
         <div class="settings-pane">
           <PaneHeader>
             <span class="pane-title">{$t('Project Settings')}</span>
-            {#snippet actions()}
-              {#if canEditSettings}
-                <label class="advanced-toggle">
-                  <span>{$t('Advanced')}</span>
-                  <input
-                    type="checkbox"
-                    checked={isAdvancedMode}
-                    onchange={handleAdvancedModeChange}
-                    disabled={loading || readOnly}
-                  />
-                </label>
-              {/if}
-            {/snippet}
           </PaneHeader>
           <div class="settings-pane-body">
             {#if canEditSettings}
@@ -1068,21 +1047,6 @@
     color: var(--color-text-primary);
   }
 
-  /* Advanced-mode toggle relocated into the Project Settings pane header. */
-  .advanced-toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    white-space: nowrap;
-    cursor: pointer;
-  }
-
-  .advanced-toggle input {
-    cursor: pointer;
-  }
-
   .no-workspace-message,
   .loading-message {
     color: var(--color-text-secondary);
@@ -1154,6 +1118,11 @@
     color: var(--color-text-secondary);
     font-size: 0.875rem;
     line-height: 1.4;
+  }
+
+  /* Lead-in copy that sits above its control (not indented under a checkbox). */
+  .setting-description--lead {
+    margin: 0 0 0.5rem 0;
   }
 
   .setting-label-text {
