@@ -14,6 +14,7 @@
     loadPluginManifest,
     findActivePlugin,
     resolvePluginEntryUrl,
+    isPluginHostingAvailable,
   } from './lib/plugins/plugin-registry';
   import type { PluginManifestEntry } from './lib/plugins/contract';
   import {
@@ -903,6 +904,21 @@
         // served) and read the user's enabled set.
         availablePlugins = await loadPluginManifest();
         enabledPluginIds = appState.getSettingsService().getEnabledPlugins();
+        // Reconcile the saved enabled set against what's actually available. A plugin
+        // left enabled but missing from the manifest yields an inconsistent UI — the
+        // Publish view falls back to the core feature while Settings still shows the
+        // plugin on. Force-disable any such plugin so persisted state matches reality.
+        // Skipped on file:// (the offline single-file build), where plugin hosting is
+        // structurally unavailable, so opening it never wipes the user's choice.
+        if (isPluginHostingAvailable()) {
+          const settings = appState.getSettingsService();
+          const availableIds = new Set(availablePlugins.map(p => p.id));
+          const orphaned = enabledPluginIds.filter(id => !availableIds.has(id));
+          if (orphaned.length > 0) {
+            for (const id of orphaned) settings.setPluginEnabled(id, false);
+            enabledPluginIds = settings.getEnabledPlugins();
+          }
+        }
         availableExtensions = await loadExtensionCatalog();
 
         // Seed the Publish tab's visibility from any already-packaged EPUBs, and
