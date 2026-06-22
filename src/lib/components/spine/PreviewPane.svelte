@@ -25,7 +25,8 @@
   } from '$lib/plugins/validation-report';
   import { snippetAroundClick } from './preview-click.js';
   import { buildPagedDocument, chapterToSection, MARGIN_MM } from '$lib/pdf/pdf-export.js';
-  import type { PrintSettings } from '$lib/services/settings/settings.service.js';
+  import type { PrintSettings, PreviewSettings } from '$lib/services/settings/settings.service.js';
+  import { DEFAULT_PREVIEW, previewTypeForDevice } from '$lib/services/settings/settings.service.js';
   import { ArrowsClockwise, FilePdf, DeviceRotate, X } from 'phosphor-svelte';
 
   // Props using Svelte 5 runes syntax
@@ -41,6 +42,9 @@
     printSettings = undefined,
     projectIdentifier = null,
     onGeneratePdf = undefined,
+    previewHead = '',
+    previewAutoUpdate = DEFAULT_PREVIEW.autoUpdate,
+    previewIncludeHead = DEFAULT_PREVIEW.includeHead,
   }: {
     xhtmlContent?: string;
     isTransforming?: boolean;
@@ -61,6 +65,14 @@
     /** Current project's package identifier (dc:identifier) — the epubcheck report
      *  is only surfaced when it was produced for this same project. */
     projectIdentifier?: string | null;
+    /** Contents of the project's `preview/head.xml` (inline style/script markup),
+     *  injected into the preview head for the preview types whose `includeHead`
+     *  is on. Authoring-time only — never reaches the packaged EPUB. */
+    previewHead?: string;
+    /** Per preview type, whether the preview re-renders live on every edit. */
+    previewAutoUpdate?: PreviewSettings['autoUpdate'];
+    /** Per preview type, whether to inject `previewHead` into the preview <head>. */
+    previewIncludeHead?: PreviewSettings['includeHead'];
   } = $props();
 
   /** Format the transform's execution time for the status indicator. */
@@ -87,13 +99,24 @@
   const PAGED_DONE = 'preview-paged';
 
   let printPaginating = $state(false);
-  let printStale = $state(false);
-  // Non-reactive: the content string last paginated, used to detect edits while
-  // Print is active (undefined = not yet paginated this Print session).
-  let printRenderedContent: string | undefined = undefined;
+  // The preview is out of date because auto-update is off for the current type and
+  // the chapter (or the injected head) changed since the last render. Drives the
+  // on-demand Refresh badge; was print-only, now applies to every preview type.
+  let previewStale = $state(false);
+  // Non-reactive bookkeeping for what was last written to the iframe, so we can
+  // detect edits (and device-type switches) and decide whether to re-render or just
+  // mark the preview stale (undefined = nothing rendered yet this session).
+  let renderedContent: string | undefined = undefined;
   // The chapter id that content belonged to, so switching chapters re-renders
   // (rather than just marking the old chapter stale).
-  let printRenderedChapterId: string | null | undefined = undefined;
+  let renderedChapterId: string | null | undefined = undefined;
+  // The preview type last rendered, so switching device type always re-renders even
+  // when that type's auto-update is off (otherwise a stale frame of the old type
+  // would linger).
+  let renderedType: ReturnType<typeof previewTypeForDevice> | undefined = undefined;
+  // The head fragment actually injected last render (''=none), so toggling
+  // include/editing head.xml marks the preview stale when auto-update is off.
+  let renderedHead = '';
   let printSafetyTimer: ReturnType<typeof setTimeout> | undefined;
 
   interface AxeViolation {
@@ -380,31 +403,35 @@
     return `${sizeLabel} ${mm}mm`;
   });
 
-  // Update iframe content when the XHTML or the selected device changes. Reading
-  // both makes the effect re-run when the user switches to/from Print as well.
+  // Drive the preview when the XHTML, the selected device, or the preview-head
+  // config changes. Per preview type, `previewAutoUpdate` decides whether edits
+  // re-render live or just mark the preview stale (author refreshes on demand) —
+  // a generalisation of the old "Responsive/Device live, Print on demand" rule.
   $effect(() => {
     const device = selectedDevice;
     const content = xhtmlContent;
     const chapter = chapterId;
+    const type = typeOfDevice(device);
+    const auto = previewAutoUpdate[type];
+    // Track the head config so toggling include / editing head.xml re-runs this.
+    const wantHead = previewIncludeHead[type] && previewHead ? previewHead : '';
+
     if (device !== 'print') {
-      // Leaving (or never on) print: reset its session state and render plainly.
-      printRenderedContent = undefined;
-      printRenderedChapterId = undefined;
-      printStale = false;
+      // Not on print: clear any leftover print pagination state.
       printPaginating = false;
       clearTimeout(printSafetyTimer);
-      updatePreviewContent(content);
-      return;
     }
-    if (printRenderedContent === undefined || chapter !== printRenderedChapterId) {
-      // First switch to Print, or the chapter changed: paginate the new content
-      // now (a chapter switch should show the new chapter, not a stale badge —
-      // even with unsaved edits to the chapter we're leaving).
-      writePagedDoc(content);
-    } else if (content !== printRenderedContent) {
-      // Same chapter edited while Print is active: mark stale (re-paginating per
-      // keystroke is too heavy); the author refreshes on demand.
-      printStale = true;
+
+    // Always render on first show (nothing rendered yet, or only empty content), a
+    // chapter change, or a device-type switch (so a stale frame of the previous type
+    // never lingers); otherwise honour auto-update. Empty `renderedContent` counts as
+    // "not yet rendered" so the first real content shows even when auto-update is off.
+    const firstOrSwitch =
+      !renderedContent || chapter !== renderedChapterId || type !== renderedType;
+    if (firstOrSwitch || auto) {
+      renderNow();
+    } else if (content !== renderedContent || wantHead !== renderedHead) {
+      previewStale = true;
     }
   });
 
@@ -534,6 +561,30 @@
     }
   }
 
+  /** The preview type of a device preset id (falls back to responsive). */
+  function typeOfDevice(id: string): ReturnType<typeof previewTypeForDevice> {
+    const category = DEVICE_PRESETS.find(d => d.id === id)?.category ?? 'responsive';
+    return previewTypeForDevice(category);
+  }
+
+  /** The preview-head fragment to inject for the current preview type ('' = none). */
+  function currentWantHead(): string {
+    return previewIncludeHead[typeOfDevice(selectedDevice)] && previewHead ? previewHead : '';
+  }
+
+  /**
+   * Splice the project's preview-only head fragment into a chapter's head, just
+   * before the closing head tag (after the book's own stylesheets, so author CSS
+   * can override). Preview only — the published/packaged XHTML never goes through
+   * here. The fragment is inserted after blob-URL processing, so it is for INLINE
+   * style/script markup; external href/src in head.xml won't be blob-resolved.
+   */
+  function withPreviewHead(content: string): string {
+    const head = currentWantHead();
+    if (!head) return content;
+    return content.replace('</head>', `${head}\n</head>`);
+  }
+
   /**
    * Update iframe with new XHTML content while preserving scroll position
    */
@@ -567,10 +618,21 @@
 
   // --- Print pagination --------------------------------------------------------
 
-  /** Render the current chapter for whichever device is selected. */
-  function renderCurrent(): void {
-    if (selectedDevice === 'print') writePagedDoc(xhtmlContent);
-    else updatePreviewContent(xhtmlContent);
+  /**
+   * Render the current chapter for whichever device is selected, then record what
+   * was rendered (content, chapter, preview type, injected head) so the auto-update
+   * effect can decide between re-rendering and showing the stale Refresh badge.
+   * The single entry point for both the effect and the on-demand Refresh button.
+   */
+  function renderNow(): void {
+    const content = xhtmlContent;
+    if (selectedDevice === 'print') writePagedDoc(content);
+    else updatePreviewContent(withPreviewHead(content));
+    renderedContent = content;
+    renderedChapterId = chapterId;
+    renderedType = typeOfDevice(selectedDevice);
+    renderedHead = currentWantHead();
+    previewStale = false;
   }
 
   /**
@@ -597,15 +659,14 @@
       lang: wrapped.lang ?? undefined,
       print: printSettings,
       previewChrome: true,
+      // Inject the project's preview-only head fragment (when PDF includeHead is on).
+      headExtra: currentWantHead(),
     });
 
     const iframeDoc = previewIframe.contentDocument;
     if (!iframeDoc) return;
 
     printPaginating = true;
-    printStale = false;
-    printRenderedContent = content;
-    printRenderedChapterId = chapterId;
     // Print output has a different DOM than the live preview; don't carry over
     // scroll anchors or auto-run axe against Paged.js wrapper elements.
     pendingScrollRestore = null;
@@ -767,7 +828,7 @@
       setTimeout(() => {
         // Re-render for the active device (paginated when Print is selected) and
         // re-apply device dimensions/scaling after returning from the source view.
-        renderCurrent();
+        renderNow();
         handleDeviceChange(selectedDevice);
       }, 0);
     }
@@ -1053,14 +1114,15 @@
         </div>
       {/if}
 
-      <!-- Print preview: refresh when the chapter changed since it was paginated.
+      <!-- On-demand refresh: shown when the current preview type has auto-update off
+           and the chapter (or injected head) changed since it was last rendered.
            Placed after the transform status (rather than among the device controls)
            so the control order stays stable as it appears/disappears. -->
-      {#if selectedDevice === 'print' && printStale}
+      {#if previewStale}
         <button
           type="button"
           class="print-refresh"
-          onclick={() => writePagedDoc(xhtmlContent)}
+          onclick={() => renderNow()}
           title={$t('Preview out of date')}
           aria-label={$t('Refresh')}
         >

@@ -65,13 +65,13 @@
       value: string;
       label: string;
       path: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     }>;
     availableFiles2?: Array<{
       value: string;
       label: string;
       path: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     }>;
     /** Basic mode hides JavaScript/transform entries from the file dropdowns —
         JS isn't exposed as editable there. */
@@ -104,9 +104,10 @@
     generatorRunner?: GeneratorRunner | null;
   } = $props();
 
-  // Basic mode hides JavaScript and transform-script entries (the "JS:" options),
-  // so JavaScript isn't offered as editable; text and CSS stay.
-  const isEditableInBasicMode = (type: string) => type !== 'javascript' && type !== 'transform';
+  // Basic mode hides JavaScript, transform-script and preview-head entries, so
+  // power-user surfaces aren't offered as editable; text and CSS stay.
+  const isEditableInBasicMode = (type: string) =>
+    type !== 'javascript' && type !== 'transform' && type !== 'preview-head';
   const visibleFiles1 = $derived(
     advancedMode ? availableFiles1 : availableFiles1.filter(f => isEditableInBasicMode(f.type))
   );
@@ -283,6 +284,9 @@
     }
     if (fileType.includes('transform')) {
       return '// Transform script\n\nfunction transform(input) {\n  // Your transform logic here\n  return input;\n}';
+    }
+    if (fileType === 'preview-head') {
+      return '<!-- Preview-only <head> additions. Injected into the preview, never the\n     packaged EPUB. Use inline <style>/<script> to surface hidden markup. -->\n<style>\n  /* e.g. flag language-switch spans for a quick visual check: */\n  [lang] { outline: 1px dashed red; }\n</style>';
     }
     return '';
   }

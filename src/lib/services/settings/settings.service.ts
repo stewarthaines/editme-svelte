@@ -39,6 +39,51 @@ export interface PrintSettings {
   cover_page: boolean;
 }
 
+/**
+ * The three preview "types" the preview pane renders. Several device presets map to
+ * `device` (phone/tablet/e-ink); the responsive "Fill" preset is `responsive`; the
+ * Paged.js print preview is `pdf`.
+ */
+export type PreviewType = 'responsive' | 'device' | 'pdf';
+
+/**
+ * Authoring-time preview settings (preview pane only — these never affect the
+ * packaged EPUB or any exported file).
+ *
+ * - `autoUpdate`: per-type, whether the preview re-renders live on every edit. When
+ *   off, the author refreshes on demand (the preview shows a stale → Refresh badge).
+ * - `head`: workspace-relative path to an XHTML fragment (default
+ *   `preview/head.xml`, i.e. `SOURCE/preview/head.xml`) whose inline `<style>`/
+ *   `<script>` is injected into the preview `<head>` for authoring-time feedback.
+ * - `includeHead`: per-type, whether to inject the `head` fragment for that preview.
+ */
+export interface PreviewSettings {
+  autoUpdate: Record<PreviewType, boolean>;
+  head: string;
+  includeHead: Record<PreviewType, boolean>;
+}
+
+/**
+ * Default preview settings. Reproduces the historical hard-coded behaviour: the
+ * Responsive and Device previews auto-update; the PDF preview does not.
+ */
+export const DEFAULT_PREVIEW: PreviewSettings = {
+  autoUpdate: { responsive: true, device: true, pdf: false },
+  head: 'preview/head.xml',
+  includeHead: { responsive: true, device: false, pdf: false },
+};
+
+/**
+ * Map a preview device preset's `category` to its preview type. Responsive "Fill"
+ * is `responsive`, the Paged.js print preview is `pdf`, and every other category
+ * (commute / home / travel) is a `device`.
+ */
+export function previewTypeForDevice(category: string): PreviewType {
+  if (category === 'responsive') return 'responsive';
+  if (category === 'print') return 'pdf';
+  return 'device';
+}
+
 export interface EPUBSettings {
   text_transform: string;
   dom_transforms: string[];
@@ -56,6 +101,8 @@ export interface EPUBSettings {
     font_family: string;
   };
   print?: PrintSettings;
+  /** Authoring-time preview settings (preview pane only; never in the packaged EPUB). */
+  preview?: PreviewSettings;
 }
 
 export interface SettingsValidation {
@@ -357,6 +404,23 @@ export class SettingsService {
               cover_page: settings.print.cover_page ?? true,
             }
           : undefined,
+        // Always return a populated `preview` (defaults filled per-field) so the
+        // preview pane and settings UI needn't null-check.
+        preview: {
+          autoUpdate: {
+            responsive:
+              settings.preview?.autoUpdate?.responsive ?? DEFAULT_PREVIEW.autoUpdate.responsive,
+            device: settings.preview?.autoUpdate?.device ?? DEFAULT_PREVIEW.autoUpdate.device,
+            pdf: settings.preview?.autoUpdate?.pdf ?? DEFAULT_PREVIEW.autoUpdate.pdf,
+          },
+          head: settings.preview?.head ?? DEFAULT_PREVIEW.head,
+          includeHead: {
+            responsive:
+              settings.preview?.includeHead?.responsive ?? DEFAULT_PREVIEW.includeHead.responsive,
+            device: settings.preview?.includeHead?.device ?? DEFAULT_PREVIEW.includeHead.device,
+            pdf: settings.preview?.includeHead?.pdf ?? DEFAULT_PREVIEW.includeHead.pdf,
+          },
+        },
       };
     } catch {
       // Return defaults when file doesn't exist or is corrupted
@@ -393,6 +457,7 @@ export class SettingsService {
       audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
       filename_template: DEFAULT_FILENAME_TEMPLATE,
       include_seed_html_in_package: false,
+      preview: DEFAULT_PREVIEW,
     };
   }
 

@@ -201,6 +201,7 @@
     transformWarnings: string[];
     executionTime: number;
     spineItemId: string | null;
+    previewHead: string;
   }>({
     xhtmlContent: '',
     isTransforming: false,
@@ -208,6 +209,7 @@
     transformWarnings: [],
     executionTime: 0,
     spineItemId: null,
+    previewHead: '',
   });
 
   // Services are private in EnhancedAppState - workspace operations go through app state methods
@@ -277,6 +279,7 @@
     transformWarnings: string[];
     executionTime: number;
     spineItemId: string | null;
+    previewHead?: string;
   }) => {
     spinePreviewData = {
       xhtmlContent: detail.xhtmlContent,
@@ -285,6 +288,7 @@
       transformWarnings: detail.transformWarnings,
       executionTime: detail.executionTime,
       spineItemId: detail.spineItemId,
+      previewHead: detail.previewHead ?? '',
     };
   };
 
@@ -1245,6 +1249,9 @@
             printSettings={appState?.epubSettings?.print}
             projectIdentifier={currentWorkspaceState?.opf?.metadata?.identifier}
             onGeneratePdf={canGeneratePdf ? handleGenerateChapterPdf : undefined}
+            previewHead={spinePreviewData.previewHead}
+            previewAutoUpdate={appState?.epubSettings?.preview?.autoUpdate}
+            previewIncludeHead={appState?.epubSettings?.preview?.includeHead}
           />
         {:else}
           <div class="placeholder-content">

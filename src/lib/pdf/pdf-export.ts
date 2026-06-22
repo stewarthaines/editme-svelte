@@ -201,6 +201,12 @@ export function buildPagedDocument(
     /** Add the on-screen page drop-shadow chrome (in-app preview only, not export). */
     previewChrome?: boolean;
     /**
+     * Extra raw markup appended inside <head> (after the book's stylesheets). Used
+     * by the in-app print preview to inject the project's authoring-time
+     * `preview/head.xml` fragment; never set for the exported PDF.
+     */
+    headExtra?: string;
+    /**
      * What the document does once Paged.js finishes:
      * - 'message' (default): post `doneMessage` to the parent (in-app preview).
      * - 'print-button': add a screen-only "Save as PDF" toolbar whose button calls
@@ -219,6 +225,7 @@ export function buildPagedDocument(
     lang,
     print,
     previewChrome = false,
+    headExtra = '',
     afterMode = 'message',
   } = opts;
   const links = stylesheetHrefs
@@ -281,6 +288,7 @@ ${printCss}
 ${previewChrome ? PREVIEW_CHROME_CSS : ''}
 </style>
 ${links}
+${headExtra}
 </head>
 <body>
 ${sections.join('\n')}

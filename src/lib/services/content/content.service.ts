@@ -200,12 +200,24 @@ export class ContentService {
           content: transformDomJS,
         },
         {
+          // Empty preview <head> fragment. Authors add inline <style>/<script> here
+          // (Advanced mode → "Preview: head.xml" in the editor) for authoring-time
+          // feedback; it's injected into the preview only, never the packaged EPUB.
+          path: 'SOURCE/preview/head.xml',
+          content: '',
+        },
+        {
           path: 'SOURCE/settings.json',
           content: JSON.stringify(
             {
               version: '1.0.0',
               text_transform: 'SOURCE/scripts/transformText.js',
               dom_transforms: ['SOURCE/scripts/transformDom.js'],
+              preview: {
+                autoUpdate: { responsive: true, device: true, pdf: false },
+                head: 'preview/head.xml',
+                includeHead: { responsive: true, device: false, pdf: false },
+              },
             },
             null,
             2

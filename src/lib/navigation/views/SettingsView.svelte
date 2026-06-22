@@ -4,8 +4,11 @@
     WorkspaceSettings,
     EPUBSettings,
     PrintSettings,
+    PreviewSettings,
+    PreviewType,
     TransformOption,
   } from '../../services/settings/settings.service.js';
+  import { DEFAULT_PREVIEW } from '../../services/settings/settings.service.js';
   import type { ExtensionInfo } from '../../extensions/types.js';
 
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
@@ -268,6 +271,43 @@
     } catch (err) {
       error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
       epubSettings = { ...epubSettings, print: previous };
+    }
+  }
+
+  // --- Preview settings --------------------------------------------------------
+  // Authoring-time preview behaviour (preview pane only; never the packaged EPUB):
+  // per-type live auto-update, and per-type injection of the project's
+  // preview/head.xml fragment (edited via the spine editor's file dropdown).
+  const PREVIEW_TYPES: ReadonlyArray<{ key: 'responsive' | 'device' | 'pdf'; label: string }> = [
+    { key: 'responsive', label: 'Responsive' },
+    { key: 'device', label: 'Device' },
+    { key: 'pdf', label: 'PDF' },
+  ];
+
+  // Toggle one per-type preview flag (optimistic save + revert), resolving defaults
+  // so a change always writes a fully-populated preview object.
+  async function setPreviewFlag(
+    field: 'autoUpdate' | 'includeHead',
+    key: PreviewType,
+    value: boolean
+  ): Promise<void> {
+    if (!workspaceId || !epubSettings) return;
+    const previous = epubSettings.preview;
+    const base = epubSettings.preview ?? DEFAULT_PREVIEW;
+    const next: PreviewSettings = {
+      head: base.head,
+      autoUpdate: { ...base.autoUpdate },
+      includeHead: { ...base.includeHead },
+    };
+    next[field][key] = value;
+    const updatedSettings: EPUBSettings = { ...epubSettings, preview: next };
+    epubSettings = updatedSettings;
+    try {
+      await settingsService.saveEPUBSettings(workspaceId, updatedSettings);
+      onSettingsChanged?.();
+    } catch (err) {
+      error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
+      epubSettings = { ...epubSettings, preview: previous };
     }
   }
 
@@ -615,6 +655,11 @@
     return tt ? `${tt} · ${domLabel}` : domLabel;
   });
   const extensionsSummary = $derived($t('{n} installed', { n: extensions.length }));
+  const previewSummary = $derived.by(() => {
+    const au = epubSettings?.preview?.autoUpdate ?? DEFAULT_PREVIEW.autoUpdate;
+    const n = PREVIEW_TYPES.filter(pt => au[pt.key]).length;
+    return $t('{n}/3 auto-update', { n });
+  });
 
   // Which section starts open in each pane (the first present one). Captured once —
   // a plain const, so it isn't reactively re-applied and yanked open later.
@@ -1074,6 +1119,68 @@
                         {/each}
                       </select>
                     {/if}
+                  </div>
+                </SettingsSection>
+              {/if}
+
+              <!-- Preview -->
+              {#if canEditEPUBSettings && isAdvancedMode}
+                <SettingsSection
+                  title={$t('Preview')}
+                  summary={previewSummary}
+                  name="project-settings"
+                  persistKey="settings-project-preview"
+                >
+                  <div class="setting-group">
+                    <span class="setting-label-text">{$t('Auto Update')}</span>
+                    <p class="setting-description">
+                      {$t(
+                        'Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand.'
+                      )}
+                    </p>
+                    {#each PREVIEW_TYPES as pt (pt.key)}
+                      <label class="setting-label">
+                        <input
+                          type="checkbox"
+                          checked={epubSettings?.preview?.autoUpdate?.[pt.key] ??
+                            DEFAULT_PREVIEW.autoUpdate[pt.key]}
+                          onchange={e =>
+                            setPreviewFlag(
+                              'autoUpdate',
+                              pt.key,
+                              (e.currentTarget as HTMLInputElement).checked
+                            )}
+                          disabled={epubLoading}
+                        />
+                        <span class="setting-text">{$t(pt.label)}</span>
+                      </label>
+                    {/each}
+                  </div>
+
+                  <div class="setting-group">
+                    <span class="setting-label-text">{$t('Include preview head')}</span>
+                    <p class="setting-description">
+                      {$t(
+                        'Inject the project’s preview/head.xml (edit it via the spine editor’s file menu in Advanced mode) into the preview head, per preview type. Authoring-time only — it is never added to the packaged EPUB.'
+                      )}
+                    </p>
+                    {#each PREVIEW_TYPES as pt (pt.key)}
+                      <label class="setting-label">
+                        <input
+                          type="checkbox"
+                          checked={epubSettings?.preview?.includeHead?.[pt.key] ??
+                            DEFAULT_PREVIEW.includeHead[pt.key]}
+                          onchange={e =>
+                            setPreviewFlag(
+                              'includeHead',
+                              pt.key,
+                              (e.currentTarget as HTMLInputElement).checked
+                            )}
+                          disabled={epubLoading}
+                        />
+                        <span class="setting-text">{$t(pt.label)}</span>
+                      </label>
+                    {/each}
                   </div>
                 </SettingsSection>
               {/if}

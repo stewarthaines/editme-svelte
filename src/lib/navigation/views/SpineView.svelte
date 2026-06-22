@@ -82,6 +82,8 @@
       transformWarnings: string[];
       executionTime: number;
       spineItemId: string | null;
+      /** Contents of the project's preview/head.xml (preview-only <head> fragment). */
+      previewHead?: string;
     }) => void;
   } = $props();
 
@@ -139,6 +141,23 @@
   // Generators available in this project (discovered from SOURCE/generators/).
   let availableGenerators = $state<InstalledGenerator[]>([]);
 
+  // The project's preview-only <head> fragment (SOURCE/preview/head.xml) and its
+  // workspace path. Loaded from EPUB settings; forwarded to the preview pane so it
+  // can inject it into the preview (never the packaged EPUB). Empty when absent.
+  let previewHeadContent = $state('');
+  let previewHeadPath = $state('SOURCE/preview/head.xml');
+
+  /** Read the preview/head.xml fragment for the given settings path (missing → ''). */
+  async function loadPreviewHead(headPath: string): Promise<void> {
+    previewHeadPath = headPath.startsWith('SOURCE/') ? headPath : `SOURCE/${headPath}`;
+    try {
+      previewHeadContent = await fileStorage.readTextFile(workspace.id, previewHeadPath);
+    } catch {
+      // Not created yet (older projects) — treat as empty, inject nothing.
+      previewHeadContent = '';
+    }
+  }
+
   /** Re-scan the project for generators (after services + workspace are ready). */
   async function refreshGenerators(): Promise<void> {
     if (!fileStorage || !workspace) {
@@ -175,7 +194,7 @@
     label: string;
     path: string;
     href: string;
-    type: 'text' | 'css' | 'javascript' | 'transform';
+    type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
   }> = [];
 
   // Pane-specific available files (filtered to prevent conflicts)
@@ -185,7 +204,7 @@
       label: string;
       path: string;
       href: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     }>
   >([]);
   let availableFiles2 = $state<
@@ -194,7 +213,7 @@
       label: string;
       path: string;
       href: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     }>
   >([]);
 
@@ -384,7 +403,7 @@
         label: string;
         path: string;
         href: string;
-        type: 'text' | 'css' | 'javascript' | 'transform';
+        type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
       }> = [
         {
           value: 'text',
@@ -451,8 +470,21 @@
             type: 'transform',
           });
         }
+
+        // Preview-only <head> fragment (Advanced mode). Authoring-time CSS/JS that
+        // surfaces hidden markup in the preview without touching the published
+        // XHTML. Gated like JS entries; created on first save for older projects.
+        const headPath = epub.preview?.head ?? 'preview/head.xml';
+        await loadPreviewHead(headPath);
+        files.push({
+          value: 'preview-head',
+          label: translate('Preview: head.xml'),
+          path: previewHeadPath,
+          href: previewHeadPath, // not a manifest item
+          type: 'preview-head',
+        });
       } catch {
-        // Settings unavailable — no transform entries.
+        // Settings unavailable — no transform/preview-head entries.
       }
 
       // Generator scripts — editable here alongside transforms. They run on demand
@@ -506,7 +538,7 @@
       label: string;
       path: string;
       href: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     },
     workspaceId: string,
     workspaceService: WorkspaceService
@@ -539,6 +571,11 @@
           // Step 2: Then update preview (reads from saved file)
           if (manifestItem.type === 'text') {
             previewManager.updateContent('text', state.content);
+          } else if (manifestItem.type === 'preview-head') {
+            // The preview head isn't part of the rendered XHTML — it's injected by
+            // the preview pane. Update our copy and re-emit so the pane re-injects.
+            previewHeadContent = state.content;
+            previewManager.forcePreviewUpdate();
           } else if (['css', 'javascript', 'transform'].includes(manifestItem.type)) {
             if (manifestItem.href && blobURLManager) {
               blobURLManager.revokeFileBlob(manifestItem.href);
@@ -564,7 +601,7 @@
       label: string;
       path: string;
       href: string;
-      type: 'text' | 'css' | 'javascript' | 'transform';
+      type: 'text' | 'css' | 'javascript' | 'transform' | 'preview-head';
     },
     workspaceId: string,
     workspaceService: WorkspaceService
@@ -1083,6 +1120,7 @@
       transformWarnings: event.warnings,
       executionTime: event.executionTime,
       spineItemId: selectedItemId,
+      previewHead: previewHeadContent,
     });
   }
 
@@ -1099,6 +1137,7 @@
       transformWarnings: [],
       executionTime: 0,
       spineItemId: selectedItemId,
+      previewHead: previewHeadContent,
     });
   }
 
@@ -1206,6 +1245,7 @@
         transformWarnings: [],
         executionTime: 0,
         spineItemId: selectedItemId,
+        previewHead: previewHeadContent,
       });
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load chapter';

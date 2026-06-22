@@ -7,7 +7,7 @@
 
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { FileStorageAPI } from '../../storage/index.js';
-import { SettingsService } from './settings.service.js';
+import { SettingsService, previewTypeForDevice } from './settings.service.js';
 
 // Test utilities and mocks
 function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
@@ -260,7 +260,15 @@ describe('SettingsService Contract Tests', () => {
         'workspace-123',
         'SOURCE/settings.json'
       );
-      expect(result).toEqual(mockSettings);
+      // `preview` is always populated with defaults when absent from the file.
+      expect(result).toEqual({
+        ...mockSettings,
+        preview: {
+          autoUpdate: { responsive: true, device: true, pdf: false },
+          head: 'preview/head.xml',
+          includeHead: { responsive: true, device: false, pdf: false },
+        },
+      });
     });
 
     test('loadEPUBSettings returns defaults when file missing', async () => {
@@ -276,7 +284,52 @@ describe('SettingsService Contract Tests', () => {
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
         filename_template: '<title> - <author> - <date>',
         include_seed_html_in_package: false,
+        preview: {
+          autoUpdate: { responsive: true, device: true, pdf: false },
+          head: 'preview/head.xml',
+          includeHead: { responsive: true, device: false, pdf: false },
+        },
       });
+    });
+
+    test('loadEPUBSettings fills missing preview fields from defaults', async () => {
+      // Only one nested flag set; everything else must fall back to defaults.
+      mockFileStorage.readTextFile.mockResolvedValue(
+        JSON.stringify({
+          text_transform: 'SOURCE/scripts/transformText.js',
+          dom_transforms: [],
+          spine_basename: 'chapter',
+          preview: { autoUpdate: { pdf: true } },
+        })
+      );
+
+      const result = await service.loadEPUBSettings('workspace-123');
+
+      expect(result.preview).toEqual({
+        autoUpdate: { responsive: true, device: true, pdf: true },
+        head: 'preview/head.xml',
+        includeHead: { responsive: true, device: false, pdf: false },
+      });
+    });
+
+    test('loadEPUBSettings preserves a fully-specified preview block', async () => {
+      const preview = {
+        autoUpdate: { responsive: false, device: false, pdf: true },
+        head: 'preview/custom-head.xml',
+        includeHead: { responsive: true, device: true, pdf: true },
+      };
+      mockFileStorage.readTextFile.mockResolvedValue(
+        JSON.stringify({
+          text_transform: 'SOURCE/scripts/transformText.js',
+          dom_transforms: [],
+          spine_basename: 'chapter',
+          preview,
+        })
+      );
+
+      const result = await service.loadEPUBSettings('workspace-123');
+
+      expect(result.preview).toEqual(preview);
     });
 
     test('loadEPUBSettings canonicalizes bare transform paths to SOURCE/scripts/', async () => {
@@ -502,5 +555,22 @@ describe('SettingsService Contract Tests', () => {
       // CONTRACT: MUST use ExtensionManager for transforms
       expect(mockExtensionManager.getAvailableTransforms).toHaveBeenCalledWith('test-workspace');
     });
+  });
+});
+
+describe('previewTypeForDevice', () => {
+  test('maps the responsive "Fill" category to responsive', () => {
+    expect(previewTypeForDevice('responsive')).toBe('responsive');
+  });
+
+  test('maps the print category to pdf', () => {
+    expect(previewTypeForDevice('print')).toBe('pdf');
+  });
+
+  test('maps every other device category to device', () => {
+    expect(previewTypeForDevice('commute')).toBe('device');
+    expect(previewTypeForDevice('home')).toBe('device');
+    expect(previewTypeForDevice('travel')).toBe('device');
+    expect(previewTypeForDevice('anything-else')).toBe('device');
   });
 });
