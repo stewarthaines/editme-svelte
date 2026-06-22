@@ -4,6 +4,7 @@
   import { SOURCE_ARCHIVE_NAME } from '../../source/index.js';
   import { SEED_HTML_NAME } from '../../epub/seed-html.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
+  import { persisted, type Codec } from '../../state/persisted.svelte.js';
   import { X, CaretRight } from 'phosphor-svelte';
 
   type SortableFields = 'href' | 'size';
@@ -227,30 +228,31 @@
   const forceExpand = $derived(filterText.trim().length > 0);
 
   // --- Collapse state (persisted so the table feels stable across reloads) ---
-  const COLLAPSED_STORAGE_KEY = 'editme_manifest_collapsed_groups';
-
-  const loadCollapsedGroups = (): Set<string> => {
-    try {
-      const raw = localStorage.getItem(COLLAPSED_STORAGE_KEY);
-      if (raw) return new Set(JSON.parse(raw) as string[]);
-    } catch {
-      // Ignore unavailable/malformed storage.
-    }
-    return new Set();
+  // Stored on disk as a JSON array of collapsed group ids; the codec maps that
+  // to/from a Set in memory.
+  const collapsedCodec: Codec<Set<string>> = {
+    parse: raw => {
+      try {
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? new Set(arr as string[]) : undefined;
+      } catch {
+        return undefined;
+      }
+    },
+    serialize: s => JSON.stringify([...s]),
   };
-
-  let collapsedGroups = $state(loadCollapsedGroups());
+  const collapsedGroups = persisted(
+    'editme_manifest_collapsed_groups',
+    new Set<string>(),
+    collapsedCodec
+  );
 
   const toggleGroup = (key: string) => {
-    const next = new Set(collapsedGroups);
+    const next = new Set(collapsedGroups.current);
     if (next.has(key)) next.delete(key);
     else next.add(key);
-    collapsedGroups = next;
-    try {
-      localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify([...collapsedGroups]));
-    } catch {
-      // Best effort.
-    }
+    // Reassign through the setter so the change persists.
+    collapsedGroups.current = next;
   };
 
   const handleSort = (field: SortableFields) => {
@@ -454,7 +456,7 @@
         </thead>
         <tbody>
           {#each groups as group (group.key)}
-            {@const collapsed = !forceExpand && collapsedGroups.has(group.key)}
+            {@const collapsed = !forceExpand && collapsedGroups.current.has(group.key)}
             {#if group.kind !== 'root'}
               <tr class="group-heading" class:collapsed>
                 <td colspan="3" class="separator-cell">

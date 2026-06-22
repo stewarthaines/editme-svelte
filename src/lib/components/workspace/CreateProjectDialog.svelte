@@ -5,6 +5,7 @@
   import { titleHue } from '../../epub/cover-generator';
   import HueSelector from '../HueSelector.svelte';
   import type { ExtensionCatalogEntry } from '../../extensions/extension-catalog';
+  import { persisted, asString, asBoolean } from '../../state/persisted.svelte.js';
   import { X } from 'phosphor-svelte';
 
   // The data the create flow needs; `extension` is the chosen text-format
@@ -37,33 +38,16 @@
 
   // Remembered across sessions: repeat authors don't re-type, and the cover toggle
   // keeps the user's last choice (defaulting ON the first time).
-  const LS_AUTHOR = 'editme_new_project_author';
-  const LS_GENERATE_COVER = 'editme_new_project_generate_cover';
-  const readPref = (key: string): string | null => {
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  };
-  const writePref = (key: string, value: string): void => {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      /* localStorage unavailable (private mode / disabled) — non-fatal */
-    }
-  };
+  const author = persisted('editme_new_project_author', '', asString);
+  const generateCover = persisted('editme_new_project_generate_cover', true, asBoolean);
 
   // The dialog is mounted fresh each time it opens, so these seed the form's
   // initial values once; untrack makes that intent explicit (no reactive capture).
   let title = $state(DEFAULT_TITLE);
-  let author = $state(readPref(LS_AUTHOR) ?? '');
   let language = $state(untrack(() => defaultLanguage));
   // Pre-select the first available text format to nudge toward a transform
   // library; falls back to plain text when none are available.
   let selectedId = $state(untrack(() => textFormats[0]?.id ?? PLAIN));
-  // Default ON the first time; afterwards follow the user's last committed choice.
-  let generateCover = $state(readPref(LS_GENERATE_COVER) !== 'false');
   // null = follow the title-derived hue; a number = explicit user choice.
   let coverHue = $state<number | null>(null);
   const effectiveHue = $derived(coverHue ?? titleHue(title.trim() || DEFAULT_TITLE));
@@ -86,14 +70,13 @@
     try {
       // Remember these for the next New Project dialog (persist before onCreate,
       // which navigates into the project and unmounts this dialog).
-      writePref(LS_AUTHOR, author.trim());
-      writePref(LS_GENERATE_COVER, String(generateCover));
+      author.current = author.current.trim();
       await onCreate({
         title: title.trim() || DEFAULT_TITLE,
-        author: author.trim(),
+        author: author.current,
         language,
         extension: textFormats.find(e => e.id === selectedId) ?? null,
-        generateCover,
+        generateCover: generateCover.current,
         hue: coverHue ?? undefined,
       });
       // On success the app navigates into the new project and this dialog
@@ -150,7 +133,7 @@
       <div class="create-field">
         <label class="create-label" for="create-author">{$t('Author')}</label>
         <input
-          bind:value={author}
+          bind:value={author.current}
           id="create-author"
           type="text"
           class="create-input"
@@ -160,11 +143,11 @@
       </div>
 
       <label class="cover-option">
-        <input type="checkbox" bind:checked={generateCover} disabled={creating} />
+        <input type="checkbox" bind:checked={generateCover.current} disabled={creating} />
         {$t('Generate cover image')}
       </label>
 
-      {#if generateCover}
+      {#if generateCover.current}
         <HueSelector value={effectiveHue} disabled={creating} onInput={h => (coverHue = h)} />
       {/if}
 

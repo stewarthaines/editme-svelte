@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { navigationStore } from '../navigation-store';
+  import { persisted, asString } from '../../state/persisted.svelte.js';
   import { t, currentLocale } from '../../i18n';
   import { languageDisplayName } from '../../epub/bcp47';
   import WorkspaceActionBar from '../../components/workspace/WorkspaceActionBar.svelte';
@@ -95,21 +96,22 @@
   const currentProjectTitle = $derived(currentInfo?.title);
   let guardId = $state<string>('');
 
+  // Persisted current workspace id (removed from storage when set to null).
+  const currentWorkspace = persisted<string | null>('currentWorkspace', null, asString);
+
   // Service layer handles state directly - no reactive subscriptions needed
 
   // Helper to update workspace selection and notify parent
   const setCurrentWorkspace = async (workspaceId: string | null) => {
-    if (workspaceId) {
-      localStorage.setItem('currentWorkspace', workspaceId);
+    currentWorkspace.current = workspaceId;
 
+    if (workspaceId) {
       // Load workspace using callback
       try {
         await onLoadWorkspace(workspaceId);
       } catch (error) {
         console.error('Failed to load workspace:', error);
       }
-    } else {
-      localStorage.removeItem('currentWorkspace');
     }
 
     // Notify parent component about workspace change

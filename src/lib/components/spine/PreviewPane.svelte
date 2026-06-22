@@ -31,6 +31,7 @@
     previewTypeForDevice,
   } from '$lib/services/settings/settings.service.js';
   import { ArrowsClockwise, FilePdf, DeviceRotate, X, CircleHalf } from 'phosphor-svelte';
+  import { persisted, asBoolean, asInt, asEnum } from '../../state/persisted.svelte.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -305,7 +306,6 @@
     sepia: { bg: '#f4ecd8', fg: '#5b4636', scheme: 'light' },
     dark: { bg: '#14161a', fg: '#c9c9c9', scheme: 'dark' },
   } as const;
-  type PreviewTheme = keyof typeof THEME_PALETTES;
 
   // Category labels for dropdown groups
   const getCategoryLabel = (category: string) => {
@@ -367,16 +367,10 @@
   // Remember the chosen preview device across spine items and sessions. Restored
   // value is validated against the presets (and the onMount guard below drops a
   // stale 'print' under file://); falls back to 'desktop'.
-  const PREVIEW_DEVICE_KEY = 'editme_preview_device';
-  const restoredDevice = (() => {
-    try {
-      return localStorage.getItem(PREVIEW_DEVICE_KEY);
-    } catch {
-      return null;
-    }
-  })();
-  let selectedDevice = $state(
-    restoredDevice && DEVICE_PRESETS.some(d => d.id === restoredDevice) ? restoredDevice : 'desktop'
+  const selectedDevice = persisted(
+    'editme_preview_device',
+    'desktop',
+    asEnum(DEVICE_PRESETS.map(d => d.id))
   );
   let deviceOrientation = $state<'portrait' | 'landscape'>('portrait');
   let showSource = $state(false);
@@ -408,60 +402,25 @@
     return groups;
   });
 
-  // Persist the selected preview device whenever it changes.
-  $effect(() => {
-    try {
-      localStorage.setItem(PREVIEW_DEVICE_KEY, selectedDevice);
-    } catch {
-      /* localStorage unavailable — non-fatal */
-    }
-  });
-
   // Reader-mode preview state (theme + font size + force-colours). View-only — never
   // written to the generated/exported XHTML; persisted app-wide like the device.
-  const PREVIEW_THEME_KEY = 'editme_preview_theme';
-  const PREVIEW_FONT_STEP_KEY = 'editme_preview_font_step';
-  const PREVIEW_FORCE_COLORS_KEY = 'editme_preview_force_colors';
-  const readStored = (key: string): string | null => {
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  };
-  const storedTheme = readStored(PREVIEW_THEME_KEY);
-  let previewTheme = $state<PreviewTheme>(
-    storedTheme && storedTheme in THEME_PALETTES ? (storedTheme as PreviewTheme) : 'light'
+  const previewTheme = persisted<'light' | 'sepia' | 'dark'>(
+    'editme_preview_theme',
+    'light',
+    asEnum(['light', 'sepia', 'dark'])
   );
-  const storedStepRaw = readStored(PREVIEW_FONT_STEP_KEY);
-  const storedStep = storedStepRaw === null ? NaN : Number(storedStepRaw);
-  let fontStep = $state(
-    Number.isInteger(storedStep) && storedStep >= 0 && storedStep < FONT_STEPS.length
-      ? storedStep
-      : 2
-  );
-  let forceColors = $state(readStored(PREVIEW_FORCE_COLORS_KEY) === 'true');
-
-  // Persist the reader-mode controls whenever they change.
-  $effect(() => {
-    try {
-      localStorage.setItem(PREVIEW_THEME_KEY, previewTheme);
-      localStorage.setItem(PREVIEW_FONT_STEP_KEY, String(fontStep));
-      localStorage.setItem(PREVIEW_FORCE_COLORS_KEY, String(forceColors));
-    } catch {
-      /* localStorage unavailable — non-fatal */
-    }
-  });
+  const fontStep = persisted('editme_preview_font_step', 2, asInt({ min: 0, max: FONT_STEPS.length - 1 }));
+  const forceColors = persisted('editme_preview_force_colors', false, asBoolean);
 
   // Whether the reader-mode controls apply: reflowable previews only (not the print
   // preset, not fixed-layout chapters — readers disable user theming/sizing there).
-  const readerModeActive = $derived(selectedDevice !== 'print' && !isFixedLayout);
+  const readerModeActive = $derived(selectedDevice.current !== 'print' && !isFixedLayout);
 
   function decreaseFont(): void {
-    if (fontStep > 0) fontStep -= 1;
+    if (fontStep.current > 0) fontStep.current -= 1;
   }
   function increaseFont(): void {
-    if (fontStep < FONT_STEPS.length - 1) fontStep += 1;
+    if (fontStep.current < FONT_STEPS.length - 1) fontStep.current += 1;
   }
 
   /**
@@ -483,16 +442,16 @@
     if (!readerModeActive) return;
 
     const root = iframeDoc.documentElement;
-    const palette = THEME_PALETTES[previewTheme];
+    const palette = THEME_PALETTES[previewTheme.current];
 
     // Font size: inline on the root so em/rem/% cascade and win over stylesheet
     // rules; fixed-px text deliberately stays put (a useful "not responsive" tell).
-    const basePx = DEVICE_BASE_FONT[selectedDevice] ?? 18;
-    root.style.fontSize = `${Math.round(basePx * FONT_STEPS[fontStep])}px`;
+    const basePx = DEVICE_BASE_FONT[selectedDevice.current] ?? 18;
+    root.style.fontSize = `${Math.round(basePx * FONT_STEPS[fontStep.current])}px`;
     // Match UA-rendered chrome (scrollbars, form controls, default canvas).
     root.style.colorScheme = palette.scheme;
 
-    const rules = forceColors
+    const rules = forceColors.current
       ? `html { background: ${palette.bg} !important; }
          body { background: ${palette.bg} !important; }
          body, body * { color: ${palette.fg} !important; }`
@@ -512,10 +471,10 @@
   // Re-apply theme/font instantly when a control changes (no content rewrite).
   $effect(() => {
     // Track the controls so this re-runs on change.
-    void previewTheme;
-    void fontStep;
-    void forceColors;
-    void selectedDevice;
+    void previewTheme.current;
+    void fontStep.current;
+    void forceColors.current;
+    void selectedDevice.current;
     void readerModeActive;
     applyPreviewAppearance();
   });
@@ -543,7 +502,7 @@
   // re-render live or just mark the preview stale (author refreshes on demand) —
   // a generalisation of the old "Responsive/Device live, Print on demand" rule.
   $effect(() => {
-    const device = selectedDevice;
+    const device = selectedDevice.current;
     const content = xhtmlContent;
     const chapter = chapterId;
     const type = typeOfDevice(device);
@@ -704,7 +663,9 @@
 
   /** The preview-head fragment to inject for the current preview type ('' = none). */
   function currentWantHead(): string {
-    return previewIncludeHead[typeOfDevice(selectedDevice)] && previewHead ? previewHead : '';
+    return previewIncludeHead[typeOfDevice(selectedDevice.current)] && previewHead
+      ? previewHead
+      : '';
   }
 
   /**
@@ -768,11 +729,11 @@
    */
   function renderNow(): void {
     const content = xhtmlContent;
-    if (selectedDevice === 'print') writePagedDoc(content);
+    if (selectedDevice.current === 'print') writePagedDoc(content);
     else updatePreviewContent(withPreviewHead(content));
     renderedContent = content;
     renderedChapterId = chapterId;
-    renderedType = typeOfDevice(selectedDevice);
+    renderedType = typeOfDevice(selectedDevice.current);
     renderedHead = currentWantHead();
     previewStale = false;
   }
@@ -907,14 +868,14 @@
   function toggleOrientation(): void {
     deviceOrientation = deviceOrientation === 'portrait' ? 'landscape' : 'portrait';
     // Recalculate scaling and container dimensions for new orientation
-    handleDeviceChange(selectedDevice);
+    handleDeviceChange(selectedDevice.current);
   }
 
   /**
    * Handle device preset selection
    */
   function handleDeviceChange(deviceId: string): void {
-    selectedDevice = deviceId;
+    selectedDevice.current = deviceId as (typeof DEVICE_PRESETS)[number]['id'];
     const device = DEVICE_PRESETS.find(d => d.id === deviceId);
 
     if (device && previewContainer) {
@@ -971,7 +932,7 @@
         // Re-render for the active device (paginated when Print is selected) and
         // re-apply device dimensions/scaling after returning from the source view.
         renderNow();
-        handleDeviceChange(selectedDevice);
+        handleDeviceChange(selectedDevice.current);
       }, 0);
     }
   }
@@ -1179,16 +1140,16 @@
 
   onMount(() => {
     // Print preview is HTTP-only; never start on it under file://.
-    if (selectedDevice === 'print' && !canPaginate) selectedDevice = 'desktop';
+    if (selectedDevice.current === 'print' && !canPaginate) selectedDevice.current = 'desktop';
 
     // Initialize with default device
-    handleDeviceChange(selectedDevice);
+    handleDeviceChange(selectedDevice.current);
 
     // Re-apply device sizing on resize. For Print, re-fit the pages to the new
     // width instead — no re-pagination (Paged.js pages stay A4 regardless).
     const onResize = () => {
-      if (selectedDevice === 'print') fitPrintToWidth();
-      else handleDeviceChange(selectedDevice);
+      if (selectedDevice.current === 'print') fitPrintToWidth();
+      else handleDeviceChange(selectedDevice.current);
     };
 
     // Set up resize observer for responsive scaling
@@ -1276,7 +1237,7 @@
 
       <div class="preview-device">
         <!-- Orientation toggle (only show for scaled device frames, not fill/print) -->
-        {#if !isFillDevice(selectedDevice)}
+        {#if !isFillDevice(selectedDevice.current)}
           <button
             type="button"
             class="orientation-toggle"
@@ -1292,7 +1253,7 @@
         <!-- i18n: Accessibility label for device size dropdown menu -->
         <select
           class="device-selector"
-          bind:value={selectedDevice}
+          bind:value={selectedDevice.current}
           onchange={e => handleDeviceChange((e.target as HTMLSelectElement).value)}
           aria-label={$t('Select device preset')}
         >
@@ -1441,30 +1402,30 @@
             <button
               type="button"
               class="theme-option"
-              class:selected={previewTheme === 'light'}
+              class:selected={previewTheme.current === 'light'}
               role="radio"
-              aria-checked={previewTheme === 'light'}
-              onclick={() => (previewTheme = 'light')}
+              aria-checked={previewTheme.current === 'light'}
+              onclick={() => (previewTheme.current = 'light')}
             >
               {$t('Light')}
             </button>
             <button
               type="button"
               class="theme-option"
-              class:selected={previewTheme === 'sepia'}
+              class:selected={previewTheme.current === 'sepia'}
               role="radio"
-              aria-checked={previewTheme === 'sepia'}
-              onclick={() => (previewTheme = 'sepia')}
+              aria-checked={previewTheme.current === 'sepia'}
+              onclick={() => (previewTheme.current = 'sepia')}
             >
               {$t('Sepia')}
             </button>
             <button
               type="button"
               class="theme-option"
-              class:selected={previewTheme === 'dark'}
+              class:selected={previewTheme.current === 'dark'}
               role="radio"
-              aria-checked={previewTheme === 'dark'}
-              onclick={() => (previewTheme = 'dark')}
+              aria-checked={previewTheme.current === 'dark'}
+              onclick={() => (previewTheme.current = 'dark')}
             >
               {$t('Dark')}
             </button>
@@ -1479,20 +1440,20 @@
               type="button"
               class="font-step"
               onclick={decreaseFont}
-              disabled={fontStep === 0}
+              disabled={fontStep.current === 0}
               aria-label={$t('Decrease text size')}
               title={$t('Decrease text size')}
             >
               A<span class="font-step-sign">−</span>
             </button>
             <span class="font-step-readout" aria-live="polite"
-              >{fontStep + 1}/{FONT_STEPS.length}</span
+              >{fontStep.current + 1}/{FONT_STEPS.length}</span
             >
             <button
               type="button"
               class="font-step"
               onclick={increaseFont}
-              disabled={fontStep === FONT_STEPS.length - 1}
+              disabled={fontStep.current === FONT_STEPS.length - 1}
               aria-label={$t('Increase text size')}
               title={$t('Increase text size')}
             >
@@ -1503,7 +1464,7 @@
 
         <!-- Force reading-system colours -->
         <label class="reader-toggle">
-          <input type="checkbox" bind:checked={forceColors} />
+          <input type="checkbox" bind:checked={forceColors.current} />
           <CircleHalf size={16} aria-hidden="true" />
           <span>{$t('Force reading-system colours')}</span>
         </label>
@@ -1540,7 +1501,7 @@
             {/if}
           </div>
         {/if}
-        {#if printPaginating && selectedDevice === 'print'}
+        {#if printPaginating && selectedDevice.current === 'print'}
           <div class="print-paginating" role="status">
             <div class="status-spinner"></div>
             <span>{$t('Paginating…')}</span>
@@ -1549,8 +1510,10 @@
         <div class="preview-frame-wrapper">
           <div
             class="preview-frame-container"
-            class:device-frame={!isFillDevice(selectedDevice)}
-            style:transform={!isFillDevice(selectedDevice) ? `scale(${deviceScale})` : 'none'}
+            class:device-frame={!isFillDevice(selectedDevice.current)}
+            style:transform={!isFillDevice(selectedDevice.current)
+              ? `scale(${deviceScale})`
+              : 'none'}
             style:transform-origin="top left"
             bind:this={previewContainer}
           >
@@ -1593,7 +1556,7 @@
   <!-- Per-chapter PDF: a footer (styled like the sidebar's EPUB/PDF footer) shown
        when the PDF device is selected. The parent passes onGeneratePdf only over
        http: (Paged.js needs the origin); opens a window with just this chapter. -->
-  {#if selectedDevice === 'print' && onGeneratePdf}
+  {#if selectedDevice.current === 'print' && onGeneratePdf}
     <div class="pdf-footer">
       <button
         type="button"

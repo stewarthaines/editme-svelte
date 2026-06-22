@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import { persisted, asEnum } from '../../state/persisted.svelte.js';
   import { xmlHighlighter } from '../../utils/xml-highlighter.js';
   import { OPFUtils } from '../../epub/opf-utils.js';
   import SimpleMetadataView from './SimpleMetadataView.svelte';
@@ -38,25 +39,11 @@
   // Advanced mode shows the OPF source by default, with a second tab for the
   // metadata summary (so the cover generator stays reachable in advanced mode).
   // Remember the selected tab (content.opf vs Summary) across reloads.
-  const RIGHT_TAB_KEY = 'editme_metadata_right_tab';
-  const loadActiveTab = (): 'opf' | 'summary' => {
-    try {
-      const stored = localStorage.getItem(RIGHT_TAB_KEY);
-      if (stored === 'opf' || stored === 'summary') return stored;
-    } catch {
-      // Ignore unavailable storage.
-    }
-    return 'opf';
-  };
-  let activeTab = $state<'opf' | 'summary'>(loadActiveTab());
-  const setActiveTab = (tab: 'opf' | 'summary'): void => {
-    activeTab = tab;
-    try {
-      localStorage.setItem(RIGHT_TAB_KEY, tab);
-    } catch {
-      // Ignore unavailable storage.
-    }
-  };
+  const activeTab = persisted<'opf' | 'summary'>(
+    'editme_metadata_right_tab',
+    'opf',
+    asEnum(['opf', 'summary'])
+  );
 
   // Generate OPF content from workspace data (derived state)
   let opfContent = $derived(() => {
@@ -106,19 +93,19 @@
         <MetadataTab
           id="opf"
           label="content.opf"
-          active={activeTab === 'opf'}
-          onSelect={({ tabId }) => setActiveTab(tabId as typeof activeTab)}
+          active={activeTab.current === 'opf'}
+          onSelect={({ tabId }) => (activeTab.current = tabId as 'opf' | 'summary')}
         />
         <MetadataTab
           id="summary"
           label={$t('Summary')}
-          active={activeTab === 'summary'}
-          onSelect={({ tabId }) => setActiveTab(tabId as typeof activeTab)}
+          active={activeTab.current === 'summary'}
+          onSelect={({ tabId }) => (activeTab.current = tabId as 'opf' | 'summary')}
         />
       </div>
     </PaneHeader>
 
-    {#if activeTab === 'summary'}
+    {#if activeTab.current === 'summary'}
       <div class="summary-panel">
         <SimpleMetadataView
           {workspace}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '../../i18n';
+  import { persisted, asEnum } from '../../state/persisted.svelte.js';
   import MetadataTabBar from './MetadataTabBar.svelte';
   import PaneHeader from '../layout/PaneHeader.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
@@ -38,18 +39,8 @@
   let loading = $derived(!workspace);
 
   // Remember the selected tab across reloads (validated against the known ids).
-  const LEFT_TAB_KEY = 'editme_metadata_left_tab';
   const TAB_IDS = ['basic', 'advanced', 'accessibility'];
-  const loadActiveTab = (): string => {
-    try {
-      const stored = localStorage.getItem(LEFT_TAB_KEY);
-      if (stored && TAB_IDS.includes(stored)) return stored;
-    } catch {
-      // Ignore unavailable storage.
-    }
-    return 'basic';
-  };
-  let activeTab = $state(loadActiveTab());
+  const activeTab = persisted('editme_metadata_left_tab', 'basic', asEnum(TAB_IDS));
   let saving = $state(false);
   let error = $state<string | null>(null);
 
@@ -208,24 +199,24 @@
 
     // Allow tab switching - validation errors will be shown inline
     // No need to block navigation, users should be able to access all tabs
-    activeTab = newTabId;
-    try {
-      localStorage.setItem(LEFT_TAB_KEY, newTabId);
-    } catch {
-      // Ignore unavailable storage.
-    }
+    activeTab.current = newTabId;
   };
 
   // Tell the preview which fields the active tab owns, so it can softly
   // highlight that group in the content.opf.
   $effect(() => {
-    onTabFieldsChange?.({ fields: getTabFields(activeTab) });
+    onTabFieldsChange?.({ fields: getTabFields(activeTab.current) });
   });
 </script>
 
 <div class="metadata-editor">
   <PaneHeader>
-    <MetadataTabBar {activeTab} {validationErrors} {tabs} onTabClick={handleTabSwitch} />
+    <MetadataTabBar
+      activeTab={activeTab.current}
+      {validationErrors}
+      {tabs}
+      onTabClick={handleTabSwitch}
+    />
   </PaneHeader>
 
   <div class="pane-content" tabindex="-1">
@@ -247,11 +238,11 @@
         class="fields-fieldset"
         class:is-readonly={readOnly}
         disabled={readOnly}
-        id="metadata-panel-{activeTab}"
-        aria-labelledby="metadata-tab-{activeTab}"
+        id="metadata-panel-{activeTab.current}"
+        aria-labelledby="metadata-tab-{activeTab.current}"
         tabindex="-1"
       >
-        {#if activeTab === 'basic'}
+        {#if activeTab.current === 'basic'}
           <BasicInfoFields
             {metadata}
             {validationErrors}
@@ -264,7 +255,7 @@
             onarrayRemove={handleArrayRemove}
             ongenerateIdentifier={handleGenerateIdentifier}
           />
-        {:else if activeTab === 'advanced'}
+        {:else if activeTab.current === 'advanced'}
           <AdvancedFields
             {metadata}
             {validationErrors}
@@ -276,7 +267,7 @@
             onarrayAdd={handleArrayAdd}
             onarrayRemove={handleArrayRemove}
           />
-        {:else if activeTab === 'accessibility'}
+        {:else if activeTab.current === 'accessibility'}
           <AccessibilityFields
             {metadata}
             {validationErrors}

@@ -12,28 +12,12 @@
   behaves identically across browsers.
 -->
 <script module lang="ts">
+  import { persisted, asJSON } from '../../state/persisted.svelte.js';
+
   // Open/closed state for every section, remembered across reloads under one key
-  // (keyed by each section's persist key). try/catch so private-mode/disabled
-  // storage is non-fatal.
-  const SECTION_STATE_KEY = 'editme_section_open';
-
-  function readSectionState(): Record<string, boolean> {
-    try {
-      return JSON.parse(localStorage.getItem(SECTION_STATE_KEY) || '{}') as Record<string, boolean>;
-    } catch {
-      return {};
-    }
-  }
-
-  function persistSectionOpen(key: string, open: boolean): void {
-    try {
-      const state = readSectionState();
-      state[key] = open;
-      localStorage.setItem(SECTION_STATE_KEY, JSON.stringify(state));
-    } catch {
-      // Ignore unavailable storage.
-    }
-  }
+  // (keyed by each section's persist key). Module-scope shared state across all
+  // SettingsSection instances; the setter write-through persists without $effect.
+  const sectionOpen = persisted<Record<string, boolean>>('editme_section_open', {}, asJSON());
 </script>
 
 <script lang="ts">
@@ -62,7 +46,7 @@
   // intentional one-time capture (the open state is owned by the DOM thereafter).
   const storeKey = untrack(() => persistKey ?? name);
   // One-time initial open: the remembered state if present, else the `open` prop.
-  const initialOpen = untrack(() => readSectionState()[storeKey] ?? open);
+  const initialOpen = untrack(() => sectionOpen.current[storeKey] ?? open);
 
   // Remember the new state, then enforce single-open exclusivity across the group
   // (sections sharing a `name`, matched via the remount-safe data-accordion
@@ -70,7 +54,7 @@
   // it closed and then returns — no recursion.
   function handleToggle(event: Event): void {
     const el = event.currentTarget as HTMLDetailsElement;
-    persistSectionOpen(storeKey, el.open);
+    sectionOpen.current = { ...sectionOpen.current, [storeKey]: el.open };
     if (!el.open) return;
     for (const other of document.querySelectorAll<HTMLDetailsElement>(
       `details[data-accordion="${CSS.escape(name)}"]`
