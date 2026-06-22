@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20\n"
-"PO-Revision-Date: 2026-06-20\n"
+"POT-Creation-Date: 2026-06-22\n"
+"PO-Revision-Date: 2026-06-22\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -97,6 +97,10 @@ msgstr "{n} Warnung"
 msgid "{n} warnings"
 msgstr "{n} Warnungen"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "{n}/3 auto-update"
+msgstr ""
+
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} deleted"
 msgstr "{name} gelöscht"
@@ -152,7 +156,7 @@ msgstr "Ein Großteil dieser Software wurde mit KI-Coding-Agenten geschrieben, v
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.epub.editor"
-msgstr "Dieser Editor verwandelt reinen Text in ein gültiges EPUB — ohne Server, Konten oder Installation. Sie schreiben in einfacher, lesbarer Quelle; sie wird zu einem standardkonformen Buch gepackt, das Sie in jedem Lesesystem öffnen können."
+msgstr "Dieser Editor verwandelt reinen Text in ein gültiges EPUB — ohne Server, Konten oder Installation. Sie schreiben in einfacher, lesbarer Source; sie wird zu einem standardkonformen Buch gepackt, das Sie in jedem Lesesystem öffnen können."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.epub.format"
@@ -180,11 +184,11 @@ msgstr "Lizenz"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.seed.graphic.alt"
-msgstr "SEED.html erzeugt zwei Ausgaben: ein EPUB, das seine eigene SEED.zip-Quelle einbettet, und ein PDF. Das PDF ist ein einseitiges Zielformat; nur das EPUB hat einen Rückkehrpfeil zur App und kann erneut importiert, bearbeitet und neu veröffentlicht werden."
+msgstr "SEED.html erzeugt zwei Ausgaben: ein EPUB, das seine eigene SEED.zip-Source einbettet, und ein PDF. Das PDF ist ein einseitiges Zielformat; nur das EPUB hat einen Rückkehrpfeil zur App und kann erneut importiert, bearbeitet und neu veröffentlicht werden."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.seed.graphic.caption"
-msgstr "SEED.html exportiert ein EPUB, das seine eigene SEED.zip-Quelle einbettet, oder ein PDF – und nur dieses EPUB lässt sich erneut öffnen, bearbeiten und veröffentlichen."
+msgstr "SEED.html exportiert ein EPUB, das seine eigene SEED.zip-Source einbettet, oder ein PDF – und nur dieses EPUB lässt sich erneut öffnen, bearbeiten und veröffentlichen."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "about.seed.p1"
@@ -329,7 +333,7 @@ msgstr "SEED.html zum Paket hinzufügen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add to project"
-msgstr "Zum Projekt hinzufügen"
+msgstr "Hinzufügen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Added"
@@ -433,6 +437,10 @@ msgstr "Autorisierung fehlgeschlagen: {error}"
 msgid "Auto"
 msgstr "Automatisch"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Auto Update"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Auto-filled from bucket name"
 msgstr "Automatisch aus dem Bucket-Namen ausgefüllt"
@@ -459,7 +467,7 @@ msgstr "Zurück"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Basic Info"
-msgstr "Grundlegende Informationen"
+msgstr "Generelle Informationen"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Binary file - preview not available"
@@ -1103,7 +1111,7 @@ msgstr "Fehler:"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Essential Information"
-msgstr "Wesentliche Informationen"
+msgstr "Obligatorische Informationen"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Expanded"
@@ -1245,7 +1253,7 @@ msgstr "Nach ID, Pfad oder Medientyp filtern..."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Flow"
-msgstr "Fluss"
+msgstr "Seitenfluss"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Folder selected:"
@@ -1393,7 +1401,7 @@ msgstr "Wird importiert…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include cover page"
-msgstr "Coverseite einschließen"
+msgstr "Inklusive Titelseite"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Include in catalog"
@@ -1405,7 +1413,11 @@ msgstr "In die lineare Lesereihenfolge aufnehmen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include page numbers"
-msgstr "Seitenzahlen einschließen"
+msgstr "Inklusive Seitenzahlen"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Include preview head"
+msgstr ""
 
 #: src/App.svelte
 msgid "Initializing application..."
@@ -1422,6 +1434,10 @@ msgstr "Transformations-Engine wird initialisiert..."
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
 msgstr "Wird initialisiert..."
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Inject the project’s preview/head.xml (edit it via the spine editor’s file menu in Advanced mode) into the preview head, per preview type. Authoring-time only — it is never added to the packaged EPUB."
+msgstr ""
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Insert at cursor"
@@ -2030,7 +2046,7 @@ msgstr "PDF"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Plain text"
-msgstr "Reiner Text"
+msgstr "Einfacher Text"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Please copy license text into the License field below to comply with open source requirements."
@@ -2092,6 +2108,7 @@ msgid "Preset"
 msgstr "Voreinstellung"
 
 #: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -2107,6 +2124,10 @@ msgstr "Vorschau veraltet"
 msgid "Preview Pane"
 msgstr "Vorschaubereich"
 
+#: src/lib/navigation/views/SpineView.svelte
+msgid "Preview: head.xml"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 #. The paginated print-page preview option
 msgid "Print"
@@ -2118,7 +2139,7 @@ msgstr "Projekt enthält Fehler"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Project Settings"
-msgstr "Projekteinstellungen"
+msgstr "Projekt-Einstellungen"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
@@ -2154,6 +2175,10 @@ msgstr "Veröffentlicht"
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
 msgstr "Verlag"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand."
+msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"
@@ -2415,10 +2440,6 @@ msgstr "Secret Key"
 msgid "Select a spine item to see the preview here"
 msgstr "Wählen Sie ein Spine-Element aus, um die Vorschau hier zu sehen"
 
-#: src/lib/components/manifest/ManifestPreview.svelte
-msgid "Select an item to preview its content"
-msgstr "Wählen Sie ein Element aus, um seinen Inhalt in der Vorschau anzuzeigen"
-
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Select audio file"
 msgstr "Audiodatei auswählen"
@@ -2549,7 +2570,7 @@ msgstr "Nach Größe sortieren"
 #: src/lib/components/metadata/AdvancedFields.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Source"
-msgstr "Quelle"
+msgstr "Source"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Source on GitHub"

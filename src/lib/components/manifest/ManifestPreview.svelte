@@ -482,7 +482,6 @@
 <div class="manifest-preview">
   {#if !selectedItem}
     <div class="no-selection">
-      <p>{$t('Select an item to preview its content')}</p>
       <p class="no-selection-subtitle">{$t('Click on any row in the table to see details')}</p>
     </div>
   {:else if loading}

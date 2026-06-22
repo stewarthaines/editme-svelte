@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-20\n"
-"PO-Revision-Date: 2026-06-20\n"
+"POT-Creation-Date: 2026-06-22\n"
+"PO-Revision-Date: 2026-06-22\n"
 "Language: ar\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -95,6 +95,10 @@ msgstr ""
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{n} warnings"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "{n}/3 auto-update"
 msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
@@ -431,6 +435,10 @@ msgstr ""
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Auto"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Auto Update"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -1407,6 +1415,10 @@ msgstr ""
 msgid "Include page numbers"
 msgstr ""
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Include preview head"
+msgstr ""
+
 #: src/App.svelte
 msgid "Initializing application..."
 msgstr ""
@@ -1421,6 +1433,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Inject the project’s preview/head.xml (edit it via the spine editor’s file menu in Advanced mode) into the preview head, per preview type. Authoring-time only — it is never added to the packaged EPUB."
 msgstr ""
 
 #: src/lib/components/spine/GeneratorPanel.svelte
@@ -2092,6 +2108,7 @@ msgid "Preset"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Preview"
 msgstr ""
 
@@ -2105,6 +2122,10 @@ msgstr ""
 
 #: src/App.svelte
 msgid "Preview Pane"
+msgstr ""
+
+#: src/lib/navigation/views/SpineView.svelte
+msgid "Preview: head.xml"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -2153,6 +2174,10 @@ msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand."
 msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
@@ -2394,10 +2419,6 @@ msgstr ""
 
 #: src/App.svelte
 msgid "Select a spine item to see the preview here"
-msgstr ""
-
-#: src/lib/components/manifest/ManifestPreview.svelte
-msgid "Select an item to preview its content"
 msgstr ""
 
 #: src/lib/components/audio/AudioClipEditor.svelte
