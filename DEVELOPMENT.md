@@ -10,7 +10,8 @@ The project follows a structured 5-step development process to ensure high-quali
 
 ### 1. Feature Planning & Specification
 
-- Start with detailed feature plan in `plans/features/{number}_{name}.md`
+- Capture any non-trivial design in a new markdown doc under `process/` (per the
+  CLAUDE.md convention) before implementing
 - Collaborate on requirements, technical approach, and integration points
 - Define API interfaces, error handling, and performance considerations
 - Clarify implementation details through iterative discussion

@@ -87,7 +87,6 @@ editme-svelte/
 │   ├── routes/        # Application views
 │   ├── stores/        # Svelte stores
 │   └── styles/        # Design system
-├── plans/             # Project planning documents
 ├── static/            # Static assets (inlined at build)
 └── stories/           # Storybook component demos
 ```
