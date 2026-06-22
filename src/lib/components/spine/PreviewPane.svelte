@@ -438,7 +438,12 @@
    */
   function applyPreviewAppearance(): void {
     const iframeDoc = previewIframe?.contentDocument;
-    if (!iframeDoc?.documentElement || !iframeDoc.head) return;
+    // Bail while the document is head-only (no body element yet). A parser-blocking
+    // external script (script src) in the chapter head stalls open/write/close
+    // mid-parse, and mutating that stalled head (inserting the theme style element)
+    // can leave it permanently body-less in some browsers. The iframe `load` event
+    // re-applies appearance once the body has parsed.
+    if (!iframeDoc?.documentElement || !iframeDoc.head || !iframeDoc.body) return;
     if (!readerModeActive) return;
 
     const root = iframeDoc.documentElement;
