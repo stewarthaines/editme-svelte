@@ -36,6 +36,10 @@ async function exists(p) {
 
 const dirents = await fs.readdir(extensionsDir, { withFileTypes: true }).catch(() => []);
 const manifest = [];
+// Root-relative served URLs for the service worker to precache (see
+// src/pwa/sw-template.js). Collected as files copy so the SW needn't know the build
+// layout; relative (no leading slash) so they resolve against the SW scope.
+const precache = ['extensions/manifest.json', 'plugins/manifest.json'];
 
 for (const dirent of dirents) {
   if (!dirent.isDirectory()) continue;
@@ -108,6 +112,8 @@ for (const dirent of dirents) {
   const destDir = path.join(outDir, id);
   await fs.mkdir(destDir, { recursive: true });
   let ok = true;
+  // Served URLs for this extension; committed to `precache` only if it fully copies.
+  const entryUrls = [];
   for (const file of flatFiles) {
     const src = path.join(dir, file);
     if (!(await exists(src))) {
@@ -116,6 +122,7 @@ for (const dirent of dirents) {
       break;
     }
     await fs.copyFile(src, path.join(destDir, path.basename(file)));
+    entryUrls.push(`extensions/${id}/${path.basename(file)}`);
   }
   for (const asset of assets) {
     const src = path.join(dir, asset.file);
@@ -127,8 +134,10 @@ for (const dirent of dirents) {
     const dest = path.join(destDir, asset.file);
     await fs.mkdir(path.dirname(dest), { recursive: true });
     await fs.copyFile(src, dest);
+    entryUrls.push(`extensions/${id}/${asset.file}`);
   }
   if (!ok) continue;
+  precache.push(...entryUrls);
 
   manifest.push({
     id,
@@ -149,3 +158,13 @@ for (const dirent of dirents) {
 await fs.mkdir(outDir, { recursive: true });
 await fs.writeFile(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 console.log(`📦 Wrote ${manifest.length} extension(s) to dist/extensions/manifest.json`);
+
+// Flat URL list the service worker fetches on install to eagerly precache extensions
+// for offline use (the plugin entry HTML is intentionally left to cache-on-use).
+const distDir = path.join(root, 'dist');
+await fs.mkdir(distDir, { recursive: true });
+await fs.writeFile(
+  path.join(distDir, 'precache-manifest.json'),
+  JSON.stringify(precache, null, 2) + '\n'
+);
+console.log(`📦 Wrote ${precache.length} URL(s) to dist/precache-manifest.json`);
