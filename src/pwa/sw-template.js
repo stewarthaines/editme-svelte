@@ -22,7 +22,7 @@ const PRECACHE_URLS = [
   '/axe.min.js',
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(precache());
   self.skipWaiting();
 });
@@ -43,7 +43,7 @@ async function precache() {
       const urls = await res.json();
       if (Array.isArray(urls)) {
         await Promise.all(
-          urls.map((url) =>
+          urls.map(url =>
             cache.add(url).catch(() => {
               /* best-effort: skip any entry that fails (e.g. a 404) */
             })
@@ -56,22 +56,22 @@ async function precache() {
   }
 }
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) =>
+      .then(keys =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith('seed-shell-') && key !== CACHE_NAME)
-            .map((key) => caches.delete(key))
+            .filter(key => key.startsWith('seed-shell-') && key !== CACHE_NAME)
+            .map(key => caches.delete(key))
         )
       )
       .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
@@ -89,9 +89,9 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html')) {
     event.respondWith(
       fetch(request)
-        .then((response) => {
+        .then(response => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put('/', copy));
+          caches.open(CACHE_NAME).then(cache => cache.put('/', copy));
           return response;
         })
         .catch(() => caches.match('/'))
@@ -105,7 +105,7 @@ self.addEventListener('fetch', (event) => {
     (async () => {
       const cache = await caches.open(CACHE_NAME);
       const cached = await cache.match(request);
-      const fetchAndCache = fetch(request).then((response) => {
+      const fetchAndCache = fetch(request).then(response => {
         if (response && response.ok && response.type === 'basic') {
           cache.put(request, response.clone());
         }
