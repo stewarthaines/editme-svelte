@@ -30,6 +30,19 @@
 
   let pluginFrame = $state<HTMLIFrameElement | null>(null);
 
+  // Plugin load-failure detection. The plugin owns the whole frame only while it's
+  // available AND has actually come alive. A blank/error iframe (offline with an
+  // uncached plugin.html, a 404, or a crashed plugin) never completes the
+  // `plugin-ready` handshake — and `onerror` doesn't fire for a failed navigation
+  // (the browser fires `onload` on its error page), so liveness is judged purely by
+  // the handshake. On failure we fall back to the core publish view.
+  let pluginReady = $state(false);
+  let pluginFailed = $state(false);
+  let pluginAttempt = $state(0);
+  let readyTimer: ReturnType<typeof setTimeout> | undefined;
+  let capTimer: ReturnType<typeof setTimeout> | undefined;
+  const showingPlugin = $derived(!!pluginUrl && !pluginFailed);
+
   let epubs = $state<PublishedEpub[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
@@ -68,7 +81,7 @@
   // Core feature: list packaged epubs, refreshing as new ones are packaged.
   // Skipped when the plugin takes over the whole frame.
   $effect(() => {
-    if (pluginUrl) return;
+    if (showingPlugin) return;
     load();
     const onPackaged = () => load();
     window.addEventListener('epub-packaged', onPackaged);
@@ -79,11 +92,16 @@
   // and re-hand it whenever a new epub is packaged so the plugin re-reads the dir.
   // Re-sending `init` (with a fresh handle) is enough — no separate refresh message.
   $effect(() => {
-    if (!pluginUrl) return;
+    if (!showingPlugin) return;
     const handler = (event: MessageEvent) => {
       if (!pluginFrame || event.source !== pluginFrame.contentWindow) return;
       if (event.origin !== window.location.origin) return;
       if (isPluginReadyMessage(event.data)) {
+        // The plugin came alive — cancel failure detection and hand over.
+        pluginReady = true;
+        pluginFailed = false;
+        clearTimeout(readyTimer);
+        clearTimeout(capTimer);
         void sendPluginInit();
         sendPluginContext();
       } else if (isNavigateMessage(event.data)) {
@@ -141,7 +159,7 @@
   // Re-send context whenever the theme, locale, direction, or active project
   // changes, so the iframe tracks the app live — no reload, no lost plugin state.
   $effect(() => {
-    if (!pluginUrl) return;
+    if (!showingPlugin) return;
     // Touch each value so the effect re-runs on change.
     void activeIdentifier;
     void $themeStore.current;
@@ -149,6 +167,40 @@
     void $documentDirection;
     sendPluginContext();
   });
+
+  // (Re)arm failure detection whenever a plugin URL is assigned or a retry is
+  // requested. If the plugin never completes its `plugin-ready` handshake, fall back
+  // to the core publish view rather than leave a blank/error iframe.
+  $effect(() => {
+    void pluginAttempt; // re-arm on retry
+    if (!pluginUrl) return;
+    pluginReady = false;
+    pluginFailed = false;
+    // Backstop in case `onload` never fires; the onload grace (handlePluginFrameLoad)
+    // is the primary, fast detector for the offline/error-page case.
+    capTimer = setTimeout(() => {
+      if (!pluginReady) pluginFailed = true;
+    }, 20000);
+    return () => {
+      clearTimeout(capTimer);
+      clearTimeout(readyTimer);
+    };
+  });
+
+  function handlePluginFrameLoad(): void {
+    // The frame finished navigating. A live plugin posts `plugin-ready` almost
+    // immediately afterwards; if none arrives shortly, the frame is an error page
+    // (the offline/uncached case) — fail fast rather than wait out the backstop.
+    clearTimeout(readyTimer);
+    readyTimer = setTimeout(() => {
+      if (!pluginReady) pluginFailed = true;
+    }, 2000);
+  }
+
+  function retryPlugin(): void {
+    // Remount the iframe and re-arm detection (e.g. after coming back online).
+    pluginAttempt += 1;
+  }
 
   async function handleDownload(filename: string) {
     try {
@@ -186,9 +238,16 @@
   }
 </script>
 
-{#if pluginUrl}
-  <iframe bind:this={pluginFrame} class="plugin-frame" src={pluginUrl} title={$t('Publish')}
-  ></iframe>
+{#if showingPlugin}
+  {#key pluginAttempt}
+    <iframe
+      bind:this={pluginFrame}
+      class="plugin-frame"
+      src={pluginUrl}
+      title={$t('Publish')}
+      onload={handlePluginFrameLoad}
+    ></iframe>
+  {/key}
 {:else}
   <div class="publish-view">
     <PaneHeader>
@@ -199,6 +258,18 @@
     </PaneHeader>
 
     <div class="publish-body">
+      {#if pluginFailed}
+        <div class="plugin-fallback" role="status">
+          <p class="plugin-fallback-text">
+            {$t(
+              'The publishing plugin could not be loaded — you may be offline. Showing local publishing instead.'
+            )}
+          </p>
+          <button class="btn btn-secondary btn-sm" onclick={retryPlugin}>
+            {$t('Retry plugin')}
+          </button>
+        </div>
+      {/if}
       {#if loading}
         <p class="status">{$t('Loading…')}</p>
       {:else if error}
@@ -302,6 +373,28 @@
 
   .status.error {
     color: var(--color-error-text);
+  }
+
+  /* Shown when the publish plugin frame fails to come alive (e.g. offline with an
+     uncached plugin.html); the core publish list renders beneath it. */
+  .plugin-fallback {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-accent);
+  }
+
+  .plugin-fallback-text {
+    flex: 1;
+    min-width: 12rem;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
   }
 
   .empty-state {
