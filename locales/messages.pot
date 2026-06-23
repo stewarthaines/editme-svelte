@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-22\n"
-"PO-Revision-Date: 2026-06-22\n"
+"POT-Creation-Date: 2026-06-23\n"
+"PO-Revision-Date: 2026-06-23\n"
 "Language: \n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -2355,6 +2355,10 @@ msgstr ""
 msgid "Retry"
 msgstr ""
 
+#: src/lib/navigation/views/PublishView.svelte
+msgid "Retry plugin"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Right to Left"
 msgstr ""
@@ -2721,6 +2725,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Text Transform"
+msgstr ""
+
+#: src/lib/navigation/views/PublishView.svelte
+msgid "The publishing plugin could not be loaded — you may be offline. Showing local publishing instead."
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

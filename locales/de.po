@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-22\n"
-"PO-Revision-Date: 2026-06-22\n"
+"POT-Creation-Date: 2026-06-23\n"
+"PO-Revision-Date: 2026-06-23\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -2355,6 +2355,10 @@ msgstr "Responsiv"
 msgid "Retry"
 msgstr "Erneut versuchen"
 
+#: src/lib/navigation/views/PublishView.svelte
+msgid "Retry plugin"
+msgstr "Plugin erneut laden"
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Right to Left"
 msgstr "Rechts nach links"
@@ -2741,6 +2745,10 @@ msgstr "Schriftgröße"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Text Transform"
 msgstr "Text-Transformation"
+
+#: src/lib/navigation/views/PublishView.svelte
+msgid "The publishing plugin could not be loaded — you may be offline. Showing local publishing instead."
+msgstr "Das Veröffentlichungs-Plugin konnte nicht geladen werden — möglicherweise sind Sie offline. Stattdessen wird die lokale Veröffentlichung angezeigt."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "The single plain-text → XHTML step. Pick a project script or one supplied by an extension."
