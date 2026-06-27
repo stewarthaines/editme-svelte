@@ -23,7 +23,8 @@
     copyright: string;
   }
 
-  // Always bundled into the app (present under file:// too). All MIT.
+  // Always bundled into the app (present under file:// too). All permissive
+  // (MIT, except jsdiff which is BSD-3-Clause).
   const BUNDLED_LIBRARIES: Library[] = [
     {
       name: 'Svelte',
@@ -57,6 +58,14 @@
       url: 'https://github.com/ndesmic/zip',
       description: 'Browser-native ZIP implementation (substantial portions used)',
       copyright: 'Copyright (c) 2021 ndesmic',
+    },
+    {
+      name: 'jsdiff',
+      version: '9.0.0',
+      license: 'BSD-3-Clause',
+      url: 'https://github.com/kpdecker/jsdiff',
+      description: 'Text diffing for the import conflict review',
+      copyright: 'Copyright (c) 2009-2015 Kevin Decker',
     },
   ];
 

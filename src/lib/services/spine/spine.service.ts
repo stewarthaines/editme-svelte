@@ -9,6 +9,7 @@
 import type { WorkspaceService, WorkspaceState } from '../workspace/workspace.service.js';
 import type { SpineItem, ManifestItem } from '../../epub/opf-utils.js';
 import type { SpineItemWithSource } from '../../spine/types.js';
+import { sanitizeChapterId } from '../../import/collision.js';
 import { translate } from '$lib/i18n/index.js';
 
 // Re-export existing SpineItemWithSource type for compatibility
@@ -210,6 +211,48 @@ export class SpineService {
   }
 
   /**
+   * Replace an existing chapter's content in place: rewrites its plain-text source
+   * and regenerates its XHTML, without touching the manifest or spine. Used by the
+   * import collision flow when the user chooses to overwrite. Mirrors the file
+   * layout written by {@link addChapter}, so overwrite and create stay symmetric.
+   */
+  async overwriteChapter(
+    workspace: WorkspaceState,
+    chapterId: string,
+    options: { title: string; sourceText: string }
+  ): Promise<{ updatedWorkspace: WorkspaceState }> {
+    try {
+      const manifestItem = workspace.opf.manifest.find(item => item.id === chapterId);
+      if (!manifestItem) {
+        throw new SpineServiceError(
+          'Chapter not found in manifest',
+          'MANIFEST_ITEM_NOT_FOUND',
+          workspace.id
+        );
+      }
+
+      const xhtmlContent = this.generateChapterXHTMLFromText(options.title, options.sourceText);
+      await this.workspaceService.writeFile(workspace.id, manifestItem.href, xhtmlContent);
+      await this.workspaceService.writeFile(
+        workspace.id,
+        `SOURCE/text/${chapterId}.txt`,
+        options.sourceText
+      );
+
+      // The OPF is unchanged (same manifest/spine entry), so the workspace state
+      // is returned as-is for a uniform call signature with addChapter.
+      return { updatedWorkspace: workspace };
+    } catch (error) {
+      if (error instanceof SpineServiceError) throw error;
+      throw new SpineServiceError(
+        `Failed to overwrite chapter: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'OVERWRITE_CHAPTER_ERROR',
+        workspace.id
+      );
+    }
+  }
+
+  /**
    * Move chapter up in spine order
    */
   async moveChapterUp(
@@ -341,12 +384,7 @@ export class SpineService {
 
   /** Derive an XML-safe, unique chapter id from a name (e.g. a filename). */
   private chapterIdFromName(name: string, existingIds: Set<string>): string {
-    const sanitized =
-      name
-        .replace(/\.[^.]+$/, '') // drop extension
-        .replace(/[^a-zA-Z0-9-_]/g, '-')
-        .replace(/^[^a-zA-Z]/, 'item-') // ids must start with a letter
-        .toLowerCase() || 'chapter';
+    const sanitized = sanitizeChapterId(name);
 
     let id = sanitized;
     let counter = 1;

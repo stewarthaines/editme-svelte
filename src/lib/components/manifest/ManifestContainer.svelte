@@ -2,10 +2,19 @@
   import { onMount } from 'svelte';
   import { t } from '../../i18n';
   import ManifestTable from './ManifestTable.svelte';
+  import ImportReviewDialog from '../import/ImportReviewDialog.svelte';
   import { ManifestUtils } from '../../manifest/utils.js';
   import { generateEPUBPath, ensureUniqueHref } from '../../epub/opf-utils.js';
   import { FileStorageAPI } from '../../storage/index.js';
   import { hasSeedHtml } from '../../epub/seed-html.js';
+  import { manifestCollision } from '../../import/collision.js';
+  import {
+    stageFiles,
+    readStagedBytes,
+    clearImportStaging,
+    type StagedFile,
+  } from '../../import/import-staging.js';
+  import type { ReviewDecision, ReviewItem, ReviewPreview } from '../../import/types.js';
   import type { ManifestItem, SourceItem, ValidationResult } from '../../manifest/types';
   import type {
     WorkspaceService,
@@ -46,6 +55,13 @@
   let validationErrors = $state<ValidationResult[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
+
+  // Import collision review: items shown in the dialog (null = closed) and the
+  // staged colliding files awaiting a commit decision.
+  let reviewItems = $state<ReviewItem[] | null>(null);
+  let pendingManifestImport = $state<
+    { stagedPath: string; originalName: string; mediaType: string; existingHref: string }[]
+  >([]);
 
   const loadManifest = async () => {
     if (!workspace) return;
@@ -143,100 +159,206 @@
     }
   };
 
+  // Reliable media type: browsers misreport fonts and JavaScript, so prefer
+  // filename detection for those (and whenever the browser type is generic).
+  const reliableMediaType = (file: File): string => {
+    const browserType = file.type;
+    const filenameType = ManifestUtils.detectMediaType(file.name);
+    const isGeneric = !browserType || browserType === 'application/octet-stream';
+    const isFontFile = filenameType.startsWith('font/');
+    const isJavaScriptFile =
+      filenameType === 'application/javascript' || filenameType === 'text/javascript';
+    return isGeneric || isFontFile || isJavaScriptFile ? filenameType : browserType;
+  };
+
+  const isTextLike = (mediaType: string): boolean =>
+    mediaType.startsWith('text/') || mediaType.includes('json') || mediaType.includes('xml');
+
+  const resolvePath = (href: string): string =>
+    workspace!.pathInfo.basePath ? `${workspace!.pathInfo.basePath}/${href}` : href;
+
+  const writeBytes = async (filePath: string, mediaType: string, bytes: Uint8Array): Promise<void> => {
+    if (isTextLike(mediaType)) {
+      await workspaceService.writeFile(workspace!.id, filePath, new TextDecoder('utf-8').decode(bytes));
+    } else {
+      const buffer = new ArrayBuffer(bytes.byteLength);
+      new Uint8Array(buffer).set(bytes);
+      await workspaceService.writeBinaryFile(workspace!.id, filePath, buffer);
+    }
+  };
+
+  // Add a new manifest item from a File (non-colliding path). Rolls back the
+  // manifest entry if the content write fails. Throws on failure.
+  const uploadNewFile = async (file: File, mediaType: string): Promise<void> => {
+    const href = ensureUniqueHref(
+      generateEPUBPath(file.name, mediaType),
+      workspace!.opf.manifest.map(m => m.href)
+    );
+    workspace = await workspaceService.addManifestItem(workspace!, { href, mediaType });
+    const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
+    const filePath = resolvePath(href);
+    try {
+      if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
+        await workspaceService.writeFile(workspace.id, filePath, await file.text());
+      } else {
+        await workspaceService.writeBinaryFile(workspace.id, filePath, await file.arrayBuffer());
+      }
+    } catch (writeError) {
+      workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
+      throw writeError;
+    }
+  };
+
+  // Add a new (suffixed) manifest item from staged bytes — the "keep both" commit.
+  const addManifestFromBytes = async (
+    name: string,
+    mediaType: string,
+    bytes: Uint8Array
+  ): Promise<void> => {
+    const href = ensureUniqueHref(
+      generateEPUBPath(name, mediaType),
+      workspace!.opf.manifest.map(m => m.href)
+    );
+    workspace = await workspaceService.addManifestItem(workspace!, { href, mediaType });
+    const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
+    try {
+      await writeBytes(resolvePath(href), mediaType, bytes);
+    } catch (writeError) {
+      workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
+      throw writeError;
+    }
+  };
+
   const handleFileUpload = async (detail: { files: FileList | File[] }) => {
     if (!workspace || readOnly) return;
 
-    const files = detail.files;
+    // Split incoming files into clean imports and ones that collide with an
+    // existing manifest href. Media type is needed to compute the target path.
+    const entries = Array.from(detail.files).map(file => {
+      const mediaType = reliableMediaType(file);
+      return { file, mediaType, existingHref: manifestCollision(file.name, mediaType, workspace!) };
+    });
+    const clean = entries.filter(e => !e.existingHref);
+    const colliding = entries.filter(e => e.existingHref);
+
+    // Import the non-colliding files immediately (existing behaviour).
     const successfulFiles: string[] = [];
     const failedFiles: { name: string; error: string }[] = [];
-
-    for (const file of files) {
+    for (const e of clean) {
       try {
-        // Create manifest item with reliable media type detection
-        const browserType = file.type;
-        const filenameType = ManifestUtils.detectMediaType(file.name);
-
-        // For font files and JavaScript files, always use filename detection (browsers are unreliable)
-        // For other files, prefer browser detection unless it's generic
-        const isGeneric = !browserType || browserType === 'application/octet-stream';
-        const isFontFile = filenameType.startsWith('font/');
-        const isJavaScriptFile =
-          filenameType === 'application/javascript' || filenameType === 'text/javascript';
-        const reliableMediaType =
-          isGeneric || isFontFile || isJavaScriptFile ? filenameType : browserType;
-
-        // generateEPUBPath sanitizes the filename to an EPUB-safe form; ensure it
-        // doesn't collide (case-insensitively) with an existing manifest href.
-        const manifestItem = {
-          href: ensureUniqueHref(
-            generateEPUBPath(file.name, reliableMediaType),
-            workspace.opf.manifest.map(m => m.href)
-          ),
-          mediaType: reliableMediaType,
-        };
-
-        // Step 1: Add to manifest (may fail on duplicate ID). This persists content.opf.
-        workspace = await workspaceService.addManifestItem(workspace, manifestItem);
-        // addManifestItem appends the new entry, so it is the last one.
-        const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
-
-        // Step 2: Write the file content. If this fails, roll back the manifest
-        // entry so content.opf never references a file that isn't in storage.
-        const filePath = `${workspace.pathInfo.basePath}/${manifestItem.href}`;
-        try {
-          if (
-            file.type.startsWith('text/') ||
-            file.type.includes('json') ||
-            file.type.includes('xml')
-          ) {
-            const text = await file.text();
-            await workspaceService.writeFile(workspace.id, filePath, text);
-          } else {
-            // Handle binary files (images, fonts, etc.)
-            const arrayBuffer = await file.arrayBuffer();
-            await workspaceService.writeBinaryFile(workspace.id, filePath, arrayBuffer);
-          }
-        } catch (writeError) {
-          // Undo the manifest entry we just added (also removes the absent file).
-          workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
-          throw writeError;
-        }
-
-        // Both operations succeeded
-        successfulFiles.push(file.name);
+        await uploadNewFile(e.file, e.mediaType);
+        successfulFiles.push(e.file.name);
       } catch (fileError) {
-        // Log specific file upload failure
-        console.warn(`Failed to upload ${file.name}:`, fileError);
+        console.warn(`Failed to upload ${e.file.name}:`, fileError);
         failedFiles.push({
-          name: file.name,
+          name: e.file.name,
           error: fileError instanceof Error ? fileError.message : 'Unknown error',
         });
       }
     }
-
-    // Push the persisted workspace back to global app state so a later save
-    // can't overwrite content.opf with a stale copy that lacks these items.
-    if (successfulFiles.length > 0) {
-      onWorkspaceUpdate?.(workspace);
-    }
-
-    // Refresh the manifest to show successfully uploaded files
+    if (successfulFiles.length > 0) onWorkspaceUpdate?.(workspace);
     await loadManifest();
 
-    // Provide user feedback about upload results
-    if (failedFiles.length === 0) {
-      // All files succeeded
-      console.log(`Successfully uploaded ${successfulFiles.length} files:`, successfulFiles);
-    } else if (successfulFiles.length === 0) {
-      // All files failed
+    if (clean.length > 0 && successfulFiles.length === 0) {
       error = $t('Failed to upload all files');
       console.error('Upload failures:', failedFiles);
-    } else {
-      // Partial success
-      console.log(`Uploaded ${successfulFiles.length} files successfully:`, successfulFiles);
-      console.warn(`Failed to upload ${failedFiles.length} files:`, failedFiles);
+    } else if (failedFiles.length > 0) {
       error = $t('Some files failed to upload - see console for details');
+      console.warn(`Failed to upload ${failedFiles.length} files:`, failedFiles);
     }
+
+    // Route colliding files through the review dialog.
+    if (colliding.length > 0) {
+      try {
+        const staged = await stageFiles(colliding.map(e => e.file));
+        reviewItems = await buildManifestReviewItems(
+          staged,
+          colliding.map(e => ({ mediaType: e.mediaType, existingHref: e.existingHref! }))
+        );
+        pendingManifestImport = staged.map((s, i) => ({
+          stagedPath: s.stagedPath,
+          originalName: s.originalName,
+          mediaType: colliding[i].mediaType,
+          existingHref: colliding[i].existingHref!,
+        }));
+      } catch (stageError) {
+        console.warn('Failed to stage colliding files:', stageError);
+        error = $t('Failed to import files');
+        await clearImportStaging();
+      }
+    }
+  };
+
+  // Build review items for staged colliding files: existing content vs incoming,
+  // as an inline text diff, side-by-side image preview, or size comparison.
+  const buildManifestReviewItems = async (
+    staged: StagedFile[],
+    meta: { mediaType: string; existingHref: string }[]
+  ): Promise<ReviewItem[]> => {
+    const decoder = new TextDecoder('utf-8');
+    const items: ReviewItem[] = [];
+    for (let i = 0; i < staged.length; i++) {
+      const { mediaType, existingHref } = meta[i];
+      const incoming = await readStagedBytes(staged[i].stagedPath);
+      let current: Uint8Array | null = null;
+      try {
+        current = new Uint8Array(await workspaceService.readFile(workspace!.id, resolvePath(existingHref)));
+      } catch {
+        // Existing file unreadable — diff/preview against empty content.
+      }
+      let preview: ReviewPreview;
+      if (mediaType.startsWith('image/')) {
+        preview = { type: 'image', mediaType, current: current ?? new Uint8Array(), incoming };
+      } else if (isTextLike(mediaType)) {
+        preview = {
+          type: 'text',
+          current: current ? decoder.decode(current) : '',
+          incoming: decoder.decode(incoming),
+        };
+      } else {
+        preview = {
+          type: 'binary',
+          mediaType,
+          currentSize: current?.byteLength ?? 0,
+          incomingSize: incoming.byteLength,
+        };
+      }
+      items.push({
+        key: staged[i].stagedPath,
+        title: staged[i].originalName,
+        collisionLabel: existingHref,
+        preview,
+        resolution: 'overwrite',
+      });
+    }
+    return items;
+  };
+
+  const commitManifestImport = async (decisions: ReviewDecision[]) => {
+    if (!workspace) return;
+    const byKey = new Map(decisions.map(d => [d.key, d.resolution]));
+    try {
+      for (const p of pendingManifestImport) {
+        const bytes = await readStagedBytes(p.stagedPath);
+        if (byKey.get(p.stagedPath) === 'keep-both') {
+          await addManifestFromBytes(p.originalName, p.mediaType, bytes);
+        } else {
+          // Overwrite: replace the bytes at the existing item's path, leaving the
+          // manifest entry (id, media-type) unchanged.
+          await writeBytes(resolvePath(p.existingHref), p.mediaType, bytes);
+        }
+      }
+      onWorkspaceUpdate?.(workspace);
+      await loadManifest();
+    } finally {
+      await closeManifestReview();
+    }
+  };
+
+  const closeManifestReview = async () => {
+    reviewItems = null;
+    pendingManifestImport = [];
+    await clearImportStaging();
   };
 
   // Load manifest when component mounts or dependencies change
@@ -359,6 +481,15 @@
       <p class="drop-subtitle">{$t('Release the file anywhere to add it')}</p>
     </div>
   </div>
+{/if}
+
+{#if reviewItems}
+  <ImportReviewDialog
+    items={reviewItems}
+    kind="manifest"
+    onConfirm={commitManifestImport}
+    onCancel={closeManifestReview}
+  />
 {/if}
 
 <style>

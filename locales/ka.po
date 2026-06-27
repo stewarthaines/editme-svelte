@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-23\n"
-"PO-Revision-Date: 2026-06-23\n"
+"POT-Creation-Date: 2026-06-27\n"
+"PO-Revision-Date: 2026-06-27\n"
 "Language: ka\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -56,6 +56,10 @@ msgstr ""
 msgid "{n} available"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} bytes"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transform"
 msgstr ""
@@ -86,6 +90,14 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} installed"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} KB"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} MB"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -503,6 +515,7 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
@@ -619,6 +632,7 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
@@ -669,6 +683,14 @@ msgstr ""
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Confirm delete?"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Conflicting files"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Conflicts with {label}"
 msgstr ""
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
@@ -825,6 +847,7 @@ msgstr ""
 msgid "Credential of the certifier"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Current"
 msgstr ""
@@ -1183,6 +1206,11 @@ msgstr ""
 msgid "Failed to import extension"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+#: src/lib/components/manifest/ManifestContainer.svelte
+msgid "Failed to import files"
+msgstr ""
+
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Failed to import the selected book."
 msgstr ""
@@ -1391,6 +1419,10 @@ msgstr ""
 msgid "Identifier type"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Import"
+msgstr ""
+
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import an EPUB from a catalog URL"
 msgstr ""
@@ -1416,6 +1448,7 @@ msgstr ""
 msgid "Import text files as chapters"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Importing…"
 msgstr ""
@@ -1438,6 +1471,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include preview head"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Incoming"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -1514,6 +1551,14 @@ msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Just now"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Keep both"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Keep both (import as a new item)"
 msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
@@ -1996,6 +2041,14 @@ msgstr ""
 msgid "Other chapters with issues"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Overwrite"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Overwrite the existing item"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Overwrite?"
 msgstr ""
@@ -2359,6 +2412,10 @@ msgstr ""
 msgid "Retry plugin"
 msgstr ""
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Review import conflicts"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Right to Left"
 msgstr ""
@@ -2711,6 +2768,10 @@ msgstr ""
 msgid "Text Content"
 msgstr ""
 
+#: src/lib/components/import/InlineTextDiff.svelte
+msgid "Text differences"
+msgstr ""
+
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Text format"
 msgstr ""
@@ -2738,6 +2799,14 @@ msgstr ""
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Theme"
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "These files match existing chapters. Choose what to do with each."
+msgstr ""
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "These files match existing manifest items. Choose what to do with each."
 msgstr ""
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte

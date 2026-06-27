@@ -1406,16 +1406,39 @@
 
   // Debug functions removed
 
+  // Re-read a SOURCE file that was rewritten externally (e.g. an import
+  // overwrite) into its cached editor store, so an open textarea bound to that
+  // store updates in place instead of showing stale content until the user
+  // switches chapters and back.
+  const handleSourceFilesChanged = (event: Event) => {
+    const paths = (event as CustomEvent<{ paths?: string[] }>).detail?.paths ?? [];
+    if (!workspace || !workspaceService) return;
+    for (const path of paths) {
+      const store = fileContentStores.get(path);
+      if (!store) continue;
+      void workspaceService
+        .readFile(workspace.id, path)
+        .then(buffer => store.updateContent(new TextDecoder().decode(buffer)))
+        .catch(() => {
+          // Best-effort refresh; leave the cached content untouched on failure.
+        });
+    }
+  };
+
   // Component lifecycle
   onMount(() => {
     // Register navigation guard
     guardId = navigationStore.addNavigationGuard(canLeave);
+
+    window.addEventListener('seed:source-files-changed', handleSourceFilesChanged);
 
     // Call onViewEnter
     onViewEnter();
   });
 
   onDestroy(() => {
+    window.removeEventListener('seed:source-files-changed', handleSourceFilesChanged);
+
     // Clean up file content stores
     for (const store of fileContentStores.values()) {
       store.destroy(); // Remove from text-editor-store registry

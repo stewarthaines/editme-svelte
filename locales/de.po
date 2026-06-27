@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-23\n"
-"PO-Revision-Date: 2026-06-23\n"
+"POT-Creation-Date: 2026-06-27\n"
+"PO-Revision-Date: 2026-06-27\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -56,6 +56,10 @@ msgstr "{key} gelöscht"
 msgid "{n} available"
 msgstr "{n} verfügbar"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} bytes"
+msgstr "{n} Bytes"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transform"
 msgstr "{n} DOM-Transformation"
@@ -87,6 +91,14 @@ msgstr "{n} Info"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} installed"
 msgstr "{n} installiert"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} KB"
+msgstr "{n} KB"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "{n} MB"
+msgstr "{n} MB"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} warning"
@@ -503,6 +515,7 @@ msgstr "Bucket-Name"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
@@ -619,6 +632,7 @@ msgstr "Clip-Bezeichnung"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
@@ -670,6 +684,14 @@ msgstr "Komplex interaktiv"
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Confirm delete?"
 msgstr "Löschen bestätigen?"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Conflicting files"
+msgstr "Konflikt-Dateien"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Conflicts with {label}"
+msgstr "Konflikt mit {label}"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Conformance"
@@ -825,6 +847,7 @@ msgstr "Urheber"
 msgid "Credential of the certifier"
 msgstr "Qualifikation des Zertifizierers"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Current"
 msgstr "Aktuell"
@@ -1183,6 +1206,11 @@ msgstr "EPUB konnte nicht importiert werden: {error}"
 msgid "Failed to import extension"
 msgstr "Erweiterung konnte nicht importiert werden"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+#: src/lib/components/manifest/ManifestContainer.svelte
+msgid "Failed to import files"
+msgstr "Dateien konnten nicht importiert werden"
+
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Failed to import the selected book."
 msgstr "Das ausgewählte Buch konnte nicht importiert werden."
@@ -1391,6 +1419,10 @@ msgstr "Kennung"
 msgid "Identifier type"
 msgstr "Kennungstyp"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Import"
+msgstr "Importieren"
+
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import an EPUB from a catalog URL"
 msgstr "Ein EPUB von einer Katalog-URL importieren"
@@ -1416,6 +1448,7 @@ msgstr "JavaScript-Erweiterung importieren"
 msgid "Import text files as chapters"
 msgstr "Textdateien als Kapitel importieren"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Importing…"
 msgstr "Wird importiert…"
@@ -1439,6 +1472,10 @@ msgstr "Inklusive Seitenzahlen"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include preview head"
 msgstr "Vorschau-Head einbinden"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Incoming"
+msgstr "Neu"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Increase text size"
@@ -1515,6 +1552,14 @@ msgstr "Element-Steuerung"
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Just now"
 msgstr "Gerade eben"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Keep both"
+msgstr "Beide behalten"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Keep both (import as a new item)"
+msgstr "Beide behalten (als neues Element importieren)"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Key"
@@ -1996,6 +2041,14 @@ msgstr "Sonstige"
 msgid "Other chapters with issues"
 msgstr "Andere Kapitel mit Problemen"
 
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Overwrite"
+msgstr "Überschreiben"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Overwrite the existing item"
+msgstr "Vorhandenes Element überschreiben"
+
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Overwrite?"
 msgstr "Überschreiben?"
@@ -2358,6 +2411,10 @@ msgstr "Erneut versuchen"
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Retry plugin"
 msgstr "Plugin erneut laden"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Review import conflicts"
+msgstr "Import-Konflikte prüfen"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Right to Left"
@@ -2730,6 +2787,10 @@ msgstr "Text"
 msgid "Text Content"
 msgstr "Textinhalt"
 
+#: src/lib/components/import/InlineTextDiff.svelte
+msgid "Text differences"
+msgstr "Textunterschiede"
+
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Text format"
 msgstr "Textformat"
@@ -2758,6 +2819,14 @@ msgstr "Der einzelne Schritt von reinem Text zu XHTML. Wählen Sie ein Projektsk
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Theme"
 msgstr "Design"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "These files match existing chapters. Choose what to do with each."
+msgstr "Diese Dateien stimmen mit vorhandenen Kapiteln überein. Wählen Sie für jede aus, was geschehen soll."
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "These files match existing manifest items. Choose what to do with each."
+msgstr "Diese Dateien stimmen mit vorhandenen Manifest-Elementen überein. Wählen Sie für jede aus, was geschehen soll."
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "This chapter"

@@ -3,6 +3,16 @@
   import { t } from '../i18n';
   import SpineItem from './SpineItem.svelte';
   import EditSpineItemDialog from './EditSpineItemDialog.svelte';
+  import ImportReviewDialog from './import/ImportReviewDialog.svelte';
+  import { FileStorageAPI } from '../storage/index.js';
+  import { sanitizeChapterId } from '../import/collision.js';
+  import {
+    stageFiles,
+    readStagedText,
+    clearImportStaging,
+    type StagedFile,
+  } from '../import/import-staging.js';
+  import type { ReviewDecision, ReviewItem } from '../import/types.js';
   import type { SpineService } from '../services/spine/spine.service.js';
   import type { SpineItemWithSource } from '../spine/types.js';
   import type { WorkspaceState } from '../services/workspace/workspace.service.js';
@@ -33,6 +43,11 @@
 
   // The spine item currently open in the edit dialog (null = closed).
   let editingItem = $state<SpineItemWithSource | null>(null);
+
+  // Import collision review: items shown in the dialog (null = closed) and the
+  // staged colliding files awaiting a commit decision.
+  let reviewItems = $state<ReviewItem[] | null>(null);
+  let pendingImport = $state<{ stagedPath: string; originalName: string; targetId: string }[]>([]);
 
   // Drag feedback: the item being dragged (dimmed) and the insertion gap where it
   // would land (an index in 0..length; the line is drawn before item `dropGap`,
@@ -149,6 +164,8 @@
   }
 
   // Create a chapter per uploaded plain-text file (filename → idref, text → source).
+  // Files whose id matches an existing chapter are routed through a review dialog
+  // where the user chooses to overwrite or keep both; the rest import directly.
   async function handleImportTextChapters(files: File[]) {
     if (!workspace) return;
 
@@ -160,33 +177,131 @@
       return;
     }
 
+    const existingIds = new Set(workspace.opf.manifest.map(item => item.id));
+    const colliding = files.filter(file => existingIds.has(sanitizeChapterId(file.name)));
+    const clean = files.filter(file => !existingIds.has(sanitizeChapterId(file.name)));
+
     try {
       isLoading = true;
-      let firstChapterId: string | null = null;
 
-      for (const file of files) {
-        const text = await file.text();
-        const result = await spineService.addChapter(workspace, {
-          title: file.name,
-          baseName: file.name,
-          sourceText: text,
-          createSourceFile: true,
-          linear: true,
-        });
-        workspace = result.updatedWorkspace;
-        if (!firstChapterId) firstChapterId = result.newChapter.id;
+      const firstId = await importChaptersDirectly(clean);
+
+      if (colliding.length === 0) {
+        if (firstId) handleSelectItem(firstId);
+        return;
       }
 
-      if (onWorkspaceUpdate) {
-        onWorkspaceUpdate(workspace);
-      }
-      await loadSpineItems();
-      if (firstChapterId) handleSelectItem(firstChapterId);
+      // Stage the colliding files and open the review dialog. Staging is cleared
+      // once the user confirms or cancels.
+      const staged = await stageFiles(colliding);
+      reviewItems = await buildChapterReviewItems(staged);
+      pendingImport = staged.map((s, i) => ({
+        stagedPath: s.stagedPath,
+        originalName: s.originalName,
+        targetId: sanitizeChapterId(colliding[i].name),
+      }));
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to import chapters';
     } finally {
       isLoading = false;
     }
+  }
+
+  // Import a set of non-colliding text files as new chapters. Returns the first
+  // created chapter id (for selection), or null when nothing was imported.
+  async function importChaptersDirectly(files: File[]): Promise<string | null> {
+    if (!workspace || files.length === 0) return null;
+    let firstChapterId: string | null = null;
+    for (const file of files) {
+      const text = await file.text();
+      const result = await spineService.addChapter(workspace, {
+        title: file.name,
+        baseName: file.name,
+        sourceText: text,
+        createSourceFile: true,
+        linear: true,
+      });
+      workspace = result.updatedWorkspace;
+      if (!firstChapterId) firstChapterId = result.newChapter.id;
+    }
+    onWorkspaceUpdate?.(workspace);
+    await loadSpineItems();
+    return firstChapterId;
+  }
+
+  // Build the review-dialog items for staged colliding chapter files: the existing
+  // SOURCE text vs the incoming staged text, shown as an inline diff.
+  async function buildChapterReviewItems(staged: StagedFile[]): Promise<ReviewItem[]> {
+    const storage = FileStorageAPI.getInstance();
+    const items: ReviewItem[] = [];
+    for (const file of staged) {
+      const targetId = sanitizeChapterId(file.originalName);
+      const incoming = await readStagedText(file.stagedPath);
+      let current = '';
+      try {
+        current = await storage.readTextFile(workspace!.id, `SOURCE/text/${targetId}.txt`);
+      } catch {
+        // An existing chapter without editable source (e.g. a read-only EPUB
+        // chapter) diffs against empty — the whole incoming text shows as added.
+      }
+      items.push({
+        key: file.stagedPath,
+        title: file.originalName,
+        collisionLabel: targetId,
+        preview: { type: 'text', current, incoming },
+        resolution: 'overwrite',
+      });
+    }
+    return items;
+  }
+
+  async function commitChapterImport(decisions: ReviewDecision[]) {
+    if (!workspace) return;
+    const byKey = new Map(decisions.map(d => [d.key, d.resolution]));
+    let firstId: string | null = null;
+    const overwrittenPaths: string[] = [];
+    try {
+      for (const candidate of pendingImport) {
+        const text = await readStagedText(candidate.stagedPath);
+        if (byKey.get(candidate.stagedPath) === 'keep-both') {
+          const result = await spineService.addChapter(workspace, {
+            title: candidate.originalName,
+            baseName: candidate.originalName,
+            sourceText: text,
+            createSourceFile: true,
+            linear: true,
+          });
+          workspace = result.updatedWorkspace;
+          if (!firstId) firstId = result.newChapter.id;
+        } else {
+          await spineService.overwriteChapter(workspace, candidate.targetId, {
+            title: candidate.originalName,
+            sourceText: text,
+          });
+          overwrittenPaths.push(`SOURCE/text/${candidate.targetId}.txt`);
+          if (!firstId) firstId = candidate.targetId;
+        }
+      }
+      onWorkspaceUpdate?.(workspace);
+      await loadSpineItems();
+      // An overwrite rewrites a chapter's source under its existing id, so the
+      // editor's cached store for that file would otherwise keep showing the old
+      // text. Nudge any open editor to re-read the affected files.
+      if (overwrittenPaths.length > 0) {
+        window.dispatchEvent(
+          new CustomEvent('seed:source-files-changed', { detail: { paths: overwrittenPaths } })
+        );
+      }
+      if (firstId) handleSelectItem(firstId);
+    } finally {
+      await closeImportReview();
+    }
+  }
+
+  async function closeImportReview() {
+    reviewItems = null;
+    pendingImport = [];
+    await clearImportStaging();
   }
 
   // Handle move up
@@ -483,6 +598,15 @@
     linear={item.linear}
     onSave={({ newId, linear }) => handleSaveEdit(item, newId, linear)}
     onClose={() => (editingItem = null)}
+  />
+{/if}
+
+{#if reviewItems}
+  <ImportReviewDialog
+    items={reviewItems}
+    kind="chapter"
+    onConfirm={commitChapterImport}
+    onCancel={closeImportReview}
   />
 {/if}
 
