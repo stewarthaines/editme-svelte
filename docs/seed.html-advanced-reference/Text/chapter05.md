@@ -28,4 +28,13 @@ The other three are weaker. With **Google Drive** or **Dropbox** it's usually si
 
 ## Publishing
 
-With a remote configured, the plugin's pane lists your packaged EPUBs and the files already on the remote; publishing uploads a book, and you can delete remote files from the same place. When you're serving books from a real host — the S3/R2 case — it can also keep an **OPDS catalogue** beside them: a small feed an OPDS-aware reading app can browse and subscribe to, rather than opening one file at a time. Worth it for a shelf of books; unnecessary for a single title.
+With a remote configured, the plugin's pane lists your packaged EPUBs and the files already on the remote; publishing uploads a book, and you can delete remote files from the same place. When you're serving books from a real host — the S3/R2 case — it can also keep an **OPDS catalogue** beside them: a small feed an OPDS-aware reading app can browse and subscribe to, rather than opening one file at a time.
+
+OPDS isn't a universal format, but it's well supported and increasingly so — the same catalogue opens in a desktop reader like **Thorium**, on iOS and Android in **Cantook**, and in SEED.html's own catalogue browser.
+
+![The Essential Samples catalogue in Thorium on macOS — four book covers (Sample Magazine, Music Notation, Novel, Tech Manual) in the Catalogs view.](../Images/screenshot-thorium-macos-opds.png){.figure}
+
+![The same catalogue in Cantook on iOS — the four sample-book covers in a phone layout.](../Images/screenshot-cantook-ios-opds.jpeg){.figure}
+
+![SEED.html's Import from Catalog dialog browsing the same catalogue by URL, listing the same sample books.](../Images/screenshot-seed.html-opds.png){.figure}
+

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="SEED.html makes a SEED EPUB; because that EPUB carries its own source, it can be reopened in SEED.html and edited again.">
+  <defs>
+    <marker id="ah-gray" viewBox="0 0 6 6" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6b7280"/></marker>
+    <marker id="ah-blue" viewBox="0 0 6 6" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker>
+  </defs>
+  <!-- the editor -->
+  <rect x="14" y="46" width="92" height="52" rx="6" fill="none" stroke="#6b7280" stroke-width="3"/>
+  <text x="60" y="77" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#6b7280">SEED.html</text>
+  <!-- the book it makes -->
+  <rect x="214" y="46" width="92" height="52" rx="6" fill="none" stroke="#6b7280" stroke-width="3"/>
+  <text x="260" y="70" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#6b7280">SEED EPUB</text>
+  <text x="260" y="86" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#6b7280">book + source</text>
+  <!-- make / export (top, left to right) -->
+  <path d="M108 60 C150 40, 172 40, 212 60" fill="none" stroke="#6b7280" stroke-width="3" marker-end="url(#ah-gray)"/>
+  <text x="160" y="34" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b7280">make</text>
+  <!-- edit again (bottom, right to left, accent) -->
+  <path d="M212 86 C172 106, 150 106, 108 86" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#ah-blue)"/>
+  <text x="160" y="124" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2563eb">edit again</text>
+</svg>

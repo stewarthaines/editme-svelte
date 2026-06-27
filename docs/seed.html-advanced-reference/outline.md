@@ -83,11 +83,15 @@ real value is EPUBCheck validation.
 - OPDS catalog generation (a browsable/subscribable feed)
 - EPUBCheck validation (modal report) — where the validation deferred earlier lands
 
-## Reading System JavaScript
+## Reading System JavaScript  (drafted)
 
-- Code that ships in the EPUB and runs in the reading app
-- The `scripted` property and what marking it means
-- What reading apps allow (and the wide variance); keeping a non-scripted fallback
+- Code that ships in the EPUB and runs in the reading app (manifest JS; no special
+  slot); SEED auto-marks chapters `scripted`
+- The angle: support hugely varied / speculative / browser-preview ≠ reading system;
+  decide target readers and test in them — but the 2026 platform-WebKit trend is
+  narrowing the gap. Enhancement only; degrade gracefully
+- Worked example: responsive width — `@container` em breakpoints, with a JS fallback
+  (measure a paragraph's em-width → body class) guarded by `CSS.supports`
 
 ## Hardware-in-the-loop testing
 

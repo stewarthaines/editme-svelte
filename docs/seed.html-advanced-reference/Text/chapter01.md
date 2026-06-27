@@ -1,8 +1,10 @@
 # Before you begin
 
-This manual is for extending a SEED.html book with code. It assumes you're comfortable with JavaScript and EPUB and won't re-explain either. The user manual covers writing, describing, and producing a book; this one picks up where a script does more than the editor can on its own.
+This manual is for extending a SEED.html book with code. It assumes you're comfortable with JavaScript and EPUB. The SEED.html User Manual covers writing, describing, and producing a book; this one describes how the app supports complex content workflows and advanced Reading System features via the use of JavaScript.
 
-A book is extensible at several points in its life: the **authoring format** an author writes in, the **markup** that format produces, the **content** derived at authoring time from the whole book, and what a chapter **does** when someone reads it. Each is a place to drop in JavaScript, and each has its own chapter.
+Most of the scripting hooks for extending the app's features run in the authoring phase rather than in the Reading System. If you know about the `scripted` property of an EPUB manifest item that's discussed in the chapter on Reading System JavaScript.
+
+The fact that an EPUB is simply an archive of web page resources means that the natural place to write it and preview it is a web browser. The SEED.html app exploits this affordance to provide a local-first, offline-capable progressive web app that keeps you project files private on your own device.
 
 ## One switch reveals it all
 

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 110" role="img" aria-label="One book opening on a phone, a tablet, and an e-reader">
+  <!-- the book you make -->
+  <rect x="12" y="30" width="56" height="70" rx="4" fill="none" stroke="#6b7280" stroke-width="3"/>
+  <line x1="26" y1="48" x2="54" y2="48" stroke="#6b7280" stroke-width="3"/>
+  <line x1="26" y1="62" x2="54" y2="62" stroke="#6b7280" stroke-width="3"/>
+  <line x1="26" y1="76" x2="48" y2="76" stroke="#6b7280" stroke-width="3"/>
+  <!-- it reaches outward -->
+  <path d="M76 65 H150" fill="none" stroke="#2563eb" stroke-width="3"/>
+  <path d="M150 65 L200 30 M150 65 L200 65 M150 65 L200 100" fill="none" stroke="#2563eb" stroke-width="3"/>
+  <!-- phone, tablet, e-reader -->
+  <rect x="208" y="14" width="30" height="48" rx="4" fill="none" stroke="#6b7280" stroke-width="3"/>
+  <rect x="208" y="50" width="46" height="32" rx="4" fill="none" stroke="#6b7280" stroke-width="3"/>
+  <rect x="208" y="78" width="60" height="24" rx="4" fill="none" stroke="#6b7280" stroke-width="3"/>
+</svg>
