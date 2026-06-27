@@ -60,6 +60,10 @@ msgstr ""
 msgid "{n} bytes"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "{n} change(s)"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transform"
 msgstr ""
@@ -228,6 +232,10 @@ msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.version"
+msgstr ""
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Accept {name}"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -412,6 +420,18 @@ msgstr ""
 msgid "Apple Books"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Applied {n} change(s)."
+msgstr ""
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Apply accepted"
+msgstr ""
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Applying…"
+msgstr ""
+
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Approximate start position"
 msgstr ""
@@ -517,9 +537,23 @@ msgstr ""
 #: src/lib/components/EditSpineItemDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Capture your changes (vs the saved base) as a patchset that can be reviewed and applied to the matching project."
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Captured {n} changed file(s)."
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Captured change sets. Those matching this project are listed first."
 msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
@@ -568,6 +602,14 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Change Folder"
+msgstr ""
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Changed files"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Changes"
 msgstr ""
 
 #: src/stories/preview/ContentPreviewDemo.svelte
@@ -635,6 +677,7 @@ msgstr ""
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 #: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
@@ -903,6 +946,7 @@ msgstr ""
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete"
@@ -1174,6 +1218,10 @@ msgstr ""
 msgid "Failed to add metadata item"
 msgstr ""
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Failed to apply changes"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to change language"
 msgstr ""
@@ -1192,6 +1240,10 @@ msgstr ""
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Failed to duplicate project."
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Failed to generate patchset"
 msgstr ""
 
 #: src/lib/components/metadata/OPFPreview.svelte
@@ -1267,6 +1319,10 @@ msgstr ""
 msgid "Failed to update item"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Failed to update settings"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to upload all files"
 msgstr ""
@@ -1337,6 +1393,10 @@ msgstr ""
 msgid "Generate cover image"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Generate patchset"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Generate PDF"
 msgstr ""
@@ -1346,6 +1406,7 @@ msgid "Generating navigation from chapters..."
 msgstr ""
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generating…"
 msgstr ""
@@ -1699,6 +1760,7 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/PublishView.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1711,6 +1773,14 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Location:"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Lock package structure and track content changes"
+msgstr ""
+
+#: src/lib/Sidebar.svelte
+msgid "Locked while track changes is on"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
@@ -1728,6 +1798,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Margin"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "matches this project"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -1859,6 +1933,10 @@ msgstr ""
 msgid "No accessibility issues found"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "No changes to capture yet."
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
 msgstr ""
@@ -1909,6 +1987,10 @@ msgstr ""
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "No packaged EPUBs yet."
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "No patchsets yet."
 msgstr ""
 
 #: src/App.svelte
@@ -1975,6 +2057,14 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "OAuth Client ID"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Off"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "On — review mode"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
@@ -2111,6 +2201,10 @@ msgstr ""
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 msgid "Paste {name} license text here"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Patchsets"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestTable.svelte
@@ -2412,6 +2506,14 @@ msgstr ""
 msgid "Retry plugin"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Review & apply"
+msgstr ""
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Review changes"
+msgstr ""
+
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Review import conflicts"
 msgstr ""
@@ -2620,6 +2722,10 @@ msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Show the full license text"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show your changes against the saved version"
 msgstr ""
 
 #: src/lib/components/workspace/WorkspaceList.svelte
@@ -2833,6 +2939,10 @@ msgstr ""
 msgid "This file is empty."
 msgstr ""
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "This patchset has no changes."
+msgstr ""
+
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
@@ -2863,6 +2973,14 @@ msgstr ""
 
 #: src/lib/ThemeToggle.svelte
 msgid "Toggle theme"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Track changes"
+msgstr ""
+
+#: src/lib/Sidebar.svelte
+msgid "Track changes is on — manage it in Settings"
 msgstr ""
 
 #: src/App.svelte
@@ -2902,6 +3020,14 @@ msgstr ""
 msgid "Try adjusting your search terms"
 msgstr ""
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Turn off and discard base"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Turning off track changes deletes the saved base version. Continue?"
+msgstr ""
+
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Type"
@@ -2916,6 +3042,7 @@ msgid "Unknown View"
 msgstr ""
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Untitled"
 msgstr ""
@@ -3082,6 +3209,10 @@ msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Welcome"
+msgstr ""
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "While locked, you can edit the text of existing chapters, styles and scripts. Adding, removing or reordering chapters, changing the manifest, and editing metadata are disabled. Your original content is saved so your edits can be captured as a patchset."
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

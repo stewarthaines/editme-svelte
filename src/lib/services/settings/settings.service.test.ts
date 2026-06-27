@@ -246,6 +246,7 @@ describe('SettingsService Contract Tests', () => {
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
         filename_template: '<title> - <date>',
         include_seed_html_in_package: false,
+        track_changes: false,
         cover: {
           template: 'modern',
           background_color: '#ffffff',
@@ -287,6 +288,7 @@ describe('SettingsService Contract Tests', () => {
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
         filename_template: '<title> - <author> - <date>',
         include_seed_html_in_package: false,
+        track_changes: false,
         preview: {
           autoUpdate: { responsive: true, device: true, pdf: false },
           head: 'preview/head.xml',

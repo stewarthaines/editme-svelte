@@ -9,6 +9,7 @@
   let {
     hasWorkspace = false,
     readOnly = false,
+    reviewMode = false,
     hasPackagedEpubs = false,
     enabledPluginIds = [],
     currentWorkspace = null,
@@ -26,6 +27,7 @@
   }: {
     hasWorkspace?: boolean;
     readOnly?: boolean;
+    reviewMode?: boolean;
     hasPackagedEpubs?: boolean;
     enabledPluginIds?: string[];
     currentWorkspace?: any;
@@ -62,6 +64,7 @@
     activeSection={sidebar.activeSection}
     {hasWorkspace}
     {readOnly}
+    {reviewMode}
     {hasPackagedEpubs}
     {enabledPluginIds}
     {currentWorkspace}

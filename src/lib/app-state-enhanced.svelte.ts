@@ -20,6 +20,7 @@ import type {
 } from './services/workspace/workspace.service.js';
 import { creatorName, primaryLanguage } from './epub/opf-utils.js';
 import { workspaceIsReadOnly } from './source/source-utils.js';
+import { setReviewMode } from './track-changes/base-snapshot.js';
 import type {
   GlobalSettings,
   WorkspaceSettings,
@@ -554,6 +555,11 @@ export class EnhancedAppState {
     }
   }
 
+  /** Review mode (track changes) for the current workspace. */
+  get reviewMode(): boolean {
+    return this.epubSettings?.track_changes ?? false;
+  }
+
   async loadEPUBSettings(workspaceId: string): Promise<void> {
     try {
       this.epubSettings = await this.settingsService.loadEPUBSettings(workspaceId);
@@ -561,6 +567,8 @@ export class EnhancedAppState {
       console.warn('Failed to load EPUB settings:', error);
       this.epubSettings = this.settingsService.getDefaultEPUBSettings();
     }
+    // Keep the write-hook's review-mode registry in sync with the loaded setting.
+    setReviewMode(workspaceId, this.epubSettings?.track_changes ?? false);
   }
 
   async updateEPUBSettings(settings: Partial<EPUBSettings>): Promise<void> {
@@ -571,6 +579,7 @@ export class EnhancedAppState {
     try {
       await this.settingsService.saveEPUBSettings(this.workspace.id, updatedSettings);
       this.epubSettings = updatedSettings;
+      setReviewMode(this.workspace.id, updatedSettings.track_changes ?? false);
     } catch (error) {
       this.errorMessage = `Failed to save EPUB settings: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }

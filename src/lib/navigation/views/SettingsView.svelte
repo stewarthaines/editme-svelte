@@ -9,12 +9,15 @@
     TransformOption,
   } from '../../services/settings/settings.service.js';
   import { DEFAULT_PREVIEW } from '../../services/settings/settings.service.js';
+  import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
+  import type { Patchset } from '../../track-changes/types.js';
   import type { ExtensionInfo } from '../../extensions/types.js';
 
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
   import type { TransformEngine } from '../../infrastructure/transform-engine.js';
   import ExtensionItem from '../../components/extensions/ExtensionItem.svelte';
   import GeneratorSettings from '../../components/settings/GeneratorSettings.svelte';
+  import TrackChangesPanel from '../../components/settings/TrackChangesPanel.svelte';
   import SettingsSection from '../../components/settings/SettingsSection.svelte';
   import PaneHeader from '../../components/layout/PaneHeader.svelte';
   import {
@@ -47,6 +50,8 @@
     extensionManager: ExtensionManager;
     transformEngine: TransformEngine;
     workspaceId: string | null;
+    /** Current workspace (for the Track Changes patchset generator). */
+    workspace?: WorkspaceState | null;
     /** Plugins discovered in plugins/manifest.json (empty unless served over HTTP). */
     availablePlugins?: PluginManifestEntry[];
     /** Ids the user has enabled (global). */
@@ -66,6 +71,8 @@
         once the project list is populated (create a project first, then opt in). */
     hasProjects?: boolean;
     onSettingsChanged?: () => void;
+    /** Apply accepted track-changes patchset items to the current project. */
+    onApplyPatchset?: (patchset: Patchset, acceptedKeys: string[]) => Promise<void>;
     /** Generate a PDF of the whole book. Omitted when PDF export isn't available
         (e.g. the offline file:// build); the PDF section's button hides then. */
     onGeneratePdf?: () => void;
@@ -78,6 +85,7 @@
     extensionManager,
     transformEngine,
     workspaceId,
+    workspace = null,
     availablePlugins = [],
     enabledPluginIds = [],
     availableExtensions = [],
@@ -86,6 +94,7 @@
     readOnly = false,
     hasProjects = false,
     onSettingsChanged,
+    onApplyPatchset,
     onGeneratePdf,
     pdfGenerating = false,
   }: Props = $props();
@@ -1197,6 +1206,18 @@
                     {/each}
                   </div>
                 </SettingsSection>
+              {/if}
+
+              <!-- Track changes (review mode) -->
+              {#if canEditEPUBSettings && isAdvancedMode}
+                <TrackChangesPanel
+                  {workspaceId}
+                  {workspace}
+                  {settingsService}
+                  enabled={epubSettings?.track_changes ?? false}
+                  onChanged={onSettingsChanged}
+                  onApply={onApplyPatchset}
+                />
               {/if}
 
               {#if isAdvancedMode}

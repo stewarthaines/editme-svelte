@@ -16,6 +16,8 @@
     CaretLeft,
     CaretRight,
     CaretDown,
+    Lock,
+    ToggleRight,
   } from 'phosphor-svelte';
 
   // Props
@@ -25,6 +27,9 @@
     hasWorkspace?: boolean;
     /** Read-only EPUB: hide the add/import-chapter actions. */
     readOnly?: boolean;
+    /** Track-changes review mode: structure + metadata locked. Drives the padlock
+        affordances on the affected sections (distinct from a read-only EPUB). */
+    reviewMode?: boolean;
     /** Whether any packaged EPUBs exist — the Publish tab hides when there are
         none (and no publish plugin is enabled), to declutter the first run. */
     hasPackagedEpubs?: boolean;
@@ -48,6 +53,7 @@
     activeSection = 'workspace',
     hasWorkspace = false,
     readOnly = false,
+    reviewMode = false,
     hasPackagedEpubs = false,
     enabledPluginIds = [],
     currentWorkspace = null,
@@ -183,6 +189,24 @@
   }
 </script>
 
+<!-- Padlock affordance for sections affected by track-changes review mode. -->
+{#snippet lockMark(kind: 'lock' | 'control', corner = false)}
+  <span
+    class="section-lock"
+    class:corner
+    class:control={kind === 'control'}
+    title={kind === 'control'
+      ? $t('Track changes is on — manage it in Settings')
+      : $t('Locked while track changes is on')}
+  >
+    {#if kind === 'control'}
+      <ToggleRight size={corner ? 13 : 16} weight="fill" aria-hidden="true" />
+    {:else}
+      <Lock size={corner ? 11 : 14} weight="fill" aria-hidden="true" />
+    {/if}
+  </span>
+{/snippet}
+
 <aside class="sidebar" class:collapsed={!isExpanded}>
   <div class="sidebar-header">
     <button
@@ -301,6 +325,9 @@
                 {/if}
               </span>
             {/if}
+            {#if reviewMode && section.id === 'settings'}
+              {@render lockMark('control', !isExpanded)}
+            {/if}
           </button>
         {/if}
       {/each}
@@ -325,6 +352,9 @@
             </span>
             {#if isExpanded}
               <span class="section-label">{$t(section.label)}</span>
+            {/if}
+            {#if reviewMode && (section.id === 'metadata' || section.id === 'manifest')}
+              {@render lockMark('lock', !isExpanded)}
             {/if}
           </button>
         {/if}
@@ -558,6 +588,30 @@
     justify-content: center;
     padding-block: 0;
     padding-inline: 0;
+    position: relative;
+  }
+
+  /* Track-changes padlock affordance on locked sections. */
+  .section-lock {
+    display: inline-flex;
+    align-items: center;
+    margin-inline-start: auto;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  /* Collapsed sidebar: sit in the icon's corner instead of trailing the label. */
+  .section-lock.corner {
+    position: absolute;
+    inset-block-start: 4px;
+    inset-inline-end: 4px;
+    margin: 0;
+  }
+
+  /* The Settings mark is the control, not a lock — accent it so it reads as
+     active/actionable and is unmistakable next to the muted padlocks. */
+  .section-lock.control {
+    color: var(--color-interactive-primary, var(--color-text-link));
   }
 
   .append-button-nav {

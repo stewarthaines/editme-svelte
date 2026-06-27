@@ -19,6 +19,14 @@ import {
 } from './source-utils.js';
 import type { SourceFileInfo, SourceValidation, SourceStats } from './types.js';
 import { DEFAULT_SOURCE_SETTINGS } from './types.js';
+import { BASE_PREFIX } from '../track-changes/base-snapshot.js';
+import {
+  BASE_PATCH_SUFFIX,
+  basePatchPath,
+  originalFromBasePatch,
+  encodeBaseDiff,
+  decodeBaseDiff,
+} from '../track-changes/base-diff.js';
 
 export class SourceManager {
   constructor(private fileStorage: FileStorageAPI) {}
@@ -46,10 +54,22 @@ export class SourceManager {
       // Create ZIP writer
       const zipWriter = new ZipWriter();
 
-      // Add all SOURCE/ files to ZIP
+      // Add all SOURCE/ files to ZIP. Track-changes base snapshots
+      // (SOURCE/main/<path>) are shipped as a diff vs the current content when that
+      // is smaller — rehydrated to a full copy on import.
       for (const filePath of sourceFiles) {
         try {
           const content = await this.fileStorage.readFile(workspaceId, filePath);
+
+          if (filePath.startsWith(BASE_PREFIX)) {
+            const original = filePath.slice(BASE_PREFIX.length);
+            const patch = await this.tryEncodeBaseDiff(workspaceId, original, content);
+            if (patch !== null) {
+              await zipWriter.addFile(basePatchPath(original), patch);
+              continue;
+            }
+          }
+
           await zipWriter.addFile(filePath, content);
         } catch (error) {
           throw new Error(`Failed to read file ${filePath}: ${error}`);
@@ -72,30 +92,81 @@ export class SourceManager {
   }
 
   /**
-   * Extract SOURCE.zip to workspace SOURCE/ directory
+   * Encode a base snapshot as a diff vs its current content, or null to keep the
+   * full copy (no current file, or the diff isn't a net win).
+   */
+  private async tryEncodeBaseDiff(
+    workspaceId: string,
+    original: string,
+    baseBuffer: ArrayBuffer
+  ): Promise<string | null> {
+    let currentText: string;
+    try {
+      currentText = await this.fileStorage.readTextFile(workspaceId, original);
+    } catch {
+      return null; // no current content to diff against — ship the full base
+    }
+    const baseText = new TextDecoder().decode(baseBuffer);
+    return encodeBaseDiff(original, currentText, baseText);
+  }
+
+  /**
+   * Extract SOURCE.zip to workspace SOURCE/ directory.
+   *
+   * Two passes: write non-base entries first so the current content needed to
+   * rehydrate a `SOURCE/main/<path>.patch` base (e.g. SOURCE/text/<id>.txt, which
+   * is itself in this archive) is present before the base is reconstructed.
    */
   async extractSourceZip(workspaceId: string, sourceZipBlob: Blob): Promise<void> {
     try {
-      // Convert blob to ArrayBuffer for ZIP reader
       const zipBuffer = await sourceZipBlob.arrayBuffer();
       const zip = new Zip(zipBuffer);
 
-      // Extract all entries
+      const baseEntries: typeof zip.entries = [];
+
+      // Pass 1 — current SOURCE files, settings, scripts, full base copies, etc.
       for (const entry of zip.entries) {
         const filePath = sanitizeSourcePath(entry.fileName);
-
-        // Validate file path for security
         if (!validateSourcePath(filePath)) {
           throw new Error(`Invalid file path: ${entry.fileName}`);
         }
-
+        if (filePath.startsWith(BASE_PREFIX)) {
+          baseEntries.push(entry);
+          continue;
+        }
         try {
-          // Extract file content
-          const fileBlob = await entry.extract();
-          const content = await fileBlob.arrayBuffer();
-
-          // Write to workspace
+          const content = await (await entry.extract()).arrayBuffer();
           await this.fileStorage.writeFile(workspaceId, filePath, content);
+        } catch (error) {
+          throw new Error(`Failed to write file ${filePath}: ${error}`);
+        }
+      }
+
+      // Pass 2 — base snapshots: rehydrate diffs from current content; write full
+      // copies (legacy / small files) verbatim.
+      for (const entry of baseEntries) {
+        const filePath = sanitizeSourcePath(entry.fileName);
+        try {
+          const fileBlob = await entry.extract();
+          if (filePath.endsWith(BASE_PATCH_SUFFIX)) {
+            const original = originalFromBasePatch(filePath);
+            let currentText: string;
+            try {
+              currentText = await this.fileStorage.readTextFile(workspaceId, original);
+            } catch {
+              console.warn(`Cannot rehydrate base for ${original}: current content missing`);
+              continue;
+            }
+            const patchText = new TextDecoder().decode(await fileBlob.arrayBuffer());
+            const baseText = decodeBaseDiff(currentText, patchText);
+            if (baseText === null) {
+              console.warn(`Cannot rehydrate base for ${original}: patch did not apply`);
+              continue;
+            }
+            await this.fileStorage.writeTextFile(workspaceId, `${BASE_PREFIX}${original}`, baseText);
+          } else {
+            await this.fileStorage.writeFile(workspaceId, filePath, await fileBlob.arrayBuffer());
+          }
         } catch (error) {
           throw new Error(`Failed to write file ${filePath}: ${error}`);
         }

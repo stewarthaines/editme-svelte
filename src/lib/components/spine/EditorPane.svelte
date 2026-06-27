@@ -29,6 +29,10 @@
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
   import { t } from '$lib/i18n';
   import { RowsIcon, SquareIcon } from 'phosphor-svelte';
+  import { onMount } from 'svelte';
+  import InlineTextDiff from '$lib/components/import/InlineTextDiff.svelte';
+  import { FileStorageAPI } from '$lib/storage/index.js';
+  import { BASE_PREFIX } from '$lib/track-changes/base-snapshot.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -295,6 +299,66 @@
   let pane1Textarea: HTMLTextAreaElement | undefined = $state();
   let pane2Textarea: HTMLTextAreaElement | undefined = $state();
 
+  // Track-changes "Changes" toggle: when a base snapshot exists for the selected
+  // file, show an inline diff (base vs current) instead of the textarea. Per pane.
+  const TRACKABLE_TYPES = new Set(['text', 'css', 'javascript']);
+  const selectedFile1 = $derived(availableFiles1.find(f => f.value === pane1SelectedFile) ?? null);
+  const selectedFile2 = $derived(availableFiles2.find(f => f.value === pane2SelectedFile) ?? null);
+  // Base content if a snapshot exists for the pane's file, else null (no button).
+  let base1 = $state<string | null>(null);
+  let base2 = $state<string | null>(null);
+  let showDiff1 = $state(false);
+  let showDiff2 = $state(false);
+
+  async function loadBase(file: { path: string; type: string } | null): Promise<string | null> {
+    if (!workspace || !file || !TRACKABLE_TYPES.has(file.type)) return null;
+    const storage = FileStorageAPI.getInstance();
+    const basePath = BASE_PREFIX + file.path;
+    try {
+      if (!(await storage.fileExists(workspace.id, basePath))) return null;
+      return await storage.readTextFile(workspace.id, basePath);
+    } catch {
+      return null;
+    }
+  }
+
+  // Reload the base (and reset the diff view) whenever the pane's file changes.
+  $effect(() => {
+    const file = selectedFile1;
+    showDiff1 = false;
+    let cancelled = false;
+    void loadBase(file).then(content => {
+      if (!cancelled) base1 = content;
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+  $effect(() => {
+    const file = selectedFile2;
+    showDiff2 = false;
+    let cancelled = false;
+    void loadBase(file).then(content => {
+      if (!cancelled) base2 = content;
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+
+  // A base is created lazily on the first real edit; refresh the affected pane so
+  // its "Changes" button appears without needing to reselect the file.
+  onMount(() => {
+    const handler = (event: Event) => {
+      const path = (event as CustomEvent<{ path?: string }>).detail?.path;
+      if (!path) return;
+      if (selectedFile1?.path === path) void loadBase(selectedFile1).then(c => (base1 = c));
+      if (selectedFile2?.path === path) void loadBase(selectedFile2).then(c => (base2 = c));
+    };
+    window.addEventListener('seed:base-captured', handler);
+    return () => window.removeEventListener('seed:base-captured', handler);
+  });
+
   // Audio clip editor state
   let audioEditorVisible = $state<boolean>(false);
   let textareaSelection = $state<{ start: number; end: number } | null>(null);
@@ -498,6 +562,21 @@
   </select>
 {/snippet}
 
+<!-- Track-changes diff toggle for a pane, shown only when the file has a base snapshot. -->
+{#snippet changesToggle(pane: 1 | 2)}
+  {#if pane === 1 ? base1 !== null : base2 !== null}
+    <button
+      type="button"
+      class="changes-toggle-btn"
+      class:active={pane === 1 ? showDiff1 : showDiff2}
+      onclick={() => (pane === 1 ? (showDiff1 = !showDiff1) : (showDiff2 = !showDiff2))}
+      title={$t('Show your changes against the saved version')}
+    >
+      {$t('Changes')}
+    </button>
+  {/if}
+{/snippet}
+
 <!-- The chapter title belongs to the chapter, not a pane, so it stays in the
      header row in both single and dual mode. -->
 {#snippet chapterTitleInput()}
@@ -581,6 +660,10 @@
           {$t('Generators')}
         </button>
       {/if}
+
+      {#if editorMode === 'single'}
+        {@render changesToggle(1)}
+      {/if}
     </div>
   </div>
 
@@ -609,6 +692,7 @@
                   <option value={file.value}>{file.label}</option>
                 {/each}
               </select>
+              {@render changesToggle(2)}
             </div>
 
             {#if pane2SelectedFile === 'text' && audioEditorVisible && hasAudioFiles && audioClipService && workspace && settingsService && workspaceService}
@@ -627,22 +711,31 @@
           </div>
 
           <div class="textarea-container">
-            <textarea
-              bind:this={pane2Textarea}
-              class="content-textarea {getSyntaxClass(pane2SelectedFile)}"
-              class:has-error={pane2Error}
-              value={pane2FileStore ? $pane2FileStore?.content || '' : ''}
-              placeholder={getPlaceholder(pane2SelectedFile)}
-              oninput={handlePane2Input}
-              onselect={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
-              onmouseup={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
-              onkeyup={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
-              spellcheck={pane2SelectedFile === 'text'}
-              autocomplete="off"
-              autocapitalize="off"
-              aria-label={$t('Pane 2 content')}
-              dir={paneDir(pane2SelectedFile)}
-            ></textarea>
+            {#if showDiff2 && base2 !== null}
+              <div class="diff-view">
+                <InlineTextDiff
+                  current={base2}
+                  incoming={pane2FileStore ? ($pane2FileStore?.content ?? '') : ''}
+                />
+              </div>
+            {:else}
+              <textarea
+                bind:this={pane2Textarea}
+                class="content-textarea {getSyntaxClass(pane2SelectedFile)}"
+                class:has-error={pane2Error}
+                value={pane2FileStore ? $pane2FileStore?.content || '' : ''}
+                placeholder={getPlaceholder(pane2SelectedFile)}
+                oninput={handlePane2Input}
+                onselect={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
+                onmouseup={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
+                onkeyup={() => pane2SelectedFile === 'text' && handleTextareaSelection(2)}
+                spellcheck={pane2SelectedFile === 'text'}
+                autocomplete="off"
+                autocapitalize="off"
+                aria-label={$t('Pane 2 content')}
+                dir={paneDir(pane2SelectedFile)}
+              ></textarea>
+            {/if}
             {#if pane2Error}
               <div class="pane-error-overlay">
                 <span class="error-icon" aria-hidden="true">⚠️</span>
@@ -661,6 +754,7 @@
           <div class="pane-header">
             <div class="pane-header-content">
               {@render pane1FileSelector()}
+              {@render changesToggle(1)}
             </div>
             {@render pane1Audio()}
           </div>
@@ -669,22 +763,31 @@
         {/if}
 
         <div class="textarea-container">
-          <textarea
-            bind:this={pane1Textarea}
-            class="content-textarea {getSyntaxClass(pane1SelectedFile)}"
-            class:has-error={pane1Error}
-            value={pane1FileStore ? $pane1FileStore?.content || '' : ''}
-            placeholder={getPlaceholder(pane1SelectedFile)}
-            oninput={handlePane1Input}
-            onselect={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
-            onmouseup={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
-            onkeyup={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
-            spellcheck={pane1SelectedFile === 'text'}
-            autocomplete="off"
-            autocapitalize="off"
-            aria-label={$t('Pane 1 content')}
-            dir={paneDir(pane1SelectedFile)}
-          ></textarea>
+          {#if showDiff1 && base1 !== null}
+            <div class="diff-view">
+              <InlineTextDiff
+                current={base1}
+                incoming={pane1FileStore ? ($pane1FileStore?.content ?? '') : ''}
+              />
+            </div>
+          {:else}
+            <textarea
+              bind:this={pane1Textarea}
+              class="content-textarea {getSyntaxClass(pane1SelectedFile)}"
+              class:has-error={pane1Error}
+              value={pane1FileStore ? $pane1FileStore?.content || '' : ''}
+              placeholder={getPlaceholder(pane1SelectedFile)}
+              oninput={handlePane1Input}
+              onselect={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
+              onmouseup={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
+              onkeyup={() => pane1SelectedFile === 'text' && handleTextareaSelection(1)}
+              spellcheck={pane1SelectedFile === 'text'}
+              autocomplete="off"
+              autocapitalize="off"
+              aria-label={$t('Pane 1 content')}
+              dir={paneDir(pane1SelectedFile)}
+            ></textarea>
+          {/if}
           {#if pane1Error}
             <div class="pane-error-overlay">
               <span class="error-icon" aria-hidden="true">⚠️</span>
@@ -864,6 +967,37 @@
     background: var(--color-accent-primary);
     color: var(--color-accent-contrast);
     border-color: var(--color-accent-primary);
+  }
+
+  /* Track-changes "Changes" toggle — shares the toolbar button look, pinned right. */
+  .changes-toggle-btn {
+    margin-inline-start: auto;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .changes-toggle-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-accent-primary);
+  }
+
+  .changes-toggle-btn.active {
+    background: var(--color-accent-primary);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent-primary);
+  }
+
+  .diff-view {
+    block-size: 100%;
+    overflow: auto;
+    background-color: var(--color-surface-primary);
   }
 
   .audio-editor-panel {

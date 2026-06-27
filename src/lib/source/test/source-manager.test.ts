@@ -575,4 +575,73 @@ describe('SourceManager', () => {
       expect(result.hasSettingsFile).toBe(false);
     });
   });
+
+  describe('track-changes base diff packaging', () => {
+    const baseLines = Array.from({ length: 60 }, (_, i) => `line ${i + 1}`).join('\n') + '\n';
+    const currentLines = baseLines.replace('line 30', 'line 30 — edited');
+
+    async function zipFilenames(blob: Blob): Promise<string[]> {
+      return JSON.parse(await blob.text()).files.map((f: { filename: string }) => f.filename);
+    }
+
+    it('ships a large base as a .patch and rehydrates it on extract', async () => {
+      const ws = 'tc-pack';
+      await mockFileStorage.addTestFiles(ws, {
+        'SOURCE/text/ch01.txt': currentLines,
+        'SOURCE/main/SOURCE/text/ch01.txt': baseLines,
+      });
+
+      const blob = await sourceManager.createSourceZip(ws);
+      const names = await zipFilenames(blob!);
+      expect(names).toContain('SOURCE/main/SOURCE/text/ch01.txt.patch');
+      expect(names).not.toContain('SOURCE/main/SOURCE/text/ch01.txt');
+
+      const ws2 = 'tc-unpack';
+      await mockFileStorage.createWorkspace(ws2);
+      await sourceManager.extractSourceZip(ws2, blob!);
+
+      expect(await mockFileStorage.readTextFile(ws2, 'SOURCE/text/ch01.txt')).toBe(currentLines);
+      expect(await mockFileStorage.readTextFile(ws2, 'SOURCE/main/SOURCE/text/ch01.txt')).toBe(
+        baseLines
+      );
+    });
+
+    it('keeps a full copy when the diff would be larger (tiny file)', async () => {
+      const ws = 'tc-small';
+      await mockFileStorage.addTestFiles(ws, {
+        'SOURCE/text/x.txt': 'b\n',
+        'SOURCE/main/SOURCE/text/x.txt': 'a\n',
+      });
+
+      const blob = await sourceManager.createSourceZip(ws);
+      const names = await zipFilenames(blob!);
+      expect(names).toContain('SOURCE/main/SOURCE/text/x.txt');
+      expect(names).not.toContain('SOURCE/main/SOURCE/text/x.txt.patch');
+
+      const ws2 = 'tc-small-2';
+      await mockFileStorage.createWorkspace(ws2);
+      await sourceManager.extractSourceZip(ws2, blob!);
+      expect(await mockFileStorage.readTextFile(ws2, 'SOURCE/main/SOURCE/text/x.txt')).toBe('a\n');
+    });
+
+    it('extracts a legacy plain full-copy base unchanged', async () => {
+      const enc = (s: string) => Array.from(new TextEncoder().encode(s));
+      const legacyBlob = new Blob(
+        [
+          JSON.stringify({
+            files: [
+              { filename: 'SOURCE/text/ch.txt', content: enc('cur\n') },
+              { filename: 'SOURCE/main/SOURCE/text/ch.txt', content: enc('orig\n') },
+            ],
+          }),
+        ],
+        { type: 'application/zip' }
+      );
+
+      const ws = 'tc-legacy';
+      await mockFileStorage.createWorkspace(ws);
+      await sourceManager.extractSourceZip(ws, legacyBlob);
+      expect(await mockFileStorage.readTextFile(ws, 'SOURCE/main/SOURCE/text/ch.txt')).toBe('orig\n');
+    });
+  });
 });

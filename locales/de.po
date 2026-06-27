@@ -60,6 +60,10 @@ msgstr "{n} verfügbar"
 msgid "{n} bytes"
 msgstr "{n} Bytes"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "{n} change(s)"
+msgstr "{n} Änderung(en)"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transform"
 msgstr "{n} DOM-Transformation"
@@ -229,6 +233,10 @@ msgstr "Bibliotheken von Drittanbietern"
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "about.version"
 msgstr "Version"
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Accept {name}"
+msgstr "{name} übernehmen"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Access Key"
@@ -412,6 +420,18 @@ msgstr "Element anhängen"
 msgid "Apple Books"
 msgstr "Apple Books"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Applied {n} change(s)."
+msgstr "{n} Änderung(en) angewendet."
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Apply accepted"
+msgstr "Übernommene anwenden"
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Applying…"
+msgstr "Wird angewendet…"
+
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Approximate start position"
 msgstr "Ungefähre Startposition"
@@ -517,10 +537,24 @@ msgstr "Bucket-Name"
 #: src/lib/components/EditSpineItemDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
 msgstr "Abbrechen"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Capture your changes (vs the saved base) as a patchset that can be reviewed and applied to the matching project."
+msgstr "Erfassen Sie Ihre Änderungen (gegenüber der gespeicherten Basis) als Änderungssatz, der überprüft und auf das passende Projekt angewendet werden kann."
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Captured {n} changed file(s)."
+msgstr "{n} geänderte Datei(en) erfasst."
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Captured change sets. Those matching this project are listed first."
+msgstr "Erfasste Änderungssätze. Passende zu diesem Projekt werden zuerst aufgeführt."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog file"
@@ -569,6 +603,14 @@ msgstr "Bericht des Zertifizierers (URL)"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Change Folder"
 msgstr "Ordner ändern"
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Changed files"
+msgstr "Geänderte Dateien"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Changes"
+msgstr "Änderungen"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Chapter Content"
@@ -635,6 +677,7 @@ msgstr "Clip-Bezeichnung"
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 #: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
@@ -903,6 +946,7 @@ msgstr "Standardwert"
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete"
@@ -1174,6 +1218,10 @@ msgstr "Erweiterung konnte nicht hinzugefügt werden"
 msgid "Failed to add metadata item"
 msgstr "Metadaten-Element konnte nicht hinzugefügt werden"
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Failed to apply changes"
+msgstr "Änderungen konnten nicht angewendet werden"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to change language"
 msgstr "Sprache konnte nicht geändert werden"
@@ -1193,6 +1241,10 @@ msgstr "Arbeitsbereich konnte nicht gelöscht werden: {error}"
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Failed to duplicate project."
 msgstr "Projekt konnte nicht dupliziert werden."
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Failed to generate patchset"
+msgstr "Änderungssatz konnte nicht erzeugt werden"
 
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "Failed to generate XML preview"
@@ -1267,6 +1319,10 @@ msgstr "Kapitel konnte nicht aktualisiert werden."
 msgid "Failed to update item"
 msgstr "Element konnte nicht aktualisiert werden"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Failed to update settings"
+msgstr "Einstellungen konnten nicht aktualisiert werden"
+
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to upload all files"
 msgstr "Es konnten nicht alle Dateien hochgeladen werden"
@@ -1337,6 +1393,10 @@ msgstr "Erzeugen"
 msgid "Generate cover image"
 msgstr "Coverbild erzeugen"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Generate patchset"
+msgstr "Änderungssatz erzeugen"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Generate PDF"
 msgstr "PDF erstellen"
@@ -1346,6 +1406,7 @@ msgid "Generating navigation from chapters..."
 msgstr "Navigation wird aus Kapiteln erzeugt..."
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generating…"
 msgstr "Wird erzeugt…"
@@ -1699,6 +1760,7 @@ msgstr "Wird geladen..."
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/PublishView.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1712,6 +1774,14 @@ msgstr "Lokal gepackte EPUBs"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Location:"
 msgstr "Speicherort:"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Lock package structure and track content changes"
+msgstr "Paketstruktur sperren und Inhaltsänderungen verfolgen"
+
+#: src/lib/Sidebar.svelte
+msgid "Locked while track changes is on"
+msgstr "Gesperrt, solange die Änderungsverfolgung aktiv ist"
 
 #: src/lib/Sidebar.svelte
 msgid "Main navigation"
@@ -1729,6 +1799,10 @@ msgstr "Manifest"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Margin"
 msgstr "Rand"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "matches this project"
+msgstr "passt zu diesem Projekt"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Message:"
@@ -1859,6 +1933,10 @@ msgstr "Nein"
 msgid "No accessibility issues found"
 msgstr "Keine Barrierefreiheitsprobleme gefunden"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "No changes to capture yet."
+msgstr "Noch keine Änderungen zu erfassen."
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
 msgstr "Kein Inhalt"
@@ -1910,6 +1988,10 @@ msgstr "Keine Metadaten verfügbar"
 #: src/lib/navigation/views/PublishView.svelte
 msgid "No packaged EPUBs yet."
 msgstr "Noch keine gepackten EPUBs."
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "No patchsets yet."
+msgstr "Noch keine Änderungssätze."
 
 #: src/App.svelte
 #: src/lib/components/SpineSidebar.svelte
@@ -1976,6 +2058,14 @@ msgstr "Zahl"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "OAuth Client ID"
 msgstr "OAuth-Client-ID"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Off"
+msgstr "Aus"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "On — review mode"
+msgstr "An – Überprüfungsmodus"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
@@ -2112,6 +2202,10 @@ msgstr "Passwort oder App-Token"
 #: src/lib/components/extensions/ExtensionItem.svelte
 msgid "Paste {name} license text here"
 msgstr "{name}-Lizenztext hier einfügen"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Patchsets"
+msgstr "Änderungssätze"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Path"
@@ -2412,6 +2506,14 @@ msgstr "Erneut versuchen"
 msgid "Retry plugin"
 msgstr "Plugin erneut laden"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Review & apply"
+msgstr "Prüfen & anwenden"
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Review changes"
+msgstr "Änderungen prüfen"
+
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Review import conflicts"
 msgstr "Import-Konflikte prüfen"
@@ -2641,6 +2743,10 @@ msgstr "Gerenderte Vorschau anzeigen"
 msgid "Show the full license text"
 msgstr "Vollständigen Lizenztext anzeigen"
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show your changes against the saved version"
+msgstr "Ihre Änderungen gegenüber der gespeicherten Version anzeigen"
+
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Showing {filtered} of {total} workspaces"
 msgstr "{filtered} von {total} Arbeitsbereichen werden angezeigt"
@@ -2852,6 +2958,10 @@ msgstr "Dieses EPUB wurde nicht im Simple EPUB Editor erstellt, daher können se
 msgid "This file is empty."
 msgstr "Diese Datei ist leer."
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "This patchset has no changes."
+msgstr "Dieser Änderungssatz enthält keine Änderungen."
+
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
@@ -2883,6 +2993,14 @@ msgstr "Seitenleiste umschalten"
 #: src/lib/ThemeToggle.svelte
 msgid "Toggle theme"
 msgstr "Design umschalten"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Track changes"
+msgstr "Änderungen verfolgen"
+
+#: src/lib/Sidebar.svelte
+msgid "Track changes is on — manage it in Settings"
+msgstr "Änderungsverfolgung ist aktiv – in den Einstellungen verwalten"
 
 #: src/App.svelte
 msgid "Transform Engine Failed"
@@ -2921,6 +3039,14 @@ msgstr "Reise (E-Ink)"
 msgid "Try adjusting your search terms"
 msgstr "Versuchen Sie, Ihre Suchbegriffe anzupassen"
 
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Turn off and discard base"
+msgstr "Ausschalten und Basis verwerfen"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "Turning off track changes deletes the saved base version. Continue?"
+msgstr "Das Ausschalten der Änderungsverfolgung löscht die gespeicherte Basisversion. Fortfahren?"
+
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Type"
@@ -2935,6 +3061,7 @@ msgid "Unknown View"
 msgstr "Unbekannte Ansicht"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+#: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Untitled"
 msgstr "Ohne Titel"
@@ -3102,6 +3229,10 @@ msgstr "WebDAV-URL"
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Welcome"
 msgstr "Willkommen"
+
+#: src/lib/components/settings/TrackChangesPanel.svelte
+msgid "While locked, you can edit the text of existing chapters, styles and scripts. Adding, removing or reordering chapters, changing the manifest, and editing metadata are disabled. Your original content is saved so your edits can be captured as a patchset."
+msgstr "Im gesperrten Zustand können Sie den Text vorhandener Kapitel, Stile und Skripte bearbeiten. Das Hinzufügen, Entfernen oder Umordnen von Kapiteln, das Ändern des Manifests und das Bearbeiten von Metadaten sind deaktiviert. Ihr ursprünglicher Inhalt wird gespeichert, damit Ihre Änderungen als Änderungssatz erfasst werden können."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Wide"

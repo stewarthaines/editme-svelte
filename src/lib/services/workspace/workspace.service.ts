@@ -21,6 +21,7 @@ import {
 import type { SourceItem } from '../../manifest/types.js';
 import { resolveSourceWritePath } from '../../transform/transform-broker.js';
 import { getBrowserLocale } from '../../i18n/locale-config.js';
+import { captureBaseIfNeeded } from '../../track-changes/base-snapshot.js';
 
 // Service-specific types
 export interface WorkspaceState {
@@ -1156,6 +1157,10 @@ export class WorkspaceService {
    */
   async writeFile(workspaceId: string, filePath: string, content: string): Promise<void> {
     try {
+      // Track changes: snapshot the pre-edit version of trackable content the first
+      // time it's actually changed in review mode (no-op otherwise).
+      await captureBaseIfNeeded(this.fileStorage, workspaceId, filePath, content);
+
       const encoder = new TextEncoder();
       const uint8Array = encoder.encode(content);
       // Create a proper ArrayBuffer from the Uint8Array

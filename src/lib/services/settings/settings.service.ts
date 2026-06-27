@@ -103,6 +103,10 @@ export interface EPUBSettings {
   print?: PrintSettings;
   /** Authoring-time preview settings (preview pane only; never in the packaged EPUB). */
   preview?: PreviewSettings;
+  /** Track-changes / review mode. When on, the project is locked to editing existing
+      content (no structural or metadata changes) and edits are captured against a base
+      snapshot under SOURCE/main. Travels with the EPUB so recipients inherit review mode. */
+  track_changes?: boolean;
 }
 
 export interface SettingsValidation {
@@ -388,6 +392,7 @@ export class SettingsService {
         filename_template: settings.filename_template ?? defaults.filename_template,
         include_seed_html_in_package:
           settings.include_seed_html_in_package ?? defaults.include_seed_html_in_package,
+        track_changes: settings.track_changes ?? defaults.track_changes,
         cover: settings.cover
           ? {
               template: settings.cover.template ?? 'default',
@@ -457,6 +462,7 @@ export class SettingsService {
       audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
       filename_template: DEFAULT_FILENAME_TEMPLATE,
       include_seed_html_in_package: false,
+      track_changes: false,
       preview: DEFAULT_PREVIEW,
     };
   }
