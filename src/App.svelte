@@ -40,7 +40,7 @@
   import { WorkspaceService } from './lib/services/workspace/workspace.service.js';
   import { SpineService } from './lib/services/spine/spine.service.js';
   import { applyPatchset } from './lib/track-changes/patchset-apply.js';
-  import type { Patchset } from './lib/track-changes/types.js';
+  import type { ResolvedChange } from './lib/track-changes/types.js';
   import { MetadataService } from './lib/services/metadata/metadata.service.js';
   import { PublishService } from './lib/services/publish/publish.service.js';
   import { BlobURLManager } from './lib/blob-url/blob-url-manager.js';
@@ -373,15 +373,14 @@
     }
   };
 
-  // Apply accepted track-changes patchset items to the current project. Content-only
-  // (chapter text via overwriteChapter, CSS/JS via writeFile); the OPF is unchanged.
-  const handleApplyPatchset = async (patchset: Patchset, acceptedKeys: string[]) => {
+  // Apply resolved track-changes items to the current project. Content-only (chapter
+  // text via overwriteChapter, CSS/JS via writeFile); the OPF is unchanged.
+  const handleApplyPatchset = async (resolved: ResolvedChange[]) => {
     if (!currentWorkspaceState) return;
     const { changedPaths } = await applyPatchset(
       { spineService, workspaceService },
       currentWorkspaceState,
-      patchset,
-      new Set(acceptedKeys)
+      resolved
     );
     manifestRefreshToken += 1;
     if (changedPaths.length > 0) {

@@ -10,7 +10,7 @@
   } from '../../services/settings/settings.service.js';
   import { DEFAULT_PREVIEW } from '../../services/settings/settings.service.js';
   import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
-  import type { Patchset } from '../../track-changes/types.js';
+  import type { ResolvedChange } from '../../track-changes/types.js';
   import type { ExtensionInfo } from '../../extensions/types.js';
 
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
@@ -72,7 +72,7 @@
     hasProjects?: boolean;
     onSettingsChanged?: () => void;
     /** Apply accepted track-changes patchset items to the current project. */
-    onApplyPatchset?: (patchset: Patchset, acceptedKeys: string[]) => Promise<void>;
+    onApplyPatchset?: (resolved: ResolvedChange[]) => Promise<void>;
     /** Generate a PDF of the whole book. Omitted when PDF export isn't available
         (e.g. the offline file:// build); the PDF section's button hides then. */
     onGeneratePdf?: () => void;

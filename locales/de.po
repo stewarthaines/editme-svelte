@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-27\n"
-"PO-Revision-Date: 2026-06-27\n"
+"POT-Creation-Date: 2026-06-28\n"
+"PO-Revision-Date: 2026-06-28\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -137,6 +137,10 @@ msgstr "{path} (Zeile {line}, Spalte {col})"
 msgid "{path} (line {line})"
 msgstr "{path} (Zeile {line})"
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "{sel}/{total}"
+msgstr "{sel}/{total}"
+
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "1 day ago"
 msgstr "vor 1 Tag"
@@ -235,8 +239,12 @@ msgid "about.version"
 msgstr "Version"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
-msgid "Accept {name}"
-msgstr "{name} übernehmen"
+msgid "Accept all changes in {name}"
+msgstr "Alle Änderungen in {name} übernehmen"
+
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "Accept this change"
+msgstr "Diese Änderung übernehmen"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Access Key"
@@ -1945,6 +1953,10 @@ msgstr "Kein Inhalt"
 msgid "No content available"
 msgstr "Kein Inhalt verfügbar"
 
+#: src/lib/components/track-changes/PatchsetReviewDialog.svelte
+msgid "No differences."
+msgstr "Keine Unterschiede."
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "No DOM transforms configured."
 msgstr "Keine DOM-Transformationen konfiguriert."
@@ -2505,6 +2517,10 @@ msgstr "Erneut versuchen"
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Retry plugin"
 msgstr "Plugin erneut laden"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Revert this change"
+msgstr "Diese Änderung zurücksetzen"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Review & apply"

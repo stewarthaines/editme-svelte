@@ -7,7 +7,7 @@
   import { generatePatchset } from '../../track-changes/patchset-generate.js';
   import { listPatchsets, savePatchset, deletePatchset } from '../../track-changes/changes-store.js';
   import PatchsetReviewDialog from '../track-changes/PatchsetReviewDialog.svelte';
-  import type { Patchset } from '../../track-changes/types.js';
+  import type { Patchset, ResolvedChange } from '../../track-changes/types.js';
   import type { SettingsService } from '../../services/settings/settings.service.js';
   import type { WorkspaceState } from '../../services/workspace/workspace.service.js';
 
@@ -28,9 +28,9 @@
     /** Called after the setting is persisted so the app reloads EPUB settings
         (which re-syncs review mode and the structural lock-down). */
     onChanged?: () => void;
-    /** Apply accepted changes to the current project (orchestrated by App, which
+    /** Apply resolved changes to the current project (orchestrated by App, which
         holds the spine/workspace services). */
-    onApply?: (patchset: Patchset, acceptedKeys: string[]) => Promise<void>;
+    onApply?: (resolved: ResolvedChange[]) => Promise<void>;
   } = $props();
 
   const currentIdentifier = $derived(workspace?.opf.metadata.identifier ?? '');
@@ -59,12 +59,11 @@
     await loadList();
   }
 
-  async function confirmApply(acceptedKeys: string[]) {
-    const patchset = reviewing;
-    if (!patchset || !onApply) return;
-    await onApply(patchset, acceptedKeys);
+  async function confirmApply(resolved: ResolvedChange[]) {
+    if (!onApply) return;
+    await onApply(resolved);
     reviewing = null;
-    applyMsg = $t('Applied {n} change(s).', { n: acceptedKeys.length });
+    applyMsg = $t('Applied {n} change(s).', { n: resolved.length });
   }
 
   function formatDate(ms: number): string {

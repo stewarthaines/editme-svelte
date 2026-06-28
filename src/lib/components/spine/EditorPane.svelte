@@ -28,11 +28,11 @@
   import { isRtlLanguage } from '$lib/epub/language-direction.js';
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
   import { t } from '$lib/i18n';
-  import { RowsIcon, SquareIcon } from 'phosphor-svelte';
+  import { RowsIcon, SquareIcon, ArrowUUpLeft } from 'phosphor-svelte';
   import { onMount } from 'svelte';
-  import InlineTextDiff from '$lib/components/import/InlineTextDiff.svelte';
   import { FileStorageAPI } from '$lib/storage/index.js';
   import { BASE_PREFIX } from '$lib/track-changes/base-snapshot.js';
+  import { diffSegments, applySelectedHunks } from '$lib/track-changes/hunks.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -310,6 +310,41 @@
   let showDiff1 = $state(false);
   let showDiff2 = $state(false);
 
+  // Live current content per pane, and the base→current segments (with a revert
+  // patch) shown in the Changes view. The "Changes" button only shows when the
+  // current content actually differs from the saved base.
+  const cur1 = $derived(pane1FileStore ? ($pane1FileStore?.content ?? '') : '');
+  const cur2 = $derived(pane2FileStore ? ($pane2FileStore?.content ?? '') : '');
+  const hasDiff1 = $derived(base1 !== null && cur1 !== base1);
+  const hasDiff2 = $derived(base2 !== null && cur2 !== base2);
+  const diff1 = $derived(showDiff1 && hasDiff1 ? diffSegments(base1 ?? '', cur1) : null);
+  const diff2 = $derived(showDiff2 && hasDiff2 ? diffSegments(base2 ?? '', cur2) : null);
+
+  // When a pane has no remaining changes (e.g. after reverting the last one), drop
+  // out of the diff view — otherwise the next keystroke (which re-creates a diff)
+  // would snap the pane back from the textarea into the Changes view.
+  $effect(() => {
+    if (!hasDiff1) showDiff1 = false;
+  });
+  $effect(() => {
+    if (!hasDiff2) showDiff2 = false;
+  });
+
+  // Revert one change region back to the saved base, leaving other edits intact.
+  function revert(pane: 1 | 2, index: number) {
+    const store = pane === 1 ? pane1FileStore : pane2FileStore;
+    const base = pane === 1 ? base1 : base2;
+    if (!store || base === null) return;
+    const cur = pane === 1 ? cur1 : cur2;
+    const { revertPatch } = diffSegments(base, cur);
+    const next = applySelectedHunks(
+      cur,
+      revertPatch,
+      revertPatch.hunks.map((_, i) => i === index)
+    );
+    store.updateContent(next);
+  }
+
   async function loadBase(file: { path: string; type: string } | null): Promise<string | null> {
     if (!workspace || !file || !TRACKABLE_TYPES.has(file.type)) return null;
     const storage = FileStorageAPI.getInstance();
@@ -564,7 +599,7 @@
 
 <!-- Track-changes diff toggle for a pane, shown only when the file has a base snapshot. -->
 {#snippet changesToggle(pane: 1 | 2)}
-  {#if pane === 1 ? base1 !== null : base2 !== null}
+  {#if pane === 1 ? hasDiff1 : hasDiff2}
     <button
       type="button"
       class="changes-toggle-btn"
@@ -575,6 +610,51 @@
       {$t('Changes')}
     </button>
   {/if}
+{/snippet}
+
+<!-- Base→current diff with a per-change revert button (right edge of each change). -->
+{#snippet revertableDiff(segments: import('$lib/track-changes/hunks.js').DiffSegment[], pane: 1 | 2)}
+  <div class="diff-view">
+    {#each segments as seg, si (si)}
+      {#if seg.type === 'context'}
+        {#each seg.lines as line, li (li)}
+          <div class="diff-line diff-context">
+            <span class="diff-sign" aria-hidden="true"> </span><span class="diff-text"
+              >{line || ' '}</span
+            >
+          </div>
+        {/each}
+      {:else}
+        <div class="change-region">
+          <div class="change-lines">
+            {#each seg.removed as line, li (li)}
+              <div class="diff-line diff-remove">
+                <span class="diff-sign" aria-hidden="true">-</span><span class="diff-text"
+                  >{line || ' '}</span
+                >
+              </div>
+            {/each}
+            {#each seg.added as line, li (li)}
+              <div class="diff-line diff-add">
+                <span class="diff-sign" aria-hidden="true">+</span><span class="diff-text"
+                  >{line || ' '}</span
+                >
+              </div>
+            {/each}
+          </div>
+          <button
+            type="button"
+            class="revert-btn"
+            title={$t('Revert this change')}
+            aria-label={$t('Revert this change')}
+            onclick={() => revert(pane, seg.index)}
+          >
+            <ArrowUUpLeft size={16} aria-hidden="true" />
+          </button>
+        </div>
+      {/if}
+    {/each}
+  </div>
 {/snippet}
 
 <!-- The chapter title belongs to the chapter, not a pane, so it stays in the
@@ -711,13 +791,8 @@
           </div>
 
           <div class="textarea-container">
-            {#if showDiff2 && base2 !== null}
-              <div class="diff-view">
-                <InlineTextDiff
-                  current={base2}
-                  incoming={pane2FileStore ? ($pane2FileStore?.content ?? '') : ''}
-                />
-              </div>
+            {#if diff2}
+              {@render revertableDiff(diff2.segments, 2)}
             {:else}
               <textarea
                 bind:this={pane2Textarea}
@@ -763,13 +838,8 @@
         {/if}
 
         <div class="textarea-container">
-          {#if showDiff1 && base1 !== null}
-            <div class="diff-view">
-              <InlineTextDiff
-                current={base1}
-                incoming={pane1FileStore ? ($pane1FileStore?.content ?? '') : ''}
-              />
-            </div>
+          {#if diff1}
+            {@render revertableDiff(diff1.segments, 1)}
           {:else}
             <textarea
               bind:this={pane1Textarea}
@@ -998,6 +1068,75 @@
     block-size: 100%;
     overflow: auto;
     background-color: var(--color-surface-primary);
+    font-family: var(--font-mono, monospace);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .diff-line {
+    display: flex;
+    gap: var(--space-2);
+    padding-inline: var(--space-2);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .diff-sign {
+    flex-shrink: 0;
+    inline-size: 1ch;
+    color: var(--color-text-tertiary);
+    user-select: none;
+  }
+
+  .diff-text {
+    flex: 1;
+  }
+
+  .diff-context {
+    color: var(--color-text-secondary);
+  }
+
+  .diff-add {
+    background-color: var(--color-success-bg, rgb(0 128 0 / 0.12));
+    color: var(--color-success-text, inherit);
+  }
+
+  .diff-remove {
+    background-color: var(--color-error-bg, rgb(200 0 0 / 0.12));
+    color: var(--color-error-text, inherit);
+  }
+
+  /* A change region: its diff lines, with a revert button pinned to the right. */
+  .change-region {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .change-lines {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .revert-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-block: 2px;
+    margin-inline-end: var(--space-2);
+    padding: var(--space-1);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .revert-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-accent-primary);
+    color: var(--color-text-primary);
   }
 
   .audio-editor-panel {

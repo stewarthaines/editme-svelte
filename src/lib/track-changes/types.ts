@@ -39,3 +39,12 @@ export interface Patchset {
   createdAt: number;
   changes: ChangeItem[];
 }
+
+/**
+ * A change resolved by the review dialog to the exact content to write — the
+ * author's current content with the user-selected hunks applied. The apply step
+ * just writes these (no diff logic).
+ */
+export type ResolvedChange =
+  | { kind: 'chapter-modify'; id: string; title: string; content: string }
+  | { kind: 'file-modify'; path: string; mediaType: string; content: string };
