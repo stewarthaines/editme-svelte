@@ -197,6 +197,22 @@
     return mediaType.startsWith('video/');
   };
 
+  // Read an image's intrinsic pixel dimensions by loading it off its blob URL.
+  // Resolves null if the image fails to load or has no intrinsic size (e.g. an SVG
+  // with only a viewBox and no width/height).
+  const getImageDimensions = (url: string): Promise<{ width: number; height: number } | null> =>
+    new Promise(resolve => {
+      const img = new Image();
+      img.onload = () =>
+        resolve(
+          img.naturalWidth && img.naturalHeight
+            ? { width: img.naturalWidth, height: img.naturalHeight }
+            : null
+        );
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+
   // Helper function to determine if content should use LTR direction (for technical files)
   const shouldUseLtrDirection = (mediaType: string): boolean => {
     return (
@@ -303,6 +319,10 @@
             contentType = 'binary';
           }
 
+          // Image pixel dimensions, shown next to the media type in the preview header.
+          const imageDimensions =
+            contentType === 'image' && previewUrl ? await getImageDimensions(previewUrl) : null;
+
           contentPreview = {
             itemId: manifestItem.id,
             mediaType: manifestItem.mediaType,
@@ -310,6 +330,8 @@
             textContent,
             previewUrl,
             metadata: {
+              width: imageDimensions?.width,
+              height: imageDimensions?.height,
               characterCount: textContent ? textContent.length : undefined,
               lineCount: textContent ? textContent.split('\n').length : undefined,
               wordCount: textContent
@@ -581,6 +603,11 @@
         {#if contentPreview}
           <div class="content-header">
             <span class="content-type">{contentPreview.mediaType}</span>
+            {#if contentPreview.metadata?.width && contentPreview.metadata?.height}
+              <span class="content-dimensions"
+                >{contentPreview.metadata.width} × {contentPreview.metadata.height} px</span
+              >
+            {/if}
           </div>
 
           {#if contentPreview.error}
@@ -784,6 +811,12 @@
   }
 
   .content-type {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .content-dimensions {
     font-family: var(--font-mono);
     font-size: 0.875rem;
     color: var(--color-text-secondary);
