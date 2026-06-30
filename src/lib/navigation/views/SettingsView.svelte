@@ -23,10 +23,12 @@
   import {
     addTransform,
     removeTransformAt,
+    removeTransformsForExtension,
     moveTransform,
     transformLabel,
     transformGroup,
     basename,
+    extensionOf,
   } from '../../settings/dom-transforms.js';
   import { CaretUp, CaretDown, X } from 'phosphor-svelte';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
@@ -493,6 +495,19 @@
 
     try {
       await extensionManager.deleteWorkspaceExtension(workspaceId, extensionName);
+
+      // Prune the removed extension's transforms from settings.json — otherwise the
+      // stale dom_transforms entry lingers and the spine editor's file dropdown lists
+      // it as a ghost file (re-creating it empty when selected).
+      const dom = epubSettings?.dom_transforms;
+      if (dom) {
+        const nextDom = removeTransformsForExtension(dom, extensionName);
+        if (nextDom.length !== dom.length) await persistDomTransforms(nextDom);
+      }
+      // If the removed extension's text transform was adopted, fall back to the default.
+      if (epubSettings && extensionOf(epubSettings.text_transform) === extensionName) {
+        await persistTextTransform(settingsService.getDefaultEPUBSettings().text_transform);
+      }
 
       // Reload extensions list
       extensions = await extensionManager.listWorkspaceExtensions(workspaceId);
