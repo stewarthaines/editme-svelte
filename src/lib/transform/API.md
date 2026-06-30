@@ -4,6 +4,8 @@
 
 The Transform Pipeline executes JavaScript transform scripts to convert plain text sources into XHTML spine items with proper error handling and sandboxing. It provides a secure, extensible system for text and DOM transformations using user-defined scripts and 3rd party libraries.
 
+> **Writing a transform for an extension?** This file documents the internal pipeline classes. For the author-facing contract — the `transformText`/`transformDOM`/`generateText` signatures and the `ctx` file-access capability API (manifest/source reads, the broker, and the sandbox limits) — see [TRANSFORM_CONTEXT.md](./TRANSFORM_CONTEXT.md).
+
 **Main Classes:**
 
 - `TransformPipeline` - Core pipeline execution and management
