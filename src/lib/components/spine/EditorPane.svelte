@@ -24,6 +24,7 @@
   import type { SettingsService } from '$lib/services/settings/settings.service.js';
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
   import GeneratorPanel from '$lib/components/spine/GeneratorPanel.svelte';
+  import LineNumberGutter from '$lib/components/spine/LineNumberGutter.svelte';
   import type { GeneratorRunner } from '$lib/generators/generator-store.js';
   import { isRtlLanguage } from '$lib/epub/language-direction.js';
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
@@ -298,6 +299,15 @@
   // Textarea references for navigation
   let pane1Textarea: HTMLTextAreaElement | undefined = $state();
   let pane2Textarea: HTMLTextAreaElement | undefined = $state();
+
+  // Code panes (non-prose) get a line-number gutter and no soft-wrap; prose ('text')
+  // keeps wrapping and shows no gutter.
+  const pane1IsCode = $derived(pane1SelectedFile !== 'text');
+  const pane2IsCode = $derived(pane2SelectedFile !== 'text');
+  const pane1Content = $derived(pane1FileStore ? ($pane1FileStore?.content ?? '') : '');
+  const pane2Content = $derived(pane2FileStore ? ($pane2FileStore?.content ?? '') : '');
+  const pane1LineCount = $derived(pane1IsCode ? pane1Content.split('\n').length : 1);
+  const pane2LineCount = $derived(pane2IsCode ? pane2Content.split('\n').length : 1);
 
   // Track-changes "Changes" toggle: when a base snapshot exists for the selected
   // file, show an inline diff (base vs current) instead of the textarea. Per pane.
@@ -790,14 +800,18 @@
             {/if}
           </div>
 
-          <div class="textarea-container">
+          <div class="textarea-container" style="--gutter-digits: {String(pane2LineCount).length}">
             {#if diff2}
               {@render revertableDiff(diff2.segments, 2)}
             {:else}
+              {#if pane2IsCode}
+                <LineNumberGutter lineCount={pane2LineCount} target={pane2Textarea} />
+              {/if}
               <textarea
                 bind:this={pane2Textarea}
                 class="content-textarea {getSyntaxClass(pane2SelectedFile)}"
                 class:has-error={pane2Error}
+                class:with-gutter={pane2IsCode}
                 value={pane2FileStore ? $pane2FileStore?.content || '' : ''}
                 placeholder={getPlaceholder(pane2SelectedFile)}
                 oninput={handlePane2Input}
@@ -837,14 +851,18 @@
           {@render pane1Audio()}
         {/if}
 
-        <div class="textarea-container">
+        <div class="textarea-container" style="--gutter-digits: {String(pane1LineCount).length}">
           {#if diff1}
             {@render revertableDiff(diff1.segments, 1)}
           {:else}
+            {#if pane1IsCode}
+              <LineNumberGutter lineCount={pane1LineCount} target={pane1Textarea} />
+            {/if}
             <textarea
               bind:this={pane1Textarea}
               class="content-textarea {getSyntaxClass(pane1SelectedFile)}"
               class:has-error={pane1Error}
+              class:with-gutter={pane1IsCode}
               value={pane1FileStore ? $pane1FileStore?.content || '' : ''}
               placeholder={getPlaceholder(pane1SelectedFile)}
               oninput={handlePane1Input}
@@ -1205,18 +1223,35 @@
     outline-offset: -2px;
   }
 
-  .content-textarea:focus {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-accent);
+  /* Code panes: don't soft-wrap (one line = one row, so the gutter stays aligned;
+     long lines scroll horizontally) and pad the text clear of the line-number gutter. */
+  .content-textarea.with-gutter {
+    white-space: pre;
+    overflow: auto;
+    padding-left: calc(var(--gutter-digits, 2) * 1ch + 2 * var(--space-2) + var(--space-3));
+  }
+
+  /* Focus ring on the pane (not the textarea): an overlay above the line-number gutter
+     so the ring surrounds the whole pane — gutter included — instead of being clipped
+     by the opaque gutter on the left. */
+  .textarea-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 var(--focus-ring-width) var(--color-accent);
+    opacity: 0;
+  }
+  .textarea-container:focus-within::after {
+    opacity: 1;
   }
 
   .content-textarea.has-error {
     border-color: var(--color-error-border);
-    outline-color: var(--color-error-border);
   }
-
-  .content-textarea.has-error:focus {
-    border-color: var(--color-error-border);
-    outline-color: var(--color-error-border);
+  .textarea-container:has(.content-textarea.has-error):focus-within::after {
+    box-shadow: inset 0 0 0 var(--focus-ring-width) var(--color-error-border);
   }
 
   .pane-error-overlay {

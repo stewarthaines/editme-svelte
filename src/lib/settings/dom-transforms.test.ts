@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   addTransform,
   removeTransformAt,
+  removeTransformsForExtension,
   moveTransform,
   transformLabel,
   transformGroup,
@@ -30,6 +31,25 @@ describe('dom-transforms helpers', () => {
       const list = ['a'];
       expect(removeTransformAt(list, 5)).toBe(list);
       expect(removeTransformAt(list, -1)).toBe(list);
+    });
+  });
+
+  describe('removeTransformsForExtension', () => {
+    it('drops only the named extension, keeping project scripts and other extensions', () => {
+      const list = [
+        'SOURCE/scripts/transformDom.js',
+        'SOURCE/extensions/prism/transformPrism.js',
+        'SOURCE/extensions/highlight/transformHighlight.js',
+      ];
+      expect(removeTransformsForExtension(list, 'prism')).toEqual([
+        'SOURCE/scripts/transformDom.js',
+        'SOURCE/extensions/highlight/transformHighlight.js',
+      ]);
+    });
+
+    it('returns an equal list when the extension owns nothing', () => {
+      const list = ['SOURCE/scripts/transformDom.js'];
+      expect(removeTransformsForExtension(list, 'prism')).toEqual(list);
     });
   });
 

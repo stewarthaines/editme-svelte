@@ -36,6 +36,12 @@ export function removeTransformAt(list: string[], index: number): string[] {
   return list.filter((_, i) => i !== index);
 }
 
+/** Drop every transform owned by `extensionName` (matched via {@link extensionOf}).
+ * Used to clean up `dom_transforms` when an extension is removed from a project. */
+export function removeTransformsForExtension(list: string[], extensionName: string): string[] {
+  return list.filter(path => extensionOf(path) !== extensionName);
+}
+
 /** Swap the entry at `index` with its neighbour; clamped at the ends. */
 export function moveTransform(list: string[], index: number, dir: -1 | 1): string[] {
   const target = index + dir;
