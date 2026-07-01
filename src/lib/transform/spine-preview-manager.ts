@@ -41,6 +41,48 @@ import type { WorkspaceState } from '../services/workspace/workspace.service.js'
 import type { ManifestItem } from '../epub/opf-utils.js';
 
 /**
+ * Content-derived OPF manifest properties this app reconciles from a rendered
+ * chapter, mapped to the CSS selector that detects them. `scripted` is NOT here:
+ * it's owned by a separate blanket JS-file toggle (WorkspaceService), not content.
+ */
+const CONTENT_DERIVED_PROPERTIES: ReadonlyArray<{ token: string; selector: string }> = [
+  { token: 'svg', selector: 'svg' },
+  { token: 'mathml', selector: 'math' },
+];
+
+/**
+ * Given a chapter's rendered XHTML and its current manifest `properties`, return
+ * the desired `properties` array with the content-derived tokens (`svg`, `mathml`)
+ * reconciled — added when the element is present, removed when absent — while
+ * every other token is preserved in place. Returns `null` when nothing would
+ * change (so callers can skip the write) or when parsing fails (fail-safe: never
+ * mutate properties on a parse error).
+ *
+ * Parsing uses `text/html`, which resolves `<svg>`/`<math>` foreign content by
+ * local name and is safe under the unit test's happy-dom environment (unlike
+ * namespaced application/xml).
+ */
+export function deriveContentProperties(xhtml: string, current: string[]): string[] | null {
+  let doc: Document;
+  try {
+    doc = new DOMParser().parseFromString(xhtml, 'text/html');
+  } catch (error) {
+    console.warn('Failed to parse XHTML for manifest-property detection:', error);
+    return null;
+  }
+
+  const ownedTokens = CONTENT_DERIVED_PROPERTIES.map(p => p.token);
+  // Preserve existing order and all non-owned tokens; flip only the owned ones.
+  const next = current.filter(p => !ownedTokens.includes(p));
+  for (const { token, selector } of CONTENT_DERIVED_PROPERTIES) {
+    if (doc.querySelectorAll(selector).length > 0) next.push(token);
+  }
+
+  const unchanged = next.length === current.length && next.every(p => current.includes(p));
+  return unchanged ? null : next;
+}
+
+/**
  * Preview manager for real-time spine item editing
  */
 export class SpinePreviewManager {
@@ -61,6 +103,11 @@ export class SpinePreviewManager {
   private readonly config: PreviewManagerConfig;
   private readonly onPreviewUpdate: (event: PreviewUpdateEvent) => void;
   private readonly onError: (event: PreviewErrorEvent) => void;
+  // Reports a manifest change back to the app so the single source of truth
+  // (appState.workspace) stays current — otherwise the derived property is
+  // written only to a detached workspace copy and gets clobbered by the next
+  // full-OPF save. Optional: batch/throwaway callers refresh live state themselves.
+  private readonly onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
 
   // Spine-scoped properties (mutable - updated during spine switching)
   private spineItemId: string;
@@ -78,7 +125,8 @@ export class SpinePreviewManager {
     config: PreviewManagerConfig,
     onPreviewUpdate: (event: PreviewUpdateEvent) => void,
     onError: (event: PreviewErrorEvent) => void,
-    spineItem?: any
+    spineItem?: any,
+    onWorkspaceUpdate?: (workspace: WorkspaceState) => void
   ) {
     // Initialize workspace-scoped properties (these never change)
     this.workspaceId = workspaceId;
@@ -91,6 +139,7 @@ export class SpinePreviewManager {
     this.config = config;
     this.onPreviewUpdate = onPreviewUpdate;
     this.onError = onError;
+    this.onWorkspaceUpdate = onWorkspaceUpdate;
 
     // Initialize spine-scoped properties (these change during spine switching)
     this.spineItemId = spineItemId;
@@ -337,8 +386,8 @@ export class SpinePreviewManager {
 
       await this.workspaceService.writeFile(this.workspaceId, spineItemPath, xhtml);
 
-      // Analyze XHTML for SVG content and update manifest properties
-      await this.updateSVGProperty(xhtml, workspace, manifestItem);
+      // Analyze XHTML for content-derived manifest properties (svg, mathml)
+      await this.updateContentProperties(xhtml, workspace, manifestItem);
     } catch (error) {
       // Log manifest save errors but don't block preview
       console.warn('Failed to save XHTML to manifest:', error);
@@ -356,56 +405,39 @@ export class SpinePreviewManager {
   }
 
   /**
-   * Detect inline SVG elements in XHTML content
+   * Reconcile the content-derived manifest properties (`svg`, `mathml`) on the
+   * chapter's manifest item against the rendered XHTML, and propagate the change
+   * back to the app's live workspace state via `onWorkspaceUpdate`.
+   *
+   * Only these two tokens are owned here — any other properties (notably the
+   * blanket `scripted` toggle, plus `nav`/`cover-image`) are preserved untouched.
+   * The write goes through `updateManifestItem` so it persists to the OPF; its
+   * returned workspace is the corrected single source of truth and must reach
+   * `appState.workspace`, or the next full-OPF save overwrites this change.
    */
-  private detectInlineSVG(xhtml: string): boolean {
-    try {
-      // Use DOMParser for robust HTML parsing (following codebase preferences)
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(xhtml, 'text/html');
-
-      // Check for any <svg> elements in the document
-      const svgElements = doc.querySelectorAll('svg');
-      return svgElements.length > 0;
-    } catch (error) {
-      console.warn('Failed to parse XHTML for SVG detection:', error);
-      return false; // Fail safe - don't add property if parsing fails
-    }
-  }
-
-  /**
-   * Update SVG property on manifest item based on XHTML content
-   */
-  private async updateSVGProperty(
+  private async updateContentProperties(
     xhtml: string,
     workspace: WorkspaceState,
     manifestItem: ManifestItem
   ): Promise<void> {
     try {
-      // Only process XHTML items
+      // Only content documents carry these properties.
       if (manifestItem.mediaType !== 'application/xhtml+xml') {
         return;
       }
 
-      const hasSVG = this.detectInlineSVG(xhtml);
-      const currentProperties = manifestItem.properties || [];
-      const hasSVGProperty = currentProperties.includes('svg');
+      const current = manifestItem.properties ?? [];
+      const next = deriveContentProperties(xhtml, current);
+      if (next === null) return; // unchanged (or parse failed) → no write, no callback
 
-      // Update property if state changed
-      if (hasSVG && !hasSVGProperty) {
-        // Add svg property
-        await this.workspaceService.updateManifestItem(workspace, this.spineItemId, {
-          properties: [...currentProperties, 'svg'],
-        });
-      } else if (!hasSVG && hasSVGProperty) {
-        // Remove svg property
-        const filteredProperties = currentProperties.filter(p => p !== 'svg');
-        await this.workspaceService.updateManifestItem(workspace, this.spineItemId, {
-          properties: filteredProperties.length > 0 ? filteredProperties : undefined,
-        });
-      }
+      const updated = await this.workspaceService.updateManifestItem(
+        workspace,
+        this.spineItemId,
+        { properties: next.length > 0 ? next : undefined }
+      );
+      this.onWorkspaceUpdate?.(updated);
     } catch (error) {
-      console.warn('Failed to update SVG property:', error);
+      console.warn('Failed to update content-derived manifest properties:', error);
     }
   }
 
@@ -625,7 +657,8 @@ export function createSpinePreviewManager(
   config: Partial<PreviewManagerConfig> = {},
   onPreviewUpdate: (event: PreviewUpdateEvent) => void,
   onError: (event: PreviewErrorEvent) => void,
-  spineItem?: any
+  spineItem?: any,
+  onWorkspaceUpdate?: (workspace: WorkspaceState) => void
 ): SpinePreviewManager {
   const defaultConfig: PreviewManagerConfig = {
     debounceMs: 300,
@@ -648,7 +681,8 @@ export function createSpinePreviewManager(
     finalConfig,
     onPreviewUpdate,
     onError,
-    spineItem
+    spineItem,
+    onWorkspaceUpdate
   );
 }
 

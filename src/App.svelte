@@ -584,6 +584,14 @@
     } finally {
       manager.cleanup();
     }
+
+    // The regeneration pass persisted content-derived manifest properties (svg,
+    // mathml) straight to the OPF on disk via a throwaway manager. Refresh the
+    // app's live workspace from disk so those properties are reflected in the UI
+    // and survive the next full-OPF save (e.g. packaging's updateMetadata).
+    if (appState) {
+      appState.workspace = await workspaceService.loadWorkspace(workspaceId);
+    }
   }
 
   // The new-project dialog is owned here so any view can open it (the Projects
@@ -1216,6 +1224,9 @@
             readOnly={isReadOnly}
             advancedMode={advancedMode.current}
             onPreviewUpdate={handleSpinePreviewUpdate}
+            onWorkspaceUpdate={updatedWorkspace => {
+              if (appState) appState.workspace = updatedWorkspace;
+            }}
           />
         {:else}
           <div class="view-loading">{$t('Loading project…')}</div>

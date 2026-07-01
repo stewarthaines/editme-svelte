@@ -63,6 +63,7 @@
     readOnly = false,
     advancedMode = false,
     onPreviewUpdate,
+    onWorkspaceUpdate,
   }: {
     workspace: WorkspaceState;
     workspaceService: WorkspaceService;
@@ -85,6 +86,8 @@
       /** Contents of the project's preview/head.xml (preview-only <head> fragment). */
       previewHead?: string;
     }) => void;
+    /** Report a manifest change (content-derived properties) back to app state. */
+    onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
   } = $props();
 
   // Component state - using $state() for reactivity in Svelte 5
@@ -666,7 +669,8 @@
           DEFAULT_PREVIEW_CONFIG,
           handlePreviewUpdate,
           handlePreviewError,
-          selectedItem
+          selectedItem,
+          onWorkspaceUpdate
         );
 
         // Initialize transform pipeline first
