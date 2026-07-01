@@ -24,9 +24,6 @@ dist-ssr
 *.sw?
 .obsidian
 
-# Package manager
-package-lock.json
-
 # Generated screenshots
 __screenshots__/
 .playwright-mcp/
