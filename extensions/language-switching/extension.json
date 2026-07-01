@@ -1,0 +1,36 @@
+{
+  "id": "language-switching",
+  "name": "LanguageSwitching",
+  "description": "Promote lang-* classes to lang / xml:lang attributes for correct multilingual rendering. Ships a sample generator and a copyable preview flag overlay.",
+  "url": "https://www.w3.org/International/questions/qa-html-language-declarations",
+  "scripts": [],
+  "domTransforms": ["transformLanguageSwitching.js"],
+  "textTransforms": [],
+  "generators": [
+    {
+      "id": "language-sample",
+      "name": "Language sample",
+      "description": "Insert a short multilingual sample (a foreign-language phrase and block) in your text format's class syntax, to demonstrate lang-* switching.",
+      "script": "generateLanguageSample.js",
+      "options": [
+        {
+          "type": "select",
+          "name": "format",
+          "label": "Text format",
+          "default": "markdown",
+          "options": [
+            { "value": "markdown", "label": "Markdown" },
+            { "value": "djot", "label": "Djot" },
+            { "value": "textile", "label": "Textile" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flag-overlay",
+      "name": "Flag overlay (preview)",
+      "description": "Copy this, then paste into preview/head.xml (choose it from the file dropdown above). Overlays a flag + language title on [lang] elements in the preview only — never packaged. Use Copy, not Insert.",
+      "script": "generateFlagOverlay.js"
+    }
+  ]
+}
