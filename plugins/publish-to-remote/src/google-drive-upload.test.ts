@@ -120,12 +120,13 @@ describe('listGoogleDriveFiles', () => {
 });
 
 describe('uploadToGoogleDrive', () => {
-  it('returns success with URL and shares the file publicly on 200', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ id: 'new-file-id' }),
-    });
+  it('creates a new file, shares it, and returns its download URL', async () => {
+    // Sequence: list (no existing) → POST create → permissions (anyone/reader).
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ files: [] }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) })
+      .mockResolvedValueOnce({ ok: true, status: 200 });
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await uploadToGoogleDrive(
@@ -134,28 +135,59 @@ describe('uploadToGoogleDrive', () => {
       new Blob(['data']),
     );
     expect(result.success).toBe(true);
+    expect(result.fileId).toBe('new-file-id');
     expect(result.url).toBe(
       'https://drive.usercontent.google.com/download?id=new-file-id&export=download',
     );
 
-    // Second call shares the file so its download link resolves without sign-in.
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    const [permUrl, permInit] = fetchMock.mock.calls[1];
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const [uploadUrl, uploadInit] = fetchMock.mock.calls[1];
+    expect(uploadUrl).toBe(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+    );
+    expect(uploadInit.method).toBe('POST');
+    const [permUrl, permInit] = fetchMock.mock.calls[2];
     expect(permUrl).toBe(
       'https://www.googleapis.com/drive/v3/files/new-file-id/permissions',
     );
-    expect(permInit.method).toBe('POST');
     expect(JSON.parse(permInit.body)).toEqual({ role: 'reader', type: 'anyone' });
   });
 
-  it('fails when the file cannot be shared publicly', async () => {
-    let call = 0;
-    const fetchMock = vi.fn().mockImplementation(async () => {
-      call += 1;
-      return call === 1
-        ? { ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) }
-        : { ok: false, status: 403, statusText: 'Forbidden', text: async () => 'denied' };
-    });
+  it('updates an existing file in place (PATCH, no duplicate, no re-share)', async () => {
+    // Sequence: list (finds book.epub) → PATCH update. No permissions call.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ files: [{ id: 'existing-id', name: 'book.epub' }] }),
+      })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'existing-id' }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await uploadToGoogleDrive(
+      config,
+      'book.epub',
+      new Blob(['data']),
+    );
+    expect(result.success).toBe(true);
+    expect(result.fileId).toBe('existing-id');
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [updateUrl, updateInit] = fetchMock.mock.calls[1];
+    expect(updateUrl).toBe(
+      'https://www.googleapis.com/upload/drive/v3/files/existing-id?uploadType=multipart',
+    );
+    expect(updateInit.method).toBe('PATCH');
+  });
+
+  it('fails when a new file cannot be shared publicly', async () => {
+    // list (none) → create ok → permissions 403.
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ files: [] }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) })
+      .mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden', text: async () => 'denied' });
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await uploadToGoogleDrive(

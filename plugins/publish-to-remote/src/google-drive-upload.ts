@@ -3,6 +3,8 @@ import type { GoogleDriveRemoteConfig, S3Object } from './types.js';
 interface UploadResult {
   success: boolean;
   url?: string;
+  /** The uploaded/updated Drive file id (needed to build a stable download URL). */
+  fileId?: string;
   error?: string;
 }
 
@@ -61,10 +63,15 @@ export async function uploadToGoogleDrive(
   try {
     const token = await getValidToken(config);
 
-    const metadata = {
-      name: objectKey,
-      parents: [config.folderId],
-    };
+    // Update in place when a file with this name already exists in the folder —
+    // Drive allows same-name duplicates, so a plain create would pile up a new file
+    // (and a new id/URL) on every publish. Reusing the id keeps the download URL stable.
+    const existingId = await findGoogleDriveFileId(config, objectKey);
+
+    // A create sets the parent folder; an update (PATCH) keeps the file where it is.
+    const metadata = existingId
+      ? { name: objectKey }
+      : { name: objectKey, parents: [config.folderId] };
 
     const formData = new FormData();
     formData.append(
@@ -74,9 +81,11 @@ export async function uploadToGoogleDrive(
     formData.append('file', blob, objectKey);
 
     const response = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+      existingId
+        ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
+        : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
       {
-        method: 'POST',
+        method: existingId ? 'PATCH' : 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -97,11 +106,14 @@ export async function uploadToGoogleDrive(
     }
 
     const result = await response.json();
-    // Share the file publicly so its download link resolves without sign-in.
-    await makeGoogleDriveFilePublic(token, result.id);
+    // New files start private; share them so the download link resolves without
+    // sign-in. An updated (existing) file was already shared on creation.
+    if (!existingId) {
+      await makeGoogleDriveFilePublic(token, result.id);
+    }
     const url = getGoogleDrivePublicUrl(config, result.id);
 
-    return { success: true, url };
+    return { success: true, url, fileId: result.id };
   } catch (error) {
     if (error instanceof Error && error.message === 'GOOGLE_AUTH_REQUIRED') {
       return { success: false, error: 'GOOGLE_AUTH_REQUIRED' };
@@ -156,6 +168,21 @@ export async function listGoogleDriveFiles(
     }
     return { objects: [], error: String(error) };
   }
+}
+
+/**
+ * Find the id of a file in the configured folder by name. Drive addresses files by
+ * an opaque id (not by name) and allows same-name duplicates, so callers use this to
+ * update a file in place (and to build a stable download URL) rather than blindly
+ * creating a new one. Returns null when no file with that name exists.
+ */
+export async function findGoogleDriveFileId(
+  config: GoogleDriveRemoteConfig,
+  objectKey: string,
+): Promise<string | null> {
+  const listResult = await listGoogleDriveFiles(config);
+  if (listResult.error) throw new Error(listResult.error);
+  return listResult.objects.find((obj) => obj.key === objectKey)?.fileId ?? null;
 }
 
 export async function deleteGoogleDriveFile(
