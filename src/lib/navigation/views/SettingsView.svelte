@@ -30,7 +30,7 @@
     basename,
     extensionOf,
   } from '../../settings/dom-transforms.js';
-  import { CaretUp, CaretDown, X } from 'phosphor-svelte';
+  import { CaretUp, CaretDown, CaretRight, X } from 'phosphor-svelte';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, currentLocale, setLocale } from '../../i18n';
   import { LOCALE_CONFIGS, isLocaleEnabled } from '../../i18n/locale-config.js';
@@ -575,16 +575,49 @@
   // Extension ids already imported into the current project (dir name === id).
   const installedExtensionIds = $derived(new Set(extensions.map(e => e.name)));
 
-  // Split the catalog by kind: text-format extensions (they provide a text
-  // transform — a markup language like djot/markdown) are a different choice
-  // from library/DOM ones, so they're grouped and listed first. Within-group
-  // order stays as the catalog order.
+  // Split the catalog by kind: text-format extensions provide a text transform
+  // (a markup language like djot/markdown) — a different choice from the content
+  // transforms (DOM transforms / generators). Within-group order stays as the
+  // catalog order.
   const textFormatExtensions = $derived(
     availableExtensions.filter(e => e.textTransforms.length > 0)
   );
-  const libraryExtensions = $derived(
+  const contentTransforms = $derived(
     availableExtensions.filter(e => e.textTransforms.length === 0)
   );
+
+  // Content transforms are further grouped by their editorial `category` (from
+  // extension.json); this array owns only the display order + labels. Anything
+  // uncategorised falls into a trailing "Other" group.
+  const CONTENT_CATEGORY_ORDER = ['typesetting', 'chapter-content', 'code-blocks', 'accessibility'];
+  const contentCategoryGroups = $derived.by(() => {
+    const labels: Record<string, string> = {
+      typesetting: $t('Typesetting'),
+      'chapter-content': $t('Chapter content generation'),
+      'code-blocks': $t('Code block processing'),
+      accessibility: $t('Accessibility features'),
+    };
+    const known = new Set(CONTENT_CATEGORY_ORDER);
+    const groups = CONTENT_CATEGORY_ORDER.map(key => ({
+      key,
+      label: labels[key],
+      items: contentTransforms.filter(e => e.category === key),
+    })).filter(g => g.items.length > 0);
+    const other = contentTransforms.filter(e => !e.category || !known.has(e.category));
+    if (other.length > 0) groups.push({ key: 'other', label: $t('Other'), items: other });
+    return groups;
+  });
+
+  // Per-category collapse state for the Content transforms section (independent
+  // collapse, like the manifest table's group headings). Default: all expanded.
+  let collapsedCategories = $state(new Set<string>());
+  function toggleCategory(key: string): void {
+    const next = new Set(collapsedCategories);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    collapsedCategories = next;
+  }
+
   const canEditSettings = $derived(workspaceId !== null && workspaceSettings !== null);
   const canEditEPUBSettings = $derived(workspaceId !== null && epubSettings !== null);
 
@@ -677,8 +710,11 @@
     const names = availablePlugins.filter(p => enabledPluginIds.includes(p.id)).map(p => p.name);
     return names.length ? names.join(', ') : $t('None');
   });
-  const availableExtensionsSummary = $derived(
-    $t('{n} available', { n: availableExtensions.length })
+  const textFormatsSummary = $derived(
+    $t('{n} available', { n: textFormatExtensions.length })
+  );
+  const contentTransformsSummary = $derived(
+    $t('{n} available', { n: contentTransforms.length })
   );
   const printSummary = $derived.by(() => {
     const p = epubSettings?.print ?? DEFAULT_PRINT;
@@ -835,31 +871,52 @@
               </SettingsSection>
             {/if}
 
-            {#if isAdvancedMode && availableExtensions.length > 0}
+            {#if isAdvancedMode && textFormatExtensions.length > 0}
               <SettingsSection
-                title={$t('Available Extensions')}
-                summary={availableExtensionsSummary}
+                title={$t('Text formats')}
+                summary={textFormatsSummary}
                 name="app-settings"
-                persistKey="settings-app-extensions"
+                persistKey="settings-app-text-formats"
+              >
+                <p class="setting-description">
+                  {$t('A markup language for authoring chapters. Adopt one for the current project.')}
+                </p>
+                {#each textFormatExtensions as ext (ext.id)}
+                  {@render catalogItem(ext)}
+                {/each}
+              </SettingsSection>
+            {/if}
+
+            {#if isAdvancedMode && contentTransforms.length > 0}
+              <SettingsSection
+                title={$t('Content transforms')}
+                summary={contentTransformsSummary}
+                name="app-settings"
+                persistKey="settings-app-content-transforms"
               >
                 <p class="setting-description">
                   {$t(
-                    'Add a library and its suggested DOM transform to the current project; then enable the transform under Project Settings.'
+                    'Add a transform and its library to the current project; then enable it under Project Settings.'
                   )}
                 </p>
 
-                {#if textFormatExtensions.length > 0}
-                  <h4 class="catalog-subhead">{$t('Text formats')}</h4>
-                  {#each textFormatExtensions as ext (ext.id)}
-                    {@render catalogItem(ext)}
-                  {/each}
-                {/if}
-                {#if libraryExtensions.length > 0}
-                  <h4 class="catalog-subhead">{$t('Libraries')}</h4>
-                  {#each libraryExtensions as ext (ext.id)}
-                    {@render catalogItem(ext)}
-                  {/each}
-                {/if}
+                {#each contentCategoryGroups as group (group.key)}
+                  {@const collapsed = collapsedCategories.has(group.key)}
+                  <button
+                    type="button"
+                    class="ct-group-toggle"
+                    aria-expanded={!collapsed}
+                    onclick={() => toggleCategory(group.key)}
+                  >
+                    <span class="ct-disclosure" aria-hidden="true"><CaretRight size={14} /></span>
+                    <span class="ct-group-label">{group.label}</span>
+                  </button>
+                  {#if !collapsed}
+                    {#each group.items as ext (ext.id)}
+                      {@render catalogItem(ext)}
+                    {/each}
+                  {/if}
+                {/each}
               </SettingsSection>
             {/if}
           </div>
@@ -1502,12 +1559,44 @@
   }
 
   /* Available-extensions catalog: group subheadings (Text formats / Libraries) */
-  .catalog-subhead {
-    margin: var(--space-4) 0 var(--space-1) 0;
-    padding-bottom: var(--space-1);
-    border-bottom: 1px solid var(--color-border-subtle);
-    font-size: var(--text-sm);
-    font-weight: var(--font-semibold);
+  /* Content-transform sub-group headers — mirrors the manifest table's collapsible
+     group headings (ManifestTable .group-heading / .group-toggle). */
+  .ct-group-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-bg-secondary);
+    border: none;
+    border-top: 1px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-strong);
+    cursor: pointer;
+    text-align: start;
+    color: inherit;
+  }
+
+  .ct-group-toggle:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--color-focus-ring);
+  }
+
+  .ct-disclosure {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-secondary);
+    transition: transform 0.15s ease;
+  }
+
+  .ct-group-toggle[aria-expanded='true'] .ct-disclosure {
+    transform: rotate(90deg);
+  }
+
+  .ct-group-label {
+    font-size: 0.8125rem;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     color: var(--color-text-secondary);
   }
 
