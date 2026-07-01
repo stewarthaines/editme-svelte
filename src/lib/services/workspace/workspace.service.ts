@@ -474,13 +474,13 @@ export class WorkspaceService {
       },
     };
 
-    // Update scripted properties if JavaScript file was added
-    if (
-      manifestItem.mediaType === 'text/javascript' ||
-      manifestItem.mediaType === 'application/javascript'
-    ) {
-      updatedWorkspace = this.addScriptedPropertiesToChapters(updatedWorkspace);
-    }
+    // Reconcile the blanket 'scripted' property on every add — not only when the
+    // added item is JS. Adding a JS file toggles it on for all chapters, AND a
+    // newly-added chapter must pick up 'scripted' when a reading-system JS already
+    // exists (otherwise it's order-dependent: chapters created after the JS never
+    // get flagged). The reconcile is idempotent, so a non-JS/non-chapter add is a
+    // cheap no-op.
+    updatedWorkspace = this.addScriptedPropertiesToChapters(updatedWorkspace);
 
     // Save to storage
     return await this.saveWorkspace(updatedWorkspace);
