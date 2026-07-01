@@ -74,6 +74,9 @@ export interface ExtensionCatalogEntry {
   id: string;
   name: string;
   description?: string;
+  /** Editorial sub-group key for the settings catalog (e.g. 'typesetting',
+   * 'code-blocks'); presentational only. Text-format extensions omit it. */
+  category?: string;
   /** Project/homepage URL for the 3rd-party library. */
   url?: string;
   /** Extension-wide license file (e.g. 'LICENSE.txt'). */
@@ -261,6 +264,7 @@ function normalizeCatalogEntry(value: unknown): ExtensionCatalogEntry | null {
     id: e.id,
     name: e.name,
     description: asString(e.description),
+    category: asString(e.category),
     url: asString(e.url),
     license: asString(e.license),
     scripts: asScriptArray(e.scripts),

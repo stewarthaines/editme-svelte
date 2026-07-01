@@ -2,9 +2,20 @@
   "id": "prism",
   "name": "Prism",
   "description": "Syntax highlighting for code blocks via Prism.",
+  "category": "typesetting",
   "license": "LICENSE.txt",
-  "scripts": ["prism.js"],
-  "domTransforms": ["transformPrism.js"],
+  "scripts": [
+    "prism.js"
+  ],
+  "domTransforms": [
+    "transformPrism.js"
+  ],
   "textTransforms": [],
-  "assets": [{ "file": "themes/default.css", "target": "Styles/prism.css", "media": "text/css" }]
+  "assets": [
+    {
+      "file": "themes/default.css",
+      "target": "Styles/prism.css",
+      "media": "text/css"
+    }
+  ]
 }

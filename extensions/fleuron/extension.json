@@ -2,9 +2,12 @@
   "id": "fleuron",
   "name": "Fleuron",
   "description": "Replace thematic breaks with a centred fleuron ornament that inherits the text colour.",
+  "category": "typesetting",
   "url": "https://en.wikipedia.org/wiki/Fleuron_(typography)",
   "scripts": [],
-  "domTransforms": ["transformFleuron.js"],
+  "domTransforms": [
+    "transformFleuron.js"
+  ],
   "textTransforms": [],
   "assets": [
     {
@@ -12,6 +15,10 @@
       "target": "Images/fleuron.svg",
       "media": "image/svg+xml"
     },
-    { "file": "fleuron.css", "target": "Styles/fleuron.css", "media": "text/css" }
+    {
+      "file": "fleuron.css",
+      "target": "Styles/fleuron.css",
+      "media": "text/css"
+    }
   ]
 }

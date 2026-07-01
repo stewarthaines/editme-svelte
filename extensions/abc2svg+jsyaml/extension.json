@@ -2,6 +2,7 @@
   "id": "abc2svg+jsyaml",
   "name": "abc2svg+jsyaml",
   "description": "abc2svg is a set of ECMAscript files that handle the ABC music notation. JS-YAML is an implementation of YAML, a human-friendly data serialization language.",
+  "category": "code-blocks",
   "url": "https://chiselapp.com/user/moinejf/repository/abc2svg/doc/trunk/README.md",
   "license": "LICENSE.txt",
   "assets": [

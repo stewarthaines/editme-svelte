@@ -225,6 +225,8 @@ export default defineConfig({
                 ),
               ];
               const chapter = typeof m.chapter === 'string' ? m.chapter : undefined;
+              // Editorial sub-group key for the settings catalog (presentational only).
+              const category = typeof m.category === 'string' ? m.category : undefined;
               // An extension must bring at least one of: a lib, a transform, or a generator.
               const isEmpty =
                 scripts.length === 0 &&
@@ -236,6 +238,7 @@ export default defineConfig({
                   id: m.id,
                   name: m.name,
                   description: m.description,
+                  category,
                   url: m.url,
                   license: m.license,
                   scripts,

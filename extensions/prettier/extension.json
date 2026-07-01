@@ -2,8 +2,15 @@
   "id": "prettier",
   "name": "Prettier",
   "description": "Reformat JavaScript code blocks at narrow/wide/full widths with Prettier.",
+  "category": "typesetting",
   "url": "https://prettier.io/",
-  "scripts": ["prettier.js", "babel.js", "estree.js"],
-  "domTransforms": ["transformPrettier.js"],
+  "scripts": [
+    "prettier.js",
+    "babel.js",
+    "estree.js"
+  ],
+  "domTransforms": [
+    "transformPrettier.js"
+  ],
   "textTransforms": []
 }

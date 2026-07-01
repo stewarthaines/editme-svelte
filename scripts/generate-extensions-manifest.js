@@ -54,6 +54,8 @@ for (const dirent of dirents) {
   }
 
   const { id, name, description, url, license } = meta;
+  // Editorial sub-group key for the settings catalog (presentational only).
+  const category = typeof meta.category === 'string' ? meta.category : undefined;
   // A scripts entry is a bare filename or { file, license? }; flatten to filenames.
   const scriptFile = s =>
     typeof s === 'string' ? s : s && typeof s.file === 'string' ? s.file : null;
@@ -143,6 +145,7 @@ for (const dirent of dirents) {
     id,
     name,
     description,
+    category,
     url,
     license,
     scripts,
