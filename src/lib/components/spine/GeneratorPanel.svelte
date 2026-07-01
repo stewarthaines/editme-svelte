@@ -31,6 +31,9 @@
   let values = $state<Record<string, unknown>>({});
   let busy = $state(false);
   let error = $state<string | null>(null);
+  // Transient "Copied" feedback for the Copy action.
+  let copied = $state(false);
+  let copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
   function fallbackFor(opt: GeneratorOption): unknown {
     if (opt.type === 'boolean') return false;
@@ -59,6 +62,19 @@
 
   function setValue(name: string, value: unknown): void {
     values = { ...values, [name]: value };
+    copied = false;
+  }
+
+  // A failed generator run rejects with a plain error object ({ stage, message, … }
+  // from the transform engine), not an Error — so read its message rather than
+  // String()-ing the object into an unhelpful "[object Object]".
+  function messageOf(e: unknown): string {
+    if (e instanceof Error) return e.message;
+    if (e && typeof e === 'object' && 'message' in e) {
+      const m = (e as { message?: unknown }).message;
+      if (typeof m === 'string' && m) return m;
+    }
+    return String(e);
   }
 
   async function generate(): Promise<void> {
@@ -66,12 +82,36 @@
     if (!gen || busy) return;
     busy = true;
     error = null;
+    copied = false;
     try {
       const text = await runner.run(gen, values);
       await runner.saveValues(gen.manifest.id, values);
       onInsert(text);
     } catch (e) {
-      error = e instanceof Error ? e.message : String(e);
+      error = messageOf(e);
+    } finally {
+      busy = false;
+    }
+  }
+
+  // Copy the generated text to the clipboard instead of inserting it — for
+  // snippets that belong somewhere other than the chapter (e.g. a preview/head.xml
+  // fragment): copy here, switch the file dropdown, and paste.
+  async function copy(): Promise<void> {
+    const gen = selected;
+    if (!gen || busy) return;
+    busy = true;
+    error = null;
+    copied = false;
+    try {
+      const text = await runner.run(gen, values);
+      await runner.saveValues(gen.manifest.id, values);
+      await navigator.clipboard.writeText(text);
+      copied = true;
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(() => (copied = false), 1500);
+    } catch (e) {
+      error = messageOf(e);
     } finally {
       busy = false;
     }
@@ -159,6 +199,9 @@
     <div class="gp-actions">
       <button type="button" class="btn btn-primary" onclick={generate} disabled={busy}>
         {busy ? $t('Generating…') : $t('Insert at cursor')}
+      </button>
+      <button type="button" class="btn btn-secondary" onclick={copy} disabled={busy}>
+        {copied ? $t('Copied') : $t('Copy')}
       </button>
     </div>
   {/if}
@@ -257,6 +300,7 @@
   .gp-actions {
     display: flex;
     justify-content: flex-end;
+    gap: var(--space-2);
   }
 
 </style>
