@@ -715,8 +715,6 @@
       let feedUrl = '';
       if (activeRemote.type === 's3-compatible') {
         feedUrl = getPublicUrl(activeRemote, catalogKey);
-      } else if (activeRemote.type === 'google-drive') {
-        feedUrl = `https://drive.google.com/${catalogKey}`;
       } else if (activeRemote.type === 'dropbox') {
         feedUrl = `https://www.dropbox.com/${catalogKey}`;
       } else if (activeRemote.type === 'webdav') {
@@ -863,7 +861,11 @@
                   onDelete={onDeleteObject}
                 />
 
-                {#if activeRemote?.type !== 'google-drive'}
+                <!-- No catalog editor for Google Drive: Drive can't host an OPDS
+                     feed (Google serves public files as an HTML scan interstitial /
+                     generic types that readers reject). See AGENTS.md. Drive still
+                     works for publishing individual books. -->
+                {#if activeRemote && activeRemote.type !== 'google-drive'}
                   <div class="catalog-editor">
                     <div class="catalog-fields">
                       <label class="catalog-field catalog-field-file">

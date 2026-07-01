@@ -22,11 +22,17 @@ can use their own Google/Dropbox credentials rather than the project owner's.
 5. In the plugin: Add Remote → Google Drive → paste the **Client ID** and **API key**, then
    Connect & pick a folder.
 
-> **Sharing:** each published EPUB (and the OPDS catalog) is automatically shared
-> **"anyone with the link"** (read-only) after upload — this is what lets the OPDS
-> download links resolve without sign-in. A private file would redirect readers to a
-> Google login page. Only the files this plugin uploads are affected (the `drive.file`
-> scope grants no access to the rest of your Drive).
+> **Sharing:** each published EPUB is automatically shared **"anyone with the link"**
+> (read-only) after upload — this is what lets the download links resolve without
+> sign-in. A private file would redirect readers to a Google login page. Only the
+> files this plugin uploads are affected (the `drive.file` scope grants no access to
+> the rest of your Drive). Re-publishing a file with the same name replaces it in
+> place rather than creating a duplicate.
+>
+> **No OPDS catalog on Drive:** Google serves public files through a virus-scan
+> interstitial / generic content types (HTML), which OPDS reading apps reject for the
+> catalog *feed* document. Drive is fine for publishing and sharing individual books,
+> but use an **S3 or WebDAV** remote if you need an OPDS catalog.
 
 ## Dropbox setup
 

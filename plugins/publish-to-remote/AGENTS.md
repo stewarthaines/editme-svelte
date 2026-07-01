@@ -158,6 +158,13 @@ Run `npm run lint` to check for errors. Run `npm run lint:fix` to auto-fix. Conf
 - File list refresh: calls shared link endpoints for each file (slower for large folders)
 - No batch upload UI (files uploaded one at a time)
 - Google Drive token expires after ~1 hour — user must click "Connect to Google Drive" banner to re-authorize
+- **Google Drive can't host an OPDS catalog (feed).** The catalog editor is intentionally hidden for `google-drive` remotes (S3/WebDAV only) — see below.
+
+### Google Drive: no OPDS catalog (feed)
+
+Google serves public Drive files only through generic/sandboxed responses — a virus-scan interstitial or `text/html`/`application/octet-stream`, never a controllable content type — so an OPDS reader rejects the *catalog feed document* ("Not a valid OPDS HTTP Content-Type … (text/html)"). Individual **book** downloads are fine (a download's content type doesn't matter), so Drive is good for publishing/sharing books, just not for hosting the feed. Verified dead ends: `files.get?alt=media&key=…` → 404; `drive.usercontent.google.com/download?…&confirm=t` → still ends at `text/html`. This is a Google policy wall, not a bug — do not try to "fix" it by tweaking the URL. Use an **S3 or WebDAV** remote for a catalog. The gate lives in `App.svelte` (catalog editor `{#if activeRemote.type !== 'google-drive'}`).
+
+Note `uploadToGoogleDrive` is **update-in-place** (find by name → PATCH, else create), so re-publishing a same-named book replaces it rather than duplicating.
 
 **Nice-to-haves for future sessions:**
 - Add file preview/metadata display in file list
