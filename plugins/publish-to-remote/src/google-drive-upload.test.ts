@@ -30,7 +30,7 @@ afterEach(() => {
 describe('getGoogleDrivePublicUrl', () => {
   it('constructs download URL from fileId', () => {
     expect(getGoogleDrivePublicUrl(config, 'file-abc')).toBe(
-      'https://drive.google.com/uc?id=file-abc&export=download',
+      'https://drive.usercontent.google.com/download?id=file-abc&export=download',
     );
   });
 });
@@ -120,15 +120,13 @@ describe('listGoogleDriveFiles', () => {
 });
 
 describe('uploadToGoogleDrive', () => {
-  it('returns success with URL on 200', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => ({ id: 'new-file-id' }),
-      }),
-    );
+  it('returns success with URL and shares the file publicly on 200', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: 'new-file-id' }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
 
     const result = await uploadToGoogleDrive(
       config,
@@ -137,8 +135,36 @@ describe('uploadToGoogleDrive', () => {
     );
     expect(result.success).toBe(true);
     expect(result.url).toBe(
-      'https://drive.google.com/uc?id=new-file-id&export=download',
+      'https://drive.usercontent.google.com/download?id=new-file-id&export=download',
     );
+
+    // Second call shares the file so its download link resolves without sign-in.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [permUrl, permInit] = fetchMock.mock.calls[1];
+    expect(permUrl).toBe(
+      'https://www.googleapis.com/drive/v3/files/new-file-id/permissions',
+    );
+    expect(permInit.method).toBe('POST');
+    expect(JSON.parse(permInit.body)).toEqual({ role: 'reader', type: 'anyone' });
+  });
+
+  it('fails when the file cannot be shared publicly', async () => {
+    let call = 0;
+    const fetchMock = vi.fn().mockImplementation(async () => {
+      call += 1;
+      return call === 1
+        ? { ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) }
+        : { ok: false, status: 403, statusText: 'Forbidden', text: async () => 'denied' };
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await uploadToGoogleDrive(
+      config,
+      'book.epub',
+      new Blob(['data']),
+    );
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('share publicly');
   });
 
   it('returns GOOGLE_AUTH_REQUIRED when no token', async () => {

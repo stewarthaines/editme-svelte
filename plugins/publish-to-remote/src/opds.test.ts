@@ -369,7 +369,7 @@ describe('generateOpdsFeed', () => {
         .getElementsByTagName('entry')[0]
         .getElementsByTagName('link')[0];
       expect(link.getAttribute('href')).toBe(
-        'https://drive.google.com/uc?id=file-1&export=download',
+        'https://drive.usercontent.google.com/download?id=file-1&export=download',
       );
     });
 

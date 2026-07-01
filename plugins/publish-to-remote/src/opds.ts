@@ -1,5 +1,6 @@
 import { getPublicUrl } from './s3-upload.js';
 import { getWebDAVPublicUrl } from './webdav-upload.js';
+import { getGoogleDrivePublicUrl } from './google-drive-upload.js';
 import type {
   RemoteConfig,
   S3Object,
@@ -41,9 +42,8 @@ export function acquisitionUrl(creds: RemoteConfig, o: S3Object): string {
   if (creds.type === 's3-compatible') {
     return getPublicUrl(creds as S3RemoteConfig, o.key);
   } else if (creds.type === 'google-drive') {
-    return o.fileId
-      ? `https://drive.google.com/uc?id=${o.fileId}&export=download`
-      : '';
+    // Single source of truth for the Drive download URL (see google-drive-upload).
+    return o.fileId ? getGoogleDrivePublicUrl(creds as GoogleDriveRemoteConfig, o.fileId) : '';
   } else if (creds.type === 'dropbox') {
     return o.fileId || '';
   } else if (creds.type === 'webdav') {

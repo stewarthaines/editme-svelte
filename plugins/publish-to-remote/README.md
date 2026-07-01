@@ -22,6 +22,12 @@ can use their own Google/Dropbox credentials rather than the project owner's.
 5. In the plugin: Add Remote → Google Drive → paste the **Client ID** and **API key**, then
    Connect & pick a folder.
 
+> **Sharing:** each published EPUB (and the OPDS catalog) is automatically shared
+> **"anyone with the link"** (read-only) after upload — this is what lets the OPDS
+> download links resolve without sign-in. A private file would redirect readers to a
+> Google login page. Only the files this plugin uploads are affected (the `drive.file`
+> scope grants no access to the rest of your Drive).
+
 ## Dropbox setup
 
 1. Create an app at <https://www.dropbox.com/developers/apps> (Scoped access, Full Dropbox).

@@ -23,6 +23,34 @@ async function getValidToken(config: GoogleDriveRemoteConfig): Promise<string> {
   throw new Error('GOOGLE_AUTH_REQUIRED');
 }
 
+/**
+ * Share an uploaded file "anyone with the link" (reader). Without this the file
+ * stays private and its download URL redirects anonymous readers to a Google
+ * login page — breaking the OPDS acquisition links that reading apps fetch
+ * unauthenticated. The `drive.file` scope already permits sharing app-created
+ * files, so no extra consent is needed. Throws on failure (an unshared file is a
+ * broken publish); the caller's catch surfaces it as an UploadResult error.
+ */
+async function makeGoogleDriveFilePublic(token: string, fileId: string): Promise<void> {
+  const response = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ role: 'reader', type: 'anyone' }),
+    },
+  );
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(
+      `Uploaded, but failed to share publicly: ${response.status} ${response.statusText}\n${error}`,
+    );
+  }
+}
+
 export async function uploadToGoogleDrive(
   config: GoogleDriveRemoteConfig,
   objectKey: string,
@@ -69,6 +97,8 @@ export async function uploadToGoogleDrive(
     }
 
     const result = await response.json();
+    // Share the file publicly so its download link resolves without sign-in.
+    await makeGoogleDriveFilePublic(token, result.id);
     const url = getGoogleDrivePublicUrl(config, result.id);
 
     return { success: true, url };
@@ -185,7 +215,10 @@ export function getGoogleDrivePublicUrl(
   _config: GoogleDriveRemoteConfig,
   fileId: string,
 ): string {
-  return `https://drive.google.com/uc?id=${fileId}&export=download`;
+  // Google's direct-download host — serves the bytes for a public file without the
+  // virus-scan interstitial the legacy `drive.google.com/uc?export=download` shows
+  // for larger files. Only resolves once the file is shared (see makeGoogleDriveFilePublic).
+  return `https://drive.usercontent.google.com/download?id=${fileId}&export=download`;
 }
 
 export async function uploadTextToGoogleDrive(
