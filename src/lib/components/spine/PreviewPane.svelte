@@ -30,7 +30,15 @@
     DEFAULT_PREVIEW,
     previewTypeForDevice,
   } from '$lib/services/settings/settings.service.js';
-  import { ArrowsClockwise, FilePdf, DeviceRotate, X, CircleHalf } from 'phosphor-svelte';
+  import {
+    ArrowsClockwise,
+    FilePdf,
+    DeviceRotate,
+    X,
+    CircleHalf,
+    Code,
+    BookOpenText,
+  } from 'phosphor-svelte';
   import { persisted, asBoolean, asInt, asEnum } from '../../state/persisted.svelte.js';
 
   // Props using Svelte 5 runes syntax
@@ -1200,22 +1208,29 @@
          leaving the device dropdown floated to the right edge of the first row. -->
     <div class="header-main">
       <div class="preview-title">
+        <!-- Source/Preview toggle, left-aligned to mirror the editor pane's toggle.
+             Icon-only: it shows the view you'll switch TO — an open book (rendered
+             preview) while viewing source, </> (generated source) while previewing. -->
+        <button
+          class="view-toggle"
+          class:active={showSource}
+          onclick={toggleSourceView}
+          title={showSource ? $t('Show rendered preview') : $t('Show generated source')}
+          aria-label={showSource ? $t('Show rendered preview') : $t('Show generated source')}
+        >
+          {#if showSource}
+            <BookOpenText size={18} aria-hidden="true" />
+          {:else}
+            <Code size={18} aria-hidden="true" />
+          {/if}
+        </button>
+
         <!-- Rendered content-document filename for the current chapter. -->
         {#if renderedFilename}
           <span class="rendered-filename" title={$t('Rendered chapter file')}>
             {renderedFilename}
           </span>
         {/if}
-
-        <!-- Source/Preview toggle -->
-        <button
-          class="view-toggle"
-          class:active={showSource}
-          onclick={toggleSourceView}
-          title={showSource ? $t('Show rendered preview') : $t('Show generated source')}
-        >
-          {showSource ? $t('Preview') : $t('Source')}
-        </button>
 
         <!-- Transform status: failures stay persistently visible in the header. The
            success (timing) + content-size move to the hover/focus overlay below. -->
@@ -1861,18 +1876,21 @@
     outline-offset: var(--focus-ring-offset);
   }
 
+  /* Match the left pane's .file-selector dropdown sizing + focus treatment. */
   .device-selector {
-    padding: var(--space-1) var(--space-2);
+    padding: var(--space-2);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
+    font-size: var(--text-sm);
     cursor: pointer;
   }
 
   .device-selector:focus {
-    outline: var(--focus-ring-width) var(--focus-ring-style) var(--color-focus);
-    outline-offset: var(--focus-ring-offset);
+    outline: none;
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus);
   }
 
   /* Reader-mode panel (theme + text size + force colours) */
@@ -2036,6 +2054,9 @@
 
   .view-toggle {
     /* Match the left pane's .generator-toggle-btn sizing. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
