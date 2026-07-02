@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28\n"
-"PO-Revision-Date: 2026-06-28\n"
+"POT-Creation-Date: 2026-07-02\n"
+"PO-Revision-Date: 2026-07-02\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -157,6 +157,10 @@ msgstr "Ein Generator ist ein Skript (das generateText(ctx, options) exportiert)
 msgid "A generator with that name already exists."
 msgstr "Ein Generator mit diesem Namen existiert bereits."
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "A markup language for authoring chapters. Adopt one for the current project."
+msgstr "Eine Auszeichnungssprache zum Verfassen von Kapiteln. Für das aktuelle Projekt übernehmen."
+
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "A name is required."
 msgstr "Ein Name ist erforderlich."
@@ -272,6 +276,7 @@ msgid "Accessibility check (axe-core) — re-runs as you edit while open"
 msgstr "Barrierefreiheitsprüfung (axe-core) – wird bei Änderungen erneut ausgeführt, solange geöffnet"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Accessibility features"
 msgstr "Barrierefreiheitsmerkmale"
 
@@ -303,13 +308,13 @@ msgstr "DOM-Transformation hinzufügen…"
 msgid "Add a generator"
 msgstr "Generator hinzufügen"
 
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Add a library and its suggested DOM transform to the current project; then enable the transform under Project Settings."
-msgstr "Fügen Sie dem aktuellen Projekt eine Bibliothek und ihre vorgeschlagene DOM-Transformation hinzu; aktivieren Sie die Transformation anschließend unter den Projekteinstellungen."
-
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Add a sufficient set"
 msgstr "Ausreichenden Satz hinzufügen"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Add a transform and its library to the current project; then enable it under Project Settings."
+msgstr "Fügt dem aktuellen Projekt eine Transformation und ihre Bibliothek hinzu; anschließend in den Projekteinstellungen aktivieren."
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Add Another Contributor"
@@ -388,6 +393,7 @@ msgid "Additional title"
 msgstr "Zusätzlicher Titel"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced"
 msgstr "Erweitert"
 
@@ -497,10 +503,6 @@ msgstr "Automatisch aus dem Ordnernamen ausgefüllt"
 msgid "Auto-filled from URL"
 msgstr "Automatisch aus der URL ausgefüllt"
 
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Available Extensions"
-msgstr "Verfügbare Erweiterungen"
-
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Available when running online"
 msgstr "Verfügbar im Online-Betrieb"
@@ -548,6 +550,11 @@ msgstr "Bucket ist leer"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Bucket Name"
 msgstr "Bucket-Name"
+
+#: src/lib/components/spine/EditorPane.svelte
+#. Dropdown group for build-time transform scripts (not shipped)
+msgid "Build scripts"
+msgstr "Build-Skripte"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
@@ -632,6 +639,10 @@ msgstr "Änderungen"
 msgid "Chapter Content"
 msgstr "Kapitelinhalt"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Chapter content generation"
+msgstr "Erzeugung von Kapitelinhalten"
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Chapter PDF"
 msgstr "Kapitel-PDF"
@@ -659,6 +670,10 @@ msgstr "Geprüft:"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Checking…"
 msgstr "Wird geprüft…"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Checks"
+msgstr "Prüfungen"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Choices"
@@ -712,6 +727,10 @@ msgstr "Lesevorschau schließen"
 msgid "Close validation panel"
 msgstr "Validierungsbereich schließen"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Code block processing"
+msgstr "Verarbeitung von Codeblöcken"
+
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Collection"
@@ -741,6 +760,8 @@ msgstr "Komplex interaktiv"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/components/extensions/ExtensionItem.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Confirm delete?"
 msgstr "Löschen bestätigen?"
 
@@ -788,6 +809,10 @@ msgstr "Inhaltsvorschau"
 msgid "Content preview will appear here based on the current view"
 msgstr "Die Inhaltsvorschau erscheint hier basierend auf der aktuellen Ansicht"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Content transforms"
+msgstr "Inhaltstransformationen"
+
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Content Type"
 msgstr "Inhaltstyp"
@@ -808,7 +833,12 @@ msgstr "Mitwirkende"
 msgid "Control methods"
 msgstr "Steuerungsmethoden"
 
+#: src/lib/components/spine/GeneratorPanel.svelte
+msgid "Copied"
+msgstr "Kopiert"
+
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -850,6 +880,14 @@ msgid "Cover image"
 msgstr "Coverbild"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
+msgid "Cover image generated"
+msgstr "Coverbild erzeugt"
+
+#: src/lib/components/metadata/SimpleMetadataView.svelte
+msgid "Cover image updated"
+msgstr "Coverbild aktualisiert"
+
+#: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Cover text style"
 msgstr "Cover-Textstil"
 
@@ -886,8 +924,8 @@ msgid "Create your first item using the buttons above"
 msgstr "Erstellen Sie Ihr erstes Element über die Schaltflächen oben"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
-msgid "Creates a new cover from the current title and author."
-msgstr "Erstellt ein neues Cover aus dem aktuellen Titel und Autor."
+msgid "Creates a cover with the colour and theme above."
+msgstr "Erstellt ein Coverbild mit der oben gewählten Farbe und dem Thema."
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Creating…"
@@ -907,6 +945,7 @@ msgid "Credential of the certifier"
 msgstr "Qualifikation des Zertifizierers"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
+#: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Current"
 msgstr "Aktuell"
@@ -1414,7 +1453,7 @@ msgstr "Coverbild erzeugen"
 msgid "Generate patchset"
 msgstr "Änderungssatz erzeugen"
 
-#: src/lib/navigation/views/SettingsView.svelte
+#: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Generate PDF"
 msgstr "PDF erstellen"
 
@@ -1431,6 +1470,7 @@ msgstr "Wird erzeugt…"
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
+#. Dropdown group for on-demand content generator scripts
 msgid "Generators"
 msgstr "Generatoren"
 
@@ -1577,7 +1617,7 @@ msgstr "Wird initialisiert..."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Inject the project’s preview/head.xml (edit it via the spine editor’s file menu in Advanced mode) into the preview head, per preview type. Authoring-time only — it is never added to the packaged EPUB."
-msgstr ""
+msgstr "Fügt die preview/head.xml des Projekts (im erweiterten Modus über das Dateimenü des Kapitel-Editors bearbeitbar) je Vorschautyp in den Vorschau-Head ein. Nur zur Bearbeitungszeit – wird nie in das gepackte EPUB aufgenommen."
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Insert at cursor"
@@ -1683,10 +1723,6 @@ msgstr "mehr erfahren"
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Left to Right"
 msgstr "Links nach rechts"
-
-#: src/lib/navigation/views/SettingsView.svelte
-msgid "Libraries"
-msgstr "Bibliotheken"
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/navigation/views/ThirdPartyView.svelte
@@ -1937,6 +1973,10 @@ msgstr "Navigations-Editor"
 msgid "Navigation Preview"
 msgstr "Navigationsvorschau"
 
+#: src/lib/components/metadata/SimpleMetadataView.svelte
+msgid "New"
+msgstr "Neu"
+
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "New here? Open Import from Catalog to browse sample books and see what SEED.html can make."
 msgstr "Neu hier? Öffnen Sie „Aus Katalog importieren“, um Beispielbücher zu durchsuchen und zu sehen, was SEED.html kann."
@@ -1947,6 +1987,8 @@ msgstr "Neues Projekt"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/components/extensions/ExtensionItem.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No"
 msgstr "Nein"
 
@@ -2158,6 +2200,7 @@ msgid "Orientation:"
 msgstr "Ausrichtung:"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "Other"
 msgstr "Sonstige"
 
@@ -2185,9 +2228,17 @@ msgstr "Packen Sie ein Projekt, um es hier zu sehen."
 msgid "Package EPUB"
 msgstr "EPUB packen"
 
+#: src/lib/navigation/views/WorkspaceView.svelte
+msgid "Package EPUB without SEED"
+msgstr "EPUB ohne SEED verpacken"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Packaged Filename"
 msgstr "Dateiname des gepackten EPUBs"
+
+#: src/lib/navigation/views/WorkspaceView.svelte
+msgid "Packaging…"
+msgstr "Wird verpackt…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Page margins for the exported PDF."
@@ -2306,7 +2357,7 @@ msgstr "Position"
 msgid "Pre-paginated"
 msgstr "Vorpaginiert"
 
-#: src/lib/navigation/views/SettingsView.svelte
+#: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Preparing…"
 msgstr "Wird vorbereitet…"
 
@@ -2314,8 +2365,9 @@ msgstr "Wird vorbereitet…"
 msgid "Preset"
 msgstr "Voreinstellung"
 
-#: src/lib/components/spine/PreviewPane.svelte
+#: src/lib/components/spine/EditorPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
+#. Dropdown group for the preview-only head fragment
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -2330,10 +2382,6 @@ msgstr "Vorschau veraltet"
 #: src/App.svelte
 msgid "Preview Pane"
 msgstr "Vorschaubereich"
-
-#: src/lib/navigation/views/SpineView.svelte
-msgid "Preview: head.xml"
-msgstr "Vorschau: head.xml"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. The paginated print-page preview option
@@ -2385,7 +2433,7 @@ msgstr "Verlag"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand."
-msgstr ""
+msgstr "Rendert die Vorschau beim Bearbeiten live neu. Wenn deaktiviert, zeigt die Vorschau eine Schaltfläche „Aktualisieren“ zum manuellen Aktualisieren an."
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"
@@ -2418,6 +2466,11 @@ msgstr "Lesevorschau (Design und Schriftgröße)"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reading preview settings"
 msgstr "Einstellungen für die Lesevorschau"
+
+#: src/lib/components/spine/EditorPane.svelte
+#. Dropdown group for CSS/JS files loaded by the e-reader
+msgid "Reading System"
+msgstr "Lesesystem"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Redirect URI"
@@ -2490,6 +2543,10 @@ msgstr "Den ausgewählten Feed aus der Liste entfernen"
 msgid "Removed {name}"
 msgstr "{name} entfernt"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Rendered chapter file"
+msgstr "Gerenderte Kapiteldatei"
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Rendition Properties"
 msgstr "Rendition-Eigenschaften"
@@ -2514,6 +2571,10 @@ msgstr "Anfragen laufen über den /dav-Endpunkt dieser App; Ihre WebDAV-Anmelded
 #: src/lib/components/metadata/fields/TextareaMetadataField.svelte
 msgid "Required field"
 msgstr "Pflichtfeld"
+
+#: src/lib/components/metadata/SimpleMetadataView.svelte
+msgid "Reset"
+msgstr "Zurücksetzen"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Reset Demo"
@@ -2567,6 +2628,10 @@ msgstr "Rechte"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Route uploads through the app proxy (for servers without CORS)"
 msgstr "Uploads über den App-Proxy leiten (für Server ohne CORS)"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Running header"
+msgstr "Kolumnentitel"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "S3-Compatible"
@@ -2704,10 +2769,6 @@ msgstr "Datei für Bereich 1 auswählen"
 msgid "Select file for pane 2"
 msgstr "Datei für Bereich 2 auswählen"
 
-#: src/lib/components/spine/EditorPane.svelte
-msgid "Select file..."
-msgstr "Datei auswählen..."
-
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Select navigation file"
 msgstr "Navigationsdatei auswählen"
@@ -2769,6 +2830,10 @@ msgstr "Generierten Quelltext anzeigen"
 msgid "Show Generators"
 msgstr "Generatoren anzeigen"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Show panel"
+msgstr "Bereich anzeigen"
+
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"
 msgstr "Projektbereiche anzeigen"
@@ -2776,6 +2841,10 @@ msgstr "Projektbereiche anzeigen"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show rendered preview"
 msgstr "Gerenderte Vorschau anzeigen"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Show the chapter title at the top of each page."
+msgstr "Den Kapiteltitel oben auf jeder Seite anzeigen."
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Show the full license text"
@@ -2820,7 +2889,6 @@ msgid "Sort by size"
 msgstr "Nach Größe sortieren"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
-#: src/lib/components/spine/PreviewPane.svelte
 msgid "Source"
 msgstr "Source"
 
@@ -2927,10 +2995,6 @@ msgstr "Begriff (z. B. FIC028000)"
 msgid "Text"
 msgstr "Text"
 
-#: src/lib/navigation/views/SpineView.svelte
-msgid "Text Content"
-msgstr "Textinhalt"
-
 #: src/lib/components/import/InlineTextDiff.svelte
 msgid "Text differences"
 msgstr "Textunterschiede"
@@ -2985,6 +3049,7 @@ msgid "This EPUB wasn't created in the Simple EPUB Editor — its navigation is 
 msgstr "Dieses EPUB wurde nicht im Simple EPUB Editor erstellt — seine Navigation wird nur zur Ansicht angezeigt."
 
 #: src/App.svelte
+#: src/lib/navigation/views/WorkspaceView.svelte
 msgid "This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged."
 msgstr "Dieses EPUB wurde nicht im Simple EPUB Editor erstellt und kann daher nicht neu gepackt werden."
 
@@ -3090,6 +3155,10 @@ msgstr "Das Ausschalten der Änderungsverfolgung löscht die gespeicherte Basisv
 msgid "Type"
 msgstr "Typ"
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Typesetting"
+msgstr "Schriftsatz"
+
 #: src/lib/components/EditSpineItemDialog.svelte
 msgid "Uncheck to keep the item in the book but outside the default reading order."
 msgstr "Deaktivieren, um das Element im Buch zu behalten, aber außerhalb der standardmäßigen Lesereihenfolge."
@@ -3117,8 +3186,8 @@ msgid "Update cover image"
 msgstr "Coverbild aktualisieren"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
-msgid "Updates the cover from the current title and author."
-msgstr "Aktualisiert das Cover anhand des aktuellen Titels und Autors."
+msgid "Updates the cover with the colour and theme above."
+msgstr "Aktualisiert das Coverbild mit der oben gewählten Farbe und dem Thema."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Updating..."
@@ -3282,6 +3351,8 @@ msgstr "XHTML-Vorschau"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
+#: src/lib/components/extensions/ExtensionItem.svelte
+#: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Yes"
 msgstr "Ja"
 
@@ -3303,4 +3374,4 @@ msgstr "Ihr Browser unterstützt das Videoelement nicht."
 
 #: src/lib/services/spine/spine.service.ts
 msgid "Your chapter content goes here..."
-msgstr ""
+msgstr "Hier steht Ihr Kapitelinhalt …"
