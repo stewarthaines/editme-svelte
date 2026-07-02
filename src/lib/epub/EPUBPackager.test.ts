@@ -181,6 +181,48 @@ describe('EPUBPackager', () => {
       expect(progressCallback).toHaveBeenCalledWith(expect.objectContaining({ phase: 'writing' }));
       expect(progressCallback).toHaveBeenCalledWith(expect.objectContaining({ phase: 'complete' }));
     });
+
+    it('bundles the SEED.zip source archive by default when SOURCE/ files exist', async () => {
+      mockStorage.listFiles.mockResolvedValue([
+        ...mockValidFiles.map(f => f.path),
+        'SOURCE/settings.json',
+      ]);
+      const sourceSpy = vi
+        .spyOn((packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } }).sourceManager, 'createSourceZip')
+        .mockResolvedValue(new Blob(['source-zip'], { type: 'application/zip' }));
+
+      const result = await packager.packageEPUB(mockWorkspaceId);
+
+      expect(result.success).toBe(true);
+      expect(sourceSpy).toHaveBeenCalledWith(mockWorkspaceId);
+    });
+
+    it('omits the SEED.zip source archive when includeSource is false', async () => {
+      mockStorage.listFiles.mockResolvedValue([
+        ...mockValidFiles.map(f => f.path),
+        'SOURCE/settings.json',
+      ]);
+      const sourceSpy = vi
+        .spyOn((packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } }).sourceManager, 'createSourceZip')
+        .mockResolvedValue(new Blob(['source-zip'], { type: 'application/zip' }));
+
+      const result = await packager.packageEPUB(mockWorkspaceId, { includeSource: false });
+
+      expect(result.success).toBe(true);
+      expect(sourceSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not persist to the publish dir when persistToPublish is false', async () => {
+      const result = await packager.packageEPUB(mockWorkspaceId, { persistToPublish: false });
+
+      expect(result.success).toBe(true);
+      expect(result.blob).toBeInstanceOf(Blob);
+      expect(mockStorage.writeFile).not.toHaveBeenCalledWith(
+        'publish',
+        expect.anything(),
+        expect.anything()
+      );
+    });
   });
 
   describe('optimizeCompression', () => {

@@ -46,6 +46,12 @@ export interface PackageOptions {
   includeEditmeFiles?: boolean;
   /** Embed the editor build (SEED.html) at the EPUB root as a non-manifest payload. */
   includeSeedHtml?: boolean;
+  /** Bundle the SOURCE/ tree as the editor-source archive (SEED.zip). Default true;
+   * set false for a plain, non-self-editing "destination" EPUB. */
+  includeSource?: boolean;
+  /** Persist the packaged blob to the shared publish output dir (for the Publish
+   * view). Default true; set false for a throwaway direct-download export. */
+  persistToPublish?: boolean;
   validateStructure?: boolean;
   progressCallback?: (progress: PackageProgress) => void;
 }
@@ -128,8 +134,11 @@ export class EPUBPackager {
       const filename = this.generateFilename(metadata, template);
 
       // Persist the packaged epub to the shared publish output directory so the
-      // Publish view (and the publish plugin) can list and act on it.
-      await this.fileStorage.writeFile(PUBLISH_WORKSPACE_ID, filename, await blob.arrayBuffer());
+      // Publish view (and the publish plugin) can list and act on it. Skipped for a
+      // throwaway direct-download export (persistToPublish: false).
+      if (options.persistToPublish !== false) {
+        await this.fileStorage.writeFile(PUBLISH_WORKSPACE_ID, filename, await blob.arrayBuffer());
+      }
 
       options.progressCallback?.({
         phase: 'complete',
@@ -190,7 +199,8 @@ export class EPUBPackager {
 
     // Bundle the SOURCE/ files into the editor-source archive (SEED.zip) if any
     // exist. The archive holds the SOURCE/ tree; only its filename is SEED.zip.
-    if (sourceFiles.length > 0) {
+    // Skipped for a plain "without SEED" export (includeSource: false).
+    if (options.includeSource !== false && sourceFiles.length > 0) {
       try {
         const sourceZip = await this.sourceManager.createSourceZip(workspaceId);
         if (sourceZip) {
