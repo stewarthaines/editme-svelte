@@ -2757,10 +2757,6 @@ msgstr "Audiodatei auswählen"
 msgid "Select audio..."
 msgstr "Audio auswählen..."
 
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Select device preset"
-msgstr "Gerätevoreinstellung auswählen"
-
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 1"
 msgstr "Datei für Bereich 1 auswählen"
@@ -2776,6 +2772,10 @@ msgstr "Navigationsdatei auswählen"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Select This Folder"
 msgstr "Diesen Ordner auswählen"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Select view"
+msgstr "Ansicht wählen"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Selected folder: {name}"
@@ -2822,10 +2822,6 @@ msgstr "Eine Seitenzahl am unteren Rand jeder Seite anzeigen."
 msgid "Show Audio Clip Editor"
 msgstr "Audioclip-Editor anzeigen"
 
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Show generated source"
-msgstr "Generierten Quelltext anzeigen"
-
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Show Generators"
 msgstr "Generatoren anzeigen"
@@ -2837,10 +2833,6 @@ msgstr "Bereich anzeigen"
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"
 msgstr "Projektbereiche anzeigen"
-
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Show rendered preview"
-msgstr "Gerenderte Vorschau anzeigen"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Show the chapter title at the top of each page."
@@ -2889,8 +2881,9 @@ msgid "Sort by size"
 msgstr "Nach Größe sortieren"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
+#: src/lib/components/spine/PreviewPane.svelte
 msgid "Source"
-msgstr "Source"
+msgstr "Quelltext"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Source on GitHub"

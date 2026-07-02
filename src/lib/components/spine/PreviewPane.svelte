@@ -36,8 +36,6 @@
     DeviceRotate,
     X,
     CircleHalf,
-    Code,
-    BookOpenText,
   } from 'phosphor-svelte';
   import { persisted, asBoolean, asInt, asEnum } from '../../state/persisted.svelte.js';
 
@@ -448,6 +446,10 @@
 
     return groups;
   });
+
+  // The responsive (fill) preset(s), rendered ungrouped at the top of the view
+  // dropdown alongside Source rather than under a category header.
+  const responsiveDevices = $derived(DEVICE_PRESETS.filter(d => d.category === 'responsive'));
 
   // Reader-mode preview state (theme + font size + force-colours). View-only — never
   // written to the generated/exported XHTML; persisted app-wide like the device.
@@ -980,16 +982,19 @@
   /**
    * Toggle source view
    */
-  function toggleSourceView(): void {
-    showSource = !showSource;
-
-    if (!showSource) {
-      setTimeout(() => {
-        // Re-render for the active device (paginated when Print is selected) and
-        // re-apply device dimensions/scaling after returning from the source view.
-        renderNow();
-        handleDeviceChange(selectedDevice.current);
-      }, 0);
+  // Pick either the generated-source view or a device preset from the single view
+  // dropdown. Switching away from source re-renders the preview and re-applies the
+  // chosen device's dimensions/scaling.
+  function handleViewSelect(value: string): void {
+    if (value === 'source') {
+      showSource = true;
+      return;
+    }
+    const wasSource = showSource;
+    showSource = false;
+    handleDeviceChange(value);
+    if (wasSource) {
+      setTimeout(() => renderNow(), 0);
     }
   }
 
@@ -1242,23 +1247,6 @@
          leaving the device dropdown floated to the right edge of the first row. -->
     <div class="header-main">
       <div class="preview-title">
-        <!-- Source/Preview toggle, left-aligned to mirror the editor pane's toggle.
-             Icon-only: it shows the view you'll switch TO — an open book (rendered
-             preview) while viewing source, </> (generated source) while previewing. -->
-        <button
-          class="view-toggle"
-          class:active={showSource}
-          onclick={toggleSourceView}
-          title={showSource ? $t('Show rendered preview') : $t('Show generated source')}
-          aria-label={showSource ? $t('Show rendered preview') : $t('Show generated source')}
-        >
-          {#if showSource}
-            <BookOpenText size={18} aria-hidden="true" />
-          {:else}
-            <Code size={18} aria-hidden="true" />
-          {/if}
-        </button>
-
         <!-- Rendered content-document filename for the current chapter. -->
         {#if renderedFilename}
           <span class="rendered-filename" title={$t('Rendered chapter file')}>
@@ -1304,22 +1292,30 @@
           </button>
         {/if}
 
-        <!-- Device selector -->
-        <!-- i18n: Accessibility label for device size dropdown menu -->
+        <!-- View selector: the generated Source view + the device presets. Source and
+             the responsive (fill) preset sit ungrouped at the top; the sized device
+             presets follow under their category groups. -->
+        <!-- i18n: Accessibility label for the view / device dropdown menu -->
         <select
           class="device-selector"
-          bind:value={selectedDevice.current}
-          onchange={e => handleDeviceChange((e.target as HTMLSelectElement).value)}
-          aria-label={$t('Select device preset')}
+          value={showSource ? 'source' : selectedDevice.current}
+          onchange={e => handleViewSelect((e.target as HTMLSelectElement).value)}
+          aria-label={$t('Select view')}
         >
+          <option value="source">{$t('Source')}</option>
+          {#each responsiveDevices as device}
+            <option value={device.id}>{$t('Responsive')}</option>
+          {/each}
           {#each Object.entries(groupedDevices) as [category, devices]}
-            <optgroup label={getCategoryLabel(category)}>
-              {#each devices as device}
-                <option value={device.id}>
-                  {device.id === 'print' ? printDeviceLabel : getDeviceLabel(device)}
-                </option>
-              {/each}
-            </optgroup>
+            {#if category !== 'responsive'}
+              <optgroup label={getCategoryLabel(category)}>
+                {#each devices as device}
+                  <option value={device.id}>
+                    {device.id === 'print' ? printDeviceLabel : getDeviceLabel(device)}
+                  </option>
+                {/each}
+              </optgroup>
+            {/if}
           {/each}
         </select>
 
@@ -2105,32 +2101,7 @@
     color: var(--color-success-text, var(--color-text-secondary));
   }
 
-  .view-toggle {
-    /* Match the left pane's .generator-toggle-btn sizing. */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
-    background: var(--color-bg-secondary);
-    cursor: pointer;
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-  }
-
-  .view-toggle:hover {
-    color: var(--color-on-accent);
-    background: var(--color-hover-accent);
-  }
-
-  .view-toggle.active {
-    background: var(--color-accent-primary);
-    color: var(--color-accent-contrast);
-    border-color: var(--color-accent-primary);
-  }
-
-  /* Generated file size shown beside the Source/Preview toggle in the header. */
+  /* Generated file size shown beside the view dropdown in the header. */
   .content-size {
     font-size: var(--text-xs);
     font-weight: var(--font-normal);
@@ -2317,10 +2288,6 @@
   @media (prefers-reduced-motion: reduce) {
     .status-spinner {
       animation: none;
-    }
-
-    .view-toggle {
-      transition: none;
     }
 
     .preview-stats {

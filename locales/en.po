@@ -2757,10 +2757,6 @@ msgstr ""
 msgid "Select audio..."
 msgstr ""
 
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Select device preset"
-msgstr ""
-
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 1"
 msgstr ""
@@ -2775,6 +2771,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Select This Folder"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Select view"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -2822,10 +2822,6 @@ msgstr ""
 msgid "Show Audio Clip Editor"
 msgstr ""
 
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Show generated source"
-msgstr ""
-
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Show Generators"
 msgstr ""
@@ -2836,10 +2832,6 @@ msgstr ""
 
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"
-msgstr ""
-
-#: src/lib/components/spine/PreviewPane.svelte
-msgid "Show rendered preview"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
@@ -2889,6 +2881,7 @@ msgid "Sort by size"
 msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
+#: src/lib/components/spine/PreviewPane.svelte
 msgid "Source"
 msgstr ""
 
