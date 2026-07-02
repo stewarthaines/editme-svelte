@@ -992,9 +992,15 @@
     }
     const wasSource = showSource;
     showSource = false;
-    handleDeviceChange(value);
     if (wasSource) {
-      setTimeout(() => renderNow(), 0);
+      // Leaving the source view: re-render, then re-apply the chosen device's
+      // dimensions/scaling once the preview iframe is back in the DOM.
+      setTimeout(() => {
+        renderNow();
+        handleDeviceChange(value);
+      }, 0);
+    } else {
+      handleDeviceChange(value);
     }
   }
 
