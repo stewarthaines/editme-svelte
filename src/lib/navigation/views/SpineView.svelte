@@ -466,11 +466,10 @@
           seen.add(transformPath);
           const ext = extensionOf(transformPath);
           const name = basename(transformPath).replace(/\.js$/, '');
-          const file = basename(transformPath);
           files.push({
             value: `transform-${ext ? `${name}-${ext}` : name}`,
-            // Filename with extension; extension-owned transforms note their owner.
-            label: ext ? `${file} (${ext})` : file,
+            // The JS source filename identifies it; no owning-extension suffix.
+            label: basename(transformPath),
             path: transformPath,
             href: transformPath, // transform files don't have manifest hrefs
             type: 'transform',
