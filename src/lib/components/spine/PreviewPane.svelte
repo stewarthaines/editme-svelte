@@ -1672,12 +1672,14 @@
 
   /* Accessibility check button (spike) */
   .a11y-check {
-    padding: var(--space-1) var(--space-2);
+    /* Match the left pane's .generator-toggle-btn sizing. */
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: var(--color-bg-secondary);
     color: var(--color-text-primary);
     font-size: var(--text-sm);
+    font-weight: var(--font-medium);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -2033,12 +2035,14 @@
   }
 
   .view-toggle {
-    padding: var(--space-1) var(--space-3);
+    /* Match the left pane's .generator-toggle-btn sizing. */
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: var(--color-bg-secondary);
     cursor: pointer;
     font-size: var(--text-sm);
+    font-weight: var(--font-medium);
   }
 
   .view-toggle:hover {
