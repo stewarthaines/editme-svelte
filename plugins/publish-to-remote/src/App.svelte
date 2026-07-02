@@ -856,6 +856,7 @@
                   {activeFilenames}
                   {selectedKeys}
                   {onToggleSelect}
+                  selectable={activeRemote?.type !== 'google-drive'}
                   {googleAuthRequired}
                   {onCopyUrl}
                   onLoadCatalog={catalogReadable ? onLoadCatalog : undefined}

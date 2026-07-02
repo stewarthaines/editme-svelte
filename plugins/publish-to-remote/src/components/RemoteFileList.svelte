@@ -10,6 +10,7 @@
     activeFilenames,
     selectedKeys,
     onToggleSelect,
+    selectable = true,
     googleAuthRequired,
     onCopyUrl,
     onDelete,
@@ -22,6 +23,9 @@
     activeFilenames: Set<string>;
     selectedKeys: Set<string>;
     onToggleSelect: (key: string, checked: boolean) => void;
+    /** Show the per-epub "include in catalog" checkbox column. Off for remotes
+     * without catalog support (e.g. Google Drive), where selection is moot. */
+    selectable?: boolean;
     googleAuthRequired: boolean;
     onCopyUrl: (key: string, fileId?: string) => void;
     onDelete: (key: string) => void;
@@ -69,17 +73,19 @@
     class:current={activeFilenames.has(obj.key) || obj.key === loadedCatalogKey}
     class:loadable={isLoadable(obj.key)}
   >
-    {#if isEpub(obj.key)}
-      <input
-        type="checkbox"
-        class="remote-check"
-        checked={selectedKeys.has(obj.key)}
-        onchange={(e) => onToggleSelect(obj.key, e.currentTarget.checked)}
-        title={$t('Include in catalog')}
-        aria-label={$t('Include in catalog')}
-      />
-    {:else}
-      <span class="remote-check-spacer" aria-hidden="true"></span>
+    {#if selectable}
+      {#if isEpub(obj.key)}
+        <input
+          type="checkbox"
+          class="remote-check"
+          checked={selectedKeys.has(obj.key)}
+          onchange={(e) => onToggleSelect(obj.key, e.currentTarget.checked)}
+          title={$t('Include in catalog')}
+          aria-label={$t('Include in catalog')}
+        />
+      {:else}
+        <span class="remote-check-spacer" aria-hidden="true"></span>
+      {/if}
     {/if}
     {#if thumbnailUrls.get(obj.key)}
       <img
