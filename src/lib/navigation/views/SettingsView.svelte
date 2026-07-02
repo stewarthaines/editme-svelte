@@ -75,11 +75,6 @@
     onSettingsChanged?: () => void;
     /** Apply accepted track-changes patchset items to the current project. */
     onApplyPatchset?: (resolved: ResolvedChange[]) => Promise<void>;
-    /** Generate a PDF of the whole book. Omitted when PDF export isn't available
-        (e.g. the offline file:// build); the PDF section's button hides then. */
-    onGeneratePdf?: () => void;
-    /** True while a PDF is being prepared, to disable the button + show progress. */
-    pdfGenerating?: boolean;
   }
 
   const {
@@ -97,8 +92,6 @@
     hasProjects = false,
     onSettingsChanged,
     onApplyPatchset,
-    onGeneratePdf,
-    pdfGenerating = false,
   }: Props = $props();
 
   // State management
@@ -1042,17 +1035,6 @@
                       {$t("Start the PDF with the project's cover image as a full-page cover.")}
                     </p>
                   </div>
-
-                  {#if onGeneratePdf}
-                    <button
-                      type="button"
-                      class="generate-pdf-button"
-                      onclick={onGeneratePdf}
-                      disabled={pdfGenerating || readOnly}
-                    >
-                      {pdfGenerating ? $t('Preparing…') : $t('Generate PDF')}
-                    </button>
-                  {/if}
                 </SettingsSection>
               {/if}
 
@@ -1437,36 +1419,6 @@
 
   .setting-group {
     margin-bottom: 1rem;
-  }
-
-  /* The PDF section's action: an azure outline button that fills azure with white
-     text on hover/focus (the app's interactive convention). */
-  .generate-pdf-button {
-    display: block;
-    width: 100%;
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--color-accent);
-    background: transparent;
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition:
-      background-color var(--duration-fast) ease,
-      color var(--duration-fast) ease;
-  }
-
-  .generate-pdf-button:hover:not(:disabled),
-  .generate-pdf-button:focus-visible {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
-    outline: none;
-  }
-
-  .generate-pdf-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   .setting-label {

@@ -864,7 +864,10 @@
     }
   };
 
-  const handlePackageRequest = async (workspaceId: string) => {
+  const handlePackageRequest = async (
+    workspaceId: string,
+    opts?: { includeSource?: boolean; download?: boolean }
+  ) => {
     if (!currentWorkspaceState || isReadOnly) return;
 
     try {
@@ -887,14 +890,28 @@
         appState.workspace = navWorkspace;
       }
 
+      // A plain "without SEED" export drops the editor payloads and is delivered as a
+      // throwaway direct download (never persisted to / listed in the Publish view).
+      const plain = opts?.includeSource === false;
+      const download = opts?.download === true;
+
       // Then package the EPUB, embedding the editor (SEED.html) when the project
-      // opted in (Project Settings → "Add SEED.html to package").
+      // opted in (Project Settings → "Add SEED.html to package"). A plain export
+      // forces both editor payloads off.
       const epubSettings = await appState?.getSettingsService().loadEPUBSettings(workspaceId);
       const result = await epubPackager.packageEPUB(workspaceId, {
-        includeSeedHtml: epubSettings?.include_seed_html_in_package ?? false,
+        includeSeedHtml: plain ? false : (epubSettings?.include_seed_html_in_package ?? false),
+        includeSource: opts?.includeSource,
+        persistToPublish: download ? false : undefined,
       });
 
       if (result.success && result.blob && result.filename) {
+        if (download) {
+          // Destination-format export: hand the file straight to the browser.
+          epubPackager.downloadEPUB(result.blob, result.filename);
+          return;
+        }
+
         // Write a publish sidecar (metadata JSON + cover thumbnail) next to the
         // packaged epub so the publish plugin can build rich OPDS entries.
         // Best-effort: never let a sidecar failure break packaging.
@@ -918,6 +935,23 @@
     } catch (error) {
       console.error('Failed to package EPUB:', error);
       throw error; // Re-throw so SpineSidebar can handle UI feedback
+    }
+  };
+
+  // Plain "destination format" EPUB: no SEED.zip / SEED.html, downloaded directly.
+  let plainEpubExporting = $state(false);
+  const handleExportPlainEpub = async () => {
+    if (!currentWorkspaceState || plainEpubExporting) return;
+    plainEpubExporting = true;
+    try {
+      await handlePackageRequest(currentWorkspaceState.id, { includeSource: false, download: true });
+    } catch (error) {
+      console.error('Plain EPUB export failed:', error);
+      if (appState) {
+        appState.errorMessage = `EPUB export failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    } finally {
+      plainEpubExporting = false;
     }
   };
 
@@ -1157,6 +1191,11 @@
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
           advancedMode={advancedMode.current}
+          isReadOnly={isReadOnly}
+          onGeneratePdf={canGeneratePdf ? handleGeneratePdf : undefined}
+          {pdfGenerating}
+          onPackageWithoutSeed={handleExportPlainEpub}
+          packaging={plainEpubExporting}
           onWorkspaceOpened={() => {
             // Workspace opened
           }}
@@ -1251,8 +1290,6 @@
           {availableExtensions}
           readOnly={isReadOnly}
           {hasProjects}
-          onGeneratePdf={canGeneratePdf ? handleGeneratePdf : undefined}
-          {pdfGenerating}
           onExtensionAssets={handleExtensionAssets}
           onTogglePlugin={(id, enabled) => {
             appState?.getSettingsService().setPluginEnabled(id, enabled);

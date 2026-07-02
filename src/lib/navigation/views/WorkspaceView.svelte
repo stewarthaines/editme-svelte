@@ -31,6 +31,11 @@
     onWorkspaceChanged,
     currentWorkspaceId = null,
     advancedMode = false,
+    isReadOnly = false,
+    onGeneratePdf,
+    pdfGenerating = false,
+    onPackageWithoutSeed,
+    packaging = false,
   }: {
     onListWorkspaces: () => Promise<WorkspaceInfo[]>;
     /** Open the (app-owned) new-project dialog. */
@@ -46,6 +51,15 @@
     currentWorkspaceId?: string | null;
     /** Advanced mode unlocks typing an arbitrary catalog URL in the import dialog. */
     advancedMode?: boolean;
+    /** The active project is a read-only (imported) book — export actions disabled. */
+    isReadOnly?: boolean;
+    /** Export the active project to PDF. Omitted when PDF export isn't available
+        (offline file:// build); the button hides then. */
+    onGeneratePdf?: () => void;
+    pdfGenerating?: boolean;
+    /** Export the active project as a plain EPUB (no SEED.zip/SEED.html). */
+    onPackageWithoutSeed?: () => void;
+    packaging?: boolean;
   } = $props();
 
   // Component state using $state()
@@ -425,6 +439,34 @@
                   {#if currentInfo.description}
                     <p class="book-description">{currentInfo.description}</p>
                   {/if}
+
+                  {#if onGeneratePdf || onPackageWithoutSeed}
+                    <div class="book-actions">
+                      {#if onGeneratePdf}
+                        <button
+                          type="button"
+                          class="export-button"
+                          onclick={onGeneratePdf}
+                          disabled={pdfGenerating || isReadOnly}
+                        >
+                          {pdfGenerating ? $t('Preparing…') : $t('Generate PDF')}
+                        </button>
+                      {/if}
+                      {#if onPackageWithoutSeed}
+                        <button
+                          type="button"
+                          class="export-button"
+                          onclick={onPackageWithoutSeed}
+                          disabled={packaging || isReadOnly}
+                          title={isReadOnly
+                            ? $t("This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged.")
+                            : undefined}
+                        >
+                          {packaging ? $t('Packaging…') : $t('Package EPUB without SEED')}
+                        </button>
+                      {/if}
+                    </div>
+                  {/if}
                 </div>
               </section>
             {/if}
@@ -609,6 +651,44 @@
     color: var(--color-text-secondary);
     line-height: var(--leading-relaxed);
     white-space: pre-wrap;
+  }
+
+  /* Destination-format exports (PDF, plain EPUB) for the active project. */
+  .book-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  /* Azure outline that fills on hover/focus — the app's export CTA convention
+     (ported from the former Generate PDF button in Project Settings). */
+  .export-button {
+    display: block;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) ease,
+      color var(--duration-fast) ease;
+  }
+
+  .export-button:hover:not(:disabled),
+  .export-button:focus-visible {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    outline: none;
+  }
+
+  .export-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* Mobile adjustments */
