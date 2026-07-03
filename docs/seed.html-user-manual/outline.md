@@ -13,9 +13,9 @@ Conventions: no hard-wrapping — one line per paragraph (list items stay one li
 
 - Start a project (Basic Mode)
   - Create a new project
-  - Import from a file
   - Import from a catalog
   - Duplicate a project
+  - Import from a file
   - Find and manage projects (search, switch, delete)
 - Write and edit chapters
   - The chapter editor
