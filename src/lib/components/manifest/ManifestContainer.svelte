@@ -366,6 +366,7 @@
     const byKey = new Map(decisions.map(d => [d.key, d.resolution]));
     try {
       for (const p of pendingManifestImport) {
+        if (byKey.get(p.stagedPath) === 'skip') continue;
         const bytes = await readStagedBytes(p.stagedPath);
         if (byKey.get(p.stagedPath) === 'keep-both') {
           await addManifestFromBytes(p.originalName, p.mediaType, bytes);

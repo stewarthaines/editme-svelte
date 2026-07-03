@@ -3,15 +3,15 @@
  *
  * When an imported file would collide with an existing chapter or manifest item,
  * the import is paused and the user reviews the incoming content against the
- * current content, then chooses — per file — to overwrite the existing item or
- * keep both (import as a new, suffixed item).
+ * current content, then chooses — per file — to overwrite the existing item,
+ * keep both (import as a new, suffixed item), or skip the file entirely.
  */
 
 /** Which import surface a colliding file came from. */
 export type ImportKind = 'chapter' | 'manifest';
 
 /** Per-file decision in the review dialog. */
-export type ImportResolution = 'overwrite' | 'keep-both';
+export type ImportResolution = 'overwrite' | 'keep-both' | 'skip';
 
 /**
  * What the review dialog renders on the right for the selected file.

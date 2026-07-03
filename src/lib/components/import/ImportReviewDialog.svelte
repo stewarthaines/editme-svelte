@@ -119,7 +119,11 @@
             >
               <span class="import-list-name">{item.title}</span>
               <span class="import-list-badge import-badge-{decisions[item.key]}">
-                {decisions[item.key] === 'overwrite' ? $t('Overwrite') : $t('Keep both')}
+                {decisions[item.key] === 'overwrite'
+                  ? $t('Overwrite')
+                  : decisions[item.key] === 'keep-both'
+                    ? $t('Keep both')
+                    : $t('Ignore')}
               </span>
             </button>
           </li>
@@ -152,6 +156,16 @@
                 disabled={saving}
               />
               <span>{$t('Keep both (import as a new item)')}</span>
+            </label>
+            <label class="import-radio">
+              <input
+                type="radio"
+                name="resolution-{selected.key}"
+                checked={decisions[selected.key] === 'skip'}
+                onchange={() => setResolution(selected.key, 'skip')}
+                disabled={saving}
+              />
+              <span>{$t("Ignore changes (don't import)")}</span>
             </label>
           </fieldset>
 

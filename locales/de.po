@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-02\n"
-"PO-Revision-Date: 2026-07-02\n"
+"POT-Creation-Date: 2026-07-03\n"
+"PO-Revision-Date: 2026-07-03\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -1536,6 +1536,14 @@ msgstr "Kennung"
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Identifier type"
 msgstr "Kennungstyp"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Ignore"
+msgstr "Ignorieren"
+
+#: src/lib/components/import/ImportReviewDialog.svelte
+msgid "Ignore changes (don't import)"
+msgstr "Änderungen ignorieren (nicht importieren)"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Import"

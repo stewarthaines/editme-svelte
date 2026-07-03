@@ -286,6 +286,7 @@
     const overwrittenPaths: string[] = [];
     try {
       for (const candidate of pendingImport) {
+        if (byKey.get(candidate.stagedPath) === 'skip') continue;
         const text = await readStagedText(candidate.stagedPath);
         if (byKey.get(candidate.stagedPath) === 'keep-both') {
           const result = await spineService.addChapter(workspace, {
