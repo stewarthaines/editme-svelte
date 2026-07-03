@@ -74,6 +74,15 @@ The plugin layer isn't user-extensible, so this is not a general "plugins" chapt
 - Surfacing invisible XHTML (the `xml:lang` review-aid example)
 - Per-preview-type toggle under Project Settings → Preview
 
+## Reference  (drafted)
+
+The lookup half of the book — the narrative chapters point here. Absorbed the retired `docs/advanced/` pages (`transform-context-api.md`, `generators.md`); this chapter is now the canonical home for signatures and schemas.
+
+- Transform entry points (`transformText` / `transformDOM` / `generateText`; the async rule)
+- The transform context: scoping, data fields, `ManifestItem`, methods with return types, performance notes
+- Generator declarations and the `GeneratorOption` schema (types, defaults, the select pitfall)
+- Recipes (inline SVG, data URLs, shared glossary, persisted data, manifest walks)
+
 ## Coming later
 
 - (parked topics as they surface)

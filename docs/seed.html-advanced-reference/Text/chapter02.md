@@ -88,3 +88,5 @@ The active transforms are chosen per project in _Project Settings → EPUB Setti
 Build-time scripts don't run in the page. SEED.html executes them in an isolated iframe with a deliberately small set of globals: `console`, `JSON`, `Math`, `Date`, `RegExp`, the usual value constructors, `DOMParser`, and `document`. Absent are `eval` and `Function`, the timers, and anything that reaches the network or the surrounding app — `fetch`, `XMLHttpRequest`, `window`, `parent`, `top`. A transform is meant to be a pure function from input to markup, and the sandbox keeps it that way.
 
 The one thing added to that environment is libraries. An extension's library files are loaded into the sandbox as globals, so its transforms can call them — a Markdown extension's `transformText` reaches `window.markdownit`, a Prism extension's `transformDOM` reaches `Prism`. That's the bridge from these toy examples to real ones, and it's the subject of the next chapter.
+
+The full signatures — including the optional `ctx` argument that opens the rest of the book — are collected in _Reference_.

@@ -31,7 +31,7 @@ await ctx.readSourceText(path)        // text from the SOURCE/ tree
 await ctx.writeSourceText(path, text) // write text — scoped to SOURCE/data/
 ```
 
-The access is scoped on purpose: reads reach only declared manifest items and the `SOURCE/` tree (no path traversal), and writes land only under `SOURCE/data/` — a script can't rewrite settings, other scripts, or extensions. And because every one of these calls is asynchronous, a transform that uses `ctx` is the `async` kind from the last chapter.
+The access is scoped on purpose: reads reach only declared manifest items and the `SOURCE/` tree (no path traversal), and writes land only under `SOURCE/data/` — a script can't rewrite settings, other scripts, or extensions. And because every one of these calls is asynchronous, a transform that uses `ctx` is the `async` kind from the last chapter. The field and method signatures, with types and recipes, are collected in _Reference_.
 
 ## Generators
 

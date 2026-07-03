@@ -39,3 +39,4 @@ The chapters are organised by where each extension point sits in a book's workfl
 - **Generators** — building content from the whole book rather than one chapter
 - **The publish-to-remote plugin** — an app-level plugin adding remote storage, OPDS catalogs, and EPUBCheck validation
 - **Reading System JavaScript** — code that ships in the book and runs in the reading app
+- **Reference** — the entry-point signatures, the `ctx` fields and methods, the generator option schema, and recipes
