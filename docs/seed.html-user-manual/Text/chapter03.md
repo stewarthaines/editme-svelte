@@ -12,6 +12,9 @@ The _Basic Info_{.ui} tab holds the essentials. Set the **Title** and the **Lang
 
 Below these, **Rendition Properties** control how reading apps lay the book out: whether text reflows or pages are fixed, which way pages turn, and so on. The defaults suit an ordinary reflowing book — leave them unless you know you need to change them.
 
+> **Try it.** Open the _Metadata_{.ui .icon-article} view and give your book a short **Description** — the kind of blurb a catalog shows beside the cover.
+{.try-it}
+
 ### Advanced fields
 
 The _Advanced_{.ui} tab adds details some books need: a publisher, date, and copyright under **Publication**; **Subjects** that categorise the book, like _fiction_ or _textbook_, for catalogs to group it by; and **Contributors** — others involved, each given a role such as editor, illustrator, translator, or narrator.

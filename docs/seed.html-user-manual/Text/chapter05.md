@@ -8,6 +8,9 @@ Click _Package EPUB_{.ui} at the foot of the sidebar. SEED.html assembles your c
 
 From there, click _Download_{.ui} to save the `.epub` to your device. That file is your book — ready to read in any reading app, or to share. And because it's a SEED EPUB, it carries its own source, so you (or anyone you pass it to) can open it back in SEED.html and keep editing. Package again whenever you've made changes, to produce an updated file.
 
+> **Try it.** Package your book and open the `.epub` in the reading app you usually read in. Seeing it on your own shelf is a milestone.
+{.try-it}
+
 ## Save as PDF
 
 You can also save your book as a PDF — a fixed, printable copy, handy for proof-reading on paper or giving to someone who just wants to print it. A PDF isn't a substitute for the EPUB: it doesn't reflow or adapt to the reader, and it can't be reopened in SEED.html to edit. Packaging an EPUB, above, is how you produce the book proper.

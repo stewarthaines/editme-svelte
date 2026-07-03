@@ -42,11 +42,15 @@ TODO (images): replace `screen-device-comparison.png` with a shot of the same co
 - Table of contents
 - The file list (the Manifest view)
 
+TODO (images): cropped screenshots for this chapter — the Basic Info metadata form, and the cover controls (hue slider + Aa toggle). It currently has none.
+
 ## Check your book
 
 Catch accessibility problems while you write — the check runs inline against the chapter you're editing, so your book stays accessible from the start instead of being fixed at the end.
 
 - Accessibility check (axe-core)
+
+TODO (images): cropped screenshot of the Accessibility panel showing a finding and the count beside the button.
 
 (EPUB validation moved to the publishing material — it's provided by the publish-to-remote plugin and isn't available in Basic Mode. See "Coming later".)
 

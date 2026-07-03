@@ -34,6 +34,9 @@ Duplicating copies the project you have open — a good way to reuse a book as a
 
 The copy is its own project, separate from the original — changes to one leave the other untouched.
 
+> **Try it.** If you're reading this manual inside SEED.html, duplicate it and change something — the copy is yours to play with, and the original stays untouched.
+{.try-it}
+
 ### Import from a file
 
 You can also open a book saved on your device.
