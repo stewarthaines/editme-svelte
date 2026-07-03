@@ -90,6 +90,10 @@ novel output it affords — a designed book that still reflows.
   index and glossary via DOM transforms and generator scripts); library examples —
   KaTeX (maths), abc2svg (music), highlight.js / Prism (code)
 
+## Workflows
+
+Describes actual workflows for various types of content, including ABC notation, audio clip resources, author/editor/proof-reader round trips, themeable (light/dark mode) SVG elements, language switching for accessibility, reading system diagnostics, neumes renderer, inline fleuron themeable. Cover text and DOM transforms, Generators and app features that might not be obvious.
+
 ## Coming later
 
 These topics aren't covered yet:
