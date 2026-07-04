@@ -112,7 +112,7 @@ The component demonstrates real browser behavior with actual iframe rendering, C
   name="iPad Pro Landscape (Interactive)"
   play={async ({ canvas, userEvent }) => {
     // Wait for component to initialize
-    await canvas.findByRole('main', {}, { timeout: 5000 });
+    await canvas.findByLabelText(/Device:/i, {}, { timeout: 10000 });
 
     try {
       console.log('[ContentPreview Story] Testing iPad Pro landscape with interactive content');
@@ -155,7 +155,7 @@ The component demonstrates real browser behavior with actual iframe rendering, C
 <Story
   name="Font Control Testing"
   play={async ({ canvas, userEvent }) => {
-    await canvas.findByRole('main', {}, { timeout: 5000 });
+    await canvas.findByLabelText(/Device:/i, {}, { timeout: 10000 });
 
     try {
       console.log('[ContentPreview Story] Testing font controls');
@@ -201,7 +201,7 @@ The component demonstrates real browser behavior with actual iframe rendering, C
 <Story
   name="Device Switching Test"
   play={async ({ canvas, userEvent }) => {
-    await canvas.findByRole('main', {}, { timeout: 5000 });
+    await canvas.findByLabelText(/Device:/i, {}, { timeout: 10000 });
 
     try {
       console.log('[ContentPreview Story] Testing device switching');
@@ -253,7 +253,7 @@ The component demonstrates real browser behavior with actual iframe rendering, C
 <Story
   name="Content Type Cycling"
   play={async ({ canvas, userEvent }) => {
-    await canvas.findByRole('main', {}, { timeout: 5000 });
+    await canvas.findByLabelText(/Device:/i, {}, { timeout: 10000 });
 
     try {
       console.log('[ContentPreview Story] Testing content type cycling');

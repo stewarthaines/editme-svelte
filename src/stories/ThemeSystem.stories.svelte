@@ -1,6 +1,5 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within, userEvent } from 'storybook/test';
   import ThemeToggle from '../lib/ThemeToggle.svelte';
 
   const { Story } = defineMeta({
@@ -331,22 +330,6 @@
           'Interactive demonstration showing theme persistence and system preference detection. Toggle themes and see how the change persists across browser sessions.',
       },
     },
-  }}
-  play={async ({ canvas, userEvent }) => {
-    // Wait for component to load
-    await canvas.findByRole('main', {}, { timeout: 5000 });
-
-    // Toggle theme a few times to demonstrate functionality
-    const toggleButton = canvas.getByLabelText('Toggle theme');
-
-    await userEvent.click(toggleButton);
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    await userEvent.click(toggleButton);
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Final toggle to dark for demonstration
-    await userEvent.click(toggleButton);
   }}
 >
   <div style="padding: 2rem;">

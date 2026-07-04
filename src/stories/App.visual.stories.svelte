@@ -1,6 +1,7 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
   import App from '../App.svelte';
+  import { seedProject } from './utils/seed-project';
 
   const { Story } = defineMeta({
     title: 'Application/App (Visual)',
@@ -10,7 +11,7 @@
       docs: {
         description: {
           component:
-            'Visual demonstration of the SEED.html EPUB editor application. These stories showcase the application UI and navigation without pre-loaded content.',
+            'Visual states of the SEED.html EPUB editor: the first-run experience, and the app open on a seeded project. Navigation tours live under Application/Router System.',
         },
       },
     },
@@ -24,43 +25,31 @@
     docs: {
       description: {
         story:
-          'Shows the application in its initial state when first loaded, with empty workspace and all UI sections available for navigation.',
+          'The application as a first-time user sees it: no projects yet, the About view, and the Get Started actions.',
       },
     },
   }}
 />
 
 <Story
-  name="Section Navigation Demo"
+  name="Project Open"
+  loaders={[
+    async () => ({ seeded: await seedProject({ title: 'Visual Demo Book', view: 'spine' }) }),
+  ]}
   parameters={{
     docs: {
       description: {
         story:
-          'Interactive tour through all sidebar sections to showcase the complete application navigation workflow.',
+          'The app restored onto a seeded two-chapter book — sidebar with project sections and chapters, spine editor ready.',
       },
     },
   }}
-  play={async ({ canvas, userEvent }) => {
-    // Wait for app to initialize - use a more specific selector to avoid multiple main elements
-    await canvas.findByText('Get Started', {}, { timeout: 5000 });
-
-    // Navigate through sections
-    const sections = [
-      { name: 'Metadata', title: 'Metadata' },
-      { name: 'Manifest', title: 'Manifest' },
-      { name: 'Navigation', title: 'Navigation' },
-      { name: 'Settings', title: 'Settings' },
-      { name: 'Workspace', title: 'Workspace' },
-    ];
-
-    for (const section of sections) {
-      try {
-        const button = canvas.getByTitle(section.title);
-        await userEvent.click(button);
-        await new Promise(resolve => setTimeout(resolve, 800));
-      } catch (error) {
-        console.log(`Could not find button for ${section.name}:`, error);
-      }
-    }
+  play={async ({ canvas }) => {
+    // Not a tour — just wait until the seeded project is fully on screen so
+    // docs/capture snapshots show the real thing.
+    await canvas.findByText('Visual Demo Book', {}, { timeout: 30000 });
+    await canvas.findByText('chapter01', {}, { timeout: 30000 });
   }}
-/>
+>
+  <App />
+</Story>

@@ -17,6 +17,9 @@ export default defineConfig({
   },
   test: {
     name: 'storybook',
+    // Seeded workflow stories boot the full app against real storage and can
+    // exceed the default per-test budget when both browser instances share CPU.
+    testTimeout: 120000,
     browser: {
       enabled: true,
       headless: true,

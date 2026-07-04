@@ -105,6 +105,13 @@ export async function seedProject(options: SeedProjectOptions = {}): Promise<See
   localStorage.setItem(WORKSPACE_ID_KEY, workspace.id);
   if (view) localStorage.setItem(NAV_VIEW_KEY, view);
 
+  // Neutralise persisted UI state other stories may have left behind (e.g. the
+  // LayoutManager stories persist a collapsed sidebar, which would hide the
+  // section buttons from this story's App mount).
+  localStorage.setItem('editme_sidebar_expanded', 'true');
+  localStorage.setItem('editme_sidebar_project_expanded', 'true');
+  localStorage.removeItem('editme_sidebar_section');
+
   return {
     workspaceId: workspace.id,
     workspace,
