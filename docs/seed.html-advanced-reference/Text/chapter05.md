@@ -18,6 +18,8 @@ Many issues belong to a particular chapter. Where one does, the report links str
 
 This is the validation the earlier chapters pointed forward to: package the book, validate it, and fix anything it flags before you hand it on.
 
+Beside validation sits **Read**: every packaged EPUB — in the core Publish list and in the plugin's local files — has a Read action that opens the book in a new tab running **bene**, a lightweight EPUB reading system (nota-lang's) vendored with the app. It's the quickest look at the artefact itself: the packaged book as a reading system presents it, not the editor's preview. Like the plugin, it needs the app served over HTTP — the reader isn't part of the single-file build.
+
 ## Remotes
 
 The plugin uploads a packaged EPUB straight to a remote you've configured — an S3 or R2 bucket, WebDAV, Google Drive, or Dropbox. Credentials are entered at runtime and kept per-remote in the browser's private storage; nothing is baked into the build, and you bring your own.
