@@ -116,10 +116,14 @@ const preview: Preview = {
       return Story();
     },
 
-    // Theme decorator
+    // Theme decorator. 'light' must be the literal attribute value: an empty
+    // string leaves data-theme="" on <html>, which matches neither
+    // [data-theme='light'] nor the :root:not([data-theme]) fallback — no theme
+    // tokens apply and components render with base fallbacks (visible #ccc
+    // borders and the like).
     withThemeByDataAttribute({
       themes: {
-        light: '',
+        light: 'light',
         dark: 'dark',
       },
       defaultTheme: 'light',
