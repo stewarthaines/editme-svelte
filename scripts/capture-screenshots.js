@@ -3,122 +3,62 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * Automated Screenshot Capture for Storybook Stories
+ * Automated screenshot capture for Storybook stories.
  *
- * This script captures screenshots of all configured Storybook stories.
+ * Stories are discovered from the running Storybook's index (index.json) —
+ * no hard-coded story ids. By default only stories tagged `capture` are
+ * shot (tag workflow stories with `tags: ['capture']` in defineMeta);
+ * pass --all to shoot every story, or --tag <name> for a different tag.
  *
- * To add new stories:
- * 1. Add story configuration to the `stories` array below
- * 2. Use the story ID format: category-story-name--variant-name
- * 3. Find story IDs by visiting the story in Storybook and checking the URL
+ * Stories with a play function (Storybook tags them `play-fn`) get a long
+ * settle wait so the interaction completes before the shot.
  *
- * For backend feature demos with play functions:
- * - Use longer timeout (8000ms) to allow interactions to complete
- * - The play function will run automatically before screenshot
- *
- * Usage: npm run screenshots
+ * Usage: npm run storybook   (in another terminal)
+ *        npm run screenshots [-- --all | --tag <name>]
  */
 
+const SB_URL = process.env.SB_URL ?? 'http://localhost:6006';
 const screenshotsDir = path.resolve(process.cwd(), '__screenshots__');
 
-if (!fs.existsSync(screenshotsDir)) {
-  fs.mkdirSync(screenshotsDir, { recursive: true });
+const args = process.argv.slice(2);
+const captureAll = args.includes('--all');
+const tagFlag = args.indexOf('--tag');
+const tag = tagFlag !== -1 ? args[tagFlag + 1] : 'capture';
+
+async function discoverStories() {
+  const res = await fetch(`${SB_URL}/index.json`);
+  if (!res.ok) throw new Error(`Cannot fetch ${SB_URL}/index.json — is Storybook running?`);
+  const index = await res.json();
+  return Object.values(index.entries).filter(
+    entry => entry.type === 'story' && (captureAll || entry.tags?.includes(tag))
+  );
 }
 
-const stories = [
-  {
-    name: 'button-primary',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-button--primary&viewMode=story',
-  },
-  {
-    name: 'button-secondary',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-button--secondary&viewMode=story',
-  },
-  {
-    name: 'button-large',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-button--large&viewMode=story',
-  },
-  {
-    name: 'button-small',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-button--small&viewMode=story',
-  },
-  {
-    name: 'header-logged-in',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-header--logged-in&viewMode=story',
-  },
-  {
-    name: 'header-logged-out',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-header--logged-out&viewMode=story',
-  },
-  {
-    name: 'page-logged-in',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-page--logged-in&viewMode=story',
-  },
-  {
-    name: 'page-logged-out',
-    url: 'http://localhost:6006/iframe.html?args=&id=example-page--logged-out&viewMode=story',
-  },
-  {
-    name: 'storage-demo-interactive',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--interactive-demo&viewMode=story',
-  },
-  {
-    name: 'storage-demo-with-data',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-storage-api--demo-with-sample-data&viewMode=story',
-  },
-  {
-    name: 'epub-unpacker-interactive',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--interactive-demo&viewMode=story',
-  },
-  {
-    name: 'epub-unpacker-with-data',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--demo-with-sample-data&viewMode=story',
-  },
-  {
-    name: 'epub-unpacker-error-scenarios',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-unpacker--error-scenarios&viewMode=story',
-  },
-  {
-    name: 'epub-packager-basic-demo',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--basic-demo&viewMode=story',
-  },
-  {
-    name: 'epub-packager-without-progress',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--without-progress&viewMode=story',
-  },
-  {
-    name: 'epub-packager-progress-only',
-    url: 'http://localhost:6006/iframe.html?args=&id=backend-epub-packager--progress-only&viewMode=story',
-  },
-];
-
 async function captureScreenshots() {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ screen: { width: 1200, height: 800 } });
+  const stories = await discoverStories();
+  if (stories.length === 0) {
+    console.log(`No stories to capture (tag: ${captureAll ? 'ALL' : tag}).`);
+    return;
+  }
+  fs.mkdirSync(screenshotsDir, { recursive: true });
 
-  console.log('📸 Capturing screenshots...');
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+
+  console.log(`📸 Capturing ${stories.length} stories from ${SB_URL}...`);
 
   for (const story of stories) {
     try {
-      console.log(`Capturing ${story.name}...`);
-      await page.goto(story.url);
+      console.log(`Capturing ${story.id}...`);
+      await page.goto(`${SB_URL}/iframe.html?id=${story.id}&viewMode=story`);
+      await page.waitForLoadState('networkidle');
+      // Play-function stories drive a workflow first; give it time to finish.
+      await page.waitForTimeout(story.tags?.includes('play-fn') ? 40000 : 2000);
 
-      // For backend feature demos, wait longer for interactions to complete
-      if (story.name.includes('storage-demo') || story.name.includes('epub-')) {
-        await page.waitForTimeout(8000); // Wait for play function to complete
-      } else {
-        await page.waitForTimeout(1000); // Standard wait for other stories
-      }
-
-      const screenshotPath = path.join(screenshotsDir, `${story.name}.png`);
-      await page.screenshot({
-        path: screenshotPath,
-        fullPage: false,
-      });
-
-      console.log(`✅ Saved ${story.name}.png`);
+      await page.screenshot({ path: path.join(screenshotsDir, `${story.id}.png`) });
+      console.log(`✅ Saved ${story.id}.png`);
     } catch (error) {
-      console.error(`❌ Failed to capture ${story.name}:`, error);
+      console.error(`❌ Failed to capture ${story.id}:`, error.message);
     }
   }
 
@@ -126,4 +66,7 @@ async function captureScreenshots() {
   console.log('🎉 Screenshot capture complete!');
 }
 
-captureScreenshots().catch(console.error);
+captureScreenshots().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

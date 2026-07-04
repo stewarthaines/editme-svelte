@@ -24,8 +24,9 @@ dist-ssr
 *.sw?
 .obsidian
 
-# Generated screenshots
+# Generated screenshots and videos
 __screenshots__/
+__videos__/
 .playwright-mcp/
 
 # Storybook
