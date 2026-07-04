@@ -26,7 +26,6 @@
   let deviceSize = initialDevice;
   let orientation: 'portrait' | 'landscape' = 'portrait';
   let fontSizeAdjustment = 0;
-  let fontFamily: 'default' | 'serif' | 'sans-serif' | 'monospace' = 'default';
 
   // Sample content variations using raw imports
   const SAMPLE_CONTENT = {
@@ -43,7 +42,6 @@
     deviceSize = 'recent-iphone';
     orientation = 'portrait';
     fontSizeAdjustment = 0;
-    fontFamily = 'default';
     contentType = 'navigation';
     showEmptyState = false;
   }
@@ -53,7 +51,6 @@
       deviceSize,
       orientation,
       fontSizeAdjustment,
-      fontFamily,
       contentType,
       timestamp: new Date().toISOString(),
     });
@@ -69,10 +66,6 @@
 
   $: if (fontSizeAdjustment !== undefined && showControls) {
     logStateChange('Font size adjusted', `${fontSizeAdjustment}px`);
-  }
-
-  $: if (fontFamily && showControls) {
-    logStateChange('Font family changed', fontFamily);
   }
 
   $: if (contentType && showControls) {
@@ -153,20 +146,6 @@
             </button>
           </div>
         </div>
-
-        <div class="control-row">
-          <label for="font-family-select">{$t('Font Family:')}</label>
-          <select
-            id="font-family-select"
-            bind:value={fontFamily}
-            on:change={() => logStateChange('Font family selected', fontFamily)}
-          >
-            <option value="default">{$t('Default')}</option>
-            <option value="serif">{$t('Serif')}</option>
-            <option value="sans-serif">{$t('Sans-serif')}</option>
-            <option value="monospace">{$t('Monospace')}</option>
-          </select>
-        </div>
       {/if}
 
       <div class="control-row">
@@ -215,7 +194,7 @@
             <span>• {$t('Orientation:')} {orientation}</span>
             <span
               >• {$t('Font:')}
-              {fontFamily} ({fontSizeAdjustment > 0 ? '+' : ''}{fontSizeAdjustment}px)</span
+              ({fontSizeAdjustment > 0 ? '+' : ''}{fontSizeAdjustment}px)</span
             >
           {/if}
         </div>

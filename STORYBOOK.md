@@ -264,7 +264,6 @@ npm run test:stories  # Run Storybook tests with Vitest
 - **Seeded app tour**: `src/stories/NavigationRouter.stories.svelte`
 - **Full-app visual states**: `src/stories/App.visual.stories.svelte` (first-run + seeded project)
 - **Real-component states**: `src/stories/preview/ContentPreview.stories.svelte` (device/responsive matrix)
-- **Demo-component template**: `src/stories/_templates/BackendFeatureDemo.template.svelte`
 
 ## Division of labour (settled 2026-07)
 

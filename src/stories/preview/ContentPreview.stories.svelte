@@ -153,46 +153,17 @@ The component demonstrates real browser behavior with actual iframe rendering, C
 </Story>
 
 <Story
-  name="Font Control Testing"
+  name="Font Size Testing"
   play={async ({ canvas, userEvent }) => {
     await canvas.findByLabelText(/Device:/i, {}, { timeout: 10000 });
 
-    try {
-      console.log('[ContentPreview Story] Testing font controls');
+    // fontSizeAdjustment is a real ContentPreview prop; drive it both ways.
+    const fontIncreaseButton = await canvas.findByText('A+', {}, { timeout: 10000 });
+    const fontDecreaseButton = await canvas.findByText('A-', {}, { timeout: 10000 });
 
-      // Test font family changes
-      const fontFamilySelect = canvas.getByLabelText(/Font Family/i);
-      if (fontFamilySelect) {
-        await userEvent.selectOptions(fontFamilySelect, 'serif');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log('[ContentPreview Story] Changed to serif font');
-
-        await userEvent.selectOptions(fontFamilySelect, 'sans-serif');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log('[ContentPreview Story] Changed to sans-serif font');
-
-        await userEvent.selectOptions(fontFamilySelect, 'monospace');
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log('[ContentPreview Story] Changed to monospace font');
-      }
-
-      // Test font size adjustments
-      const fontIncreaseButton = canvas.getByText('A+');
-      const fontDecreaseButton = canvas.getByText('A-');
-
-      if (fontIncreaseButton && fontDecreaseButton) {
-        await userEvent.click(fontIncreaseButton);
-        await userEvent.click(fontIncreaseButton);
-        await new Promise(resolve => setTimeout(resolve, 300));
-        console.log('[ContentPreview Story] Increased font size');
-
-        await userEvent.click(fontDecreaseButton);
-        await new Promise(resolve => setTimeout(resolve, 300));
-        console.log('[ContentPreview Story] Decreased font size');
-      }
-    } catch (error) {
-      console.warn('[ContentPreview Story] Font control test error:', error);
-    }
+    await userEvent.click(fontIncreaseButton);
+    await userEvent.click(fontIncreaseButton);
+    await userEvent.click(fontDecreaseButton);
   }}
 >
   <ContentPreviewDemo initialDevice="recent-iphone" contentType="chapter" />
