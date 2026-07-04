@@ -13,6 +13,7 @@
     selectable = true,
     googleAuthRequired,
     onCopyUrl,
+    onRead,
     onDelete,
     onLoadCatalog,
     loadedCatalogKey = '',
@@ -28,6 +29,8 @@
     selectable?: boolean;
     googleAuthRequired: boolean;
     onCopyUrl: (key: string, fileId?: string) => void;
+    /** Open the EPUB in the host's reader tab via its public URL. */
+    onRead: (key: string, fileId?: string) => void;
     onDelete: (key: string) => void;
     /** Click a remote .xml catalog to load it into the editor. Omit to disable. */
     onLoadCatalog?: (key: string) => void;
@@ -122,6 +125,13 @@
       </div>
     {/if}
     <div class="remote-actions">
+      {#if isEpub(obj.key)}
+        <button
+          class="btn btn-secondary btn-sm"
+          onclick={() => onRead(obj.key, obj.fileId)}
+          title={$t('Open in the reader')}>{$t('Read')}</button
+        >
+      {/if}
       <button
         class="btn btn-secondary btn-sm"
         onclick={() => onCopyUrl(obj.key, obj.fileId)}

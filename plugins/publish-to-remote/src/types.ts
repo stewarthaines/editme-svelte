@@ -29,11 +29,14 @@ export type NavigateMessage = {
   path: string;
 };
 
-// plugin → main: ask the host to open a local packaged EPUB in its vendored
-// reader tab. The host owns the reader URL; the plugin sends just the filename.
+// plugin → main: ask the host to open a packaged EPUB in its vendored reader
+// tab. The host owns the reader URL. Exactly one source field is set: a
+// `filename` in the shared output dir, or a remote object's public `url`
+// (fetched by the reader — subject to the remote allowing CORS reads).
 export type ReadEpubMessage = {
   type: 'read-epub';
-  filename: string;
+  filename?: string;
+  url?: string;
 };
 
 export type MainToPlugin = InitMessage | ContextMessage;

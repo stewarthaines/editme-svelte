@@ -112,14 +112,19 @@ export interface NavigateMessage {
 }
 
 /**
- * plugin → main, asks the host to open a packaged EPUB from the shared output
- * dir in the vendored reader tab. The host owns the reader URL construction
- * (the plugin iframe's own base would resolve `bene/` wrongly), so the plugin
- * sends just the filename.
+ * plugin → main, asks the host to open a packaged EPUB in the vendored reader
+ * tab. The host owns the reader URL construction (the plugin iframe's own base
+ * would resolve `bene/` wrongly). Exactly one source field is set: `filename`
+ * for a file in the shared output dir (the host reads the bytes itself), or
+ * `url` for a remote object's public URL (handed to the reader to fetch —
+ * subject to the remote allowing cross-origin reads).
  */
 export interface ReadEpubMessage {
   type: 'read-epub';
-  filename: string;
+  /** A file in the shared output dir. */
+  filename?: string;
+  /** A publicly fetchable EPUB URL (e.g. an R2 object). */
+  url?: string;
 }
 
 export type MainToPlugin = InitMessage | ContextMessage;
@@ -197,12 +202,13 @@ export function isNavigateMessage(value: unknown): value is NavigateMessage {
   );
 }
 
-/** Runtime guard: is this a `read-epub` message carrying a string filename? */
+/** Runtime guard: is this a `read-epub` message carrying a filename or a URL? */
 export function isReadEpubMessage(value: unknown): value is ReadEpubMessage {
   return (
     typeof value === 'object' &&
     value !== null &&
     (value as { type?: unknown }).type === 'read-epub' &&
-    typeof (value as { filename?: unknown }).filename === 'string'
+    (typeof (value as { filename?: unknown }).filename === 'string' ||
+      typeof (value as { url?: unknown }).url === 'string')
   );
 }

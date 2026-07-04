@@ -511,6 +511,16 @@
     window.parent.postMessage(message, window.origin);
   }
 
+  // Same, for a remote object: hand the host its public URL. The reader fetches
+  // it directly, so the remote must allow cross-origin reads (CORS).
+  function onReadRemote(key: string, fileId?: string) {
+    if (!activeRemote) return;
+    const url = getPublicUrl(activeRemote, key, fileId);
+    if (!url) return;
+    const message: ReadEpubMessage = { type: 'read-epub', url };
+    window.parent.postMessage(message, window.origin);
+  }
+
   async function onUploadEpub(epub: File) {
     if (!activeRemote) return;
     uploading = true;
@@ -868,6 +878,7 @@
                   selectable={activeRemote?.type !== 'google-drive'}
                   {googleAuthRequired}
                   {onCopyUrl}
+                  onRead={onReadRemote}
                   onLoadCatalog={catalogReadable ? onLoadCatalog : undefined}
                   loadedCatalogKey={catalogFile.trim()}
                   loading={loadingObjects}

@@ -11,7 +11,7 @@
     isNavigateMessage,
     isReadEpubMessage,
   } from '$lib/plugins/contract';
-  import { isHttpContext, openEpubInReader } from '$lib/reader/open-in-reader';
+  import { isHttpContext, openEpubInReader, openEpubUrlInReader } from '$lib/reader/open-in-reader';
 
   interface Props {
     publishService: PublishService;
@@ -117,9 +117,14 @@
           );
         }
       } else if (isReadEpubMessage(event.data)) {
-        // The plugin lists the same OPFS output dir the core reads from, so the
-        // filename resolves through the same service either way.
-        void handleRead(event.data.filename);
+        if (event.data.url) {
+          // A remote object's public URL — the reader fetches it directly.
+          openEpubUrlInReader(event.data.url);
+        } else if (event.data.filename) {
+          // The plugin lists the same OPFS output dir the core reads from, so
+          // the filename resolves through the same service either way.
+          void handleRead(event.data.filename);
+        }
       }
     };
     const onPackaged = () => void sendPluginInit();

@@ -20,8 +20,17 @@ export function isHttpContext(): boolean {
  */
 export function openEpubInReader(blob: Blob): void {
   const blobUrl = URL.createObjectURL(blob);
+  openEpubUrlInReader(blobUrl);
+}
+
+/**
+ * Open the reader tab for an EPUB the reader can fetch itself — a blob URL, a
+ * same-origin path, or a remote object's public URL. Cross-origin URLs work
+ * only when the remote allows cross-origin reads (CORS).
+ */
+export function openEpubUrlInReader(url: string): void {
   const readerUrl = new URL(
-    `bene/index.html?preload=${encodeURIComponent(blobUrl)}`,
+    `bene/index.html?preload=${encodeURIComponent(url)}`,
     document.baseURI
   ).href;
   window.open(readerUrl, '_blank');

@@ -2160,6 +2160,7 @@ msgid "Open a project to configure its settings."
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Open in the reader"
 msgstr ""
 
@@ -2448,6 +2449,7 @@ msgid "Re-render the preview live as you edit. When off, the preview shows a Ref
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Read"
 msgstr ""

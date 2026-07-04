@@ -2160,6 +2160,7 @@ msgid "Open a project to configure its settings."
 msgstr "Öffnen Sie ein Projekt, um seine Einstellungen zu konfigurieren."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Open in the reader"
 msgstr "Im Lesemodus öffnen"
 
@@ -2448,6 +2449,7 @@ msgid "Re-render the preview live as you edit. When off, the preview shows a Ref
 msgstr "Rendert die Vorschau beim Bearbeiten live neu. Wenn deaktiviert, zeigt die Vorschau eine Schaltfläche „Aktualisieren“ zum manuellen Aktualisieren an."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Read"
 msgstr "Lesen"

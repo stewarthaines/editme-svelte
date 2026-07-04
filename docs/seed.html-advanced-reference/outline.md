@@ -56,7 +56,7 @@ The plugin layer isn't user-extensible, so this is not a general "plugins" chapt
 - Publishing: upload a packaged EPUB to a remote; list / delete local and remote files
 - OPDS catalog generation (a browsable/subscribable feed)
 - EPUBCheck validation (modal report) — where the validation deferred earlier lands
-- Read: open a packaged EPUB in the vendored bene reader tab (core Publish list + plugin local files; HTTP-only)
+- Read: open a packaged EPUB in the vendored bene reader tab (core Publish list + plugin local files + remote files via their public URL, which needs CORS on the remote; HTTP-only)
 
 ## Reading System JavaScript  (drafted)
 

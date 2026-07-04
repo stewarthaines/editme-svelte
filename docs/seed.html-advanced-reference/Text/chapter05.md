@@ -18,7 +18,7 @@ Many issues belong to a particular chapter. Where one does, the report links str
 
 This is the validation the earlier chapters pointed forward to: package the book, validate it, and fix anything it flags before you hand it on.
 
-Beside validation sits **Read**: every packaged EPUB — in the core Publish list and in the plugin's local files — has a Read action that opens the book in a new tab running **bene**, a lightweight EPUB reading system (nota-lang's) vendored with the app. It's the quickest look at the artefact itself: the packaged book as a reading system presents it, not the editor's preview. Like the plugin, it needs the app served over HTTP — the reader isn't part of the single-file build.
+Beside validation sits **Read**: every packaged EPUB — in the core Publish list, in the plugin's local files, and on the remote's files — has a Read action that opens the book in a new tab running **bene**, a lightweight EPUB reading system (nota-lang's) vendored with the app. It's the quickest look at the artefact itself: the packaged book as a reading system presents it, not the editor's preview. For a remote file the reader fetches the object's public URL directly, so the remote must allow cross-origin reads (CORS) — realistic for an S3/R2 bucket you control, effectively out of reach for Google Drive, Dropbox, and most WebDAV hosts; local files need no such setup. Like the plugin, Read needs the app served over HTTP — the reader isn't part of the single-file build.
 
 ## Remotes
 
