@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-03\n"
-"PO-Revision-Date: 2026-07-03\n"
+"POT-Creation-Date: 2026-07-04\n"
+"PO-Revision-Date: 2026-07-04\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -2159,6 +2159,10 @@ msgstr "Öffnen Sie ein Projekt, um Erweiterungen hinzuzufügen"
 msgid "Open a project to configure its settings."
 msgstr "Öffnen Sie ein Projekt, um seine Einstellungen zu konfigurieren."
 
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+msgid "Open in the reader"
+msgstr "Im Lesemodus öffnen"
+
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Open project: {title}"
 msgstr "Projekt öffnen: {title}"
@@ -2442,6 +2446,11 @@ msgstr "Verlag"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand."
 msgstr "Rendert die Vorschau beim Bearbeiten live neu. Wenn deaktiviert, zeigt die Vorschau eine Schaltfläche „Aktualisieren“ zum manuellen Aktualisieren an."
+
+#: plugins/publish-to-remote/src/components/LocalEpubList.svelte
+#: src/lib/navigation/views/PublishView.svelte
+msgid "Read"
+msgstr "Lesen"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"

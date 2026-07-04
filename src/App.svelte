@@ -62,6 +62,7 @@
     type CoverMode,
   } from './lib/epub/cover-generator.js';
   import { exportPdf, exportChapterPdf } from './lib/pdf/pdf-export.js';
+  import { isHttpContext } from './lib/reader/open-in-reader.js';
   import { writePublishSidecar } from './lib/services/publish/publish-sidecar.js';
 
   // Extension manager instance
@@ -814,7 +815,7 @@
   // Handle EPUB package request
   // PDF export is an HTTP-only feature (the vendored Paged.js polyfill is fetched
   // from the app origin; file:// can't load it), mirroring the axe-core a11y check.
-  const canGeneratePdf = typeof location !== 'undefined' && location.protocol !== 'file:';
+  const canGeneratePdf = isHttpContext();
   let pdfGenerating = $state(false);
 
   // Build a paginated PDF from the chapters and open the browser's Save-as-PDF

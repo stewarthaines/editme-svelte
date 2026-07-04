@@ -23,6 +23,7 @@
     onViewReport,
     onDownload,
     onDelete,
+    onRead,
   }: {
     epubs: File[];
     meta: Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>;
@@ -44,6 +45,8 @@
     onViewReport: (epub: File) => void;
     onDownload: (epub: File) => void;
     onDelete: (epub: File) => void;
+    /** Open the EPUB in the host's reader tab. */
+    onRead: (epub: File) => void;
   } = $props();
 
   // Most recently packaged first (File.lastModified is the OPFS write time).
@@ -107,6 +110,13 @@
                 (overwrite && !confirmOverwrite[epub.name])}
             >
               {overwrite ? $t('Replace') : $t('Upload')}
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick={() => onRead(epub)}
+              title={$t('Open in the reader')}
+            >
+              {$t('Read')}
             </button>
             <button
               class="btn btn-secondary"

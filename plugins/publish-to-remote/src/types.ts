@@ -29,8 +29,15 @@ export type NavigateMessage = {
   path: string;
 };
 
+// plugin → main: ask the host to open a local packaged EPUB in its vendored
+// reader tab. The host owns the reader URL; the plugin sends just the filename.
+export type ReadEpubMessage = {
+  type: 'read-epub';
+  filename: string;
+};
+
 export type MainToPlugin = InitMessage | ContextMessage;
-export type PluginToMain = NavigateMessage;
+export type PluginToMain = NavigateMessage | ReadEpubMessage;
 
 // Remote Configuration and Objects
 

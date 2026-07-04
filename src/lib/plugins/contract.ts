@@ -111,8 +111,19 @@ export interface NavigateMessage {
   path: string;
 }
 
+/**
+ * plugin → main, asks the host to open a packaged EPUB from the shared output
+ * dir in the vendored reader tab. The host owns the reader URL construction
+ * (the plugin iframe's own base would resolve `bene/` wrongly), so the plugin
+ * sends just the filename.
+ */
+export interface ReadEpubMessage {
+  type: 'read-epub';
+  filename: string;
+}
+
 export type MainToPlugin = InitMessage | ContextMessage;
-export type PluginToMain = PluginReadyMessage | InsertMessage | NavigateMessage;
+export type PluginToMain = PluginReadyMessage | InsertMessage | NavigateMessage | ReadEpubMessage;
 
 /** Build an `init` message for a given output-dir handle. */
 export function createInitMessage(
@@ -183,5 +194,15 @@ export function isNavigateMessage(value: unknown): value is NavigateMessage {
     value !== null &&
     (value as { type?: unknown }).type === 'navigate' &&
     typeof (value as { path?: unknown }).path === 'string'
+  );
+}
+
+/** Runtime guard: is this a `read-epub` message carrying a string filename? */
+export function isReadEpubMessage(value: unknown): value is ReadEpubMessage {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as { type?: unknown }).type === 'read-epub' &&
+    typeof (value as { filename?: unknown }).filename === 'string'
   );
 }

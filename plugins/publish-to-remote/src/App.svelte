@@ -42,6 +42,7 @@
     RemotesStore,
     S3Object,
     NavigateMessage,
+    ReadEpubMessage,
   } from './types.js';
   import type { ValidationReport } from './epub-validation.js';
   import ConfigureForm from './components/ConfigureForm.svelte';
@@ -503,6 +504,13 @@
     window.parent.postMessage(message, window.origin);
   }
 
+  // Ask the host to open a local packaged EPUB in its vendored reader tab —
+  // the host owns the reader URL (this iframe's base would resolve it wrongly).
+  function onReadEpub(epub: File) {
+    const message: ReadEpubMessage = { type: 'read-epub', filename: epub.name };
+    window.parent.postMessage(message, window.origin);
+  }
+
   async function onUploadEpub(epub: File) {
     if (!activeRemote) return;
     uploading = true;
@@ -819,6 +827,7 @@
                 onViewReport={onViewValidationReport}
                 onDownload={onDownloadEpub}
                 onDelete={onDeleteEpub}
+                onRead={onReadEpub}
               />
             </div>
           </div>

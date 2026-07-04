@@ -9,7 +9,9 @@
     createContextMessage,
     isPluginReadyMessage,
     isNavigateMessage,
+    isReadEpubMessage,
   } from '$lib/plugins/contract';
+  import { isHttpContext, openEpubInReader } from '$lib/reader/open-in-reader';
 
   interface Props {
     publishService: PublishService;
@@ -114,6 +116,10 @@
             new CustomEvent('select-spine-item', { detail: { itemId: match[1] } })
           );
         }
+      } else if (isReadEpubMessage(event.data)) {
+        // The plugin lists the same OPFS output dir the core reads from, so the
+        // filename resolves through the same service either way.
+        void handleRead(event.data.filename);
       }
     };
     const onPackaged = () => void sendPluginInit();
@@ -200,6 +206,17 @@
   function retryPlugin(): void {
     // Remount the iframe and re-arm detection (e.g. after coming back online).
     pluginAttempt += 1;
+  }
+
+  // Reading in the vendored bene tab needs dist/bene/ served over HTTP.
+  const canRead = isHttpContext();
+
+  async function handleRead(filename: string) {
+    try {
+      openEpubInReader(await publishService.getPublishedEpubBlob(filename));
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Failed to open the reader';
+    }
   }
 
   async function handleDownload(filename: string) {
@@ -313,6 +330,14 @@
                 <td class="num">{formatDate(epub.lastModified)}</td>
                 <td class="actions">
                   <div class="action-buttons">
+                    {#if canRead}
+                      <button
+                        class="btn btn-secondary btn-sm"
+                        onclick={() => handleRead(epub.filename)}
+                      >
+                        {$t('Read')}
+                      </button>
+                    {/if}
                     <button
                       class="btn btn-secondary btn-sm"
                       onclick={() => handleDownload(epub.filename)}
