@@ -1,3 +1,31 @@
-# Sample Novel
+# Chapter 1
 
-This is a placeholder chapter. The drafted content lives in the author's working browser and will replace this file.
+{.description}
+["Je ne regrette rien"]{.lang-fr}
+
+{.attribution}
+-- Edith Piaf
+
+{.drop-cap}
+[It was the _best_ of times]{.opening} it was the [_wurst_]{.lang-de} of times. That was a language-switching _pain_{.lang-fr} -- or 'play' -- on the German word for _sausage_. _Best sausage time._ There were periods of intense concentration punctuated by deployments. I'm not a prose writer. Mostly software, me.
+
+That doesn't mean anything.
+
+After a few hours of this you might tire and look for an alternative. There won't be one. This is all that's left. At least it isn't A.I.-generated.
+
+"Some text", he said.
+
+"What about now?" she asked.
+
+Djot does most of this including some special `CSS` style selectors for [capitalisation]{.smallcaps}.
+
+---
+
+The next chapter reproduces an extract from _Polostan_ (Volume One of Bomb Light) by *Neal Stephenson*.
+
+Keep an eye out for the language switch to [Русский \[russkiy\]]{.lang-ru} near the end of the sample. Find somewhere to buy the book if you like what you read. [Polostan by Neal Stephenson](https://www.nealstephenson.com/polostan.html)
+
+First published by HarperCollins_Publishers_ Ltd 2024
+
+{.raw}
+Copyright © Neal Stephenson 2024.

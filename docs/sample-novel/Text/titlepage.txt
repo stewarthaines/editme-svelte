@@ -1,0 +1,8 @@
+{.title}
+# [Sample Novel](cover.xhtml)
+
+{.author}
+## Stewart Haines
+
+{.publisher}
+[stewarthaines.com](https://stewarthaines.com)

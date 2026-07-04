@@ -1,3 +1,37 @@
 # Sample Tech Manual
 
-This is a placeholder chapter. The drafted content lives in the author's working browser and will replace this file.
+This sample is written in Djot -- plain text that can carry classes and attributes -- with two extensions installed: `Prism.js` highlights code blocks, and `KaTeX` sets mathematics from TeX.
+
+A stylesheet rule and a function, highlighted at render time:
+
+```css
+.a { border-color: red; }
+```
+
+```js
+function() {
+  return "Hello world";
+}
+```
+
+The mathematics below is written as TeX and becomes MathML in the packaged EPUB -- selectable, accessible text that reflows with the page, not an image. Reading-system support for MathML is improving rather than universal, so check the readers you care about.
+
+```katex
+\sum_{i=1}^{n} x_i \quad \prod_{i=1}^{n} x_i \quad \int_{a}^{b} f(x) dx
+```
+
+```katex
+\alpha \quad \beta \quad \gamma \quad \delta \quad
+\epsilon \quad \theta \quad
+\lambda \quad \mu \quad \pi \quad \sigma \quad \phi \quad \omega
+```
+
+```katex
+\begin{align}
+f(x) &= x^2 + 2x + 1 \\
+     &= (x + 1)^2 \\
+     &= x^2 + 2x + 1
+\end{align}
+```
+
+Like every SEED EPUB, this book carries its source. Open it in `SEED.html` and compare this page with the plain text it was rendered from.

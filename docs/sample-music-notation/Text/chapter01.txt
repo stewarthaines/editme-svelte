@@ -1,3 +1,30 @@
 # Sample Music Notation
 
-This is a placeholder chapter. The drafted content lives in the author's working browser and will replace this file.
+The score below is engraved from ABC notation -- a plain-text format for music -- by the `abc2svg` extension installed in this project.
+
+The notation is this chapter's source. Open this book in `SEED.html` and the ABC you see in the editor is everything the score is made from; the frontmatter block sets how the engraving scales at different reading widths, and the lyric line is Georgian (the opening of "Suliko").
+
+```abc2svg
+---
+scales:
+  narrow: 1.9
+  wide: 1.15
+  full: 0.69
+---
+M:4/4
+%%measurenb 0
+L:1/4
+Q:1/4=60
+V:T clef=treble name=I
+V:M clef=treble name=II
+V:B clef=bass octave=-2 name=III
+%%score (T M) B
+K:Gmaj
+V:T
+cdef|gabc'|]
+V:M
+CDEF|GABc|]
+V:B
+CDEF|GABc|]
+w:sa-q’va-rlis sa-plavs ve-dze-bdi ver vna-khe! da-k’a-rgul-iq’-o!
+```

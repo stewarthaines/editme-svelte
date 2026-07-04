@@ -1,3 +1,35 @@
 # Sample Magazine
 
-This is a placeholder chapter. The drafted content lives in the author's working browser and will replace this file.
+## Your Sample Starts Here
+
+{.introduction}
+Welcome, [Bonjour]{.lang-fr} to the first issue of [Sample Magazine]{.custom} -- a designed, reflowable **`EPUB`** magazine produced from plain text and images.
+
+## Key Features
+
+This `SEED.html` EPUB demonstrates these features:
+
+{% The 'cols' class is a selector in Styles/page.css with a grid layout %}
+{% that changes at the breakpoints from one to two columns. %}
+{% The breakpoints are defined in Scripts/responsive.js and Styles/page.css %}
+
+::: cols
+- Custom heading font -- ["Noto Serif Georgian"]{.custom}
+- Responsive layout (on supported Reading Systems)
+- Embedded audio
+- Accessibly captioned image figures
+
+![apartment interior](../Images/paris9.webp){.figure title="Hello apartment"}
+:::
+
+---
+
+## Make one of your own
+
+This could be *your magazine*. It's built with html/css/javascript, so your designers and developers are the right people to talk to about style and layout.
+
+Then each issue's content is simple images and plain text.
+
+None of that is a claim you have to take on trust: this issue carries its own source. Open it in `SEED.html` and read this page as it was written.
+
+---

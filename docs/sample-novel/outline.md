@@ -1,24 +1,23 @@
 # Sample Novel — Outline
 
-This sample is the simplest of the four catalog books — long-form fiction with clean typography, front matter, and a straightforward chapter sequence, showing SEED.html handling the plainest and most common case well. Each `##` section becomes its own chapter file as we draft it (e.g. "Front matter" → `chapter01.txt`); the drafted content currently lives in the author's working browser and will replace the placeholder Text/chapter01.txt as it's brought across.
+This sample is the plainest of the four catalog books — long-form fiction with front matter, clean typography, and Djot's finer affordances where fiction needs them: language-switching spans (fr/de/ru), drop caps, small caps, epigraph/attribution classes. The self-aware authorial voice is deliberate; it disarms rather than sells.
 
 Production notes:
 
-- No hard-wrapping — one line per paragraph (list items stay one line each).
-- Placeholder only: section headings below are plausible guesses, not settled content — replace/reorder freely when the real draft lands.
+- No hard-wrapping — one line per paragraph.
+- Front matter files are separate spine items: titlepage, copyright (deliberately a code block — semantically weak, axe-core will flag it, and that's part of the demo), dedication.
 
-## Front matter
+## Files (drafted)
 
-- Title page / dedication — placeholder
+- `titlepage.txt` — classed title/author/publisher
+- `copyright.txt` — the code-block colophon
+- `dedication.txt` — "For Authors"
+- `chapter01.txt` — voice-forward opening; language-switch play; smallcaps demo
+- `polostan.txt` — extract from Neal Stephenson's _Polostan_ with attribution + buy link; includes a Russian language switch
+- `acknowledgements.txt` — stub, ends in the `[replace me]{.autology}` generator hook
 
-## Chapter one
+## TODO (author's calls)
 
-- Opening chapter — placeholder for the story's start
-
-## Chapter two
-
-- Second chapter — placeholder, demonstrating a plain multi-chapter sequence
-
-## Back matter
-
-- Closing material (e.g. acknowledgements) — placeholder
+- Acknowledgements: real text to replace "Thanks to everyone for all the things."; wire the `autology` generator so "this book is software" lists what the book actually contains.
+- Decide whether "At least it isn't A.I.-generated." stays, given the app's About-page AI disclaimer sits one view away.
+- Polostan extract: confirm permission/fair-dealing position before the sample ships publicly — attribution and buy link are good practice, not a licence.

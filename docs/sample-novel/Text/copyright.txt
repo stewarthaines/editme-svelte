@@ -1,0 +1,21 @@
+{% This page is produced as a Djot code block, delimited by ``` triple back-ticks. %}
+{% Semantically it's not great and doesn't contain a Heading1 element, so axe-core will complain. %}
+
+{.copyright}
+```
+This is a work of fiction. All of the characters, organizations, and events portrayed in this novel are either products of the author’s imagination or are used fictitiously.
+
+Sample Novel
+Copyright © 2026 by Stewart Haines
+All rights reserved.
+
+Cover art and design by Stewart Haines
+
+Published by Stewart Haines at ReaditInaBook.com
+
+First Edition: 2026
+
+```
+
+{.raw}
+[stewarthaines.com](https://stewarthaines.com)

@@ -1,0 +1,9 @@
+# Acknowledgements
+
+Thanks to everyone for all the things.
+
+---
+
+This book is software. It contains, among other things;
+
+[replace me]{.autology}

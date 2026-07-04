@@ -1,20 +1,16 @@
 # Sample Music Notation — Outline
 
-This sample demonstrates music notation rendered from plain-text ABC notation via the abc2svg extension — a DOM transform that turns an ABC code block into an inline SVG score at render time. Each `##` section becomes its own chapter file as we draft it (e.g. "About this score" → `chapter01.txt`); the drafted content currently lives in the author's working browser and will replace the placeholder Text/chapter01.txt as it's brought across.
+This sample demonstrates music engraved from plain-text ABC notation by the abc2svg extension — the score is the chapter's source, with a frontmatter `scales` block controlling how the engraving sizes at different reading widths. The lyric line is Georgian (the opening of "Suliko"), quietly demonstrating non-Latin lyric support.
 
 Production notes:
 
-- No hard-wrapping — one line per paragraph (list items stay one line each).
-- Placeholder only: section headings below are plausible guesses, not settled content — replace/reorder freely when the real draft lands.
+- No hard-wrapping — one line per paragraph.
+- Keep prose minimal: two orienting sentences before the score (what ABC is; the source is this chapter — verify in SEED.html), then let the engraving carry it.
 
-## About this score
+## Sample Music Notation (drafted)
 
-- Introductory note on the piece — placeholder for context/attribution
+- Orienting prose + the three-voice score (treble/treble/bass, Georgian lyric line)
 
-## The notation
+## Coming later
 
-- ABC source rendered via abc2svg — placeholder for the main score(s)
-
-## Variations
-
-- Additional pieces or arrangements — placeholder, demonstrating multiple scores in one book
+- Possibly a second score showing a different texture (single melody + chords), if the sample needs contrast
