@@ -6,7 +6,7 @@
 <script lang="ts">
   import { dirHandle } from './store.js';
   import { t } from './i18n.js';
-  import { listAudioItems } from './opf.js';
+  import { listAudioItems, readTextFile } from './opf.js';
   import type { AudioManifestItem, InsertMessage } from './types.js';
 
   let audioItems = $state<AudioManifestItem[]>([]);
@@ -37,16 +37,42 @@
       });
   });
 
-  // Default directive template, matching the core `audio_clip_template` default
-  // so output renders through the existing transform out of the box. Becomes a
-  // plugin-persisted setting in session 2.
-  function formatDirective(href: string): string {
-    return `:clip[]{src=${href} begin=0:00:00.00 end=0:00:05.00}`;
+  // The project's directive template: SOURCE/settings.json → audio_clip_template,
+  // the same setting the built-in editor uses (exposed in EPUB Settings), read
+  // fresh at insert time so mid-session settings changes apply. Read-only here —
+  // settings writes stay host-side. Falls back to the core default.
+  const DEFAULT_TEMPLATE = ':clip[<label>]{src=<href> begin=<begin> end=<end>}';
+
+  async function loadTemplate(handle: FileSystemDirectoryHandle): Promise<string> {
+    try {
+      const settings = JSON.parse(await readTextFile(handle, 'SOURCE/settings.json'));
+      if (typeof settings.audio_clip_template === 'string' && settings.audio_clip_template) {
+        return settings.audio_clip_template;
+      }
+    } catch {
+      // No/unreadable settings.json — the default template applies.
+    }
+    return DEFAULT_TEMPLATE;
   }
 
-  function insertTestClip(): void {
-    if (!selectedHref) return;
-    const message: InsertMessage = { type: 'insert', content: formatDirective(selectedHref) };
+  // Minimal placeholder substitution (mirrors the core formatClipDirective just
+  // enough for the skeleton's fixed test clip; session 2 brings real times/labels).
+  function formatDirective(template: string, href: string): string {
+    return template
+      .replace(/<href>|<src>/g, href)
+      .replace(/<begin>/g, '0:00:00.00')
+      .replace(/<end>/g, '0:00:05.00')
+      .replace(/<label>/g, '');
+  }
+
+  async function insertTestClip(): Promise<void> {
+    const handle = $dirHandle;
+    if (!selectedHref || !handle) return;
+    const template = await loadTemplate(handle);
+    const message: InsertMessage = {
+      type: 'insert',
+      content: formatDirective(template, selectedHref),
+    };
     window.parent.postMessage(message, window.origin);
   }
 </script>
