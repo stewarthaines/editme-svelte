@@ -732,6 +732,7 @@ msgstr "Clip-Bezeichnung"
 #: src/lib/components/EditSpineItemDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/spine/ChapterValidationPanel.svelte
+#: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
@@ -740,6 +741,10 @@ msgstr "Clip-Bezeichnung"
 #: src/lib/pdf/pdf-export.ts
 msgid "Close"
 msgstr "Schließen"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Close {name}"
+msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close accessibility panel"

@@ -32,7 +32,7 @@
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
   import { convertManifestPathToXHTMLPath } from '$lib/epub/path-utils.js';
   import { t } from '$lib/i18n';
-  import { RowsIcon, SquareIcon, ArrowUUpLeft } from 'phosphor-svelte';
+  import { RowsIcon, SquareIcon, ArrowUUpLeft, X } from 'phosphor-svelte';
   import { onMount } from 'svelte';
   import { FileStorageAPI } from '$lib/storage/index.js';
   import {
@@ -991,6 +991,20 @@
   />
 {/snippet}
 
+<!-- The X in each insert panel's top-right corner — same style as the checks
+     panels in the preview header (btn-icon + Phosphor X). -->
+{#snippet insertPanelClose(name: string)}
+  <button
+    type="button"
+    class="btn btn-icon insert-panel-close"
+    onclick={() => (activeInsertPanel = null)}
+    aria-label={$t('Close {name}', { name })}
+    title={$t('Close')}
+  >
+    <X size={16} aria-hidden="true" />
+  </button>
+{/snippet}
+
 {#snippet builtinAudioEditor()}
   {#if audioClipService && workspace && settingsService && workspaceService}
     <AudioClipEditor
@@ -1011,6 +1025,7 @@
 {#snippet audioPanel(paneSelectedFile: string)}
   {#if paneSelectedFile === 'text' && audioEditorVisible && hasAudioFiles && workspace}
     <div class="audio-editor-panel">
+      {@render insertPanelClose($t('Audio Clip Editor'))}
       {#if audioPluginUrl}
         <PluginPanel
           pluginUrl={audioPluginUrl}
@@ -1097,11 +1112,15 @@
   </div>
 
   {#if mediaBrowserVisible && hasImageFiles && textPaneActive && workspace && workspaceService}
-    <MediaBrowserPanel {workspace} {workspaceService} onPick={handleInsertImage} />
+    <div class="insert-panel-host">
+      {@render insertPanelClose($t('Images'))}
+      <MediaBrowserPanel {workspace} {workspaceService} onPick={handleInsertImage} />
+    </div>
   {/if}
 
   {#if generatorPanelVisible && generatorRunner && hasGenerators && textPaneActive}
     <div class="generator-editor-panel">
+      {@render insertPanelClose($t('Generators'))}
       <GeneratorPanel runner={generatorRunner} onInsert={insertClipDirective} />
     </div>
   {/if}
@@ -1494,7 +1513,21 @@
   }
 
   .audio-editor-panel {
+    position: relative;
     border-top: 1px solid var(--color-border-default);
+  }
+
+  /* Host for insert panels that don't bring their own container (media browser). */
+  .insert-panel-host {
+    position: relative;
+  }
+
+  /* The panel-corner close button; the panel containers are position:relative. */
+  .insert-panel-close {
+    position: absolute;
+    top: var(--space-1);
+    right: var(--space-1);
+    z-index: 1;
   }
 
   /* The Generators toggle shares the toolbar button look; the panel itself
@@ -1533,6 +1566,7 @@
   }
 
   .generator-editor-panel {
+    position: relative;
     padding: var(--space-3);
     border-top: 1px solid var(--color-border-default);
     background: var(--color-bg-primary);
