@@ -289,7 +289,11 @@ Unit tests in `src/lib/**/*.test.ts` are the coverage of record for backend beha
 
 ## Manual screenshots (docs illustrations)
 
-The manuals' app screenshots are regenerated from stories. `scripts/manual-shots.json` maps each image path under `docs/*/Images/` to a story in `src/stories/manual-shots/` (the state recipe: seed, navigate, open the dialog/pane), the element to clip to, and the app **mode** the shot documents — every recipe forces Basic or Advanced Mode explicitly, since the manual illustrates both. `npm run manual-shots` (with Storybook running) rewrites the images in place at a fixed viewport and 2× scale; review the docs diff like any other change. Recipes run in `test:stories` too, so a screenshot that can no longer be produced fails loudly instead of going stale.
+The manuals' app screenshots are regenerated from stories. `scripts/manual-shots.json` maps each image path under `docs/*/Images/` to a story in `src/stories/manual-shots/` (the state recipe: seed, navigate, open the dialog/pane), the element to clip to, and the app **mode** the shot documents — every recipe forces Basic or Advanced Mode explicitly, since the manual illustrates both. `npm run manual-shots` (with Storybook running) rewrites the images in place at a fixed viewport and 2× scale; review the docs diff like any other change. The capture script picks stories by id from the manifest (`node scripts/capture-manual-shots.js <substring>` to regenerate a subset).
+
+Recipes run in `test:stories` too, so a locally-producible screenshot that breaks fails loudly instead of going stale — **except** shots that depend on the network (e.g. Import from Catalog fetches the live `sample.readitinabook.com` feed). The isolated `test:stories` browser can't reach external hosts, so those stories are tagged `tags={['!test']}` to opt out of the suite; they're still captured by `npm run manual-shots` (which runs a real browser) and fail loudly there if the feed is unreachable.
+
+Shots that **can't** be automated, and stay hand-made: native `<select>` popups (open dropdowns render outside the page, invisible to CDP), external apps (Thorium/Cantook), and real-hardware comparisons. Shots needing a project with specific **extensions installed** (Djot/markdown/prism — e.g. the EPUB Settings and generator illustrations, and any live preview showing a figure) await a `seedProject` option to install extensions; the default seed's minimal transform renders headings/bold/emphasis only.
 
 ## Workflow stories: seeding real projects, screenshots, and videos
 

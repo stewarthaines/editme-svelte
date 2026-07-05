@@ -72,3 +72,38 @@
 >
   <App />
 </Story>
+
+<Story
+  name="Import from Catalog"
+  tags={['!test']}
+  loaders={[
+    async () => {
+      localStorage.setItem('editme_advanced_mode', 'false');
+      return {};
+    },
+  ]}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Produces docs/seed.html-user-manual/Images/screen-import-catalog.png — the Import from Catalog window listing the built-in sample books. Fetches the live published catalog (sample.readitinabook.com), so it's tagged `!test` (excluded from test:stories, whose isolated browser can't reach external hosts) and validated at capture time by `npm run manual-shots` instead.",
+      },
+    },
+  }}
+  play={async ({ canvas, userEvent }) => {
+    // Navigate by testid (see STORYBOOK.md); assert on rendered book titles.
+    const projects = await canvas.findByTestId('nav-workspace', {}, { timeout: 30000 });
+    await userEvent.click(projects);
+
+    const catalog = await canvas.findByTestId('import-from-catalog', {}, { timeout: 20000 });
+    await waitFor(() => {
+      if (catalog.disabled) throw new Error('project list still loading');
+    }, { timeout: 20000 });
+    await userEvent.click(catalog);
+
+    // The dialog fetches the feed; wait for a sample book to render before the shot.
+    await canvas.findByText('Sample Magazine', {}, { timeout: 30000 });
+  }}
+>
+  <App />
+</Story>

@@ -72,6 +72,7 @@
         onclick={handleImportFromOPDS}
         disabled={isLoading}
         aria-label={$t('Import an EPUB from a catalog URL')}
+        data-testid="import-from-catalog"
       >
         {$t('Import from Catalog')}
       </button>
