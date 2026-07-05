@@ -1,9 +1,6 @@
-html,
-body,
-#app {
-  height: 100%;
-}
-
+/* No height:100% chain: the host's PluginPanel measures the body's intrinsic
+   height (ResizeObserver) to size the iframe like a normal panel — the content
+   must define its own height for that to converge. */
 body {
   margin: 0;
   padding: 0;

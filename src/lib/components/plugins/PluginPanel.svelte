@@ -44,6 +44,25 @@
   let readyTimer: ReturnType<typeof setTimeout> | undefined;
   let capTimer: ReturnType<typeof setTimeout> | undefined;
 
+  // Content-driven height: panel plugins are same-origin, so the host can watch
+  // the plugin document's intrinsic height directly (no resize message needed)
+  // and let the iframe behave like a normal in-flow panel. Requires the plugin
+  // body to be auto-height; capped at half the viewport (the iframe scrolls
+  // internally beyond that). Until the first measurement the CSS fallback
+  // height applies.
+  let contentHeight = $state<number | null>(null);
+  $effect(() => {
+    if (!pluginReady || pluginFailed) return;
+    const body = pluginFrame?.contentDocument?.body;
+    if (!body) return;
+    const observer = new ResizeObserver(() => {
+      const height = Math.ceil(body.scrollHeight);
+      if (height > 0) contentHeight = height;
+    });
+    observer.observe(body);
+    return () => observer.disconnect();
+  });
+
   // Route the plugin's messages: the handshake arms the hand-over, `insert`
   // forwards to the host callback. Same source/origin gating as PublishView.
   $effect(() => {
@@ -146,6 +165,7 @@
     <iframe
       bind:this={pluginFrame}
       class="plugin-panel-frame"
+      style:height={contentHeight ? `min(${contentHeight}px, 50vh)` : undefined}
       src={pluginUrl}
       {title}
       onload={handlePluginFrameLoad}
@@ -156,9 +176,9 @@
 <style>
   .plugin-panel-frame {
     width: 100%;
-    /* Panel height: enough for the plugin's controls without dominating the
-       editor column; the embedding container may override via height on the
-       wrapper it renders this component into. */
+    /* Fallback until the first content measurement lands (see the
+       ResizeObserver above); after that the inline style tracks the plugin
+       document's intrinsic height, capped at half the viewport. */
     height: 16rem;
     border: 0;
     display: block;

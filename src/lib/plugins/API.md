@@ -87,7 +87,7 @@ Two modes only: `panel` and `view`.
 
 ### `panel`
 
-A fixed-height region above the editor textarea, toggled by a button in the editor toolbar. Suited to plugins that augment content editing in context.
+A content-sized region above the editor textarea, toggled by a button in the editor toolbar. Suited to plugins that augment content editing in context. The host tracks the plugin document's intrinsic height (same-origin ResizeObserver — no resize message), capped at half the viewport; the plugin's body must therefore be auto-height, not `height: 100%`.
 
 **Example:** Audio Clip Editor — sits alongside the active textarea and inserts a formatted clip reference at the cursor position via the `insert` message.
 
