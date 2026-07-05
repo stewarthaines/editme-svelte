@@ -335,6 +335,10 @@ export class BlobURLManager {
       const manifestPath = convertXHTMLPathToManifestPath(href);
       const blobURL = await this.createBlobURL(manifestPath);
       element.setAttribute(attr, blobURL);
+      // Keep the manifest href discoverable on the element (the blob URL erases
+      // it): the preview's click-to-source uses it to find the source reference.
+      // Display-only documents (preview iframe, print window) — never persisted.
+      element.setAttribute('data-source-href', manifestPath);
     } catch (error) {
       this.handleMissingAsset(element, href, error as Error);
     }

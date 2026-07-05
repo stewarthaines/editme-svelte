@@ -1049,6 +1049,24 @@
     if (!target) return;
 
     try {
+      // An image or video first: the blob rewrite preserved the manifest href on
+      // data-source-href (the blob: URL erases it), and its filename is a robust
+      // search key in any source syntax — matched by the same position-hinted
+      // search the text path uses.
+      const media = target.closest('img, video');
+      const sourceHref = media?.getAttribute('data-source-href');
+      if (media && sourceHref) {
+        const filename = sourceHref.split('/').pop() ?? sourceHref;
+        if (filename.length >= 3) {
+          onPreviewClick({
+            text: filename,
+            documentPosition: estimateDocumentPosition(media),
+            elementType: media.tagName.toLowerCase(),
+          });
+          return;
+        }
+      }
+
       // Prefer the exact text node + caret under the cursor: a single rendered
       // text node is a contiguous, markup-free slice of the source, so a short
       // snippet from it matches even when the element has inline markup.
@@ -1148,6 +1166,15 @@
       /* Indicate clickable text elements */
       p, h1, h2, h3, h4, h5, h6, div, span, li, blockquote, td, th {
         cursor: pointer;
+      }
+
+      /* Images/videos are click-to-source too (see handlePreviewClick). */
+      img[data-source-href], video[data-source-href] {
+        cursor: pointer;
+      }
+      img[data-source-href]:hover, video[data-source-href]:hover {
+        outline: 1px solid rgba(59, 130, 246, 0.3);
+        outline-offset: 1px;
       }
 
       /* Visual feedback on hover */
