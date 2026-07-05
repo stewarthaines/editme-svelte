@@ -1,5 +1,6 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { waitFor } from 'storybook/test';
   import App from '../../App.svelte';
 
   // Screenshot recipes for the user manual (docs/seed.html-user-manual/).
@@ -52,6 +53,13 @@
       { name: /Create a new minimal EPUB project/ },
       { timeout: 20000 }
     );
+    // Create New is disabled while the project list loads. With no projects
+    // (a fresh capture context) that's instant, but a browser holding the
+    // seeded stories' projects loads slower — wait for enabled, or the click
+    // is swallowed and no dialog opens.
+    await waitFor(() => {
+      if (createNew.disabled) throw new Error('project list still loading');
+    }, { timeout: 20000 });
     await userEvent.click(createNew);
 
     // The dialog is the photograph. Fill the illustration's example book —
