@@ -25,6 +25,7 @@
   import AudioClipEditor from '$lib/components/audio/AudioClipEditor.svelte';
   import PluginPanel from '$lib/components/plugins/PluginPanel.svelte';
   import GeneratorPanel from '$lib/components/spine/GeneratorPanel.svelte';
+  import MediaBrowserPanel from '$lib/components/spine/MediaBrowserPanel.svelte';
   import LineNumberGutter from '$lib/components/spine/LineNumberGutter.svelte';
   import type { GeneratorRunner } from '$lib/generators/generator-store.js';
   import { isRtlLanguage } from '$lib/epub/language-direction.js';
@@ -410,6 +411,24 @@
     }
   }
 
+  // Media browser pick: format the image snippet exactly like the drop path
+  // (chapter-relative href, filename-stem alt left selected) and splice it at
+  // the active text pane's caret.
+  async function handleInsertImage(href: string): Promise<void> {
+    const pane = textContentPane;
+    if ((pane !== 1 && pane !== 2) || !workspace || !settingsService) return;
+    const epubSettings = await settingsService.loadEPUBSettings(workspace.id);
+    const alt = filenameStem(href.split('/').pop() ?? href);
+    const snippet = formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', {
+      href: convertManifestPathToXHTMLPath(href),
+      alt,
+    });
+    let selection: { start: number; end: number } | undefined;
+    const altIndex = alt ? snippet.indexOf(alt) : -1;
+    if (altIndex !== -1) selection = { start: altIndex, end: altIndex + alt.length };
+    insertDroppedText(pane, snippet, selection);
+  }
+
   // The insertClipDirective splice, generalised to a given pane and an optional
   // post-insert selection (offsets relative to the inserted text).
   function insertDroppedText(
@@ -673,6 +692,12 @@
         item => item.mediaType && item.mediaType.startsWith('audio/')
       );
     })()
+  );
+
+  // Media browser: thumbnails of the manifest's images, click to insert.
+  let mediaBrowserVisible = $state<boolean>(false);
+  let hasImageFiles = $derived(
+    !!workspace?.opf?.manifest?.some(item => item.mediaType?.startsWith('image/'))
   );
 
   // Determine which pane has text content
@@ -1023,6 +1048,19 @@
         </button>
       {/if}
 
+      {#if textPaneActive && hasImageFiles && workspace && workspaceService}
+        <button
+          type="button"
+          class="generator-toggle-btn"
+          class:active={mediaBrowserVisible}
+          onclick={() => (mediaBrowserVisible = !mediaBrowserVisible)}
+          title={mediaBrowserVisible ? $t('Hide Images') : $t('Show Images')}
+          aria-label={mediaBrowserVisible ? $t('Hide Images') : $t('Show Images')}
+        >
+          {$t('Images')}
+        </button>
+      {/if}
+
       {#if textPaneActive && hasGenerators}
         <button
           type="button"
@@ -1041,6 +1079,10 @@
       {/if}
     </div>
   </div>
+
+  {#if mediaBrowserVisible && hasImageFiles && textPaneActive && workspace && workspaceService}
+    <MediaBrowserPanel {workspace} {workspaceService} onPick={handleInsertImage} />
+  {/if}
 
   {#if generatorPanelVisible && generatorRunner && hasGenerators && textPaneActive}
     <div class="generator-editor-panel">

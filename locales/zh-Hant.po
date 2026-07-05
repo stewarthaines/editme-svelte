@@ -1576,6 +1576,10 @@ msgstr ""
 msgid "Hide Generators"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Hide Images"
+msgstr ""
+
 #: src/lib/Sidebar.svelte
 msgid "Hide project sections"
 msgstr ""
@@ -1613,6 +1617,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Image Insertion"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Images"
 msgstr ""
 
 #: src/lib/components/import/ImportReviewDialog.svelte
@@ -1699,6 +1707,10 @@ msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Insert"
+msgstr ""
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "Insert {name} at the cursor"
 msgstr ""
 
 #: src/lib/components/spine/GeneratorPanel.svelte
@@ -2144,6 +2156,10 @@ msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No generators defined."
+msgstr ""
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "No images in this project."
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -2934,6 +2950,10 @@ msgstr ""
 msgid "Show Generators"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show Images"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show panel"
 msgstr ""
@@ -2973,6 +2993,10 @@ msgstr ""
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Some files failed to upload - see console for details"
+msgstr ""
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "Some images could not be loaded."
 msgstr ""
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte

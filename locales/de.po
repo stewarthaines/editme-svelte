@@ -1576,6 +1576,10 @@ msgstr "Audioclip-Editor ausblenden"
 msgid "Hide Generators"
 msgstr "Generatoren ausblenden"
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Hide Images"
+msgstr ""
+
 #: src/lib/Sidebar.svelte
 msgid "Hide project sections"
 msgstr "Projektbereiche ausblenden"
@@ -1613,6 +1617,10 @@ msgstr "Änderungen ignorieren (nicht importieren)"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Image Insertion"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Images"
 msgstr ""
 
 #: src/lib/components/import/ImportReviewDialog.svelte
@@ -1699,6 +1707,10 @@ msgstr "Fügt die preview/head.xml des Projekts (im erweiterten Modus über das 
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Insert"
+msgstr ""
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "Insert {name} at the cursor"
 msgstr ""
 
 #: src/lib/components/spine/GeneratorPanel.svelte
@@ -2145,6 +2157,10 @@ msgstr "Keine Generatoren"
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No generators defined."
 msgstr "Keine Generatoren definiert."
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "No images in this project."
+msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "No issues"
@@ -2953,6 +2969,10 @@ msgstr "Audioclip-Editor anzeigen"
 msgid "Show Generators"
 msgstr "Generatoren anzeigen"
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Show Images"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show panel"
 msgstr "Bereich anzeigen"
@@ -2993,6 +3013,10 @@ msgstr "Größe"
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Some files failed to upload - see console for details"
 msgstr "Einige Dateien konnten nicht hochgeladen werden – Einzelheiten in der Konsole"
+
+#: src/lib/components/spine/MediaBrowserPanel.svelte
+msgid "Some images could not be loaded."
+msgstr ""
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
