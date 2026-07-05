@@ -13,6 +13,8 @@ export interface ClipRegion {
   /** Seconds. */
   end: number;
   label: string;
+  /** Playback rate; unset (or 1) emits no rate attribute in the directive. */
+  rate?: number;
 }
 
 export interface ClipStore {

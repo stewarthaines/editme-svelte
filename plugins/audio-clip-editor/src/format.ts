@@ -21,20 +21,39 @@ export interface ClipDirectiveData {
   begin: number;
   end: number;
   label: string;
+  /** Unset (or 1) emits no rate attribute at all. */
+  rate?: number;
 }
 
 /**
  * Substitute the template's placeholders. `<href>` (and its `<src>` alias),
  * `<begin>`, `<end>` are required by the settings validation; `<label>` clears
- * to empty when unset; a `<rate>` placeholder (no rate UI here) is stripped
- * together with its attribute.
+ * to empty when unset. Rate mirrors the core semantics: with a rate set (≠ 1),
+ * a `<rate>` placeholder is filled in place, and a template without one gets a
+ * `rate=` attribute injected before the closing brace — quoted when the
+ * template's own values are quoted (djot rejects bare values containing '.').
+ * With no rate, any `<rate>` attribute is stripped whole.
  */
 export function formatDirective(template: string, data: ClipDirectiveData): string {
-  return template
+  let result = template
     .replace(/<href>|<src>/g, data.href)
     .replace(/<begin>/g, formatTimeString(data.begin))
     .replace(/<end>/g, formatTimeString(data.end))
-    .replace(/<label>/g, data.label.trim())
-    .replace(/\s+(?:rate|speed)="?<rate>"?/g, '')
-    .replace(/<rate>/g, '');
+    .replace(/<label>/g, data.label.trim());
+
+  const rate =
+    data.rate !== undefined && data.rate > 0 && data.rate !== 1
+      ? Number(data.rate.toFixed(2)).toString()
+      : null;
+
+  if (!rate) {
+    return result.replace(/\s+(?:rate|speed)="?<rate>"?/g, '').replace(/<rate>/g, '');
+  }
+  if (result.includes('<rate>')) {
+    return result.replace(/<rate>/g, rate);
+  }
+  const close = result.lastIndexOf('}');
+  if (close === -1) return result;
+  const attr = template.includes('="') ? ` rate="${rate}"` : ` rate=${rate}`;
+  return result.slice(0, close) + attr + result.slice(close);
 }

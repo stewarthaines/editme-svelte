@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05\n"
-"PO-Revision-Date: 2026-07-05\n"
+"POT-Creation-Date: 2026-07-06\n"
+"PO-Revision-Date: 2026-07-06\n"
 "Language: en\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -2384,6 +2384,10 @@ msgstr ""
 msgid "Play"
 msgstr ""
 
+#: plugins/audio-clip-editor/src/App.svelte
+msgid "Playback rate — leave empty for normal speed (no rate in the directive)"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Please copy license text into the License field below to comply with open source requirements."
 msgstr ""
@@ -2507,6 +2511,10 @@ msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
+msgstr ""
+
+#: plugins/audio-clip-editor/src/App.svelte
+msgid "Rate"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

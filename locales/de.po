@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: EDITME EPUB Editor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-05\n"
-"PO-Revision-Date: 2026-07-05\n"
+"POT-Creation-Date: 2026-07-06\n"
+"PO-Revision-Date: 2026-07-06\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -2384,6 +2384,10 @@ msgstr "Einfacher Text"
 msgid "Play"
 msgstr ""
 
+#: plugins/audio-clip-editor/src/App.svelte
+msgid "Playback rate — leave empty for normal speed (no rate in the directive)"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Please copy license text into the License field below to comply with open source requirements."
 msgstr "Bitte kopieren Sie den Lizenztext in das untenstehende Lizenzfeld, um die Open-Source-Anforderungen zu erfüllen."
@@ -2508,6 +2512,10 @@ msgstr "Veröffentlicht"
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
 msgstr "Verlag"
+
+#: plugins/audio-clip-editor/src/App.svelte
+msgid "Rate"
+msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit. When off, the preview shows a Refresh button to update on demand."

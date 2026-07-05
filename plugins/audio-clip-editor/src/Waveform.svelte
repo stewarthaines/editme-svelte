@@ -137,9 +137,13 @@
 
   /** Play the selected clip from its start; reports state via onPlayStateChange. */
   export function playSelected(): void {
-    if (!ready || !regionsPlugin || !selectedId) return;
+    if (!ready || !ws || !regionsPlugin || !selectedId) return;
     const region = regionsPlugin.getRegions().find(r => r.id === selectedId);
     if (!region) return;
+    // Preview at the clip's own rate (pitch preserved), matching what the
+    // packaged EPUB's player will do with data-rate.
+    const clip = clips.find(c => c.id === selectedId);
+    ws.setPlaybackRate(clip?.rate ?? 1, true);
     playingId = selectedId;
     region.play();
     onPlayStateChange?.(true);

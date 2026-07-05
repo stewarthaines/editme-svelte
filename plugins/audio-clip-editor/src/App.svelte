@@ -112,6 +112,19 @@
     updateClips(clips.map(c => (c.id === selectedClip.id ? { ...c, label } : c)));
   }
 
+  // Empty (or 1, or unparsable) clears the rate — the directive then carries no
+  // rate attribute at all. JSON.stringify drops the undefined on save.
+  function handleRateChange(event: Event): void {
+    if (!selectedClip) return;
+    const raw = (event.currentTarget as HTMLInputElement).value.trim();
+    const parsed = raw === '' ? NaN : Number(raw);
+    const rate =
+      Number.isFinite(parsed) && parsed > 0 && parsed !== 1
+        ? Math.min(4, Math.max(0.25, parsed))
+        : undefined;
+    updateClips(clips.map(c => (c.id === selectedClip.id ? { ...c, rate } : c)));
+  }
+
   function deleteSelected(): void {
     if (!selectedClip) return;
     waveform?.stop();
@@ -135,6 +148,7 @@
         begin: clip.begin,
         end: clip.end,
         label: clip.label,
+        rate: clip.rate,
       }),
     };
     window.parent.postMessage(message, window.origin);
@@ -219,6 +233,21 @@
         placeholder={$t('Clip label')}
         aria-label={$t('Clip label')}
       />
+      <label class="field">
+        <span class="field-label">{$t('Rate')}</span>
+        <input
+          type="number"
+          class="rate-input"
+          min="0.25"
+          max="4"
+          step="0.05"
+          value={selectedClip?.rate ?? ''}
+          onchange={handleRateChange}
+          disabled={!selectedClip}
+          placeholder="1"
+          title={$t('Playback rate — leave empty for normal speed (no rate in the directive)')}
+        />
+      </label>
       <button
         type="button"
         class="btn btn-sm"
@@ -279,6 +308,17 @@
   .hint {
     color: var(--color-text-secondary);
     font-size: 0.8rem;
+  }
+
+  .rate-input {
+    width: 4.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--text-sm);
   }
 
   .label-input {
