@@ -2385,7 +2385,7 @@ msgid "Play"
 msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
-msgid "Playback rate — leave empty for normal speed (no rate in the directive)"
+msgid "Playback rate — 1 is normal speed (no rate in the directive)"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte

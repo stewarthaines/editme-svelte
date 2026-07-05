@@ -235,17 +235,18 @@
       />
       <label class="field">
         <span class="field-label">{$t('Rate')}</span>
+        <!-- Unset renders as a real value of 1 (not a placeholder): stepping an
+             empty number input would start from min (0.25). 1 ≡ no rate. -->
         <input
           type="number"
           class="rate-input"
           min="0.25"
           max="4"
           step="0.05"
-          value={selectedClip?.rate ?? ''}
+          value={selectedClip?.rate ?? 1}
           onchange={handleRateChange}
           disabled={!selectedClip}
-          placeholder="1"
-          title={$t('Playback rate — leave empty for normal speed (no rate in the directive)')}
+          title={$t('Playback rate — 1 is normal speed (no rate in the directive)')}
         />
       </label>
       <button
