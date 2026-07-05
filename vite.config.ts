@@ -385,8 +385,12 @@ export default defineConfig({
   ],
   test: {
     projects: [
-      // Main project tests
+      // Main project tests. Extends the root config so a bare `vitest run`
+      // matches `npm run test` (vitest.config.unit.ts): without it this project
+      // gets neither the svelte plugin ($state in .svelte.ts modules) nor the
+      // `define` block (__VERSION__), and dozens of tests fail spuriously.
       {
+        extends: true,
         test: {
           name: "unit",
           include: ["src/**/*.{test,spec}.{js,ts}"],
