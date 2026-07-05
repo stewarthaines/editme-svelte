@@ -7,7 +7,11 @@
   import { FileStorageAPI } from '../../storage/index.js';
   import { hasSeedHtml } from '../../epub/seed-html.js';
   import { manifestCollision } from '../../import/collision.js';
-  import { importFileToManifest, reliableMediaType } from '../../import/import-media.js';
+  import {
+    importFileToManifest,
+    analyzeManifestCollision,
+    reliableMediaType,
+  } from '../../import/import-media.js';
   import { showToast } from '../../stores/toast.svelte.js';
   import {
     stageFiles,
@@ -166,12 +170,6 @@
   const resolvePath = (href: string): string =>
     workspace!.pathInfo.basePath ? `${workspace!.pathInfo.basePath}/${href}` : href;
 
-  const bytesEqual = (a: Uint8Array, b: Uint8Array): boolean => {
-    if (a.byteLength !== b.byteLength) return false;
-    for (let i = 0; i < a.byteLength; i++) if (a[i] !== b[i]) return false;
-    return true;
-  };
-
   const writeBytes = async (filePath: string, mediaType: string, bytes: Uint8Array): Promise<void> => {
     if (isTextLike(mediaType)) {
       await workspaceService.writeFile(workspace!.id, filePath, new TextDecoder('utf-8').decode(bytes));
@@ -249,20 +247,13 @@
     }
 
     // A name collision is only a real conflict when the bytes differ; an identical
-    // upload is a no-op, so skip it rather than prompting to overwrite.
+    // upload is a no-op, so skip it rather than prompting to overwrite. (Shared
+    // with the chapter editor's drop-to-insert via analyzeManifestCollision.)
     const changedColliding: typeof colliding = [];
     let identicalCount = 0;
     for (const e of colliding) {
-      const incoming = new Uint8Array(await e.file.arrayBuffer());
-      let existing: Uint8Array | null = null;
-      try {
-        existing = new Uint8Array(
-          await workspaceService.readFile(workspace.id, resolvePath(e.existingHref!))
-        );
-      } catch {
-        existing = null;
-      }
-      if (existing && bytesEqual(existing, incoming)) identicalCount += 1;
+      const info = await analyzeManifestCollision(workspace, workspaceService, e.file, e.mediaType);
+      if (info?.identical) identicalCount += 1;
       else changedColliding.push(e);
     }
 

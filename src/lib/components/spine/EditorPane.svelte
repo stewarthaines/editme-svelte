@@ -35,6 +35,8 @@
   import { FileStorageAPI } from '$lib/storage/index.js';
   import {
     importFileToManifest,
+    analyzeManifestCollision,
+    overwriteManifestFile,
     reliableMediaType,
     formatImageSnippet,
     formatVideoSnippet,
@@ -298,6 +300,7 @@
     if (!workspace || !workspaceService || !settingsService) return;
 
     let ws = workspace;
+    let workspaceTouched = false;
     const epubSettings = await settingsService.loadEPUBSettings(ws.id);
     const snippets: string[] = [];
     let manifestOnly = 0;
@@ -308,15 +311,40 @@
     for (const file of files) {
       const mediaType = reliableMediaType(file);
       try {
-        const imported = await importFileToManifest(ws, workspaceService, file, mediaType);
-        ws = imported.workspace;
+        // Filename collision with an existing manifest item: identical bytes are
+        // a no-op for the manifest (just reference the existing href); changed
+        // bytes need the user's explicit say-so to overwrite in place.
+        const collision = await analyzeManifestCollision(ws, workspaceService, file, mediaType);
+        let href: string;
+        if (collision?.identical) {
+          href = collision.existingHref;
+        } else if (collision) {
+          const overwrite = confirm(
+            $t('{href} already exists with different content. Overwrite it?', {
+              href: collision.existingHref,
+            })
+          );
+          if (!overwrite) continue;
+          await overwriteManifestFile(
+            ws,
+            workspaceService,
+            collision.existingHref,
+            mediaType,
+            file
+          );
+          href = collision.existingHref;
+          workspaceTouched = true;
+        } else {
+          const imported = await importFileToManifest(ws, workspaceService, file, mediaType);
+          ws = imported.workspace;
+          href = imported.href;
+          workspaceTouched = true;
+        }
+
         if (mediaType.startsWith('image/')) {
           const alt = filenameStem(file.name);
           snippets.push(
-            formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', {
-              href: imported.href,
-              alt,
-            })
+            formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', { href, alt })
           );
           selectAlt = alt;
         } else if (mediaType.startsWith('audio/') && audioClipService) {
@@ -324,7 +352,7 @@
           const duration = (await mediaDuration(file)) || 5;
           snippets.push(
             audioClipService.formatClipDirective(
-              { href: imported.href, startTime: 0, duration, endTime: duration, label: '' },
+              { href, startTime: 0, duration, endTime: duration, label: '' },
               await audioClipService.getTemplate(ws.id)
             )
           );
@@ -332,9 +360,11 @@
           snippets.push(
             formatVideoSnippet(
               epubSettings.video_template || '<video src="<href>" controls="controls"></video>',
-              { href: imported.href }
+              { href }
             )
           );
+        } else if (collision?.identical) {
+          // Already in the manifest with the same content and nothing to insert.
         } else {
           manifestOnly++;
         }
@@ -344,7 +374,7 @@
       }
     }
 
-    if (ws !== workspace) onWorkspaceUpdate?.(ws);
+    if (workspaceTouched) onWorkspaceUpdate?.(ws);
 
     if (snippets.length > 0) {
       const text = snippets.join('\n\n');

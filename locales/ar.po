@@ -48,6 +48,10 @@ msgstr ""
 msgid "{done}/{total} addressed"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "{href} already exists with different content. Overwrite it?"
+msgstr ""
+
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{key} deleted"
 msgstr ""

@@ -17,6 +17,7 @@ import type {
 } from '../services/workspace/workspace.service.js';
 import { ManifestUtils } from '../manifest/utils.js';
 import { generateEPUBPath, ensureUniqueHref } from '../epub/opf-utils.js';
+import { manifestCollision } from './collision.js';
 
 /**
  * Reliable media type for an incoming File: browsers misreport fonts and
@@ -35,6 +36,67 @@ export function reliableMediaType(file: File): string {
 
 const isTextLike = (mediaType: string): boolean =>
   mediaType.startsWith('text/') || mediaType.includes('json') || mediaType.includes('xml');
+
+const resolvePath = (workspace: WorkspaceState, href: string): string =>
+  workspace.pathInfo.basePath ? `${workspace.pathInfo.basePath}/${href}` : href;
+
+const bytesEqual = (a: Uint8Array, b: Uint8Array): boolean => {
+  if (a.byteLength !== b.byteLength) return false;
+  for (let i = 0; i < a.byteLength; i++) if (a[i] !== b[i]) return false;
+  return true;
+};
+
+export interface ManifestCollisionInfo {
+  /** The manifest href the incoming file collides with. */
+  existingHref: string;
+  /** True when the incoming bytes match the existing content — a no-op import. */
+  identical: boolean;
+}
+
+/**
+ * Would this file collide with an existing manifest item, and if so, is it the
+ * same content? A name collision is only a real conflict when the bytes differ;
+ * an identical upload is a no-op (the caller can just reference `existingHref`).
+ */
+export async function analyzeManifestCollision(
+  workspace: WorkspaceState,
+  workspaceService: WorkspaceService,
+  file: File,
+  mediaType: string = reliableMediaType(file)
+): Promise<ManifestCollisionInfo | null> {
+  const existingHref = manifestCollision(file.name, mediaType, workspace);
+  if (!existingHref) return null;
+  let identical = false;
+  try {
+    const existing = new Uint8Array(
+      await workspaceService.readFile(workspace.id, resolvePath(workspace, existingHref))
+    );
+    identical = bytesEqual(existing, new Uint8Array(await file.arrayBuffer()));
+  } catch {
+    // Existing file unreadable — treat as changed.
+  }
+  return { existingHref, identical };
+}
+
+/**
+ * Overwrite an existing manifest item's content in place, leaving the manifest
+ * entry (id, href, media-type) unchanged — the explicit-overwrite resolution
+ * for a changed collision.
+ */
+export async function overwriteManifestFile(
+  workspace: WorkspaceState,
+  workspaceService: WorkspaceService,
+  existingHref: string,
+  mediaType: string,
+  file: File
+): Promise<void> {
+  const filePath = resolvePath(workspace, existingHref);
+  if (isTextLike(mediaType)) {
+    await workspaceService.writeFile(workspace.id, filePath, await file.text());
+  } else {
+    await workspaceService.writeBinaryFile(workspace.id, filePath, await file.arrayBuffer());
+  }
+}
 
 export interface ImportedMediaFile {
   /** Workspace state carrying the new manifest item — propagate via onWorkspaceUpdate. */
@@ -63,7 +125,7 @@ export async function importFileToManifest(
   );
   let updated = await workspaceService.addManifestItem(workspace, { href, mediaType });
   const addedItemId = updated.opf.manifest[updated.opf.manifest.length - 1].id;
-  const filePath = updated.pathInfo.basePath ? `${updated.pathInfo.basePath}/${href}` : href;
+  const filePath = resolvePath(updated, href);
   try {
     if (isTextLike(mediaType)) {
       await workspaceService.writeFile(updated.id, filePath, await file.text());
