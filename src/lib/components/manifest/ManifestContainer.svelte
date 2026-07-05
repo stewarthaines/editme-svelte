@@ -3,11 +3,11 @@
   import { t } from '../../i18n';
   import ManifestTable from './ManifestTable.svelte';
   import ImportReviewDialog from '../import/ImportReviewDialog.svelte';
-  import { ManifestUtils } from '../../manifest/utils.js';
   import { generateEPUBPath, ensureUniqueHref } from '../../epub/opf-utils.js';
   import { FileStorageAPI } from '../../storage/index.js';
   import { hasSeedHtml } from '../../epub/seed-html.js';
   import { manifestCollision } from '../../import/collision.js';
+  import { importFileToManifest, reliableMediaType } from '../../import/import-media.js';
   import { showToast } from '../../stores/toast.svelte.js';
   import {
     stageFiles,
@@ -160,18 +160,6 @@
     }
   };
 
-  // Reliable media type: browsers misreport fonts and JavaScript, so prefer
-  // filename detection for those (and whenever the browser type is generic).
-  const reliableMediaType = (file: File): string => {
-    const browserType = file.type;
-    const filenameType = ManifestUtils.detectMediaType(file.name);
-    const isGeneric = !browserType || browserType === 'application/octet-stream';
-    const isFontFile = filenameType.startsWith('font/');
-    const isJavaScriptFile =
-      filenameType === 'application/javascript' || filenameType === 'text/javascript';
-    return isGeneric || isFontFile || isJavaScriptFile ? filenameType : browserType;
-  };
-
   const isTextLike = (mediaType: string): boolean =>
     mediaType.startsWith('text/') || mediaType.includes('json') || mediaType.includes('xml');
 
@@ -195,25 +183,11 @@
   };
 
   // Add a new manifest item from a File (non-colliding path). Rolls back the
-  // manifest entry if the content write fails. Throws on failure.
+  // manifest entry if the content write fails. Throws on failure. Shared with
+  // the chapter editor's drop-to-insert (import-media.ts).
   const uploadNewFile = async (file: File, mediaType: string): Promise<void> => {
-    const href = ensureUniqueHref(
-      generateEPUBPath(file.name, mediaType),
-      workspace!.opf.manifest.map(m => m.href)
-    );
-    workspace = await workspaceService.addManifestItem(workspace!, { href, mediaType });
-    const addedItemId = workspace.opf.manifest[workspace.opf.manifest.length - 1].id;
-    const filePath = resolvePath(href);
-    try {
-      if (file.type.startsWith('text/') || file.type.includes('json') || file.type.includes('xml')) {
-        await workspaceService.writeFile(workspace.id, filePath, await file.text());
-      } else {
-        await workspaceService.writeBinaryFile(workspace.id, filePath, await file.arrayBuffer());
-      }
-    } catch (writeError) {
-      workspace = await workspaceService.removeManifestItem(workspace, addedItemId);
-      throw writeError;
-    }
+    workspace = (await importFileToManifest(workspace!, workspaceService, file, mediaType))
+      .workspace;
   };
 
   // Add a new (suffixed) manifest item from staged bytes — the "keep both" commit.

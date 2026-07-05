@@ -267,6 +267,34 @@
     }
   }
 
+  // Persist a drop-to-insert media template (image/video). Validated (<href>
+  // required); cleared → the built-in default applies.
+  async function handleMediaTemplateChange(
+    key: 'image_template' | 'video_template',
+    event: Event
+  ): Promise<void> {
+    if (!workspaceId || !epubSettings) return;
+
+    const newTemplate = (event.target as HTMLInputElement).value.trim();
+    const validation = settingsService.validateEPUBSettings({ [key]: newTemplate });
+    if (!validation.isValid) {
+      error = validation.errors[0] || $t('Invalid media template');
+      return;
+    }
+
+    const previous = epubSettings[key];
+    const updatedSettings: EPUBSettings = { ...epubSettings, [key]: newTemplate };
+    epubSettings = updatedSettings;
+
+    try {
+      await settingsService.saveEPUBSettings(workspaceId, updatedSettings);
+      onSettingsChanged?.();
+    } catch (err) {
+      error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
+      epubSettings = { ...epubSettings, [key]: previous };
+    }
+  }
+
   // --- Print settings ----------------------------------------------------------
   // Minimal page geometry exposed to novices (drives the PDF export + print
   // preview; still overridable by the book's own @page CSS). HTTP-only, like the
@@ -1242,6 +1270,48 @@
                     <p class="setting-description">
                       {$t(
                         'Template for inserted audio clip directives. Required placeholders: <href>, <begin>, <end>; <label> and <rate> are optional. Djot needs the values quoted, e.g. src="<href>". Clear to restore the default.'
+                      )}
+                    </p>
+                  </div>
+
+                  <div class="setting-group">
+                    <label for="image-template" class="setting-label-text">
+                      {$t('Image Insertion')}
+                    </label>
+                    <!-- i18n-ignore: literal template, not prose -->
+                    <input
+                      id="image-template"
+                      type="text"
+                      class="template-input"
+                      value={epubSettings?.image_template || ''}
+                      placeholder="![&lt;alt&gt;](&lt;href&gt;)"
+                      onblur={e => handleMediaTemplateChange('image_template', e)}
+                      disabled={epubLoading}
+                    />
+                    <p class="setting-description">
+                      {$t(
+                        'Inserted when an image is dropped into a chapter. Placeholders: <href>, <alt>. Clear to restore the default.'
+                      )}
+                    </p>
+                  </div>
+
+                  <div class="setting-group">
+                    <label for="video-template" class="setting-label-text">
+                      {$t('Video Insertion')}
+                    </label>
+                    <!-- i18n-ignore: literal template, not prose -->
+                    <input
+                      id="video-template"
+                      type="text"
+                      class="template-input"
+                      value={epubSettings?.video_template || ''}
+                      placeholder="&lt;video src=&quot;&lt;href&gt;&quot; controls=&quot;controls&quot;&gt;&lt;/video&gt;"
+                      onblur={e => handleMediaTemplateChange('video_template', e)}
+                      disabled={epubLoading}
+                    />
+                    <p class="setting-description">
+                      {$t(
+                        'Inserted when a video is dropped into a chapter. Placeholder: <href>. Clear to restore the default.'
                       )}
                     </p>
                   </div>

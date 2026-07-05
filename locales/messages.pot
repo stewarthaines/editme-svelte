@@ -80,6 +80,10 @@ msgstr ""
 msgid "{n} errors"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "{n} files added to the manifest"
+msgstr ""
+
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "{n} generator"
 msgstr ""
@@ -143,6 +147,10 @@ msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "1 day ago"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "1 file added to the manifest"
 msgstr ""
 
 #: src/lib/components/SpineItem.svelte
@@ -1356,6 +1364,14 @@ msgstr ""
 msgid "Failed to generate XML preview"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Failed to import {n} dropped files"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Failed to import 1 dropped file"
+msgstr ""
+
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to import EPUB: {error}"
 msgstr ""
@@ -1591,6 +1607,10 @@ msgstr ""
 msgid "Ignore changes (don't import)"
 msgstr ""
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Image Insertion"
+msgstr ""
+
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Import"
 msgstr ""
@@ -1693,6 +1713,14 @@ msgstr ""
 msgid "Insert the clip directive at the editor cursor"
 msgstr ""
 
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Inserted when a video is dropped into a chapter. Placeholder: <href>. Clear to restore the default."
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Inserted when an image is dropped into a chapter. Placeholders: <href>, <alt>. Clear to restore the default."
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Invalid"
 msgstr ""
@@ -1703,6 +1731,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Invalid EPUB"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Invalid media template"
 msgstr ""
 
 #: src/stories/preview/ContentPreviewDemo.svelte
@@ -3368,6 +3400,10 @@ msgstr ""
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "value:Label, value:Label"
+msgstr ""
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Video Insertion"
 msgstr ""
 
 #: src/App.svelte

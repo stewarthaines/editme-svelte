@@ -33,6 +33,15 @@
   import { RowsIcon, SquareIcon, ArrowUUpLeft } from 'phosphor-svelte';
   import { onMount } from 'svelte';
   import { FileStorageAPI } from '$lib/storage/index.js';
+  import {
+    importFileToManifest,
+    reliableMediaType,
+    formatImageSnippet,
+    formatVideoSnippet,
+    filenameStem,
+    mediaDuration,
+  } from '$lib/import/import-media.js';
+  import { showToast } from '$lib/stores/toast.svelte.js';
   import { BASE_PREFIX } from '$lib/track-changes/base-snapshot.js';
   import { diffSegments, applySelectedHunks } from '$lib/track-changes/hunks.js';
 
@@ -65,6 +74,7 @@
     onChapterTitleChange,
     generatorRunner = null,
     audioPluginUrl = null,
+    onWorkspaceUpdate,
   }: {
     transformError?: TransformError | null;
     transformWarnings?: string[];
@@ -112,6 +122,9 @@
     /** Resolved iframe src for the audio clip panel plugin; when set it supersedes
         the built-in AudioClipEditor (which stays as the load-failure fallback). */
     audioPluginUrl?: string | null;
+    /** Report a manifest change (drop-to-insert media import) back to app state —
+        without it the next full-OPF save clobbers the added item. */
+    onWorkspaceUpdate?: (workspace: WorkspaceState) => void;
   } = $props();
 
   // Basic mode hides JavaScript, transform-script, generator and preview-head
@@ -242,6 +255,143 @@
     textarea.dispatchEvent(inputEvent);
 
     // Focus back to textarea
+    textarea.focus();
+  }
+
+  // --- Drop-to-insert media ------------------------------------------------
+  // Dropping a file on a text pane does two things in one gesture: imports it
+  // into the manifest (the same pipeline as the manifest view's drop, via
+  // importFileToManifest) and inserts its plain-text representation at the
+  // caret — image/video via the project's template settings, audio via the
+  // audio clip template spanning the file's duration. Non-insertable files
+  // (fonts, CSS, …) import to the manifest only, reported via toast.
+
+  let dropTargetPane = $state<1 | 2 | null>(null);
+
+  function paneAcceptsMediaDrop(pane: 1 | 2): boolean {
+    const selected = pane === 1 ? pane1SelectedFile : pane2SelectedFile;
+    return selected === 'text' && !!workspace && !!workspaceService && !!settingsService;
+  }
+
+  function handleEditorDragOver(pane: 1 | 2, event: DragEvent): void {
+    if (!paneAcceptsMediaDrop(pane)) return;
+    if (!event.dataTransfer?.types?.includes('Files')) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    dropTargetPane = pane;
+  }
+
+  function handleEditorDragLeave(pane: 1 | 2, event: DragEvent): void {
+    // dragleave fires when moving over children — only clear when genuinely
+    // leaving the container.
+    const container = event.currentTarget as HTMLElement;
+    if (event.relatedTarget instanceof Node && container.contains(event.relatedTarget)) return;
+    if (dropTargetPane === pane) dropTargetPane = null;
+  }
+
+  async function handleEditorDrop(pane: 1 | 2, event: DragEvent): Promise<void> {
+    dropTargetPane = null;
+    if (!paneAcceptsMediaDrop(pane)) return;
+    const files = Array.from(event.dataTransfer?.files ?? []);
+    if (files.length === 0) return;
+    event.preventDefault();
+    if (!workspace || !workspaceService || !settingsService) return;
+
+    let ws = workspace;
+    const epubSettings = await settingsService.loadEPUBSettings(ws.id);
+    const snippets: string[] = [];
+    let manifestOnly = 0;
+    let failed = 0;
+    // Single-image drop: leave the alt placeholder selected so typing replaces it.
+    let selectAlt: string | null = null;
+
+    for (const file of files) {
+      const mediaType = reliableMediaType(file);
+      try {
+        const imported = await importFileToManifest(ws, workspaceService, file, mediaType);
+        ws = imported.workspace;
+        if (mediaType.startsWith('image/')) {
+          const alt = filenameStem(file.name);
+          snippets.push(
+            formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', {
+              href: imported.href,
+              alt,
+            })
+          );
+          selectAlt = alt;
+        } else if (mediaType.startsWith('audio/') && audioClipService) {
+          // A whole-file clip directive; the audio clip editor refines the bounds.
+          const duration = (await mediaDuration(file)) || 5;
+          snippets.push(
+            audioClipService.formatClipDirective(
+              { href: imported.href, startTime: 0, duration, endTime: duration, label: '' },
+              await audioClipService.getTemplate(ws.id)
+            )
+          );
+        } else if (mediaType.startsWith('video/')) {
+          snippets.push(
+            formatVideoSnippet(
+              epubSettings.video_template || '<video src="<href>" controls="controls"></video>',
+              { href: imported.href }
+            )
+          );
+        } else {
+          manifestOnly++;
+        }
+      } catch (err) {
+        console.warn(`Failed to import dropped file ${file.name}:`, err);
+        failed++;
+      }
+    }
+
+    if (ws !== workspace) onWorkspaceUpdate?.(ws);
+
+    if (snippets.length > 0) {
+      const text = snippets.join('\n\n');
+      let selection: { start: number; end: number } | undefined;
+      if (snippets.length === 1 && selectAlt) {
+        const altIndex = text.indexOf(selectAlt);
+        if (altIndex !== -1) selection = { start: altIndex, end: altIndex + selectAlt.length };
+      }
+      insertDroppedText(pane, text, selection);
+    }
+    if (manifestOnly > 0) {
+      showToast(
+        manifestOnly === 1
+          ? $t('1 file added to the manifest')
+          : $t('{n} files added to the manifest', { n: manifestOnly })
+      );
+    }
+    if (failed > 0) {
+      showToast(
+        failed === 1
+          ? $t('Failed to import 1 dropped file')
+          : $t('Failed to import {n} dropped files', { n: failed }),
+        'error'
+      );
+    }
+  }
+
+  // The insertClipDirective splice, generalised to a given pane and an optional
+  // post-insert selection (offsets relative to the inserted text).
+  function insertDroppedText(
+    pane: 1 | 2,
+    text: string,
+    select?: { start: number; end: number }
+  ): void {
+    const textarea = pane === 1 ? pane1Textarea : pane2Textarea;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    textarea.value = textarea.value.slice(0, start) + text + textarea.value.slice(end);
+    if (select) {
+      textarea.setSelectionRange(start + select.start, start + select.end);
+    } else {
+      const pos = start + text.length;
+      textarea.setSelectionRange(pos, pos);
+    }
+    // Trigger input so the file store persists the change.
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
     textarea.focus();
   }
 
@@ -894,6 +1044,10 @@
                 class="content-textarea {getSyntaxClass(pane2SelectedFile)}"
                 class:has-error={pane2Error}
                 class:with-gutter={pane2IsCode}
+                class:drop-target={dropTargetPane === 2}
+                ondragover={e => handleEditorDragOver(2, e)}
+                ondragleave={e => handleEditorDragLeave(2, e)}
+                ondrop={e => handleEditorDrop(2, e)}
                 value={pane2FileStore ? $pane2FileStore?.content || '' : ''}
                 placeholder={getPlaceholder(pane2SelectedFile)}
                 oninput={handlePane2Input}
@@ -945,6 +1099,10 @@
               class="content-textarea {getSyntaxClass(pane1SelectedFile)}"
               class:has-error={pane1Error}
               class:with-gutter={pane1IsCode}
+              class:drop-target={dropTargetPane === 1}
+              ondragover={e => handleEditorDragOver(1, e)}
+              ondragleave={e => handleEditorDragLeave(1, e)}
+              ondrop={e => handleEditorDrop(1, e)}
               value={pane1FileStore ? $pane1FileStore?.content || '' : ''}
               placeholder={getPlaceholder(pane1SelectedFile)}
               oninput={handlePane1Input}
@@ -1288,6 +1446,12 @@
     flex: 1;
     overflow: hidden;
     position: relative; /* For absolute positioning of error overlay */
+  }
+
+  /* Media-file drag hover: about to import + insert at the caret. */
+  .content-textarea.drop-target {
+    outline: 2px dashed var(--color-interactive-primary);
+    outline-offset: -2px;
   }
 
   .content-textarea {

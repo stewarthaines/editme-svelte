@@ -38,7 +38,7 @@
   import { ExtensionManager } from '../../extensions/extension-manager.js';
   import { FileStorageAPI } from '../../storage/index.js';
   import type { TransformEngine } from '../../infrastructure/transform-engine.js';
-  import { t, translate } from '../../i18n';
+  import { t } from '../../i18n';
   import { themeStore } from '../../stores/theme.js';
   import { i18nService } from '../../i18n/index.js';
   import {
@@ -1548,6 +1548,7 @@
       {settingsService}
       {generatorRunner}
       {audioPluginUrl}
+      onWorkspaceUpdate={ws => onWorkspaceUpdate?.(ws)}
     />
   </div>
 {:else}

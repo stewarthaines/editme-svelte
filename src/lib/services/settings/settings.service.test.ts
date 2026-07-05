@@ -264,9 +264,12 @@ describe('SettingsService Contract Tests', () => {
         'workspace-123',
         'SOURCE/settings.json'
       );
-      // `preview` is always populated with defaults when absent from the file.
+      // `preview` (and the media insertion templates) are always populated with
+      // defaults when absent from the file.
       expect(result).toEqual({
         ...mockSettings,
+        image_template: '![<alt>](<href>)',
+        video_template: '<video src="<href>" controls="controls"></video>',
         preview: {
           autoUpdate: { responsive: true, device: true, pdf: false },
           head: 'preview/head.xml',
@@ -286,6 +289,8 @@ describe('SettingsService Contract Tests', () => {
         dom_transforms: ['SOURCE/scripts/transformDom.js'],
         spine_basename: 'chapter',
         audio_clip_template: ':clip[<label>]{src=<href> begin=<begin> end=<end>}',
+        image_template: '![<alt>](<href>)',
+        video_template: '<video src="<href>" controls="controls"></video>',
         filename_template: '<title> - <author> - <date>',
         include_seed_html_in_package: false,
         track_changes: false,
