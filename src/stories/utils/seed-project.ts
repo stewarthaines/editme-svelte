@@ -18,9 +18,18 @@ import { FileStorageAPI } from '../../lib/storage';
 import { WorkspaceService } from '../../lib/services/workspace/workspace.service';
 import type { WorkspaceState } from '../../lib/services/workspace/workspace.service';
 import { SpineService } from '../../lib/services/spine/spine.service';
+import { ExtensionManager } from '../../lib/extensions/extension-manager';
+import { loadExtensionCatalog } from '../../lib/extensions/extension-catalog';
+import { addTransform } from '../../lib/settings/dom-transforms';
+import pageCSS from '../../assets/universal/page.css?raw';
+import transformTextJS from '../../assets/universal/transformText.js?raw';
+import transformDomJS from '../../assets/universal/transformDom.js?raw';
 
 const WORKSPACE_ID_KEY = 'editme_app_workspace_id';
 const NAV_VIEW_KEY = 'editme_nav_current_view';
+
+const BASE_TEXT_TRANSFORM = 'SOURCE/scripts/transformText.js';
+const BASE_DOM_TRANSFORM = 'SOURCE/scripts/transformDom.js';
 
 export interface SeedChapter {
   title: string;
@@ -36,6 +45,19 @@ export interface SeedProjectOptions {
   chapters?: SeedChapter[];
   /** View the app should open on (persisted nav state), e.g. 'spine'. */
   view?: string;
+  /**
+   * Catalog extension ids to install into the project (e.g. ['djot', 'prism']),
+   * in the order they should stack. The first one that provides a text
+   * transform becomes the project's text_transform (like picking a format on
+   * create); every DOM transform is appended to dom_transforms. The extension
+   * files are fetched from the same-origin `/extensions/` the app uses, so this
+   * works in Storybook and in test:stories.
+   *
+   * Note: EPUB assets an extension carries (e.g. a Prism theme CSS) are not yet
+   * registered into the manifest here — enough for the settings form and for
+   * transforms that highlight structurally, not for asset-dependent styling.
+   */
+  extensions?: string[];
 }
 
 export interface SeededProject {
@@ -66,6 +88,7 @@ export async function seedProject(options: SeedProjectOptions = {}): Promise<See
     language = 'en',
     chapters = DEFAULT_CHAPTERS,
     view,
+    extensions = [],
   } = options;
 
   const fileStorage = FileStorageAPI.getInstance();
@@ -100,6 +123,57 @@ export async function seedProject(options: SeedProjectOptions = {}): Promise<See
       linear: true,
     });
     workspace = result.updatedWorkspace;
+  }
+
+  // Extensions need the project's structural base (the default transform
+  // scripts they stack onto, plus a settings file wiring the pipeline). Only
+  // write it when extensions are requested — the app tolerates its absence for
+  // plain seeds, and skipping the extra writes keeps the common seed fast (it's
+  // on the hot path of every seeded story in the parallel test suite).
+  if (extensions.length > 0) {
+    const wsId = workspace.id;
+    await fileStorage.writeTextFile(wsId, 'OEBPS/Styles/page.css', pageCSS);
+    await fileStorage.writeTextFile(wsId, BASE_TEXT_TRANSFORM, transformTextJS);
+    await fileStorage.writeTextFile(wsId, BASE_DOM_TRANSFORM, transformDomJS);
+    await fileStorage.writeTextFile(wsId, 'SOURCE/preview/head.xml', '');
+
+    let textTransform = BASE_TEXT_TRANSFORM;
+    let domTransforms = [BASE_DOM_TRANSFORM];
+
+    // Install each extension from the same-origin catalog and wire its
+    // transforms into the settings, mirroring App.installCatalogExtension.
+    const extensionManager = new ExtensionManager(fileStorage);
+    const catalog = await loadExtensionCatalog();
+    for (const id of extensions) {
+      const entry = catalog.find(e => e.id === id);
+      if (!entry) throw new Error(`seedProject: extension '${id}' not in the catalog`);
+      await extensionManager.importCatalogExtension(wsId, entry);
+      for (const file of entry.domTransforms) {
+        domTransforms = addTransform(domTransforms, `SOURCE/extensions/${id}/${file}`);
+      }
+      if (entry.textTransforms.length > 0) {
+        textTransform = `SOURCE/extensions/${id}/${entry.textTransforms[0]}`;
+      }
+    }
+
+    await fileStorage.writeTextFile(
+      wsId,
+      'SOURCE/settings.json',
+      JSON.stringify(
+        {
+          version: '1.0.0',
+          text_transform: textTransform,
+          dom_transforms: domTransforms,
+          preview: {
+            autoUpdate: { responsive: true, device: true, pdf: false },
+            head: 'preview/head.xml',
+            includeHead: { responsive: true, device: false, pdf: false },
+          },
+        },
+        null,
+        2
+      )
+    );
   }
 
   localStorage.setItem(WORKSPACE_ID_KEY, workspace.id);

@@ -1107,6 +1107,9 @@
                     </p>
                   </div>
 
+                  <!-- The transform pipeline (text + DOM). Wrapped as one unit;
+                       also the clip target for the manual's EPUB-settings shot. -->
+                  <div class="transform-pipeline-settings">
                   <div class="setting-group">
                     <label for="text-transform" class="setting-label-text">
                       {$t('Text Transform')}
@@ -1215,6 +1218,7 @@
                         {/each}
                       </select>
                     {/if}
+                  </div>
                   </div>
                 </SettingsSection>
               {/if}
