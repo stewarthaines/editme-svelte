@@ -146,6 +146,8 @@ const PRINT_TOOLBAR_CSS = `
   }
   .pdf-export-btn:active { background: #1d4ed8; }
   .pdf-export-hint { opacity: 0.85; }
+  .pdf-export-close { margin-left: auto; background: #3f3f3f; }
+  .pdf-export-close:active { background: #2f2f2f; }
 }
 @media print {
   .pdf-export-bar { display: none !important; }
@@ -300,7 +302,14 @@ export function buildPagedDocument(
         `k.addEventListener('click',function(){window.print();});b.appendChild(k);` +
         `var h=document.createElement('span');h.className='pdf-export-hint';` +
         `h.textContent=${JSON.stringify(translate("Opens your device's print dialog."))};` +
-        `b.appendChild(h);document.body.insertBefore(b,document.body.firstChild);}catch(e){}`
+        `b.appendChild(h);` +
+        // Close: this window is always script-opened, so window.close() is
+        // permitted. Essential in installed-PWA contexts (iOS standalone) where
+        // the window renders without browser chrome — no tab bar, no way back.
+        `var c=document.createElement('button');c.type='button';c.className='pdf-export-btn pdf-export-close';` +
+        `c.textContent=${JSON.stringify(translate('Close'))};` +
+        `c.addEventListener('click',function(){window.close();});b.appendChild(c);` +
+        `document.body.insertBefore(b,document.body.firstChild);}catch(e){}`
       : `parent.postMessage('${doneMessage}','*');`;
   const inject =
     `<script>window.PagedConfig={auto:true,after:function(){` +

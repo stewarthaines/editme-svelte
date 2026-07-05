@@ -725,12 +725,17 @@ msgstr "Clip-Bezeichnung"
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
+#: src/lib/pdf/pdf-export.ts
 msgid "Close"
 msgstr "Schließen"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close accessibility panel"
 msgstr "Barrierefreiheitsbereich schließen"
+
+#: src/lib/components/reader/ReaderOverlay.svelte
+msgid "Close reader"
+msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close reading preview panel"
@@ -2543,6 +2548,7 @@ msgstr "Schreibgeschütztes Kapitel"
 msgid "Read-only navigation"
 msgstr "Schreibgeschützte Navigation"
 
+#: src/lib/components/reader/ReaderOverlay.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reader"
 msgstr "Lesemodus"

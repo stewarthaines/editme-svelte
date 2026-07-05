@@ -725,11 +725,16 @@ msgstr ""
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
+#: src/lib/pdf/pdf-export.ts
 msgid "Close"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close accessibility panel"
+msgstr ""
+
+#: src/lib/components/reader/ReaderOverlay.svelte
+msgid "Close reader"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -2543,6 +2548,7 @@ msgstr ""
 msgid "Read-only navigation"
 msgstr ""
 
+#: src/lib/components/reader/ReaderOverlay.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reader"
 msgstr ""

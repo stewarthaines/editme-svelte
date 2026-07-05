@@ -62,7 +62,8 @@
     type CoverMode,
   } from './lib/epub/cover-generator.js';
   import { exportPdf, exportChapterPdf } from './lib/pdf/pdf-export.js';
-  import { isHttpContext } from './lib/reader/open-in-reader.js';
+  import { isHttpContext, readerOverlayUrl } from './lib/reader/open-in-reader.js';
+  import ReaderOverlay from './lib/components/reader/ReaderOverlay.svelte';
   import { writePublishSidecar } from './lib/services/publish/publish-sidecar.js';
 
   // Extension manager instance
@@ -1420,6 +1421,12 @@
 
 <!-- App-wide toast host for fleeting notifications (see Toast.svelte). -->
 <Toast />
+
+<!-- In-app reader (standalone/installed-PWA mode only — a script-opened reader
+     window would render without browser chrome there and strand the user). -->
+{#if $readerOverlayUrl}
+  <ReaderOverlay url={$readerOverlayUrl} onClose={() => readerOverlayUrl.set(null)} />
+{/if}
 
 <style>
   .loading-state,
