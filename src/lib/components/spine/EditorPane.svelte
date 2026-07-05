@@ -29,6 +29,7 @@
   import type { GeneratorRunner } from '$lib/generators/generator-store.js';
   import { isRtlLanguage } from '$lib/epub/language-direction.js';
   import { primaryLanguage } from '$lib/epub/opf-utils.js';
+  import { convertManifestPathToXHTMLPath } from '$lib/epub/path-utils.js';
   import { t } from '$lib/i18n';
   import { RowsIcon, SquareIcon, ArrowUUpLeft } from 'phosphor-svelte';
   import { onMount } from 'svelte';
@@ -341,10 +342,17 @@
           workspaceTouched = true;
         }
 
+        // Image/video references resolve from the chapter document (Text/), so
+        // they need the ../ hop; the clip directive instead carries the
+        // OPF-relative href by convention (its player resolves ../ at runtime).
+        const contentHref = convertManifestPathToXHTMLPath(href);
         if (mediaType.startsWith('image/')) {
           const alt = filenameStem(file.name);
           snippets.push(
-            formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', { href, alt })
+            formatImageSnippet(epubSettings.image_template || '![<alt>](<href>)', {
+              href: contentHref,
+              alt,
+            })
           );
           selectAlt = alt;
         } else if (mediaType.startsWith('audio/') && audioClipService) {
@@ -360,7 +368,7 @@
           snippets.push(
             formatVideoSnippet(
               epubSettings.video_template || '<video src="<href>" controls="controls"></video>',
-              { href }
+              { href: contentHref }
             )
           );
         } else if (collision?.identical) {
