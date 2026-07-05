@@ -7,8 +7,10 @@
  *
  * Click — or Enter/Space, once the script has promoted the span to a button —
  * toggles playback of the clip's [begin, end) range; starting one clip stops any
- * other. data-src is the OPF-relative href and chapters live one level below the
- * OPF (Text/), so it resolves via '../'. One shared <audio> per source file.
+ * other. One shared <audio> per source file. data-src is the OPF-relative href
+ * and chapters live one level below the OPF (Text/), so it resolves via '../' —
+ * except when it's already absolute: the authoring preview rewrites data-src to
+ * a blob: URL, which passes through untouched.
  *
  * Progressive enhancement: without JavaScript the span is plain styled text
  * (clip.css keys its play affordance on the role attribute this script adds).
@@ -25,6 +27,12 @@
     }, 0);
   }
 
+  // OPF-relative href → '../…' (chapters live in Text/); any URL that already
+  // carries a scheme (blob: in the preview, http(s): remote) passes through.
+  function resolveSrc(src) {
+    return /^[a-z][a-z0-9+.-]*:/i.test(src) ? src : '../' + src;
+  }
+
   var players = {}; // data-src → shared HTMLAudioElement
   var active = null; // { span, audio, end } for the clip now playing
 
@@ -39,7 +47,7 @@
     var src = span.getAttribute('data-src');
     var audio = players[src];
     if (!audio) {
-      audio = new Audio('../' + src);
+      audio = new Audio(resolveSrc(src));
       audio.preload = 'auto';
       audio.addEventListener('timeupdate', function () {
         if (active && active.audio === audio && audio.currentTime >= active.end) stop();
