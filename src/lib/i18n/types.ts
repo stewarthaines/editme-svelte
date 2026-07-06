@@ -60,6 +60,32 @@ export interface TranslationFunction {
   (key: string, params?: Record<string, any>): string;
 }
 
+/** One downloadable catalog in the locales manifest sidecar */
+export interface LocalesManifestEntry {
+  /** Locale code (e.g. 'de') */
+  code: string;
+  /** Human-readable name in the locale's own language */
+  name: string;
+  /** English name for reference */
+  englishName: string;
+  /** Text direction for layout */
+  direction: 'ltr' | 'rtl';
+  /** Catalog filename relative to locales/ (e.g. 'de.json') */
+  file: string;
+  /** Catalog size in bytes (informational) */
+  bytes?: number;
+  /** Content hash for cache invalidation (e.g. 'sha256-…') */
+  hash?: string;
+}
+
+/** The locales/manifest.json sidecar served next to the hosted app */
+export interface LocalesManifest {
+  /** App version the manifest was generated for */
+  version: string;
+  /** Downloadable catalogs; English is never listed (msgids are the content) */
+  locales: LocalesManifestEntry[];
+}
+
 export interface I18nLoader {
   /** Load all storage-cached translation catalogs */
   loadTranslations(): Promise<Record<string, TranslationCatalog>>;
@@ -73,4 +99,12 @@ export interface I18nLoader {
   listCachedLocales(): Promise<string[]>;
   /** Load a single cached catalog, or null if absent/unreadable */
   loadCatalog(locale: string): Promise<TranslationCatalog | null>;
+  /** Validate and cache a fetched catalog (raw po2json text) into storage */
+  cacheCatalog(locale: string, jsonText: string): Promise<void>;
+  /** Remove a cached catalog (e.g. it went stale against a fresh manifest) */
+  removeCatalog(locale: string): Promise<void>;
+  /** The locales manifest persisted from the last successful fetch, if any */
+  getCachedManifest(): Promise<LocalesManifest | null>;
+  /** Persist the fetched locales manifest for hash comparison on later startups */
+  saveManifest(manifest: LocalesManifest): Promise<void>;
 }

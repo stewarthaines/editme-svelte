@@ -8,12 +8,27 @@ import type {
   TranslationFunction,
   TranslationCatalog,
   AvailableLocale,
+  LocalesManifestEntry,
 } from './types.js';
 import { LOCALE_CONFIGS, DEFAULT_LOCALE, getEnabledBrowserLocale, isRTL } from './locale-config.js';
 import { createI18nLoader } from './loader.js';
+import {
+  isHttpSourceAvailable,
+  fetchLocalesManifest,
+  fetchCatalogFile,
+} from './http-catalog-source.js';
 
 /** localStorage key for the persisted locale preference (load-bearing — do not rename) */
 const LOCALE_STORAGE_KEY = 'editme-locale';
+
+/**
+ * Manifest entries from the last http fetch this session, keyed by locale code.
+ * setLocale needs them to resolve a 'remote' locale to its catalog file.
+ */
+let remoteEntries: Record<string, LocalesManifestEntry> = {};
+
+/** In-flight background availability refresh (exposed to tests via _awaitRemoteRefresh) */
+let remoteRefreshPromise: Promise<void> | null = null;
 
 // Internal state store
 const i18nState = writable<I18nState>({
@@ -29,8 +44,8 @@ const i18nState = writable<I18nState>({
 export const currentLocale = derived(i18nState, $state => $state.currentLocale);
 export const isLoading = derived(i18nState, $state => $state.loading);
 export const isInitialized = derived(i18nState, $state => $state.initialized);
-export const documentDirection = derived(currentLocale, $locale =>
-  isRTL($locale) ? 'rtl' : 'ltr'
+export const documentDirection = derived(i18nState, $state =>
+  localeDirection($state, $state.currentLocale)
 );
 /** Locales the picker can offer — the union of what all catalog sources can supply */
 export const availableLocales = derived(i18nState, $state =>
@@ -124,10 +139,23 @@ export const t = derived(
  * attributes (read by screen readers, hyphenation, `:lang()`, translation tools)
  * plus the `data-*` hooks the stylesheets key off.
  */
+/**
+ * Text direction for a locale: the availability entry (which can carry manifest
+ * metadata for locales the runtime doesn't know natively) wins, then the static
+ * config, then the RTL list.
+ */
+function localeDirection(state: I18nState, locale: string): 'ltr' | 'rtl' {
+  return (
+    state.availableLocales[locale]?.direction ??
+    LOCALE_CONFIGS[locale]?.direction ??
+    (isRTL(locale) ? 'rtl' : 'ltr')
+  );
+}
+
 function applyDocumentLocale(locale: string): void {
   if (typeof document === 'undefined') return;
   const el = document.documentElement;
-  const dir = isRTL(locale) ? 'rtl' : 'ltr';
+  const dir = localeDirection(get(i18nState), locale);
   el.lang = locale;
   el.dir = dir;
   el.setAttribute('data-dir', dir);
@@ -213,6 +241,14 @@ export async function initI18n(): Promise<void> {
       initialized: true,
       loading: false,
     }));
+
+    // Hosted only: discover fetchable locales in the background. First paint never
+    // blocks on the network — remote availability lands as a later store update.
+    if (isHttpSourceAvailable()) {
+      remoteRefreshPromise = refreshRemoteAvailability().catch(error => {
+        console.warn('Failed to refresh remote locale availability:', error);
+      });
+    }
   } catch (error) {
     console.error('Failed to initialize i18n:', error);
 
@@ -230,6 +266,75 @@ export async function initI18n(): Promise<void> {
 }
 
 /**
+ * Fetch the locales manifest, merge remote availability into the store, drop
+ * stale cached catalogs (hash mismatch against the previously stored manifest),
+ * and re-resolve the persisted locale preference now that remote locales are
+ * known. Runs in the background after init on http deployments.
+ */
+async function refreshRemoteAvailability(): Promise<void> {
+  const manifest = await fetchLocalesManifest();
+  if (!manifest) {
+    // No sidecar / offline: behave like file:// — local sources only.
+    return;
+  }
+
+  const loader = createI18nLoader();
+  const cachedManifest = await loader.getCachedManifest();
+  const cachedHashes = new Map(
+    (cachedManifest?.locales ?? []).map(entry => [entry.code, entry.hash])
+  );
+
+  const entries = manifest.locales.filter(entry => entry.code !== DEFAULT_LOCALE);
+  remoteEntries = Object.fromEntries(entries.map(entry => [entry.code, entry]));
+
+  // A cached catalog whose hash no longer matches the fresh manifest is stale:
+  // remove it so no later startup can read it, and downgrade to 'remote' so the
+  // next use refetches.
+  const stale = entries.filter(
+    entry => entry.hash !== undefined && cachedHashes.get(entry.code) !== entry.hash
+  );
+  for (const entry of stale) {
+    await loader.removeCatalog(entry.code);
+  }
+  const staleCodes = new Set(stale.map(entry => entry.code));
+
+  i18nState.update(s => {
+    const available = { ...s.availableLocales };
+    for (const entry of entries) {
+      const existing = available[entry.code];
+      if (existing && !staleCodes.has(entry.code)) {
+        continue; // already satisfiable locally and still fresh
+      }
+      // Display metadata: static config wins; the manifest is the metadata
+      // channel for locales the runtime doesn't know natively.
+      const meta = LOCALE_CONFIGS[entry.code] ?? {
+        code: entry.code,
+        name: entry.name,
+        englishName: entry.englishName,
+        direction: entry.direction === 'rtl' ? 'rtl' : 'ltr',
+      };
+      available[entry.code] = { ...meta, availability: 'remote' };
+    }
+    return { ...s, availableLocales: available };
+  });
+
+  // Re-resolve the persisted preference: it may have been locally unsatisfiable
+  // at init (very first hosted load) and only now fetchable.
+  const persisted = getPersistedLocale();
+  const state = get(i18nState);
+  if (persisted && persisted !== state.currentLocale && state.availableLocales[persisted]) {
+    await setLocale(persisted);
+  } else if (state.availableLocales[state.currentLocale]?.availability === 'remote') {
+    // The active locale's catalog went stale — refetch it in place.
+    await setLocale(state.currentLocale);
+  }
+
+  // Persist the manifest last: a failed refetch above leaves the old manifest in
+  // place, so the staleness is redetected on the next startup.
+  await loader.saveManifest(manifest);
+}
+
+/**
  * Switch to a different locale
  */
 export async function setLocale(locale: string): Promise<void> {
@@ -239,7 +344,9 @@ export async function setLocale(locale: string): Promise<void> {
     throw new Error('i18n system not initialized');
   }
 
-  if (!LOCALE_CONFIGS[locale]) {
+  // Unknown = neither statically configured nor supplied by any source (a
+  // manifest entry can introduce a locale the runtime doesn't know natively).
+  if (!LOCALE_CONFIGS[locale] && !state.availableLocales[locale]) {
     throw new Error(`Unsupported locale: ${locale}`);
   }
 
@@ -250,6 +357,41 @@ export async function setLocale(locale: string): Promise<void> {
   if (!availability) {
     console.warn(`Locale ${locale} is not available; ignoring switch.`);
     return;
+  }
+
+  // Catalog only fetchable over http: download, cache, then switch.
+  if (availability === 'remote') {
+    const entry = remoteEntries[locale];
+    if (!entry) {
+      console.warn(`No manifest entry for locale ${locale}; ignoring switch.`);
+      return;
+    }
+
+    i18nState.update(s => ({ ...s, loading: true }));
+    try {
+      const jsonText = await fetchCatalogFile(entry);
+      if (jsonText === null) {
+        console.warn(`Failed to fetch catalog for ${locale}; staying on current locale.`);
+        return;
+      }
+      const loader = createI18nLoader();
+      await loader.cacheCatalog(locale, jsonText);
+      const catalog = await loader.loadCatalog(locale);
+      if (!catalog) {
+        console.warn(`Fetched catalog for ${locale} is unreadable; staying on current locale.`);
+        return;
+      }
+      i18nState.update(s => ({
+        ...s,
+        catalogs: { ...s.catalogs, [locale]: catalog },
+        availableLocales: {
+          ...s.availableLocales,
+          [locale]: { ...s.availableLocales[locale], availability: 'loaded' },
+        },
+      }));
+    } finally {
+      i18nState.update(s => ({ ...s, loading: false }));
+    }
   }
 
   // Catalog cached in storage but not in memory yet: load it before switching.
@@ -305,6 +447,8 @@ export function getCurrentLocaleConfig() {
  * @internal
  */
 export function _resetI18nForTesting() {
+  remoteEntries = {};
+  remoteRefreshPromise = null;
   i18nState.set({
     currentLocale: DEFAULT_LOCALE,
     locales: LOCALE_CONFIGS,
@@ -313,6 +457,15 @@ export function _resetI18nForTesting() {
     initialized: false,
     loading: false,
   });
+}
+
+/**
+ * Await the background remote-availability refresh initI18n kicked off, if any
+ * (internal use only — lets tests assert the post-refresh state deterministically)
+ * @internal
+ */
+export async function _awaitRemoteRefreshForTesting(): Promise<void> {
+  await remoteRefreshPromise;
 }
 
 // Export i18nState for Storybook and testing

@@ -2,11 +2,17 @@
  * ZIP-based translation loader with storage integration
  */
 
-import type { I18nLoader, TranslationCatalog } from './types.js';
+import type { I18nLoader, TranslationCatalog, LocalesManifest } from './types.js';
 import { FileStorageAPI } from '../storage/index.js';
 import { Zip } from '../zip/index.js';
 
 const LOCALES_WORKSPACE_ID = 'locales';
+
+/**
+ * Workspace file persisting the last fetched locales manifest. Dot-prefixed so
+ * listCachedLocales never mistakes it for a catalog.
+ */
+const MANIFEST_CACHE_FILE = '.manifest.json';
 
 /**
  * Create translation loader instance
@@ -141,6 +147,65 @@ class TranslationLoader implements I18nLoader {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Validate and cache a fetched catalog (raw po2json text) into storage
+   */
+  async cacheCatalog(locale: string, jsonText: string): Promise<void> {
+    // Validate JSON before writing — a broken download must not poison the cache
+    JSON.parse(jsonText);
+
+    if (!this.storage.isInitialized()) {
+      await this.storage.init();
+    }
+    await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
+    await this.storage.writeTextFile(LOCALES_WORKSPACE_ID, `${locale}.json`, jsonText);
+  }
+
+  /**
+   * Remove a cached catalog (e.g. it went stale against a fresh manifest)
+   */
+  async removeCatalog(locale: string): Promise<void> {
+    if (!this.storage.isInitialized()) {
+      await this.storage.init();
+    }
+    try {
+      await this.storage.deleteFile(LOCALES_WORKSPACE_ID, `${locale}.json`);
+    } catch {
+      // Already absent — nothing to remove
+    }
+  }
+
+  /**
+   * The locales manifest persisted from the last successful fetch, if any
+   */
+  async getCachedManifest(): Promise<LocalesManifest | null> {
+    if (!this.storage.isInitialized()) {
+      await this.storage.init();
+    }
+    try {
+      const content = await this.storage.readTextFile(LOCALES_WORKSPACE_ID, MANIFEST_CACHE_FILE);
+      const manifest = JSON.parse(content);
+      return manifest && Array.isArray(manifest.locales) ? manifest : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Persist the fetched locales manifest for hash comparison on later startups
+   */
+  async saveManifest(manifest: LocalesManifest): Promise<void> {
+    if (!this.storage.isInitialized()) {
+      await this.storage.init();
+    }
+    await this.storage.createWorkspace(LOCALES_WORKSPACE_ID);
+    await this.storage.writeTextFile(
+      LOCALES_WORKSPACE_ID,
+      MANIFEST_CACHE_FILE,
+      JSON.stringify(manifest)
+    );
   }
 
   /**

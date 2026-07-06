@@ -15,6 +15,7 @@ import {
   getAvailableLocales,
   getCurrentLocaleConfig,
   _resetI18nForTesting,
+  _awaitRemoteRefreshForTesting,
 } from '../index.js';
 import { MockLocalStorage, mockTranslationCatalogs } from './fixtures/mock-translations.js';
 
@@ -24,10 +25,27 @@ const mockLoader = {
   listCachedLocales: vi.fn(),
   loadCatalog: vi.fn(),
   loadTranslations: vi.fn(),
+  cacheCatalog: vi.fn(),
+  removeCatalog: vi.fn(),
+  getCachedManifest: vi.fn(),
+  saveManifest: vi.fn(),
 };
 
 vi.mock('../loader.js', () => ({
   createI18nLoader: () => mockLoader,
+}));
+
+// Mock the http catalog source (default: unavailable, like file://)
+const mockHttpSource = {
+  isHttpSourceAvailable: vi.fn(),
+  fetchLocalesManifest: vi.fn(),
+  fetchCatalogFile: vi.fn(),
+};
+
+vi.mock('../http-catalog-source.js', () => ({
+  isHttpSourceAvailable: (...args: unknown[]) => mockHttpSource.isHttpSourceAvailable(...args),
+  fetchLocalesManifest: (...args: unknown[]) => mockHttpSource.fetchLocalesManifest(...args),
+  fetchCatalogFile: (...args: unknown[]) => mockHttpSource.fetchCatalogFile(...args),
 }));
 
 // Mock navigator for browser locale detection
@@ -86,9 +104,25 @@ describe('i18n runtime system', () => {
     mockLoader.listCachedLocales.mockReset();
     mockLoader.loadCatalog.mockReset();
     mockLoader.loadTranslations.mockReset();
+    mockLoader.cacheCatalog.mockReset();
+    mockLoader.removeCatalog.mockReset();
+    mockLoader.getCachedManifest.mockReset();
+    mockLoader.saveManifest.mockReset();
     mockLoader.extractEmbeddedBundle.mockResolvedValue([]);
     mockLoader.listCachedLocales.mockResolvedValue([]);
     mockLoader.loadCatalog.mockResolvedValue(null);
+    mockLoader.cacheCatalog.mockResolvedValue(undefined);
+    mockLoader.removeCatalog.mockResolvedValue(undefined);
+    mockLoader.getCachedManifest.mockResolvedValue(null);
+    mockLoader.saveManifest.mockResolvedValue(undefined);
+
+    // Reset http source mocks (default: unavailable, like file://)
+    mockHttpSource.isHttpSourceAvailable.mockReset();
+    mockHttpSource.fetchLocalesManifest.mockReset();
+    mockHttpSource.fetchCatalogFile.mockReset();
+    mockHttpSource.isHttpSourceAvailable.mockReturnValue(false);
+    mockHttpSource.fetchLocalesManifest.mockResolvedValue(null);
+    mockHttpSource.fetchCatalogFile.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -478,6 +512,170 @@ describe('i18n runtime system', () => {
       await initI18n();
 
       expect(get(currentLocale)).toBe('en');
+    });
+  });
+
+  describe('http on-demand locales', () => {
+    const deManifest = {
+      version: '1.0.0',
+      locales: [
+        {
+          code: 'de',
+          name: 'Deutsch',
+          englishName: 'German',
+          direction: 'ltr' as const,
+          file: 'de.json',
+          bytes: 100,
+          hash: 'sha256-abc',
+        },
+      ],
+    };
+    const deCatalogJson = JSON.stringify({
+      '': { Language: 'de' },
+      Save: 'Speichern',
+    });
+    const deCatalog = {
+      locale: 'de',
+      messages: { Save: 'Speichern' },
+      headers: { Language: 'de' },
+    };
+
+    beforeEach(() => {
+      mockHttpSource.isHttpSourceAvailable.mockReturnValue(true);
+    });
+
+    it('should merge remote locales into availability after init', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockLoader.loadTranslations.mockResolvedValue({});
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      const de = getAvailableLocales().find(l => l.code === 'de');
+      expect(de).toMatchObject({ code: 'de', availability: 'remote' });
+      expect(mockLoader.saveManifest).toHaveBeenCalledWith(deManifest);
+    });
+
+    it('should fetch, cache and switch on setLocale of a remote locale', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockHttpSource.fetchCatalogFile.mockResolvedValue(deCatalogJson);
+      mockLoader.loadTranslations.mockResolvedValue({});
+      mockLoader.loadCatalog.mockResolvedValue(deCatalog);
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+      await setLocale('de');
+
+      expect(get(currentLocale)).toBe('de');
+      expect(get(t)('Save')).toBe('Speichern');
+      expect(mockLoader.cacheCatalog).toHaveBeenCalledWith('de', deCatalogJson);
+      // Next switch needs no refetch
+      expect(getAvailableLocales().find(l => l.code === 'de')?.availability).toBe('loaded');
+    });
+
+    it('should stay on the current locale when the remote fetch fails', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockHttpSource.fetchCatalogFile.mockResolvedValue(null);
+      mockLoader.loadTranslations.mockResolvedValue({});
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+      await setLocale('de');
+
+      expect(get(currentLocale)).toBe('en');
+      expect(mockLocalStorage.getItem('editme-locale')).toBeNull();
+    });
+
+    it('should resolve a persisted remote-only locale after the manifest lands', async () => {
+      // Very first hosted load with a persisted 'de': init starts on English,
+      // the background refresh then fetches and applies the preference.
+      mockLocalStorage.setItem('editme-locale', 'de');
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockHttpSource.fetchCatalogFile.mockResolvedValue(deCatalogJson);
+      mockLoader.loadTranslations.mockResolvedValue({});
+      mockLoader.loadCatalog.mockResolvedValue(deCatalog);
+
+      await initI18n();
+      expect(get(currentLocale)).toBe('en'); // first paint doesn't block on the network
+
+      await _awaitRemoteRefreshForTesting();
+      expect(get(currentLocale)).toBe('de');
+      expect(get(t)('Save')).toBe('Speichern');
+    });
+
+    it('should drop a stale cached catalog when the manifest hash changes', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockLoader.loadTranslations.mockResolvedValue({ de: deCatalog });
+      mockLoader.getCachedManifest.mockResolvedValue({
+        version: '0.9.0',
+        locales: [{ ...deManifest.locales[0], hash: 'sha256-OLD' }],
+      });
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      expect(mockLoader.removeCatalog).toHaveBeenCalledWith('de');
+      expect(getAvailableLocales().find(l => l.code === 'de')?.availability).toBe('remote');
+    });
+
+    it('should keep a fresh cached catalog loaded when the hash is unchanged', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockLoader.loadTranslations.mockResolvedValue({ de: deCatalog });
+      mockLoader.getCachedManifest.mockResolvedValue(deManifest);
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      expect(mockLoader.removeCatalog).not.toHaveBeenCalled();
+      expect(getAvailableLocales().find(l => l.code === 'de')?.availability).toBe('loaded');
+    });
+
+    it('should offer a manifest-only locale with manifest metadata and switch to it', async () => {
+      // 'fr' has no LOCALE_CONFIGS entry — the manifest is its metadata channel.
+      const frManifest = {
+        version: '1.0.0',
+        locales: [
+          {
+            code: 'fr',
+            name: 'Français',
+            englishName: 'French',
+            direction: 'ltr' as const,
+            file: 'fr.json',
+            hash: 'sha256-fr',
+          },
+        ],
+      };
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(frManifest);
+      mockHttpSource.fetchCatalogFile.mockResolvedValue(
+        JSON.stringify({ '': { Language: 'fr' }, Save: 'Enregistrer' })
+      );
+      mockLoader.loadTranslations.mockResolvedValue({});
+      mockLoader.loadCatalog.mockResolvedValue({
+        locale: 'fr',
+        messages: { Save: 'Enregistrer' },
+        headers: { Language: 'fr' },
+      });
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      const fr = getAvailableLocales().find(l => l.code === 'fr');
+      expect(fr).toMatchObject({ code: 'fr', name: 'Français', availability: 'remote' });
+
+      await setLocale('fr');
+      expect(get(currentLocale)).toBe('fr');
+      expect(get(t)('Save')).toBe('Enregistrer');
+    });
+
+    it('should behave like file:// when the sidecar is missing', async () => {
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(null);
+      mockLoader.loadTranslations.mockResolvedValue({});
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      expect(getAvailableLocales().map(l => l.code)).toEqual(['en']);
+      expect(mockLoader.saveManifest).not.toHaveBeenCalled();
     });
   });
 });
