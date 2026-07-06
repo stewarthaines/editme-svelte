@@ -30,6 +30,39 @@ let remoteEntries: Record<string, LocalesManifestEntry> = {};
 /** In-flight background availability refresh (exposed to tests via _awaitRemoteRefresh) */
 let remoteRefreshPromise: Promise<void> | null = null;
 
+/** Locale codes the embedded bundle delivered this startup (always legitimate) */
+let embeddedLocales: string[] = [];
+
+/**
+ * Remove cached catalogs no active source can vouch for — artifacts of earlier
+ * app revisions (e.g. locales once written by an old embedded bundle or demo
+ * scripts) that would otherwise surface in the picker forever, since extraction
+ * only ever writes. A catalog is legitimate if a source delivered it THIS
+ * deployment: the embedded/injected bundle (re-extracted every startup, so
+ * EPUB-carried locales always survive) or the fetched manifest. English is
+ * always kept. Returns the codes that were removed.
+ *
+ * NOTE: if catalogs ever travel by a path that is NOT re-established each
+ * startup (e.g. SEED.zip transport, the deferred Phase D), that source must be
+ * added to the legitimate set here.
+ */
+async function sweepOrphanCatalogs(
+  loader: ReturnType<typeof createI18nLoader>,
+  legitimate: Set<string>
+): Promise<string[]> {
+  const removed: string[] = [];
+  for (const code of await loader.listCachedLocales()) {
+    if (code === DEFAULT_LOCALE || legitimate.has(code)) continue;
+    await loader.removeCatalog(code);
+    removed.push(code);
+  }
+  if (removed.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(`Removed cached locale catalog(s) with no active source: ${removed.join(', ')}`);
+  }
+  return removed;
+}
+
 // Internal state store
 const i18nState = writable<I18nState>({
   currentLocale: DEFAULT_LOCALE,
@@ -213,7 +246,16 @@ export async function initI18n(): Promise<void> {
 
     // Extract embedded catalogs (if this build carries any) into the workspace,
     // then load everything the workspace holds — whatever source put it there.
-    await loader.extractEmbeddedBundle();
+    embeddedLocales = await loader.extractEmbeddedBundle();
+
+    // On file:// the embedded bundle is the only non-English source, so anything
+    // else in the cache is an orphaned artifact — sweep it before it can load.
+    // Hosted deployments sweep later, once the manifest says what is fetchable
+    // (and never when offline, so the PWA cache survives).
+    if (!isHttpSourceAvailable()) {
+      await sweepOrphanCatalogs(loader, new Set(embeddedLocales));
+    }
+
     const catalogs = await loader.loadTranslations();
 
     // Ensure English fallback is available
@@ -246,6 +288,7 @@ export async function initI18n(): Promise<void> {
     // blocks on the network — remote availability lands as a later store update.
     if (isHttpSourceAvailable()) {
       remoteRefreshPromise = refreshRemoteAvailability().catch(error => {
+        // eslint-disable-next-line no-console
         console.warn('Failed to refresh remote locale availability:', error);
       });
     }
@@ -286,6 +329,28 @@ async function refreshRemoteAvailability(): Promise<void> {
 
   const entries = manifest.locales.filter(entry => entry.code !== DEFAULT_LOCALE);
   remoteEntries = Object.fromEntries(entries.map(entry => [entry.code, entry]));
+
+  // With the manifest in hand, the legitimate set is complete: sweep cached
+  // catalogs that neither the manifest nor this build's embedded bundle
+  // delivered (artifacts of earlier app revisions), and drop them from the
+  // session too — except the active locale, which keeps working until the next
+  // startup falls back (its storage is already gone).
+  const orphans = await sweepOrphanCatalogs(
+    loader,
+    new Set([...entries.map(entry => entry.code), ...embeddedLocales])
+  );
+  if (orphans.length > 0) {
+    i18nState.update(s => {
+      const catalogs = { ...s.catalogs };
+      const available = { ...s.availableLocales };
+      for (const code of orphans) {
+        if (code === s.currentLocale) continue;
+        delete catalogs[code];
+        delete available[code];
+      }
+      return { ...s, catalogs, availableLocales: available };
+    });
+  }
 
   // A cached catalog whose hash no longer matches the fresh manifest is stale:
   // remove it so no later startup can read it, and downgrade to 'remote' so the
@@ -363,6 +428,7 @@ export async function setLocale(locale: string): Promise<void> {
   if (availability === 'remote') {
     const entry = remoteEntries[locale];
     if (!entry) {
+      // eslint-disable-next-line no-console
       console.warn(`No manifest entry for locale ${locale}; ignoring switch.`);
       return;
     }
@@ -371,6 +437,7 @@ export async function setLocale(locale: string): Promise<void> {
     try {
       const jsonText = await fetchCatalogFile(entry);
       if (jsonText === null) {
+        // eslint-disable-next-line no-console
         console.warn(`Failed to fetch catalog for ${locale}; staying on current locale.`);
         return;
       }
@@ -378,6 +445,7 @@ export async function setLocale(locale: string): Promise<void> {
       await loader.cacheCatalog(locale, jsonText);
       const catalog = await loader.loadCatalog(locale);
       if (!catalog) {
+        // eslint-disable-next-line no-console
         console.warn(`Fetched catalog for ${locale} is unreadable; staying on current locale.`);
         return;
       }
@@ -449,6 +517,7 @@ export function getCurrentLocaleConfig() {
 export function _resetI18nForTesting() {
   remoteEntries = {};
   remoteRefreshPromise = null;
+  embeddedLocales = [];
   i18nState.set({
     currentLocale: DEFAULT_LOCALE,
     locales: LOCALE_CONFIGS,

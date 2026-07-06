@@ -231,6 +231,26 @@ describe('i18n runtime system', () => {
       expect(get(isInitialized)).toBe(true);
     });
 
+    it('should sweep orphaned cached catalogs on file://', async () => {
+      // 'ka' was written by an earlier app revision; this build's bundle only
+      // delivers 'de', so 'ka' has no active source and must not surface.
+      mockLoader.extractEmbeddedBundle.mockResolvedValue(['de']);
+      mockLoader.listCachedLocales.mockResolvedValue(['de', 'ka']);
+      mockLoader.loadTranslations.mockResolvedValue({
+        de: mockTranslationCatalogs.de,
+      });
+
+      await initI18n();
+
+      expect(mockLoader.removeCatalog).toHaveBeenCalledWith('ka');
+      expect(mockLoader.removeCatalog).not.toHaveBeenCalledWith('de');
+      expect(
+        getAvailableLocales()
+          .map(l => l.code)
+          .sort()
+      ).toEqual(['de', 'en']);
+    });
+
     it('should not initialize twice', async () => {
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
@@ -676,6 +696,66 @@ describe('i18n runtime system', () => {
 
       expect(getAvailableLocales().map(l => l.code)).toEqual(['en']);
       expect(mockLoader.saveManifest).not.toHaveBeenCalled();
+    });
+
+    const kaCatalog = {
+      locale: 'ka',
+      messages: { Save: 'შენახვა' },
+      headers: { Language: 'ka' },
+    };
+
+    it('should sweep orphaned cached catalogs once the manifest lands', async () => {
+      // 'ka' is cached from an earlier revision but neither the manifest nor the
+      // embedded bundle delivers it — remove it from storage AND the session.
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockLoader.listCachedLocales.mockResolvedValue(['de', 'ka']);
+      mockLoader.loadTranslations.mockResolvedValue({ de: deCatalog, ka: kaCatalog });
+      mockLoader.getCachedManifest.mockResolvedValue(deManifest); // de hash fresh
+
+      await initI18n();
+      expect(getAvailableLocales().some(l => l.code === 'ka')).toBe(true); // pre-sweep
+
+      await _awaitRemoteRefreshForTesting();
+
+      expect(mockLoader.removeCatalog).toHaveBeenCalledWith('ka');
+      expect(mockLoader.removeCatalog).not.toHaveBeenCalledWith('de');
+      expect(
+        getAvailableLocales()
+          .map(l => l.code)
+          .sort()
+      ).toEqual(['de', 'en']);
+    });
+
+    it('should not sweep when offline (manifest unavailable)', async () => {
+      // A hosted PWA offline can't know what's fetchable — the cache must survive.
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(null);
+      mockLoader.listCachedLocales.mockResolvedValue(['ka']);
+      mockLoader.loadTranslations.mockResolvedValue({ ka: kaCatalog });
+
+      await initI18n();
+      await _awaitRemoteRefreshForTesting();
+
+      expect(mockLoader.removeCatalog).not.toHaveBeenCalled();
+      expect(getAvailableLocales().some(l => l.code === 'ka')).toBe(true);
+    });
+
+    it('should keep the active locale working in-session when its cache is swept', async () => {
+      // The user is ON the orphaned locale: storage is cleared (next startup
+      // falls back) but the running session keeps its catalog and picker entry.
+      mockLocalStorage.setItem('editme-locale', 'ka');
+      mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
+      mockLoader.listCachedLocales.mockResolvedValue(['ka']);
+      mockLoader.loadTranslations.mockResolvedValue({ ka: kaCatalog });
+
+      await initI18n();
+      expect(get(currentLocale)).toBe('ka');
+
+      await _awaitRemoteRefreshForTesting();
+
+      expect(mockLoader.removeCatalog).toHaveBeenCalledWith('ka');
+      expect(get(currentLocale)).toBe('ka');
+      expect(get(t)('Save')).toBe('შენახვა');
+      expect(getAvailableLocales().some(l => l.code === 'ka')).toBe(true);
     });
   });
 });
