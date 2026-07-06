@@ -7,5 +7,13 @@
   "scripts": ["markdown-it-attrs.browser.min.js", "markdown-it.min.js"],
   "chapter": "chapter.txt",
   "domTransforms": [],
-  "textTransforms": ["transformMarkdown.js"]
+  "textTransforms": ["transformMarkdown.js"],
+  "generators": [
+    {
+      "id": "markdown-example",
+      "name": "Markdown syntax example",
+      "description": "Insert a concise example of Markdown syntax: headings, emphasis, lists, links, a quote, a code block and a markdown-it-attrs class.",
+      "script": "generateMarkdownExample.js"
+    }
+  ]
 }

@@ -7,5 +7,13 @@
   "scripts": ["djot.js"],
   "chapter": "chapter.txt",
   "domTransforms": [],
-  "textTransforms": ["transformDjot.js"]
+  "textTransforms": ["transformDjot.js"],
+  "generators": [
+    {
+      "id": "djot-example",
+      "name": "Djot syntax example",
+      "description": "Insert a concise example of Djot syntax: headings, emphasis, lists, links, a quote, a code block and an attributed span.",
+      "script": "generateDjotExample.js"
+    }
+  ]
 }
