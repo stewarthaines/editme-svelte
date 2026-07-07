@@ -137,7 +137,9 @@ msgstr "{name} gelöscht"
 msgid "{name} uploaded successfully"
 msgstr "{name} erfolgreich hochgeladen"
 
+#: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "{name} website"
 msgstr "{name}-Website"
 
@@ -1228,6 +1230,10 @@ msgstr "Generator bearbeiten"
 msgid "Edition"
 msgstr "Ausgabe"
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Editor text size"
+msgstr "Editor-Textgröße"
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
 msgstr "Element"
@@ -1809,6 +1815,10 @@ msgstr "Sprachen"
 #. Device size for larger mobile phones or e-readers
 msgid "Large"
 msgstr "Groß"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Larger editor text"
+msgstr "Editor-Text vergrößern"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Layout"
@@ -2742,6 +2752,10 @@ msgstr "Zurücksetzen"
 msgid "Reset Demo"
 msgstr "Demo zurücksetzen"
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Reset editor text size"
+msgstr "Editor-Textgröße zurücksetzen"
+
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
@@ -2982,6 +2996,10 @@ msgstr "Simple EPUB Editor (vertrieben als SEED.html) ist freie und quelloffene 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Size"
 msgstr "Größe"
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Smaller editor text"
+msgstr "Editor-Text verkleinern"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Some files failed to upload - see console for details"

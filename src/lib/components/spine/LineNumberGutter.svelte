@@ -46,7 +46,8 @@
     background: var(--color-bg-primary);
     color: var(--color-text-secondary);
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    /* Track the editor text-size control so line numbers stay row-aligned. */
+    font-size: var(--editor-font-size, var(--text-sm));
     line-height: var(--leading-relaxed);
     text-align: right;
     user-select: none;

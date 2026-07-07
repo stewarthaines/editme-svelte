@@ -137,7 +137,9 @@ msgstr ""
 msgid "{name} uploaded successfully"
 msgstr ""
 
+#: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
+#: src/lib/navigation/views/SettingsView.svelte
 msgid "{name} website"
 msgstr ""
 
@@ -1209,6 +1211,10 @@ msgstr ""
 msgid "Edition"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Editor text size"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
 msgstr ""
@@ -1789,6 +1795,10 @@ msgstr ""
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for larger mobile phones or e-readers
 msgid "Large"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Larger editor text"
 msgstr ""
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
@@ -2723,6 +2733,10 @@ msgstr ""
 msgid "Reset Demo"
 msgstr ""
 
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Reset editor text size"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
@@ -2962,6 +2976,10 @@ msgstr ""
 #: src/lib/components/manifest/ManifestTable.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Size"
+msgstr ""
+
+#: src/lib/components/spine/EditorPane.svelte
+msgid "Smaller editor text"
 msgstr ""
 
 #: src/lib/components/manifest/ManifestContainer.svelte

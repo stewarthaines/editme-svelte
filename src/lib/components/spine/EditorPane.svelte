@@ -48,6 +48,29 @@
   import { showToast } from '$lib/stores/toast.svelte.js';
   import { BASE_PREFIX } from '$lib/track-changes/base-snapshot.js';
   import { diffSegments, applySelectedHunks } from '$lib/track-changes/hunks.js';
+  import { persisted, asInt } from '$lib/state/persisted.svelte.js';
+
+  // Editor text size: a ladder of px steps applied to the editing textareas AND
+  // the line-number gutter (both consume --editor-font-size, so code-file gutter
+  // alignment holds). App-level preference, persisted across sessions. Sizes the
+  // editing text only — never the preview or the book.
+  const FONT_SIZES = [12, 13, 14, 16, 18, 20, 24];
+  const DEFAULT_FONT_SIZE = 14;
+  const editorFontSize = persisted(
+    'editme_editor_font_size',
+    DEFAULT_FONT_SIZE,
+    asInt({ min: FONT_SIZES[0], max: FONT_SIZES[FONT_SIZES.length - 1] })
+  );
+  // Snap a possibly hand-edited stored value to the nearest ladder step.
+  const fontSizeStep = $derived(
+    FONT_SIZES.reduce((a, b) =>
+      Math.abs(b - editorFontSize.current) < Math.abs(a - editorFontSize.current) ? b : a
+    )
+  );
+  function stepFontSize(dir: -1 | 1): void {
+    const next = FONT_SIZES[FONT_SIZES.indexOf(fontSizeStep) + dir];
+    if (next !== undefined) editorFontSize.current = next;
+  }
 
   // Props using Svelte 5 runes syntax
   let {
@@ -1044,7 +1067,7 @@
   {/if}
 {/snippet}
 
-<div class="editor-pane-container">
+<div class="editor-pane-container" style="--editor-font-size: {fontSizeStep}px">
   <!-- Single header row: pane toggle, pane-1 file picker + chapter title
        (single-pane mode), audio toggle, and the transform status. -->
   <div class="editor-header">
@@ -1070,6 +1093,39 @@
       {#if advancedMode}
         {@render chapterTitleInput()}
       {/if}
+
+      <div class="font-size-controls" role="group" aria-label={$t('Editor text size')}>
+        <button
+          type="button"
+          class="btn btn-icon btn-icon-lg font-size-btn"
+          onclick={() => stepFontSize(-1)}
+          disabled={fontSizeStep === FONT_SIZES[0]}
+          aria-label={$t('Smaller editor text')}
+          title={$t('Smaller editor text')}
+        >
+          −
+        </button>
+        <button
+          type="button"
+          class="btn btn-icon btn-icon-lg font-size-btn"
+          onclick={() => (editorFontSize.current = DEFAULT_FONT_SIZE)}
+          disabled={fontSizeStep === DEFAULT_FONT_SIZE}
+          aria-label={$t('Reset editor text size')}
+          title={$t('Reset editor text size')}
+        >
+          Aa
+        </button>
+        <button
+          type="button"
+          class="btn btn-icon btn-icon-lg font-size-btn"
+          onclick={() => stepFontSize(1)}
+          disabled={fontSizeStep === FONT_SIZES[FONT_SIZES.length - 1]}
+          aria-label={$t('Larger editor text')}
+          title={$t('Larger editor text')}
+        >
+          +
+        </button>
+      </div>
 
       {#if availableInsertPanels.length >= 2}
         <!-- More than one insert panel available: collapse into a single
@@ -1610,10 +1666,21 @@
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    font-size: var(--editor-font-size, var(--text-sm));
     line-height: var(--leading-relaxed);
     resize: none;
     outline-offset: -2px;
+  }
+
+  .font-size-controls {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .font-size-btn {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
   }
 
   /* Code panes: don't soft-wrap (one line = one row, so the gutter stays aligned;

@@ -299,7 +299,7 @@
   line-height: 1;
 }
 
-.btn-icon:hover {
+.btn-icon:hover:not(:disabled) {
   color: var(--color-on-accent);
   background-color: var(--color-hover-accent);
   border-color: var(--color-hover-accent);
@@ -311,7 +311,7 @@
   color: var(--color-error);
 }
 
-.btn-icon-danger:hover {
+.btn-icon-danger:hover:not(:disabled) {
   color: var(--color-white);
   background-color: var(--color-error);
   border-color: var(--color-error);
