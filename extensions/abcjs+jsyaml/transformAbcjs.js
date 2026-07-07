@@ -30,7 +30,13 @@
  * glyphs OUT of a display:none variant avoids WebKit's troubles resolving
  * <use> into hidden subtrees.
  *
- * @param {Document} document - the chapter's rendered DOM (HTML)
+ * Rendering happens in THIS script's live document (the transform iframe), not
+ * the chapter document: abcjs resolves shared glyph <defs> and measures text
+ * through its global `document`, so rendering into a foreign document silently
+ * drops all but the first glyph definition. Finished variants are imported
+ * into the chapter afterwards.
+ *
+ * @param {Document} chapterDocument - the chapter's rendered DOM (HTML)
  * @param {string} idref - spine item id for this chapter
  * @returns {Document} the transformed document
  */
@@ -39,10 +45,13 @@ const SVGNS = 'http://www.w3.org/2000/svg'
 
 function fixSvgViewBoxes(container, staffwidth) {
   // Workaround for renders whose viewBox ends up with zero height: recompute it
-  // from the top-level groups, abcjs-style.
+  // from the top-level groups, abcjs-style. Detect numerically — abcjs 6.4.0
+  // wrote "… 0", 6.4.4 writes "… 0.000".
   container.querySelectorAll('svg').forEach(svg => {
     const currentViewBox = svg.getAttribute('viewBox')
-    if (!currentViewBox || !currentViewBox.endsWith(' 0')) return
+    if (!currentViewBox) return
+    const parts = currentViewBox.trim().split(/[\s,]+/).map(Number)
+    if (parts.length !== 4 || !(parts[3] <= 0)) return
 
     const sections = svg.querySelectorAll('svg > g')
     let minY = Infinity
@@ -100,9 +109,11 @@ function extractYCoordinates(pathData) {
 }
 
 /**
- * Deduplicate every <defs> in the container into one zero-size, always-rendered
- * SVG inserted as the container's first child. The glyph ids are identical
- * across variants (same abcjs build, same tune), so one copy serves them all.
+ * Merge every <defs> in the container into one zero-size, always-rendered SVG
+ * inserted as the container's first child, deduplicating glyphs by id. The
+ * renderer scatters glyph definitions across the per-line svgs (its
+ * document-global defs lookup can't see this chapter DOM), and variants repeat
+ * the same ids — one merged copy serves every <use> in the container.
  */
 function hoistDefs(document, container) {
   const allDefs = [...container.querySelectorAll('svg defs')]
@@ -114,19 +125,34 @@ function hoistDefs(document, container) {
   holder.setAttribute('focusable', 'false')
   holder.setAttribute('width', '0')
   holder.setAttribute('height', '0')
-  holder.appendChild(allDefs[0])
-  allDefs.slice(1).forEach(d => d.remove())
+
+  const merged = document.createElementNS(SVGNS, 'defs')
+  const seen = new Set()
+  allDefs.forEach(defs => {
+    ;[...defs.children].forEach(child => {
+      const id = child.getAttribute('id')
+      if (id && seen.has(id)) return
+      if (id) seen.add(id)
+      merged.appendChild(child)
+    })
+    defs.remove()
+  })
+
+  holder.appendChild(merged)
   container.insertBefore(holder, container.firstChild)
 }
 
-function transformDOM(document, idref) {
-  const codes = document.querySelectorAll('pre:has(code.language-abcjs)')
+function transformDOM(chapterDocument, idref) {
+  const codes = chapterDocument.querySelectorAll('pre:has(code.language-abcjs)')
 
   const defaultOptions = {
     staffwidth: 360,
     add_classes: true,
     scale: 1.0,
     oneSvgPerLine: true,
+    // Custom-build feature: glyphs render once as <defs> paths and repeat as
+    // <use> references, for far smaller DOM trees. Ignored by stock abcjs.
+    useDefsForGlyphs: true,
     responsive: 'resize',
     textboxpadding: 0,
     paddingleft: 0,
@@ -147,11 +173,13 @@ function transformDOM(document, idref) {
   codes.forEach(c => {
     let options = { ...defaultOptions }
 
-    const container = document.createElement('div')
+    const container = chapterDocument.createElement('div')
     container.setAttribute('class', 'abcjs-container')
-    // The render target must be attached to the DOM (abcjs measures as it
-    // draws); moved into the code block's place when complete.
-    document.body.appendChild(container)
+
+    // Live, attached scratch area for rendering (see header). Removed per
+    // block, so glyph ids never leak between blocks or runs.
+    const scratch = document.createElement('div')
+    document.body.appendChild(scratch)
 
     let abcContent = c.querySelector('code').textContent
     const frontmatterMatch = abcContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
@@ -210,7 +238,7 @@ function transformDOM(document, idref) {
         'class',
         ['abcjs-variant', config.name, ...roles].filter(Boolean).join(' ')
       )
-      container.appendChild(variant)
+      scratch.appendChild(variant)
 
       ABCJS.renderAbc(variant, abcContent, { ...options, staffwidth: config.width })
       fixSvgViewBoxes(variant, config.width)
@@ -218,12 +246,16 @@ function transformDOM(document, idref) {
       // The renderer writes display:inline-block into the element style, which
       // would defeat the stylesheet's variant switching; clear it.
       variant.style.display = ''
+
+      container.appendChild(chapterDocument.importNode(variant, true))
     })
 
-    hoistDefs(document, container)
+    scratch.remove()
+
+    hoistDefs(chapterDocument, container)
 
     c.replaceWith(container)
   })
 
-  return document
+  return chapterDocument
 }

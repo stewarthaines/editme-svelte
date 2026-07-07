@@ -5,7 +5,7 @@
   "category": "code-blocks",
   "url": "https://www.abcjs.net/",
   "scripts": [
-    { "file": "abcjs-basic.js", "license": "abcjs-LICENSE.txt" },
+    { "file": "abcjs-basic-min.js", "license": "abcjs-LICENSE.txt" },
     { "file": "js-yaml.min.js", "license": "jsyaml-LICENSE.txt" }
   ],
   "domTransforms": ["transformAbcjs.js"],
