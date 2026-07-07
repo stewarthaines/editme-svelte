@@ -34,17 +34,6 @@
     onarrayRemove,
   }: Props = $props();
 
-  // The lesser-used Dublin Core fields are gated like other advanced refinements:
-  // each shows in advanced mode or when already populated, and the whole section
-  // collapses when none are set and advanced mode is off.
-  const showSource = $derived(advancedMode || !!metadata.source?.trim());
-  const showRelation = $derived(advancedMode || !!metadata.relation?.trim());
-  const showCoverage = $derived(advancedMode || !!metadata.coverage?.trim());
-  const showFormat = $derived(advancedMode || !!metadata.format?.trim());
-  const showAdditionalInfo = $derived(showSource || showRelation || showCoverage || showFormat);
-  const showCollections = $derived(advancedMode || (metadata.collections?.length ?? 0) > 0);
-  const showAppleBooks = $derived(advancedMode || !!metadata.ibooksSpecifiedFonts);
-
   const getFieldError = (fieldName: string) => {
     const error = validationErrors.find(err => err.field === fieldName);
     return error ? error.message : '';
@@ -111,76 +100,64 @@
         />
       </SettingsSection>
 
-      {#if showAdditionalInfo}
-        <SettingsSection title={$t('Additional Information')} name="meta-additional" open>
-          {#if showSource}
-            <TextMetadataField
-              id="source"
-              label={$t('Source')}
-              value={metadata.source || ''}
-              placeholder={$t('Enter source information')}
-              error={getFieldError('source')}
-              onchange={e => handleFieldChange('source', e.value)}
-              onblur={e => handleFieldSave('source', e.value)}
-              onfocus={() => handleFieldFocus('source')}
-            />
-          {/if}
+      <SettingsSection title={$t('Additional Information')} name="meta-additional" open>
+        <TextMetadataField
+          id="source"
+          label={$t('Source')}
+          value={metadata.source || ''}
+          placeholder={$t('Enter source information')}
+          error={getFieldError('source')}
+          onchange={e => handleFieldChange('source', e.value)}
+          onblur={e => handleFieldSave('source', e.value)}
+          onfocus={() => handleFieldFocus('source')}
+        />
 
-          {#if showRelation}
-            <TextMetadataField
-              id="relation"
-              label={$t('Relation')}
-              value={metadata.relation || ''}
-              placeholder={$t('Enter related work information')}
-              error={getFieldError('relation')}
-              onchange={e => handleFieldChange('relation', e.value)}
-              onblur={e => handleFieldSave('relation', e.value)}
-              onfocus={() => handleFieldFocus('relation')}
-            />
-          {/if}
+        <TextMetadataField
+          id="relation"
+          label={$t('Relation')}
+          value={metadata.relation || ''}
+          placeholder={$t('Enter related work information')}
+          error={getFieldError('relation')}
+          onchange={e => handleFieldChange('relation', e.value)}
+          onblur={e => handleFieldSave('relation', e.value)}
+          onfocus={() => handleFieldFocus('relation')}
+        />
 
-          {#if showCoverage}
-            <TextMetadataField
-              id="coverage"
-              label={$t('Coverage')}
-              value={metadata.coverage || ''}
-              placeholder={$t('Enter spatial or temporal coverage')}
-              error={getFieldError('coverage')}
-              onchange={e => handleFieldChange('coverage', e.value)}
-              onblur={e => handleFieldSave('coverage', e.value)}
-              onfocus={() => handleFieldFocus('coverage')}
-            />
-          {/if}
+        <TextMetadataField
+          id="coverage"
+          label={$t('Coverage')}
+          value={metadata.coverage || ''}
+          placeholder={$t('Enter spatial or temporal coverage')}
+          error={getFieldError('coverage')}
+          onchange={e => handleFieldChange('coverage', e.value)}
+          onblur={e => handleFieldSave('coverage', e.value)}
+          onfocus={() => handleFieldFocus('coverage')}
+        />
 
-          {#if showFormat}
-            <TextMetadataField
-              id="format"
-              label={$t('Format')}
-              value={metadata.format || ''}
-              placeholder={$t('Enter format information')}
-              error={getFieldError('format')}
-              onchange={e => handleFieldChange('format', e.value)}
-              onblur={e => handleFieldSave('format', e.value)}
-              onfocus={() => handleFieldFocus('format')}
-            />
-          {/if}
-        </SettingsSection>
-      {/if}
+        <TextMetadataField
+          id="format"
+          label={$t('Format')}
+          value={metadata.format || ''}
+          placeholder={$t('Enter format information')}
+          error={getFieldError('format')}
+          onchange={e => handleFieldChange('format', e.value)}
+          onblur={e => handleFieldSave('format', e.value)}
+          onfocus={() => handleFieldFocus('format')}
+        />
+      </SettingsSection>
 
-      {#if showAppleBooks}
-        <SettingsSection title={$t('Apple Books')} name="meta-apple-books" open>
-          <label class="checkbox-row">
-            <input
-              type="checkbox"
-              checked={metadata.ibooksSpecifiedFonts ?? false}
-              disabled={saving}
-              onchange={e => handleFieldSave('ibooksSpecifiedFonts', e.currentTarget.checked)}
-              onfocus={() => handleFieldFocus('ibooksSpecifiedFonts')}
-            />
-            <span>{$t('Use the publication’s own fonts (do not re-style)')}</span>
-          </label>
-        </SettingsSection>
-      {/if}
+      <SettingsSection title={$t('Apple Books')} name="meta-apple-books" open>
+        <label class="checkbox-row">
+          <input
+            type="checkbox"
+            checked={metadata.ibooksSpecifiedFonts ?? false}
+            disabled={saving}
+            onchange={e => handleFieldSave('ibooksSpecifiedFonts', e.currentTarget.checked)}
+            onfocus={() => handleFieldFocus('ibooksSpecifiedFonts')}
+          />
+          <span>{$t('Use the publication’s own fonts (do not re-style)')}</span>
+        </label>
+      </SettingsSection>
     </div>
 
     <div class="column">
@@ -210,17 +187,15 @@
         {onfieldFocus}
       />
 
-      {#if showCollections}
-        <SettingsSection title={$t('Collections')} name="meta-collections" open>
-          <CollectionsEditor
-            collections={metadata.collections}
-            {saving}
-            {getFieldError}
-            {onfieldSave}
-            {onfieldFocus}
-          />
-        </SettingsSection>
-      {/if}
+      <SettingsSection title={$t('Collections')} name="meta-collections" open>
+        <CollectionsEditor
+          collections={metadata.collections}
+          {saving}
+          {getFieldError}
+          {onfieldSave}
+          {onfieldFocus}
+        />
+      </SettingsSection>
     </div>
   </div>
 </div>

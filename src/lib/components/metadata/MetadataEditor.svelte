@@ -44,12 +44,25 @@
   let saving = $state(false);
   let error = $state<string | null>(null);
 
-  // Tab definitions with labels
-  let tabs = $derived([
-    { id: 'basic', label: $t('Basic Info') },
-    { id: 'advanced', label: $t('Advanced') },
-    { id: 'accessibility', label: $t('Accessibility') },
-  ]);
+  // Tab definitions with labels. Basic mode shows only Basic Info; the Advanced
+  // and Accessibility tabs (and everything in them) are Advanced-mode features.
+  let tabs = $derived(
+    advancedMode
+      ? [
+          { id: 'basic', label: $t('Basic Info') },
+          { id: 'advanced', label: $t('Advanced') },
+          { id: 'accessibility', label: $t('Accessibility') },
+        ]
+      : [{ id: 'basic', label: $t('Basic Info') }]
+  );
+
+  // A persisted or currently selected tab that is no longer offered (advanced
+  // mode turned off) snaps back to Basic Info.
+  $effect(() => {
+    if (!advancedMode && activeTab.current !== 'basic') {
+      activeTab.current = 'basic';
+    }
+  });
 
   const getTabFields = (tabId: string) => {
     switch (tabId) {
@@ -272,7 +285,6 @@
             {metadata}
             {validationErrors}
             {saving}
-            {advancedMode}
             onfieldChange={handleFieldChange}
             onfieldSave={handleFieldSave}
             onfieldFocus={handleFieldFocus}

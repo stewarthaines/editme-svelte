@@ -21,7 +21,6 @@
     metadata?: EPUBMetadata;
     validationErrors?: ValidationResult[];
     saving?: boolean;
-    advancedMode?: boolean;
     onfieldChange?: (event: CustomEvent<{ field: string; value: any }>) => void;
     onfieldSave?: (event: CustomEvent<{ field: string; value: any }>) => void;
     onfieldFocus?: (event: CustomEvent<{ field: keyof EPUBMetadata | null }>) => void;
@@ -31,7 +30,6 @@
     metadata = { title: '', language: [], identifier: '' },
     validationErrors = [],
     saving = false,
-    advancedMode = false,
     onfieldSave,
     onfieldFocus,
   }: Props = $props();
@@ -115,17 +113,6 @@
   const conformanceOptions = $derived(
     CONFORMANCE_OPTIONS.map(o => ({ value: o.value, label: $t(o.label) }))
   );
-
-  // Advanced sections: shown in advanced mode or when already populated.
-  const showSufficient = $derived(advancedMode || (metadata.accessModeSufficient?.length ?? 0) > 0);
-  const showControls = $derived(advancedMode || (metadata.accessibilityControl?.length ?? 0) > 0);
-  const showApi = $derived(advancedMode || (metadata.accessibilityAPI?.length ?? 0) > 0);
-  const showCertification = $derived(
-    advancedMode ||
-      !!metadata.accessibilityCertifiedBy ||
-      !!metadata.accessibilityCertifierCredential ||
-      !!metadata.accessibilityCertifierReport
-  );
 </script>
 
 {#snippet checkboxGroup(
@@ -159,47 +146,45 @@
     <div class="column">
       {@render checkboxGroup($t('Access modes'), ACCESS_MODES, metadata.accessMode, 'accessMode')}
 
-      {#if showSufficient}
-        <SettingsSection title={$t('Sufficient access modes')} name="meta-sufficient" open>
-          <p class="field-hint">
-            {$t(
-              'Each row is one combination of modes that is enough on its own to read the whole publication.'
-            )}
-          </p>
+      <SettingsSection title={$t('Sufficient access modes')} name="meta-sufficient" open>
+        <p class="field-hint">
+          {$t(
+            'Each row is one combination of modes that is enough on its own to read the whole publication.'
+          )}
+        </p>
 
-          {#each sufficientSets as set, index (index)}
-            <div class="sufficient-row">
-              <div class="mode-toggles">
-                {#each availableModes as mode (mode.value)}
-                  <label class="mode-chip" class:selected={setTokens(set).includes(mode.value)}>
-                    <input
-                      type="checkbox"
-                      checked={setTokens(set).includes(mode.value)}
-                      disabled={saving}
-                      onchange={e => toggleInSet(index, mode.value, e.currentTarget.checked)}
-                      onfocus={() => focus('accessModeSufficient')}
-                    />
-                    <span>{mode.label}</span>
-                  </label>
-                {/each}
-              </div>
-              <button
-                type="button"
-                class="btn btn-icon"
-                onclick={() => removeSet(index)}
-                disabled={saving}
-                aria-label={$t('Remove')}
-              >
-                <X size={14} aria-hidden="true" />
-              </button>
+        {#each sufficientSets as set, index (index)}
+          <div class="sufficient-row">
+            <div class="mode-toggles">
+              {#each availableModes as mode (mode.value)}
+                <label class="mode-chip" class:selected={setTokens(set).includes(mode.value)}>
+                  <input
+                    type="checkbox"
+                    checked={setTokens(set).includes(mode.value)}
+                    disabled={saving}
+                    onchange={e => toggleInSet(index, mode.value, e.currentTarget.checked)}
+                    onfocus={() => focus('accessModeSufficient')}
+                  />
+                  <span>{mode.label}</span>
+                </label>
+              {/each}
             </div>
-          {/each}
+            <button
+              type="button"
+              class="btn btn-icon"
+              onclick={() => removeSet(index)}
+              disabled={saving}
+              aria-label={$t('Remove')}
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          </div>
+        {/each}
 
-          <button type="button" class="btn btn-secondary" onclick={addSet} disabled={saving}>
-            {$t('Add a sufficient set')}
-          </button>
-        </SettingsSection>
-      {/if}
+        <button type="button" class="btn btn-secondary" onclick={addSet} disabled={saving}>
+          {$t('Add a sufficient set')}
+        </button>
+      </SettingsSection>
 
       <SettingsSection title={$t('Conformance')} name="meta-conformance" open>
         <SelectMetadataField
@@ -212,34 +197,32 @@
         />
       </SettingsSection>
 
-      {#if showCertification}
-        <SettingsSection title={$t('Certification')} name="meta-certification" open>
-          <TextMetadataField
-            id="accessibilityCertifiedBy"
-            label={$t('Certified by')}
-            value={metadata.accessibilityCertifiedBy || ''}
-            placeholder={$t('Name of the certifying party')}
-            onblur={e => save('accessibilityCertifiedBy', e.value)}
-            onfocus={() => focus('accessibilityCertifiedBy' as keyof EPUBMetadata)}
-          />
-          <TextMetadataField
-            id="accessibilityCertifierCredential"
-            label={$t('Certifier credential')}
-            value={metadata.accessibilityCertifierCredential || ''}
-            placeholder={$t('Credential of the certifier')}
-            onblur={e => save('accessibilityCertifierCredential', e.value)}
-            onfocus={() => focus('accessibilityCertifierCredential' as keyof EPUBMetadata)}
-          />
-          <TextMetadataField
-            id="accessibilityCertifierReport"
-            label={$t('Certifier report (URL)')}
-            value={metadata.accessibilityCertifierReport || ''}
-            placeholder={$t('https://example.com/report')}
-            onblur={e => save('accessibilityCertifierReport', e.value)}
-            onfocus={() => focus('accessibilityCertifierReport' as keyof EPUBMetadata)}
-          />
-        </SettingsSection>
-      {/if}
+      <SettingsSection title={$t('Certification')} name="meta-certification" open>
+        <TextMetadataField
+          id="accessibilityCertifiedBy"
+          label={$t('Certified by')}
+          value={metadata.accessibilityCertifiedBy || ''}
+          placeholder={$t('Name of the certifying party')}
+          onblur={e => save('accessibilityCertifiedBy', e.value)}
+          onfocus={() => focus('accessibilityCertifiedBy' as keyof EPUBMetadata)}
+        />
+        <TextMetadataField
+          id="accessibilityCertifierCredential"
+          label={$t('Certifier credential')}
+          value={metadata.accessibilityCertifierCredential || ''}
+          placeholder={$t('Credential of the certifier')}
+          onblur={e => save('accessibilityCertifierCredential', e.value)}
+          onfocus={() => focus('accessibilityCertifierCredential' as keyof EPUBMetadata)}
+        />
+        <TextMetadataField
+          id="accessibilityCertifierReport"
+          label={$t('Certifier report (URL)')}
+          value={metadata.accessibilityCertifierReport || ''}
+          placeholder={$t('https://example.com/report')}
+          onblur={e => save('accessibilityCertifierReport', e.value)}
+          onfocus={() => focus('accessibilityCertifierReport' as keyof EPUBMetadata)}
+        />
+      </SettingsSection>
     </div>
 
     <!-- Column 2: supporting detail; the free-text Summary complements the
@@ -258,23 +241,19 @@
         'accessibilityHazard'
       )}
 
-      {#if showControls}
-        {@render checkboxGroup(
-          $t('Control methods'),
-          ACCESSIBILITY_CONTROLS,
-          metadata.accessibilityControl,
-          'accessibilityControl'
-        )}
-      {/if}
+      {@render checkboxGroup(
+        $t('Control methods'),
+        ACCESSIBILITY_CONTROLS,
+        metadata.accessibilityControl,
+        'accessibilityControl'
+      )}
 
-      {#if showApi}
-        {@render checkboxGroup(
-          $t('Accessibility API'),
-          ACCESSIBILITY_APIS,
-          metadata.accessibilityAPI,
-          'accessibilityAPI'
-        )}
-      {/if}
+      {@render checkboxGroup(
+        $t('Accessibility API'),
+        ACCESSIBILITY_APIS,
+        metadata.accessibilityAPI,
+        'accessibilityAPI'
+      )}
 
       <SettingsSection title={$t('Summary')} name="meta-summary" open>
         <TextareaMetadataField
