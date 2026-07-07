@@ -678,11 +678,27 @@ export class ExtensionManager {
       totalSize += fileInfo.size;
     }
 
+    // Homepage URL from the copied manifest, when the extension shipped one
+    // (hand-imported JS extensions have no extension.json).
+    let url: string | undefined;
+    try {
+      const meta = JSON.parse(
+        await this.fileStorage.readTextFile(
+          workspaceId,
+          `SOURCE/extensions/${extensionName}/extension.json`
+        )
+      );
+      if (typeof meta?.url === 'string' && meta.url) url = meta.url;
+    } catch {
+      // No manifest — url stays undefined.
+    }
+
     return {
       name: extensionName,
       files: extensionFileInfos,
       totalSize,
       location: 'workspace',
+      url,
     };
   }
 

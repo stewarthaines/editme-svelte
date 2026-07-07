@@ -30,7 +30,7 @@
     basename,
     extensionOf,
   } from '../../settings/dom-transforms.js';
-  import { CaretUp, CaretDown, CaretRight, X } from 'phosphor-svelte';
+  import { ArrowSquareOut, CaretUp, CaretDown, CaretRight, X } from 'phosphor-svelte';
   import { PaneGroup, Pane, PaneResizer } from 'paneforge';
   import { t, currentLocale, setLocale, availableLocales } from '../../i18n';
   import { LOCALE_CONFIGS } from '../../i18n/locale-config.js';
@@ -847,7 +847,21 @@
   {@const installed = installedExtensionIds.has(ext.id)}
   <div class="catalog-item">
     <div class="catalog-item-info">
-      <span class="catalog-item-name">{ext.name}</span>
+      <span class="catalog-item-name">
+        {ext.name}
+        {#if ext.url}
+          <a
+            class="btn btn-icon btn-icon-sm catalog-item-link"
+            href={ext.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={$t('{name} website', { name: ext.name })}
+            title={$t('{name} website', { name: ext.name })}
+          >
+            <ArrowSquareOut size={14} aria-hidden="true" />
+          </a>
+        {/if}
+      </span>
       {#if ext.description}
         <span class="catalog-item-desc">{ext.description}</span>
       {/if}
@@ -1754,8 +1768,15 @@
   }
 
   .catalog-item-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
     font-weight: 500;
     color: var(--color-text-primary);
+  }
+
+  .catalog-item-link {
+    color: var(--color-text-secondary);
   }
 
   .catalog-item-desc {

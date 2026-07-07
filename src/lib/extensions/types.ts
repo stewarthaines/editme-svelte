@@ -14,6 +14,8 @@ export interface ExtensionInfo {
   totalSize: number;
   /** Where this info was retrieved from */
   location: 'workspace' | 'cache';
+  /** Project/homepage URL from the extension's copied extension.json, if any */
+  url?: string;
 }
 
 /**

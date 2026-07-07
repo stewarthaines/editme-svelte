@@ -2,6 +2,7 @@
   import type { ExtensionInfo } from '../../extensions/types.js';
   import type { ExtensionManager } from '../../extensions/extension-manager.js';
   import { t } from '../../i18n';
+  import { ArrowSquareOut } from 'phosphor-svelte';
 
   interface Props {
     extension: ExtensionInfo;
@@ -87,7 +88,21 @@
 
 <li class="extension-item">
   <div class="extension-header">
-    <span class="extension-name">{extension.name}</span>
+    <span class="extension-name">
+      {extension.name}
+      {#if extension.url}
+        <a
+          class="btn btn-icon btn-icon-sm extension-link"
+          href={extension.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={$t('{name} website', { name: extension.name })}
+          title={$t('{name} website', { name: extension.name })}
+        >
+          <ArrowSquareOut size={14} aria-hidden="true" />
+        </a>
+      {/if}
+    </span>
     <div class="extension-actions">
       <button
         type="button"
@@ -168,8 +183,15 @@
   }
 
   .extension-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
     font-weight: 500;
     color: var(--color-text-primary);
+  }
+
+  .extension-link {
+    color: var(--color-text-secondary);
   }
 
   .extension-actions {
