@@ -8,6 +8,11 @@
   "chapter": "chapter.txt",
   "domTransforms": [],
   "textTransforms": ["transformDjot.js"],
+  "templates": {
+    "image": "![<alt>](<href>)",
+    "video": "`<video src=\"<href>\" controls=\"controls\"></video>`{=html}",
+    "audioClip": ":clip[<label>]{src=\"<href>\" begin=\"<begin>\" end=\"<end>\"}"
+  },
   "generators": [
     {
       "id": "djot-example",

@@ -221,6 +221,19 @@ export default defineConfig({
               const chapter = typeof m.chapter === 'string' ? m.chapter : undefined;
               // Editorial sub-group key for the settings catalog (presentational only).
               const category = typeof m.category === 'string' ? m.category : undefined;
+              // Per-format insertion templates — keep in sync with
+              // scripts/generate-extensions-manifest.js.
+              const rawTemplates =
+                m.templates && typeof m.templates === 'object'
+                  ? (m.templates as Record<string, unknown>)
+                  : undefined;
+              const templates = rawTemplates
+                ? Object.fromEntries(
+                    ['image', 'video', 'audioClip']
+                      .filter(k => typeof rawTemplates[k] === 'string' && rawTemplates[k])
+                      .map(k => [k, rawTemplates[k]])
+                  )
+                : undefined;
               // An extension must bring at least one of: a lib, a transform, a
               // generator, or an EPUB asset (mirrors generate-extensions-manifest.js).
               const isEmpty =
@@ -244,6 +257,8 @@ export default defineConfig({
                   assets,
                   licenses,
                   chapter,
+                  templates:
+                    templates && Object.keys(templates).length > 0 ? templates : undefined,
                 });
               }
             } catch {

@@ -8,6 +8,9 @@
   "scripts": ["org.js"],
   "domTransforms": [],
   "textTransforms": ["transformOrg.js"],
+  "templates": {
+    "image": "[[<href>]]"
+  },
   "generators": [
     {
       "id": "org-example",

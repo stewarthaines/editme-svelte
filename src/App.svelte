@@ -803,9 +803,16 @@
       };
     }
     if (entry.textTransforms.length > 0) {
+      // A text format brings its own media-insertion templates: adopting it sets
+      // the project's image/video/audio-clip templates to the format's defaults
+      // (keys the extension omits reset to the app defaults).
+      const defaults = settingsService.getDefaultEPUBSettings();
       next = {
         ...next,
         text_transform: `SOURCE/extensions/${entry.id}/${entry.textTransforms[0]}`,
+        image_template: entry.templates?.image ?? defaults.image_template,
+        video_template: entry.templates?.video ?? defaults.video_template,
+        audio_clip_template: entry.templates?.audioClip ?? defaults.audio_clip_template,
       };
     }
     if (next !== epub) {

@@ -8,6 +8,9 @@
   "scripts": ["latex.min.js"],
   "domTransforms": [],
   "textTransforms": ["transformLatex.js"],
+  "templates": {
+    "image": "\\includegraphics{<href>}"
+  },
   "assets": [
     {
       "file": "latex.css",

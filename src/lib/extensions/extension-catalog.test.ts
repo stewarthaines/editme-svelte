@@ -227,6 +227,40 @@ describe('extension-catalog', () => {
     expect(prism.chapter).toBeUndefined();
   });
 
+  it('parses the optional insertion templates (dropping non-string/empty keys)', async () => {
+    const entries = [
+      {
+        id: 'djot',
+        name: 'Djot',
+        scripts: ['djot.js'],
+        templates: {
+          image: '![<alt>](<href>)',
+          video: '`<video src="<href>"></video>`{=html}',
+          audioClip: ':clip[<label>]{src="<href>" begin="<begin>" end="<end>"}',
+          bogus: 'ignored',
+        },
+      },
+      { id: 'weird', name: 'Weird', scripts: ['w.js'], templates: { image: 42, video: '' } },
+      { id: 'prism', name: 'Prism', scripts: ['prism.js'] }, // no templates
+    ];
+    const fetchFn = vi.fn(async () => jsonResponse(entries));
+
+    const [djot, weird, prism] = await loadExtensionCatalog({
+      protocol: 'https:',
+      baseUrl: BASE,
+      fetch: fetchFn,
+    });
+
+    expect(djot.templates).toEqual({
+      image: '![<alt>](<href>)',
+      video: '`<video src="<href>"></video>`{=html}',
+      audioClip: ':clip[<label>]{src="<href>" begin="<begin>" end="<end>"}',
+    });
+    // All keys invalid → the whole field collapses to undefined.
+    expect(weird.templates).toBeUndefined();
+    expect(prism.templates).toBeUndefined();
+  });
+
   it('returns [] on file:// without fetching', async () => {
     const fetchFn = vi.fn();
     expect(

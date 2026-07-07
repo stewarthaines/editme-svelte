@@ -95,6 +95,20 @@ export interface ExtensionCatalogEntry {
   licenses: string[];
   /** Sample chapter (plain-text source) used to seed a new project's first chapter. */
   chapter?: string;
+  /** Format-specific editor insertion templates (media drop, audio clip directive).
+   * Installing a text-format extension overwrites the project's template settings
+   * with these; omitted keys reset to the app defaults. */
+  templates?: ExtensionTemplates;
+}
+
+/** Editor insertion templates a text-format extension ships as its defaults. */
+export interface ExtensionTemplates {
+  /** Inserted when an image is dropped into a chapter. Placeholders: <href>, <alt>. */
+  image?: string;
+  /** Inserted when a video is dropped into a chapter. Placeholder: <href>. */
+  video?: string;
+  /** Audio clip directive. Placeholders: <href>, <begin>, <end>, <label>, <rate>. */
+  audioClip?: string;
 }
 
 /**
@@ -252,6 +266,17 @@ function collectLicenses(
   return out;
 }
 
+/** Validate the optional per-format insertion templates ({ image?, video?, audioClip? }). */
+function asTemplates(value: unknown): ExtensionTemplates | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const t = value as Record<string, unknown>;
+  const out: ExtensionTemplates = {};
+  if (typeof t.image === 'string' && t.image) out.image = t.image;
+  if (typeof t.video === 'string' && t.video) out.video = t.video;
+  if (typeof t.audioClip === 'string' && t.audioClip) out.audioClip = t.audioClip;
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
 /** Validate + normalize an entry (coercing missing transform arrays to []). */
 function normalizeCatalogEntry(value: unknown): ExtensionCatalogEntry | null {
   if (typeof value !== 'object' || value === null) return null;
@@ -274,6 +299,7 @@ function normalizeCatalogEntry(value: unknown): ExtensionCatalogEntry | null {
     assets,
     licenses: collectLicenses(e.scripts, e.license, assets, generators),
     chapter: asString(e.chapter),
+    templates: asTemplates(e.templates),
   };
 }
 

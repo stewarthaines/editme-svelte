@@ -8,6 +8,11 @@
   "chapter": "chapter.txt",
   "domTransforms": [],
   "textTransforms": ["transformMarkdown.js"],
+  "templates": {
+    "image": "![<alt>](<href>)",
+    "video": "<video src=\"<href>\" controls=\"controls\"></video>",
+    "audioClip": ":clip[<label>]{src=<href> begin=<begin> end=<end>}"
+  },
   "generators": [
     {
       "id": "markdown-example",

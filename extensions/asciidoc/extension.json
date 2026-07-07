@@ -8,6 +8,10 @@
   "scripts": ["asciidoctor.min.js"],
   "domTransforms": [],
   "textTransforms": ["transformAsciidoc.js"],
+  "templates": {
+    "image": "image::<href>[<alt>]",
+    "video": "video::<href>[]"
+  },
   "generators": [
     {
       "id": "asciidoc-example",

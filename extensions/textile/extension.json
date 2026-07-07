@@ -8,6 +8,10 @@
   "scripts": ["textile.min.js"],
   "domTransforms": [],
   "textTransforms": ["transformTextile.js"],
+  "templates": {
+    "image": "!<href>(<alt>)!",
+    "video": "<video src=\"<href>\" controls=\"controls\"></video>"
+  },
   "generators": [
     {
       "id": "textile-example",

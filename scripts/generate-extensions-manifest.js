@@ -85,6 +85,17 @@ for (const dirent of dirents) {
   ];
   // Optional sample chapter (plain-text source) used to seed a new project.
   const chapter = typeof meta.chapter === 'string' ? meta.chapter : undefined;
+  // Optional per-format insertion templates ({ image?, video?, audioClip? }) —
+  // applied to a project's settings when its text format is installed. Keep the
+  // shape in sync with serve-extensions-dev in vite.config.ts.
+  const templates =
+    meta.templates && typeof meta.templates === 'object'
+      ? Object.fromEntries(
+          ['image', 'video', 'audioClip']
+            .filter(k => typeof meta.templates[k] === 'string' && meta.templates[k])
+            .map(k => [k, meta.templates[k]])
+        )
+      : undefined;
   // An extension must bring at least one of: a 3rd-party lib, a transform, a
   // generator, or an EPUB asset (e.g. audio-clips ships only a reading-system
   // script + CSS as assets).
@@ -158,6 +169,7 @@ for (const dirent of dirents) {
     assets,
     licenses,
     chapter,
+    templates: templates && Object.keys(templates).length > 0 ? templates : undefined,
   });
 }
 
