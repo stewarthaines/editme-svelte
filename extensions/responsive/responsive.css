@@ -1,0 +1,105 @@
+/*
+  Responsive layout for chapter content, in four layers of progressively
+  narrower support. The markup hooks (.sr-page, .sr-figure) are added by
+  transformResponsive.js at build time.
+
+  Everything is in em, so the buckets track the reader's chosen font size:
+  a large-print reader gets the narrow layout — which is the correct one.
+
+  Layer 1  intrinsic/fluid CSS   — no query support needed; correct everywhere
+  Layer 2  @media (monochrome)   — e-ink adjustments
+  Layer 3  @media width buckets  — coarse chrome; the viewport may be a spread,
+                                   so treat these as approximate
+  Layer 4  @container on figures — precise, gated behind @supports; containment
+                                   is applied ONLY to figure wrappers because
+                                   chapter-wide containment can break pagination
+*/
+
+/* ---- Layer 1: the reading measure and fluid media (works everywhere) ---- */
+
+.sr-page {
+  max-width: 36em; /* the default measure — ~60–70 characters */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sr-page img,
+.sr-page svg,
+.sr-page video {
+  max-width: 100%;
+  height: auto;
+}
+
+.sr-page table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875em; /* tables earn back some columns */
+}
+
+.sr-figure {
+  margin: 1em 0;
+}
+
+.sr-figure figure {
+  margin: 0; /* the wrapper owns the spacing */
+}
+
+.sr-figure figcaption {
+  font-size: 0.875em;
+  margin-top: 0.5em;
+}
+
+/* ---- Layer 3: coarse width buckets (approximate on paginated spreads) ---- */
+
+@media (min-width: 45em) {
+  /* Wide page: let figures break out of the measure symmetrically. */
+  .sr-figure {
+    width: 120%;
+    margin-left: -10%;
+    margin-right: -10%;
+  }
+}
+
+/* ---- Layer 2 (last so it wins): e-ink ---- */
+
+@media (monochrome) {
+  /* E-ink pages are already narrow; give the text the whole column and keep
+     figures in the flow (no breakouts on a device that can't scroll). */
+  .sr-page {
+    max-width: 100%;
+  }
+
+  .sr-figure {
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* ---- Layer 4: figure container queries (progressive enhancement) ---- */
+
+@supports (container-type: inline-size) {
+  .sr-figure {
+    container-type: inline-size;
+  }
+
+  /* A roomy figure puts its caption beside the image instead of below it. */
+  @container (min-width: 28em) {
+    .sr-figure figure:has(figcaption) {
+      display: flex;
+      align-items: flex-end;
+      gap: 1em;
+    }
+
+    .sr-figure figure:has(figcaption) > img,
+    .sr-figure figure:has(figcaption) > svg {
+      flex: 1 1 70%;
+      min-width: 0;
+    }
+
+    .sr-figure figcaption {
+      flex: 1 1 30%;
+      margin-top: 0;
+    }
+  }
+}
