@@ -550,7 +550,11 @@
     persistDomTransforms(moveTransform(epubSettings.dom_transforms, index, dir));
   }
 
-  // Persist the single text_transform (optimistic save + revert).
+  // Persist the single text_transform (optimistic save + revert). The active
+  // format's media-insertion templates follow the switch: the owning extension's
+  // extension.json (copied into SOURCE/extensions/<id>/ on install) supplies
+  // them; a built-in transform — or an extension without templates — resets the
+  // project to the app defaults.
   async function persistTextTransform(path: string): Promise<void> {
     if (!workspaceId || !epubSettings || !path) return;
 
@@ -560,8 +564,20 @@
       return;
     }
 
-    const previous = epubSettings.text_transform;
-    const updatedSettings: EPUBSettings = { ...epubSettings, text_transform: path };
+    const owner = extensionOf(path);
+    const templates = owner
+      ? await extensionManager.readWorkspaceExtensionTemplates(workspaceId, owner)
+      : undefined;
+    const defaults = settingsService.getDefaultEPUBSettings();
+
+    const previous = epubSettings;
+    const updatedSettings: EPUBSettings = {
+      ...epubSettings,
+      text_transform: path,
+      image_template: templates?.image ?? defaults.image_template,
+      video_template: templates?.video ?? defaults.video_template,
+      audio_clip_template: templates?.audioClip ?? defaults.audio_clip_template,
+    };
     epubSettings = updatedSettings;
 
     try {
@@ -569,7 +585,7 @@
       onSettingsChanged?.();
     } catch (err) {
       error = err instanceof Error ? err.message : $t('Failed to save EPUB settings');
-      epubSettings = { ...epubSettings, text_transform: previous };
+      epubSettings = previous;
     }
   }
 
@@ -637,27 +653,14 @@
       }
 
       // Auto-adopt the extension's text transform when the project's is still the
-      // untouched default — the typical "install one text extension" flow. Adopting
-      // a format also takes its media-insertion templates: the project's
-      // image/video/audio-clip templates become the format's defaults (keys the
-      // extension omits reset to the app defaults). Templates follow ADOPTION, not
+      // untouched default — the typical "install one text extension" flow.
+      // persistTextTransform carries the format's media-insertion templates along
+      // (read from the just-copied extension.json). Templates follow ADOPTION, not
       // mere installation — installing a second format while another is active
       // must not leave templates mismatched with the active transform.
-      const defaults = settingsService.getDefaultEPUBSettings();
-      if (
-        entry.textTransforms.length > 0 &&
-        epubSettings?.text_transform === defaults.text_transform
-      ) {
-        const updated: EPUBSettings = {
-          ...epubSettings,
-          text_transform: `SOURCE/extensions/${entry.id}/${entry.textTransforms[0]}`,
-          image_template: entry.templates?.image ?? defaults.image_template,
-          video_template: entry.templates?.video ?? defaults.video_template,
-          audio_clip_template: entry.templates?.audioClip ?? defaults.audio_clip_template,
-        };
-        epubSettings = updated;
-        await settingsService.saveEPUBSettings(workspaceId, updated);
-        onSettingsChanged?.();
+      const defaultText = settingsService.getDefaultEPUBSettings().text_transform;
+      if (entry.textTransforms.length > 0 && epubSettings?.text_transform === defaultText) {
+        await persistTextTransform(`SOURCE/extensions/${entry.id}/${entry.textTransforms[0]}`);
       } else {
         onSettingsChanged?.();
       }

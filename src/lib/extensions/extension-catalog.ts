@@ -266,8 +266,11 @@ function collectLicenses(
   return out;
 }
 
-/** Validate the optional per-format insertion templates ({ image?, video?, audioClip? }). */
-function asTemplates(value: unknown): ExtensionTemplates | undefined {
+/**
+ * Validate the optional per-format insertion templates ({ image?, video?, audioClip? }).
+ * Exported for readers of on-disk extension.json copies (extension-manager).
+ */
+export function asTemplates(value: unknown): ExtensionTemplates | undefined {
   if (typeof value !== 'object' || value === null) return undefined;
   const t = value as Record<string, unknown>;
   const out: ExtensionTemplates = {};

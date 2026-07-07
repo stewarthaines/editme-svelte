@@ -14,7 +14,12 @@ import type {
   ValidationResult,
 } from './types.js';
 import type { TransformOption } from '../services/settings/settings.service.js';
-import { resolveExtensionFileUrl, type ExtensionCatalogEntry } from './extension-catalog.js';
+import {
+  resolveExtensionFileUrl,
+  asTemplates,
+  type ExtensionCatalogEntry,
+  type ExtensionTemplates,
+} from './extension-catalog.js';
 import { writeGenerator } from '../generators/generator-store.js';
 import { ExtensionCache } from './extension-cache.js';
 import {
@@ -801,6 +806,28 @@ export class ExtensionManager {
       if (parts.length >= 3) dirs.add(parts[2]);
     }
     return dirs;
+  }
+
+  /**
+   * The media-insertion templates a workspace extension declares in its copied
+   * extension.json, or undefined when absent/unreadable. Used when the active
+   * text transform is switched, so the format's templates follow it.
+   */
+  async readWorkspaceExtensionTemplates(
+    workspaceId: string,
+    extensionName: string
+  ): Promise<ExtensionTemplates | undefined> {
+    try {
+      const meta = JSON.parse(
+        await this.fileStorage.readTextFile(
+          workspaceId,
+          `SOURCE/extensions/${extensionName}/extension.json`
+        )
+      );
+      return asTemplates(meta?.templates);
+    } catch {
+      return undefined;
+    }
   }
 
   /**

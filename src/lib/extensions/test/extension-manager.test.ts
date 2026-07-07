@@ -596,4 +596,62 @@ describe('ExtensionManager', () => {
       expect(summary.successCount + summary.errors.length).toBe(summary.totalScanned);
     });
   });
+
+  describe('readWorkspaceExtensionTemplates()', () => {
+    const workspaceId = TEST_WORKSPACE_IDS.MINIMAL;
+
+    it('reads validated templates from the copied extension.json', async () => {
+      await mockFileStorage.createWorkspace(workspaceId);
+      await mockFileStorage.writeTextFile(
+        workspaceId,
+        'SOURCE/extensions/djot/extension.json',
+        JSON.stringify({
+          id: 'djot',
+          name: 'Djot',
+          templates: {
+            image: '![<alt>](<href>)',
+            audioClip: ':clip[<label>]{src="<href>" begin="<begin>" end="<end>"}',
+            bogus: 'dropped',
+            video: 42,
+          },
+        })
+      );
+
+      const templates = await extensionManager.readWorkspaceExtensionTemplates(
+        workspaceId,
+        'djot'
+      );
+
+      expect(templates).toEqual({
+        image: '![<alt>](<href>)',
+        audioClip: ':clip[<label>]{src="<href>" begin="<begin>" end="<end>"}',
+      });
+    });
+
+    it('returns undefined for a missing manifest, malformed JSON, or no templates', async () => {
+      await mockFileStorage.createWorkspace(workspaceId);
+
+      expect(
+        await extensionManager.readWorkspaceExtensionTemplates(workspaceId, 'absent')
+      ).toBeUndefined();
+
+      await mockFileStorage.writeTextFile(
+        workspaceId,
+        'SOURCE/extensions/broken/extension.json',
+        'not json{{{'
+      );
+      expect(
+        await extensionManager.readWorkspaceExtensionTemplates(workspaceId, 'broken')
+      ).toBeUndefined();
+
+      await mockFileStorage.writeTextFile(
+        workspaceId,
+        'SOURCE/extensions/plain/extension.json',
+        JSON.stringify({ id: 'plain', name: 'Plain' })
+      );
+      expect(
+        await extensionManager.readWorkspaceExtensionTemplates(workspaceId, 'plain')
+      ).toBeUndefined();
+    });
+  });
 });
