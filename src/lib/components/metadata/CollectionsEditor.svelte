@@ -42,7 +42,7 @@
       <span class="collection-entry-label">{$t('Collection')}</span>
       <button
         type="button"
-        class="btn btn-icon"
+        class="btn btn-icon btn-icon-danger"
         onclick={() => removeEntry(index)}
         disabled={saving}
         aria-label={$t('Remove')}

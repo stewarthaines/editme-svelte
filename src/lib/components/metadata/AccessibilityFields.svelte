@@ -171,7 +171,7 @@
             </div>
             <button
               type="button"
-              class="btn btn-icon"
+              class="btn btn-icon btn-icon-danger"
               onclick={() => removeSet(index)}
               disabled={saving}
               aria-label={$t('Remove')}

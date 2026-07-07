@@ -237,8 +237,9 @@
   }
 
   .add-role-select:hover:not(:disabled) {
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
+    background-color: var(--color-hover-accent);
+    border-inline-start-color: var(--color-hover-accent);
+    color: var(--color-on-accent);
   }
 
   .remove-button:disabled,

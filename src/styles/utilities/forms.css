@@ -305,6 +305,18 @@
   border-color: var(--color-hover-accent);
 }
 
+/* Destructive icon button (remove ×): red icon, solid delete-red fill on hover —
+   matches the metadata row remove buttons. */
+.btn-icon-danger {
+  color: var(--color-error);
+}
+
+.btn-icon-danger:hover {
+  color: var(--color-white);
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+}
+
 /* Fixed-size icon buttons: -sm (compact row controls) and -lg (touch target). */
 .btn-icon-sm {
   inline-size: 28px;
