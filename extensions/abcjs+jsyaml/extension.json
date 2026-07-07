@@ -1,0 +1,20 @@
+{
+  "id": "abcjs+jsyaml",
+  "name": "abcjs+jsyaml",
+  "description": "Render ABC music notation code blocks as SVG scores with abcjs; js-yaml reads each block's frontmatter options. Pre-rendered staff-width variants switch to fit the reading column.",
+  "category": "code-blocks",
+  "url": "https://www.abcjs.net/",
+  "scripts": [
+    { "file": "abcjs-basic.js", "license": "abcjs-LICENSE.txt" },
+    { "file": "js-yaml.min.js", "license": "jsyaml-LICENSE.txt" }
+  ],
+  "domTransforms": ["transformAbcjs.js"],
+  "textTransforms": [],
+  "assets": [
+    {
+      "file": "abc.css",
+      "target": "Styles/abc.css",
+      "media": "text/css"
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+/*
+  abcjs score variants — which pre-rendered staff width displays, in three
+  layers of progressively narrower support (same ladder as the Responsive
+  layout extension; no reading-system JavaScript):
+
+  1. base                 — the narrowest variant (.is-default); works everywhere
+  2. @supports not + @media — approximate viewport buckets where container
+                              queries are unavailable
+  3. @supports + @container — precise buckets against the reading column
+
+  The transform stamps the classes this sheet keys on: .is-default (narrowest),
+  .is-widest, and .no-wide / .no-full on the container when a block doesn't
+  define those conventional variants. Switch points are a fixed convention
+  (30em / 45em); the frontmatter staff widths control each variant's line
+  breaking, not when it displays.
+*/
+
+.abcjs-container {
+  padding: 0;
+}
+
+.abcjs-container svg {
+  padding: 0;
+}
+
+/* The hoisted shared <defs> holder: rendered (so <use> resolves reliably)
+   but occupying no space. */
+.abcjs-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---- Layer 1: narrowest variant only (works everywhere) ---- */
+
+.abcjs-variant {
+  display: none;
+}
+
+.abcjs-container .abcjs-variant.is-default {
+  display: block;
+}
+
+/* ---- Layer 2: approximate viewport buckets (no container-query support) ---- */
+
+@supports not (container-type: inline-size) {
+  @media (min-width: 30em) {
+    .abcjs-container .abcjs-variant.is-default {
+      display: none;
+    }
+    .abcjs-container .abcjs-variant.wide {
+      display: block;
+    }
+    /* This block defines no wide variant: keep the narrowest. */
+    .abcjs-container.no-wide .abcjs-variant.is-default {
+      display: block;
+    }
+  }
+
+  @media (min-width: 45em) {
+    .abcjs-container .abcjs-variant.is-default,
+    .abcjs-container .abcjs-variant.wide {
+      display: none;
+    }
+    .abcjs-container.no-wide .abcjs-variant.is-default {
+      display: none;
+    }
+    .abcjs-container .abcjs-variant.full {
+      display: block;
+    }
+    /* No full variant: show the widest this block defines. */
+    .abcjs-container.no-full .abcjs-variant.is-widest {
+      display: block;
+    }
+  }
+}
+
+/* ---- Layer 3: precise container buckets (progressive enhancement) ---- */
+
+@supports (container-type: inline-size) {
+  .abcjs-container {
+    container-type: inline-size;
+  }
+
+  @container (min-width: 30em) {
+    .abcjs-container .abcjs-variant.is-default {
+      display: none;
+    }
+    .abcjs-container .abcjs-variant.wide {
+      display: block;
+    }
+    .abcjs-container.no-wide .abcjs-variant.is-default {
+      display: block;
+    }
+  }
+
+  @container (min-width: 45em) {
+    .abcjs-container .abcjs-variant.is-default,
+    .abcjs-container .abcjs-variant.wide {
+      display: none;
+    }
+    .abcjs-container.no-wide .abcjs-variant.is-default {
+      display: none;
+    }
+    .abcjs-container .abcjs-variant.full {
+      display: block;
+    }
+    .abcjs-container.no-full .abcjs-variant.is-widest {
+      display: block;
+    }
+  }
+}
