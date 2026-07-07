@@ -100,9 +100,6 @@
         />
         <label class="edit-check-label" for="edit-spine-linear">
           <span>{$t('Include in the linear reading order')}</span>
-          <span class="edit-check-hint">
-            {$t('Uncheck to keep the item in the book but outside the default reading order.')}
-          </span>
         </label>
       </div>
     {/if}
@@ -115,12 +112,7 @@
       <button type="button" class="btn btn-secondary" onclick={onClose} disabled={saving}>
         {$t('Cancel')}
       </button>
-      <button
-        type="button"
-        class="btn btn-primary"
-        onclick={save}
-        disabled={saving || !id.trim()}
-      >
+      <button type="button" class="btn btn-primary" onclick={save} disabled={saving || !id.trim()}>
         {saving ? $t('Saving…') : $t('Save')}
       </button>
     </footer>
@@ -212,11 +204,6 @@
     font-size: var(--text-sm);
     color: var(--color-text-primary);
     cursor: pointer;
-  }
-
-  .edit-check-hint {
-    font-size: var(--text-xs);
-    color: var(--color-text-tertiary);
   }
 
   .edit-error {

@@ -3266,10 +3266,6 @@ msgstr ""
 msgid "Typesetting"
 msgstr ""
 
-#: src/lib/components/EditSpineItemDialog.svelte
-msgid "Uncheck to keep the item in the book but outside the default reading order."
-msgstr ""
-
 #: src/App.svelte
 msgid "Unknown View"
 msgstr ""

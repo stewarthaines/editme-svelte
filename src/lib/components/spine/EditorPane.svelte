@@ -1288,7 +1288,7 @@
     align-items: center;
     /* Match the sidebar header height + grey (see PaneHeader) so all top bars align. */
     min-height: var(--touch-target-min);
-    padding: 0 var(--space-3);
+    padding: 0 var(--space-3) 0 0;
     border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-tertiary);
     box-sizing: border-box;
