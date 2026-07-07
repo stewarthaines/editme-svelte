@@ -146,10 +146,15 @@
     font-size: 1.25rem;
     font-weight: 700;
     cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
+    background-color: var(--color-error);
+    color: white;
   }
 
   .subject-scheme-row {

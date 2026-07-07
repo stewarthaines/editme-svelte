@@ -142,6 +142,9 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .remove-button:hover:not(:disabled) {

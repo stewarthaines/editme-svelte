@@ -220,8 +220,9 @@
   }
 
   .remove-button:hover:not(:disabled) {
-    background-color: var(--color-error-bg);
-    border-inline-start-color: var(--color-error-600);
+    background-color: var(--color-error);
+    border-inline-start-color: var(--color-error);
+    color: white;
   }
 
   /* Compact "add role" control, sized to match the remove (×) button so the two
