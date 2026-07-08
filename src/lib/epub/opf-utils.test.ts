@@ -525,7 +525,10 @@ describe('OPFUtils', () => {
           version: '3.0',
           metadata: {
             title: 'كتاب عربي', // Arabic title
-            creator: [{ name: '作者名前', roles: [] }, { name: 'שם המחבר', roles: [] }], // Japanese and Hebrew
+            creator: [
+              { name: '作者名前', roles: [] },
+              { name: 'שם המחבר', roles: [] },
+            ], // Japanese and Hebrew
             description: 'Book with <em>HTML</em> & "quotes" content',
             language: ['en'],
             identifier: 'test-unicode-123',
@@ -1042,6 +1045,29 @@ describe('OPFUtils', () => {
       );
       expect(xml).toContain('<meta property="a11y:certifiedBy">Acme Publishing</meta>');
       expect(xml).toContain('<link rel="a11y:certifierReport" href="https://example.com/report"/>');
+    });
+  });
+
+  describe('Legacy Cover Meta', () => {
+    it('should emit EPUB 2 meta name="cover" for the cover-image manifest item', () => {
+      const testDoc = createTestOPFDocument();
+      testDoc.manifest.push({
+        id: 'cover-img',
+        href: 'Images/cover.png',
+        mediaType: 'image/png',
+        properties: ['cover-image'],
+      });
+
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expectValidXML(xml, 'OPF with cover image');
+
+      expect(xml).toContain('<meta name="cover" content="cover-img"/>');
+    });
+
+    it('should omit the legacy cover meta when no cover-image item exists', () => {
+      const xml = OPFUtils.generateOPFXML(createTestOPFDocument());
+
+      expect(xml).not.toContain('<meta name="cover"');
     });
   });
 

@@ -924,6 +924,15 @@ export class OPFUtils {
     // "book producer" dc:contributor, which records the creating version.
     xml += `\n    <meta name="generator" content="${escapeXML(`SEED.html ${__VERSION__}`)}"/>`;
 
+    // EPUB 2 legacy cover marker, alongside the manifest item's cover-image
+    // property. Google Play Books (and older Kindle/library tooling) key on
+    // this meta rather than the EPUB 3 property; legal optional metadata in
+    // EPUB 3 and epubcheck-clean.
+    const coverItem = manifest.find(item => item.properties?.includes('cover-image'));
+    if (coverItem) {
+      xml += `\n    <meta name="cover" content="${escapeXML(coverItem.id)}"/>`;
+    }
+
     // Add rendition properties only when they differ from defaults
     if (metadata.renditionLayout && metadata.renditionLayout !== 'reflowable') {
       xml += `\n    <meta property="rendition:layout">${escapeXML(metadata.renditionLayout)}</meta>`;
