@@ -30,7 +30,7 @@
     {
       "id": "abc-sample",
       "name": "ABC Sample",
-      "description": "Insert a sample of ABC notation with yaml frontmatter specifying rendering options.",
+      "description": "Insert a sample ABC tune: choose voices, key, tempo, lyrics and responsive scale variants.",
       "script": "abc-sample.js",
       "options": [
         {
@@ -50,15 +50,103 @@
           ]
         },
         {
-          "type": "boolean",
-          "name": "include_scales",
-          "label": "Include multiple scale classes",
-          "default": false
+          "type": "select",
+          "name": "voices",
+          "label": "Voices",
+          "default": "1",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 voice"
+            },
+            {
+              "value": "2",
+              "label": "2 voices"
+            },
+            {
+              "value": "3",
+              "label": "3 voices"
+            },
+            {
+              "value": "satb",
+              "label": "SATB"
+            }
+          ]
         },
         {
           "type": "boolean",
-          "name": "multiple_voices",
-          "label": "Include three voices",
+          "name": "responsive",
+          "label": "Responsive scale variants",
+          "default": true
+        },
+        {
+          "type": "select",
+          "name": "tempo",
+          "label": "Tempo",
+          "default": "120",
+          "options": [
+            {
+              "value": "60",
+              "label": "Largo (60)"
+            },
+            {
+              "value": "90",
+              "label": "Andante (90)"
+            },
+            {
+              "value": "120",
+              "label": "Moderato (120)"
+            },
+            {
+              "value": "144",
+              "label": "Allegro (144)"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "name": "key",
+          "label": "Key",
+          "default": "C",
+          "options": [
+            {
+              "value": "C",
+              "label": "C major"
+            },
+            {
+              "value": "G",
+              "label": "G major"
+            },
+            {
+              "value": "D",
+              "label": "D major"
+            },
+            {
+              "value": "F",
+              "label": "F major"
+            },
+            {
+              "value": "Bb",
+              "label": "B♭ major"
+            },
+            {
+              "value": "Am",
+              "label": "A minor"
+            },
+            {
+              "value": "Em",
+              "label": "E minor"
+            },
+            {
+              "value": "Dm",
+              "label": "D minor"
+            }
+          ]
+        },
+        {
+          "type": "boolean",
+          "name": "words",
+          "label": "Include sample lyrics",
           "default": false
         }
       ]

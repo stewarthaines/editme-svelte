@@ -143,7 +143,8 @@ function hoistDefs(document, container) {
 }
 
 function transformDOM(chapterDocument, idref) {
-  const codes = chapterDocument.querySelectorAll('pre:has(code.language-abcjs)')
+  // markdown/djot fences AND textile bc(abcjs). blocks
+  const codes = chapterDocument.querySelectorAll('pre.abcjs, pre:has(code.language-abcjs)')
 
   const defaultOptions = {
     staffwidth: 360,

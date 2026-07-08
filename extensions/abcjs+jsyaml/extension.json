@@ -5,16 +5,150 @@
   "category": "code-blocks",
   "url": "https://www.abcjs.net/",
   "scripts": [
-    { "file": "abcjs-basic-min.js", "license": "abcjs-LICENSE.txt" },
-    { "file": "js-yaml.min.js", "license": "jsyaml-LICENSE.txt" }
+    {
+      "file": "abcjs-basic-min.js",
+      "license": "abcjs-LICENSE.txt"
+    },
+    {
+      "file": "js-yaml.min.js",
+      "license": "jsyaml-LICENSE.txt"
+    }
   ],
-  "domTransforms": ["transformAbcjs.js"],
+  "domTransforms": [
+    "transformAbcjs.js"
+  ],
   "textTransforms": [],
   "assets": [
     {
       "file": "abc.css",
       "target": "Styles/abc.css",
       "media": "text/css"
+    }
+  ],
+  "generators": [
+    {
+      "id": "abc-sample",
+      "name": "ABC Sample",
+      "description": "Insert a sample ABC tune: choose voices, key, tempo, lyrics and responsive staff-width variants.",
+      "script": "abcjs-sample.js",
+      "options": [
+        {
+          "type": "select",
+          "name": "format",
+          "label": "Plain text wrapper",
+          "default": "markdown",
+          "options": [
+            {
+              "value": "markdown",
+              "label": "Markdown"
+            },
+            {
+              "value": "textile",
+              "label": "Textile"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "name": "voices",
+          "label": "Voices",
+          "default": "1",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 voice"
+            },
+            {
+              "value": "2",
+              "label": "2 voices"
+            },
+            {
+              "value": "3",
+              "label": "3 voices"
+            },
+            {
+              "value": "satb",
+              "label": "SATB"
+            }
+          ]
+        },
+        {
+          "type": "boolean",
+          "name": "responsive",
+          "label": "Responsive staff-width variants",
+          "default": true
+        },
+        {
+          "type": "select",
+          "name": "tempo",
+          "label": "Tempo",
+          "default": "120",
+          "options": [
+            {
+              "value": "60",
+              "label": "Largo (60)"
+            },
+            {
+              "value": "90",
+              "label": "Andante (90)"
+            },
+            {
+              "value": "120",
+              "label": "Moderato (120)"
+            },
+            {
+              "value": "144",
+              "label": "Allegro (144)"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "name": "key",
+          "label": "Key",
+          "default": "C",
+          "options": [
+            {
+              "value": "C",
+              "label": "C major"
+            },
+            {
+              "value": "G",
+              "label": "G major"
+            },
+            {
+              "value": "D",
+              "label": "D major"
+            },
+            {
+              "value": "F",
+              "label": "F major"
+            },
+            {
+              "value": "Bb",
+              "label": "B♭ major"
+            },
+            {
+              "value": "Am",
+              "label": "A minor"
+            },
+            {
+              "value": "Em",
+              "label": "E minor"
+            },
+            {
+              "value": "Dm",
+              "label": "D minor"
+            }
+          ]
+        },
+        {
+          "type": "boolean",
+          "name": "words",
+          "label": "Include sample lyrics",
+          "default": false
+        }
+      ]
     }
   ]
 }

@@ -1,23 +1,23 @@
 /**
  * Generator: insert a sample of ABC music notation, wrapped in the plain-text
- * block syntax the project authors in, ready for transformABC.js to render.
+ * block syntax the project authors in, ready for transformAbcjs.js to render.
  *
  * The wrapper is chosen with the `format` option:
- *   - markdown -> a fenced ```abc2svg block  (=> <pre><code class="language-abc2svg">)
- *   - textile  -> a `bc(abc2svg).` block      (=> <pre class="abc2svg"><code>)
- * Both selectors are recognised by transformABC.js.
+ *   - markdown -> a fenced ```abcjs block  (=> <pre><code class="language-abcjs">)
+ *   - textile  -> a `bc(abcjs).` block      (=> <pre class="abcjs"><code>)
+ * Both selectors are recognised by transformAbcjs.js.
  *
  * With `responsive` on, a YAML frontmatter block naming the conventional
- * scale variants is placed inside the code block. transformABC.js parses it
- * (via js-yaml) and renders the tune once per scale as
- * div.abc2svg-variant.<name> inside one div.abc2svg-container;
- * Styles/abc2svg.css shows the variant that fits the reading column
- * (container query, with fallbacks).
+ * staff-width variants is placed inside the code block. transformAbcjs.js
+ * parses it (via js-yaml) and renders the tune once per width as
+ * div.abcjs-variant.<name> inside one div.abcjs-container; Styles/abc.css
+ * shows the variant that fits the reading column (container query, with
+ * fallbacks).
  *
  * Options:
  *   format (select)      — "markdown" | "textile" block wrapper
  *   voices (select)      — "1" | "2" | "3" | "satb" voice arrangement
- *   responsive (boolean) — emit the scales YAML frontmatter
+ *   responsive (boolean) — emit the staffwidths YAML frontmatter
  *   tempo (select)       — Q: header value (beats per minute)
  *   key (select)         — K: header value
  *   words (boolean)      — sample lyric (w:) line under each voice
@@ -55,15 +55,14 @@ function generateText(ctx, options) {
     ].concat(w, ['V:2', 'C,D,E,F,|G,A,B,C|]'], w);
   } else if (voices === '3') {
     body = [
-      '%%measurenb 0',
       'V:T clef=treble name=I',
       'V:M clef=treble name=II',
-      'V:B clef=bass octave=-2 name=III',
+      'V:B clef=bass name=III',
       '%%score (T M) B',
       `K:${key}`,
       'V:T',
       "cdef|gabc'|]",
-    ].concat(w, ['V:M', 'CDEF|GABc|]'], w, ['V:B', 'CDEF|GABc|]'], w);
+    ].concat(w, ['V:M', 'CDEF|GABc|]'], w, ['V:B', 'C,D,E,F,|G,A,B,C,|]'], w);
   } else {
     // SATB: two braced staves — women's voices sharing treble, men's on
     // treble-8 / bass.
@@ -87,10 +86,11 @@ function generateText(ctx, options) {
     );
   }
 
-  // Optional YAML frontmatter: the conventional responsive scale variants.
-  // Larger scale = bigger engraving = the narrow-column variant.
+  // Optional YAML frontmatter: the conventional responsive staff-width
+  // variants. A narrower staff = fewer measures per line = the narrow-column
+  // variant.
   const frontmatter = responsive
-    ? ['---', 'scales:', '  narrow: 1.9', '  wide: 1.15', '  full: 0.69', '---']
+    ? ['---', 'staffwidths:', '  narrow: 320', '  wide: 640', '  full: 960', '---']
     : [];
 
   const block = frontmatter.concat(head, body);
@@ -98,10 +98,10 @@ function generateText(ctx, options) {
   if (format === 'textile') {
     // The trailing blank line closes the `bc.` block so following text isn't
     // pulled into the code listing.
-    return 'bc(abc2svg).\n' + block.join('\n') + '\n\n';
+    return 'bc(abcjs).\n' + block.join('\n') + '\n\n';
   }
 
   // Markdown fenced block. (Backticks kept out of a template literal on purpose.)
   const fence = '```';
-  return fence + 'abc2svg\n' + block.join('\n') + '\n' + fence + '\n';
+  return fence + 'abcjs\n' + block.join('\n') + '\n' + fence + '\n';
 }
