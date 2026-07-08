@@ -1377,20 +1377,6 @@
           {/if}
         </div>
       </div>
-
-      <!-- Collapse the preview pane (spine view only) — mirrors the sidebar's
-           toggle, right edge instead of left. Reopened from the rail that
-           replaces the pane (LayoutManager). -->
-      <button
-        type="button"
-        class="btn btn-icon btn-icon-lg preview-collapse"
-        onclick={() => layoutStore.toggleSpinePreview()}
-        aria-expanded="true"
-        aria-label={$t('Hide preview')}
-        title={$t('Hide preview')}
-      >
-        <CaretRight size={16} aria-hidden="true" />
-      </button>
     </div>
 
     <div class="preview-controls">
@@ -1463,6 +1449,23 @@
         {/if}
       {/if}
     </div>
+
+    <!-- Collapse the preview pane (spine view only) — mirrors the sidebar's
+         toggle, right edge instead of left. Pinned to the header's top-right
+         corner (out of flow, so it never adds row height): right of the Checks
+         dropdown on a single row, right of the device dropdown when the
+         controls wrap. Reopened from the rail that replaces the pane
+         (LayoutManager). -->
+    <button
+      type="button"
+      class="btn btn-icon btn-icon-lg preview-collapse"
+      onclick={() => layoutStore.toggleSpinePreview()}
+      aria-expanded="true"
+      aria-label={$t('Hide preview')}
+      title={$t('Hide preview')}
+    >
+      <CaretRight size={16} aria-hidden="true" />
+    </button>
   </div>
 
   <!-- Accessibility results panel (spike): plain-text violations, sorted by impact -->
@@ -1735,9 +1738,22 @@
     /* Match the sidebar header height + grey (see PaneHeader) so all top bars align. */
     min-height: var(--touch-target-min);
     padding: var(--space-1) var(--space-3);
+    /* The collapse toggle is pinned to the top-right corner; reserve its column
+       so the dropdowns never slide under it. */
+    padding-inline-end: calc(var(--touch-target-min) + var(--space-2));
+    position: relative;
     border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-tertiary);
     box-sizing: border-box;
+  }
+
+  /* Flat header-height square flush with the pane's top-right corner, like the
+     sidebar toggle on the left edge — out of flow so it adds no row height. */
+  .preview-collapse {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    border-radius: 0;
   }
 
   /* Source (left) + device controls (right). Basis `auto` so line-breaking uses its
