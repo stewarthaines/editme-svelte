@@ -155,6 +155,45 @@
     outline-offset: var(--focus-ring-offset);
   }
 
+  /* Touch devices: the 4px strip is too fine a drag target, so grow a thumb at
+     the bottom of the handle. A pseudo-element extends the resizer's hit area
+     (pseudo-elements hit-test as their originating element), so dragging the
+     thumb IS dragging the handle — no extra wiring. */
+  @media (pointer: coarse) {
+    :global([data-pane-resizer]) {
+      position: relative;
+      z-index: 1; /* the thumb overlays the neighbouring pane content */
+      touch-action: none;
+    }
+
+    :global([data-pane-resizer])::after {
+      content: '⋮⋮';
+      position: absolute;
+      inset-block-end: var(--space-4);
+      /* Physical centering on the strip (translateX doesn't flip in RTL). */
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 66px;
+      block-size: 44px;
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-full);
+      background: var(--color-bg-tertiary);
+      box-shadow: var(--shadow-sm);
+      color: var(--color-text-secondary);
+      font-size: var(--text-base);
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    :global([data-pane-resizer][data-resize-handle-active])::after {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+  }
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     .main-content {
