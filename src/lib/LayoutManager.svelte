@@ -184,6 +184,13 @@
     border-radius: 0;
   }
 
+  /* The scoped background above outweighs the shared .btn-icon hover rule —
+     restate the azure fill. */
+  .preview-rail .btn:hover {
+    background: var(--color-hover-accent);
+    color: var(--color-on-accent);
+  }
+
   /* PaneForge resizer styling - using logical properties.
      border-strong (one step more contrasted than the bg-tertiary header) gives a
      clear division in both themes: darker than the header in light (#e0e0e0 vs
