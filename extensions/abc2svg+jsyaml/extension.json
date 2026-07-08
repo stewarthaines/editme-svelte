@@ -29,7 +29,7 @@
   "generators": [
     {
       "id": "abc-sample",
-      "name": "ABC Sample",
+      "name": "ABC Sample (abc2svg)",
       "description": "Insert a sample ABC tune: choose voices, key, tempo, lyrics and responsive scale variants.",
       "script": "abc-sample.js",
       "options": [

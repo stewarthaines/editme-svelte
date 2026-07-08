@@ -27,8 +27,8 @@
   ],
   "generators": [
     {
-      "id": "abc-sample",
-      "name": "ABC Sample",
+      "id": "abcjs-sample",
+      "name": "ABC Sample (abcjs)",
       "description": "Insert a sample ABC tune: choose voices, key, tempo, lyrics and responsive staff-width variants.",
       "script": "abcjs-sample.js",
       "options": [
