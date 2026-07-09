@@ -74,4 +74,9 @@ describe('isBookFile', () => {
     expect(isBookFile('catalog.xml')).toBe(false);
     expect(isBookFile('notes.epub.bak')).toBe(false);
   });
+
+  it('rejects dot-prefixed names (macOS AppleDouble sidecars)', () => {
+    expect(isBookFile('._book.epub')).toBe(false);
+    expect(isBookFile('.hidden.epub')).toBe(false);
+  });
 });

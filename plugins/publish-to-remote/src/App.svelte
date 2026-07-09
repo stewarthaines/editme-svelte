@@ -938,7 +938,8 @@
                   {activeFilenames}
                   {selectedKeys}
                   {onToggleSelect}
-                  selectable={activeRemote?.type !== 'google-drive'}
+                  selectable={activeRemote?.type !== 'google-drive' &&
+                    activeRemote?.type !== 'device'}
                   {googleAuthRequired}
                   {onCopyUrl}
                   onRead={onReadRemote}

@@ -219,9 +219,11 @@ export async function uploadToDevice(
   }
 }
 
-/** Files the device list shows: EPUBs (plain or Kobo kepub). */
+/** Files the device list shows: EPUBs (plain or Kobo kepub). Dot-prefixed
+ * names are excluded — macOS strews AppleDouble sidecars (`._book.epub`)
+ * across FAT volumes, one per file. */
 export function isBookFile(name: string): boolean {
-  return /\.(epub|kepub\.epub)$/i.test(name);
+  return !name.startsWith('.') && /\.(epub|kepub\.epub)$/i.test(name);
 }
 
 export async function listDeviceFiles(
