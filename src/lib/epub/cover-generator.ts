@@ -25,10 +25,7 @@ export type CoverMode = 'dark' | 'light';
 // than HSL's uneven sweep. Two themes: 'dark' = deep, saturated background with
 // white text; 'light' = pale, low-chroma "paper" tint with near-black text.
 // (Tweak the constants to taste.)
-const COVER_THEMES: Record<
-  CoverMode,
-  { L: number; C: number; text: string; author: string }
-> = {
+const COVER_THEMES: Record<CoverMode, { L: number; C: number; text: string; author: string }> = {
   dark: { L: 0.5, C: 0.15, text: '#ffffff', author: 'rgba(255,255,255,0.72)' },
   light: { L: 0.9, C: 0.07, text: '#1a1a1a', author: 'rgba(0,0,0,0.6)' },
 };
@@ -129,7 +126,8 @@ function fitLines(text: string): string[] {
  */
 export async function generateCoverPng(svgString: string, maxDim = 512): Promise<ArrayBuffer> {
   // The SVG viewBox is 600×900 (2:3). Fit within maxDim on the longer side.
-  const SVG_W = 600, SVG_H = 900;
+  const SVG_W = 600,
+    SVG_H = 900;
   const scale = maxDim / Math.max(SVG_W, SVG_H);
   const w = Math.round(SVG_W * scale);
   const h = Math.round(SVG_H * scale);
@@ -206,7 +204,11 @@ export function generateCoverSvg(
   // Font size is constrained by BOTH the width (longest line fills ~87% of the 600 px
   // viewBox; 0.52 ≈ Georgia's average char-width ratio at large sizes) and the title
   // zone's height (so a tall multi-line title can't overflow upward).
-  const widthFont = clamp(Math.round(TITLE_WIDTH_TARGET / (longestLine.length * 0.52)), 44, FONT_CAP);
+  const widthFont = clamp(
+    Math.round(TITLE_WIDTH_TARGET / (longestLine.length * 0.52)),
+    44,
+    FONT_CAP
+  );
   const zoneHeight = TITLE_ZONE_BOTTOM - TITLE_ZONE_TOP;
   // Cap by height too. The visual block height ≈ the baseline spans plus one line's
   // cap-height + descender (~0.9·font), so solving that ≤ zoneHeight gives the largest
@@ -222,7 +224,10 @@ export function generateCoverSvg(
   const firstBaselineY = Math.round(zoneCenter - span / 2 + 0.25 * fontSize);
 
   const tspans = lines
-    .map((line, i) => `      <tspan x="300" dy="${i === 0 ? 0 : lineHeight}">${xmlEscape(line)}</tspan>`)
+    .map(
+      (line, i) =>
+        `      <tspan x="300" dy="${i === 0 ? 0 : lineHeight}">${xmlEscape(line)}</tspan>`
+    )
     .join('\n');
 
   // Scale the ~250 px-tall mark to LOGO_TARGET_H and centre it at (300, LOGO_CENTER_Y).

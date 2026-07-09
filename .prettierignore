@@ -12,8 +12,14 @@ node_modules/
 __screenshots__/
 *.tsbuildinfo
 
-# Vendored / third-party sample assets (not ours to reformat)
-src/assets/sample/vextab.js
+# Runtime-injected / vendored assets (mirrors the eslint ignore) — served
+# as-is, not formatted as app modules
+src/assets/
+
+# Vendored bene reader build and Paged.js polyfill (third-party, served as-is)
+public/bene/
+public/paged.polyfill.js
+patches/
 
 # Vendored minified libraries (e.g. axe-core for the accessibility check)
 *.min.js
@@ -32,6 +38,13 @@ vitest.config.ts
 
 # Tooling / agent config (not project source)
 .claude/
+
+# Local Python virtualenv (untracked) — not project source
+.venv/
+
+# Book sources for the in-app manuals: prose is deliberately one line per
+# paragraph (reviewed in Obsidian) — never reflow
+docs/
 
 # Temporary files
 .DS_Store

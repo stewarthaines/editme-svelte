@@ -13,12 +13,12 @@ The single-file build (`dist/index.html`) is 1,084KB raw / 295KB gzip: 859KB inl
 
 ## Goals (measurable)
 
-| # | Goal | Baseline | Target |
-|---|------|----------|--------|
-| G1 | Icon payload in the built file | ~70KB (est. minified share) | ≤15KB |
-| G2 | Global CSS layer (tokens + themes + utilities + global) | ~60KB built | ≤30KB built |
-| G3 | `dist/index.html` total | 1,084KB / 295KB gz | ≤990KB / ≤278KB gz |
-| G4 | Regressions become visible | none | size budget asserted in `npm run smoke`; icon/CSS drift checked in `npm run check` or `validate` |
+| #   | Goal                                                    | Baseline                    | Target                                                                                           |
+| --- | ------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------ |
+| G1  | Icon payload in the built file                          | ~70KB (est. minified share) | ≤15KB                                                                                            |
+| G2  | Global CSS layer (tokens + themes + utilities + global) | ~60KB built                 | ≤30KB built                                                                                      |
+| G3  | `dist/index.html` total                                 | 1,084KB / 295KB gz          | ≤990KB / ≤278KB gz                                                                               |
+| G4  | Regressions become visible                              | none                        | size budget asserted in `npm run smoke`; icon/CSS drift checked in `npm run check` or `validate` |
 
 Non-goals for this effort: component-scoped CSS reduction (137KB — a separate, riskier refactor of the monolith views), framework/architecture changes, self-extracting compression.
 
@@ -80,4 +80,4 @@ Each step lands as its own commit with before/after sizes in the message; whole 
 1. **Alias, not codemod** — `phosphor-svelte` import paths stay; `resolve.alias` redirects to the generated module.
 2. **Utilities: prune in place** — keep the layer, delete unreferenced classes; do not fold survivors into `global.css`.
 3. **Tokens are app-internal** — no public contract; prune unreferenced ones (with the iterative fixpoint below, since tokens can reference each other).
-4. **Plugins stay on stock phosphor-svelte** — their builds are untouched. The generator still *scans* `plugins/*/src` so the core dev server (whose alias applies to plugin sources served through it) can resolve every icon; generating a few extra icons is cheap insurance.
+4. **Plugins stay on stock phosphor-svelte** — their builds are untouched. The generator still _scans_ `plugins/*/src` so the core dev server (whose alias applies to plugin sources served through it) can resolve every icon; generating a few extra icons is cheap insurance.

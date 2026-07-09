@@ -117,17 +117,17 @@ All stories are `.stories.svelte` files using **Svelte CSF v5** — `defineMeta`
 
 Split queries by purpose:
 
-- **Assertions — what the story is *about*.** Query the way a user perceives it: `findByRole` with an accessible name, `findByText`, `findByLabelText`, against the expected (localized) string. That coupling *is* the test — the i18n story's `findByText('Metadaten')` verifies the translation applied, on purpose.
+- **Assertions — what the story is _about_.** Query the way a user perceives it: `findByRole` with an accessible name, `findByText`, `findByLabelText`, against the expected (localized) string. That coupling _is_ the test — the i18n story's `findByText('Metadaten')` verifies the translation applied, on purpose.
 - **Navigation / setup — controls you pass through to reach a state.** Use a **`data-testid`** hook. This app is internationalized, so any name/text/label query is locale-locked; and matching an `aria-label` binds a test to invisible prose that gets reworded for accessibility reasons, not behaviour. A testid is locale- and copy-stable, which is exactly what a setup step wants.
 
 Keep testids **sparse** — they are Testing Library's explicit last resort (they don't resemble user behaviour and won't catch a11y regressions), so they belong only on genuine, repeatedly-driven navigation hooks, never as a blanket replacement for semantic queries. The established hooks:
 
-| `data-testid` | Element | Where |
-| --- | --- | --- |
-| `nav-<sectionId>` | Sidebar section buttons | `src/lib/Sidebar.svelte` (e.g. `nav-workspace` is Projects, `nav-metadata`, `nav-settings`) |
-| `create-project` | New-project button | `src/lib/components/workspace/WorkspaceActionBar.svelte` |
-| `package-epub` | Package-EPUB button | `src/App.svelte` |
-| `spine-item-<chapterId>` | Chapter buttons in the spine list | `src/lib/components/SpineItem.svelte` (e.g. `spine-item-chapter01`) |
+| `data-testid`            | Element                           | Where                                                                                       |
+| ------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| `nav-<sectionId>`        | Sidebar section buttons           | `src/lib/Sidebar.svelte` (e.g. `nav-workspace` is Projects, `nav-metadata`, `nav-settings`) |
+| `create-project`         | New-project button                | `src/lib/components/workspace/WorkspaceActionBar.svelte`                                    |
+| `package-epub`           | Package-EPUB button               | `src/App.svelte`                                                                            |
+| `spine-item-<chapterId>` | Chapter buttons in the spine list | `src/lib/components/SpineItem.svelte` (e.g. `spine-item-chapter01`)                         |
 
 Adding a hook: prefer a stable, non-localized suffix (a section/chapter **id**, not a label). Add the row above, and reach for a testid only when a semantic query would be locale- or copy-brittle for a step that isn't itself under test.
 

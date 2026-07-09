@@ -163,7 +163,11 @@ export class SourceManager {
               console.warn(`Cannot rehydrate base for ${original}: patch did not apply`);
               continue;
             }
-            await this.fileStorage.writeTextFile(workspaceId, `${BASE_PREFIX}${original}`, baseText);
+            await this.fileStorage.writeTextFile(
+              workspaceId,
+              `${BASE_PREFIX}${original}`,
+              baseText
+            );
           } else {
             await this.fileStorage.writeFile(workspaceId, filePath, await fileBlob.arrayBuffer());
           }

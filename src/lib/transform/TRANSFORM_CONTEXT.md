@@ -1,6 +1,6 @@
 # Transform scripts and the `ctx` capability API
 
-This documents the contract an **extension author** writes against — the transform script functions and the `ctx` (transform context) object passed to them. It is the runtime view from *inside* a transform, complementary to [API.md](./API.md), which documents the internal `TransformPipeline` orchestration classes. If you are writing a `transformText`/`transformDOM`/`generateText` for an extension under `extensions/`, this is the file you want.
+This documents the contract an **extension author** writes against — the transform script functions and the `ctx` (transform context) object passed to them. It is the runtime view from _inside_ a transform, complementary to [API.md](./API.md), which documents the internal `TransformPipeline` orchestration classes. If you are writing a `transformText`/`transformDOM`/`generateText` for an extension under `extensions/`, this is the file you want.
 
 ## Where transform scripts run
 
@@ -18,15 +18,21 @@ An extension transform file defines one or more of these top-level functions. Ea
 ```js
 // Text transform: plain-text source -> HTML string.
 // Declared in extension.json "textTransforms".
-function transformText(plainText, idref, ctx) { /* return html string */ }
+function transformText(plainText, idref, ctx) {
+  /* return html string */
+}
 
 // DOM transform: mutate (and return) the chapter document.
 // Declared in extension.json "domTransforms".
-function transformDOM(document, idref, ctx) { /* return document */ }
+function transformDOM(document, idref, ctx) {
+  /* return document */
+}
 
 // Generator: project-wide source producer, no chapter input.
 // Declared in extension.json "generators[].script"; one generateText per file.
-async function generateText(ctx, options) { /* return string */ }
+async function generateText(ctx, options) {
+  /* return string */
+}
 ```
 
 Notes:
@@ -39,15 +45,15 @@ Notes:
 
 Built per-invocation by `createTransformContext` in `src/assets/iframe/editor.js`. Shape:
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `ctx.idref` | `string` | Current spine item id. |
-| `ctx.basePath` | `string` | OPF content base path (e.g. `"OEBPS"`). Manifest hrefs are relative to this; you pass the bare href, the broker joins the base. |
-| `ctx.manifest` | `ManifestItem[]` | The OPF manifest: `{ id, href, mediaType, properties?, fallback? }` per item. Read-only snapshot. |
-| `await ctx.readManifestText(href)` | `Promise<string>` | Decoded UTF-8 text of a **declared** manifest item. |
-| `await ctx.readManifestDataURL(href)` | `Promise<string>` | `data:` URL of a manifest item — use for binary assets (images, fonts). |
-| `await ctx.readSourceText(path)` | `Promise<string>` | Read a file from the editor's `SOURCE/` tree as text. |
-| `await ctx.writeSourceText(path, text)` | `Promise<string>` | Persist text; **scoped to `SOURCE/data/`**. Returns the resolved path. |
+| Field                                   | Type              | Notes                                                                                                                           |
+| --------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `ctx.idref`                             | `string`          | Current spine item id.                                                                                                          |
+| `ctx.basePath`                          | `string`          | OPF content base path (e.g. `"OEBPS"`). Manifest hrefs are relative to this; you pass the bare href, the broker joins the base. |
+| `ctx.manifest`                          | `ManifestItem[]`  | The OPF manifest: `{ id, href, mediaType, properties?, fallback? }` per item. Read-only snapshot.                               |
+| `await ctx.readManifestText(href)`      | `Promise<string>` | Decoded UTF-8 text of a **declared** manifest item.                                                                             |
+| `await ctx.readManifestDataURL(href)`   | `Promise<string>` | `data:` URL of a manifest item — use for binary assets (images, fonts).                                                         |
+| `await ctx.readSourceText(path)`        | `Promise<string>` | Read a file from the editor's `SOURCE/` tree as text.                                                                           |
+| `await ctx.writeSourceText(path, text)` | `Promise<string>` | Persist text; **scoped to `SOURCE/data/`**. Returns the resolved path.                                                          |
 
 All four methods are async and reject (throw) on failure — wrap in `try/catch` and degrade gracefully (leave the DOM untouched) rather than letting the whole transform fail.
 
@@ -65,14 +71,17 @@ This is the canonical pattern for "the transform needs to read/modify a bundled 
    ```json
    "assets": [{ "file": "fleuron.svg", "target": "Images/fleuron.svg", "media": "image/svg+xml" }]
    ```
-2. On install, the file is written to `OEBPS/Images/fleuron.svg` and registered as an OPF manifest item with `href: "Images/fleuron.svg"` (`extension-manager.ts` → `App.svelte` `handleExtensionAssets` → `addManifestItem`). It now ships *inside* the book.
+2. On install, the file is written to `OEBPS/Images/fleuron.svg` and registered as an OPF manifest item with `href: "Images/fleuron.svg"` (`extension-manager.ts` → `App.svelte` `handleExtensionAssets` → `addManifestItem`). It now ships _inside_ the book.
 3. At render time the transform reads it back:
    ```js
    async function transformDOM(document, idref, ctx) {
      if (!ctx) return document;
      let svg;
-     try { svg = await ctx.readManifestText('Images/fleuron.svg'); }
-     catch { return document; } // asset missing — leave the chapter as-is
+     try {
+       svg = await ctx.readManifestText('Images/fleuron.svg');
+     } catch {
+       return document;
+     } // asset missing — leave the chapter as-is
      // …parse, modify (e.g. force fill/stroke to currentColor), inline…
      return document;
    }

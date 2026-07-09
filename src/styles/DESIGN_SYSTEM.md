@@ -479,12 +479,7 @@ Use inline banners/messages only for persistent state that must stay visible (e.
     children?: Snippet;
   }
 
-  let {
-    direction = 'auto',
-    title,
-    collapsible = false,
-    collapsed = false,
-  }: Props = $props();
+  let { direction = 'auto', title, collapsible = false, collapsed = false }: Props = $props();
 </script>
 
 <div class="panel" dir={direction} class:panel--rtl={direction === 'rtl'}>

@@ -641,7 +641,9 @@ describe('SourceManager', () => {
       const ws = 'tc-legacy';
       await mockFileStorage.createWorkspace(ws);
       await sourceManager.extractSourceZip(ws, legacyBlob);
-      expect(await mockFileStorage.readTextFile(ws, 'SOURCE/main/SOURCE/text/ch.txt')).toBe('orig\n');
+      expect(await mockFileStorage.readTextFile(ws, 'SOURCE/main/SOURCE/text/ch.txt')).toBe(
+        'orig\n'
+      );
     });
   });
 });

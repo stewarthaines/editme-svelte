@@ -131,7 +131,9 @@ describe('OPFS Worker Script', () => {
         try {
           const root = await mockNavigator.storage.getDirectory();
           const workspacesDir = await root.getDirectoryHandle('workspaces', { create: true });
-          const workspaceDir = await workspacesDir.getDirectoryHandle(workspaceId, { create: true });
+          const workspaceDir = await workspacesDir.getDirectoryHandle(workspaceId, {
+            create: true,
+          });
           const fileHandle = await workspaceDir.getFileHandle(path, { create: true });
           const file = await fileHandle.getFile();
           return {

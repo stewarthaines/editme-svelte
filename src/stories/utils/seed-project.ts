@@ -77,7 +77,8 @@ const DEFAULT_CHAPTERS: SeedChapter[] = [
   },
   {
     title: 'Chapter Two',
-    sourceText: '# Chapter Two\n\nA second chapter, so reordering and navigation have something to work with.',
+    sourceText:
+      '# Chapter Two\n\nA second chapter, so reordering and navigation have something to work with.',
   },
 ];
 

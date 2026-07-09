@@ -22,14 +22,17 @@
   // slider previews the real palette rather than a generic rainbow.
   const trackGradient = $derived(
     `linear-gradient(to right, ${Array.from({ length: 13 }, (_, i) =>
-      coverBackgroundColor(i * 30, mode),
-    ).join(', ')})`,
+      coverBackgroundColor(i * 30, mode)
+    ).join(', ')})`
   );
 </script>
 
 <div class="hue-selector">
   {#if showSwatch}
-    <span class="hue-swatch" style="background: {coverBackgroundColor(value, mode)}" aria-hidden="true"
+    <span
+      class="hue-swatch"
+      style="background: {coverBackgroundColor(value, mode)}"
+      aria-hidden="true"
     ></span>
   {/if}
   <input

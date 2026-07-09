@@ -3,7 +3,12 @@
   import { t } from '../../i18n';
   import { X } from 'phosphor-svelte';
   import InlineTextDiff from './InlineTextDiff.svelte';
-  import type { ImportKind, ImportResolution, ReviewDecision, ReviewItem } from '../../import/types';
+  import type {
+    ImportKind,
+    ImportResolution,
+    ReviewDecision,
+    ReviewItem,
+  } from '../../import/types';
 
   let {
     items,
@@ -171,7 +176,10 @@
 
           <div class="import-preview-body">
             {#if selected.preview.type === 'text'}
-              <InlineTextDiff current={selected.preview.current} incoming={selected.preview.incoming} />
+              <InlineTextDiff
+                current={selected.preview.current}
+                incoming={selected.preview.incoming}
+              />
             {:else if selected.preview.type === 'image'}
               <div class="import-image-pair">
                 <figure>

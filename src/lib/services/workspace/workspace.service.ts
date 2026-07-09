@@ -178,9 +178,10 @@ export class WorkspaceService {
    * Resolve pathInfo (cached) and the current OPF mtime, returning a cache slot
    * for this workspace. A changed mtime drops the stale slot so callers rebuild.
    */
-  private async cacheSlot(
-    id: string
-  ): Promise<{ pathInfo: WorkspacePathInfo; slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta } }> {
+  private async cacheSlot(id: string): Promise<{
+    pathInfo: WorkspacePathInfo;
+    slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta };
+  }> {
     const pathInfo = await this.getWorkspacePathInfo(id);
     let opfMtime = 0;
     try {
@@ -812,9 +813,7 @@ export class WorkspaceService {
         ? new Date(metadata.modifiedDate)
         : new Date();
 
-    const authors = metadata.creator
-      ?.map(c => creatorName(c))
-      .filter((n): n is string => !!n);
+    const authors = metadata.creator?.map(c => creatorName(c)).filter((n): n is string => !!n);
 
     slot.info = {
       id,

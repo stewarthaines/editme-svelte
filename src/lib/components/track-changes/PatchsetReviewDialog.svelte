@@ -45,7 +45,12 @@
   let saving = $state(false);
   let error = $state<string | null>(null);
 
-  const selIndex = $derived(Math.max(0, rows.findIndex(r => r.key === selectedKey)));
+  const selIndex = $derived(
+    Math.max(
+      0,
+      rows.findIndex(r => r.key === selectedKey)
+    )
+  );
   const selRow = $derived(rows[selIndex]);
 
   onMount(async () => {
@@ -125,7 +130,12 @@
         if (row.kind === 'chapter-modify') {
           resolved.push({ kind: 'chapter-modify', id: row.target, title: row.title, content });
         } else {
-          resolved.push({ kind: 'file-modify', path: row.target, mediaType: row.mediaType, content });
+          resolved.push({
+            kind: 'file-modify',
+            path: row.target,
+            mediaType: row.mediaType,
+            content,
+          });
         }
       }
       await onConfirm(resolved);

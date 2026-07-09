@@ -57,7 +57,12 @@ export async function generatePatchset(
 
     const chapterId = chapterIdFromTextPath(original);
     if (chapterId) {
-      changes.push({ kind: 'chapter-modify', id: chapterId, title: chapterId, newText: currentText });
+      changes.push({
+        kind: 'chapter-modify',
+        id: chapterId,
+        title: chapterId,
+        newText: currentText,
+      });
     } else {
       changes.push({
         kind: 'file-modify',

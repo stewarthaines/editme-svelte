@@ -16,18 +16,23 @@
       app. Hidden by default; the gate script below adds .compat-show on failure.
     -->
     <style>
-      #compat-warning { display: none; }
+      #compat-warning {
+        display: none;
+      }
       #compat-warning.compat-show {
         display: block;
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         margin: 0;
         padding: 24px;
         box-sizing: border-box;
         overflow: auto;
         background-color: #f7f7f7;
         color: #1a1a1a;
-        font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+        font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
         font-size: 16px;
         line-height: 1.5;
         -webkit-text-size-adjust: 100%;
@@ -37,15 +42,23 @@
         margin: 10vh auto 0 auto;
         text-align: left;
       }
-      #compat-warning h1 { font-size: 22px; margin: 0 0 12px 0; }
-      #compat-warning p { margin: 0 0 12px 0; }
-      #compat-warning ul { margin: 0 0 12px 20px; padding: 0; }
+      #compat-warning h1 {
+        font-size: 22px;
+        margin: 0 0 12px 0;
+      }
+      #compat-warning p {
+        margin: 0 0 12px 0;
+      }
+      #compat-warning ul {
+        margin: 0 0 12px 20px;
+        padding: 0;
+      }
       #compat-warning .compat-ua {
         margin-top: 16px;
         padding: 10px;
         background-color: #ececec;
         border-radius: 6px;
-        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+        font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
         font-size: 12px;
         word-break: break-all;
         color: #555;
@@ -61,9 +74,9 @@
       <div class="compat-inner">
         <h1>This browser is too old for SEED.html</h1>
         <p>
-          The SEED.html EPUB editor needs a recent browser. It relies on modern
-          JavaScript and the Compression Streams API to read, edit, and package
-          EPUB files, which this browser does not support.
+          The SEED.html EPUB editor needs a recent browser. It relies on modern JavaScript and the
+          Compression Streams API to read, edit, and package EPUB files, which this browser does not
+          support.
         </p>
         <p>Once you upgrade, reload this page to start editing.</p>
         <div class="compat-ua">Your browser: <span id="compat-ua"></span></div>
@@ -87,17 +100,23 @@
     -->
     <script>
       (function () {
-        var ua = (window.navigator && navigator.userAgent) || "";
-        var uaEl = document.getElementById("compat-ua");
-        if (uaEl) { uaEl.appendChild(document.createTextNode(ua)); }
+        var ua = (window.navigator && navigator.userAgent) || '';
+        var uaEl = document.getElementById('compat-ua');
+        if (uaEl) {
+          uaEl.appendChild(document.createTextNode(ua));
+        }
         var supported =
-          typeof window.CompressionStream !== "undefined" &&
-          typeof window.DecompressionStream !== "undefined";
+          typeof window.CompressionStream !== 'undefined' &&
+          typeof window.DecompressionStream !== 'undefined';
         if (!supported) {
-          var warn = document.getElementById("compat-warning");
-          var app = document.getElementById("app");
-          if (warn) { warn.className = "compat-show"; }
-          if (app) { app.style.display = "none"; }
+          var warn = document.getElementById('compat-warning');
+          var app = document.getElementById('app');
+          if (warn) {
+            warn.className = 'compat-show';
+          }
+          if (app) {
+            app.style.display = 'none';
+          }
         }
       })();
     </script>

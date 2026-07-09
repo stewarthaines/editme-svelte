@@ -9,14 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > something a user would notice, and cut a dated version section on each
 > `package.json` version bump. Internal/CI-only changes (build, deploy, dependency
 > pins) are intentionally omitted — this log describes what changed for someone who
-> *uses* the editor, not the commit history.
+> _uses_ the editor, not the commit history.
 
 ## [Unreleased]
 
 ### Added
 
 - Text formats carry their own media-insertion templates: adopting a format — at project creation, from the App Settings catalog, or by switching the text transform in EPUB Settings — sets the project's image, video and audio-clip templates to format-appropriate defaults (Djot projects, for example, get the quoted clip directive and a raw-HTML video wrapper automatically).
-- New **abcjs+jsyaml** extension (Code blocks): ```` ```abcjs ```` code blocks render as SVG music scores. YAML frontmatter names staff-width variants (narrow/wide/full) and the one that fits the reading column displays — pure CSS via container queries with media-query fallbacks, no reading-system JavaScript.
+- New **abcjs+jsyaml** extension (Code blocks): ` ```abcjs ` code blocks render as SVG music scores. YAML frontmatter names staff-width variants (narrow/wide/full) and the one that fits the reading column displays — pure CSS via container queries with media-query fallbacks, no reading-system JavaScript.
 - Both music extensions (abc2svg, abcjs) ship a reworked ABC Sample generator: choose the block wrapper (Markdown/Textile), voices (1, 2, 3 or SATB), key, tempo, sample lyrics, and whether to include the responsive variants frontmatter.
 - New **Responsive layout** extension (Typesetting): chapter content adapts to the reading column — a comfortable em-based reading measure that works in every reading system, wide-page figure breakouts, e-ink adjustments, and caption-beside-image figures where the reading system supports container queries. Because it's em-based, readers who raise the font size get the narrow layout automatically.
 

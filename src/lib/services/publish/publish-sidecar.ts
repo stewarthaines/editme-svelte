@@ -58,9 +58,7 @@ export async function writePublishSidecar(
     publisher: metadata.publisher,
     issued: metadata.date,
     identifier: metadata.identifier,
-    subjects: metadata.subject
-      ?.map(s => (typeof s === 'string' ? s : s.value))
-      .filter(Boolean),
+    subjects: metadata.subject?.map(s => (typeof s === 'string' ? s : s.value)).filter(Boolean),
   };
 
   // Drop empty arrays/undefined for a tidy sidecar.

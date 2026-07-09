@@ -430,11 +430,9 @@ export class SpinePreviewManager {
       const next = deriveContentProperties(xhtml, current);
       if (next === null) return; // unchanged (or parse failed) → no write, no callback
 
-      const updated = await this.workspaceService.updateManifestItem(
-        workspace,
-        this.spineItemId,
-        { properties: next.length > 0 ? next : undefined }
-      );
+      const updated = await this.workspaceService.updateManifestItem(workspace, this.spineItemId, {
+        properties: next.length > 0 ? next : undefined,
+      });
       this.onWorkspaceUpdate?.(updated);
     } catch (error) {
       console.warn('Failed to update content-derived manifest properties:', error);

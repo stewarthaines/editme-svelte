@@ -38,7 +38,9 @@ export async function listPatchsets(): Promise<Patchset[]> {
   for (const file of files) {
     if (!file.endsWith('.json')) continue;
     try {
-      patchsets.push(JSON.parse(await storage.readTextFile(CHANGES_WORKSPACE_ID, file)) as Patchset);
+      patchsets.push(
+        JSON.parse(await storage.readTextFile(CHANGES_WORKSPACE_ID, file)) as Patchset
+      );
     } catch {
       // Skip unreadable/corrupt patchset files.
     }

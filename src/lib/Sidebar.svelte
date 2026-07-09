@@ -98,8 +98,7 @@
   // (or a subdomain). Everywhere else — localhost, *.pages.dev, standalone HTML, inside
   // an EPUB (file://) — keep the descriptive "Simple EPUB Editor" heading.
   const isBrandHost =
-    typeof window !== 'undefined' &&
-    /(^|\.)readitinabook\.com$/i.test(window.location.hostname);
+    typeof window !== 'undefined' && /(^|\.)readitinabook\.com$/i.test(window.location.hostname);
 
   // Main navigation sections (clickable)
   const MAIN_SECTIONS: Array<{

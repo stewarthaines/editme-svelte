@@ -55,10 +55,8 @@ export function openEpubInReader(blob: Blob): void {
  * only when the remote allows cross-origin reads (CORS).
  */
 export function openEpubUrlInReader(url: string): void {
-  const readerUrl = new URL(
-    `bene/index.html?preload=${encodeURIComponent(url)}`,
-    document.baseURI
-  ).href;
+  const readerUrl = new URL(`bene/index.html?preload=${encodeURIComponent(url)}`, document.baseURI)
+    .href;
   if (isStandaloneDisplayMode()) {
     readerOverlayUrl.set(readerUrl);
   } else {

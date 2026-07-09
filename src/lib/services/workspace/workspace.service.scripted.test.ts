@@ -46,7 +46,12 @@ describe('WorkspaceService — scripted reconciliation on add', () => {
     const service = new WorkspaceService(makeFileStorage());
     const start = stateWith([
       { id: 'reader-js', href: 'Scripts/reader.js', mediaType: 'application/javascript' },
-      { id: 'ch1', href: 'Text/ch1.xhtml', mediaType: 'application/xhtml+xml', properties: ['scripted'] },
+      {
+        id: 'ch1',
+        href: 'Text/ch1.xhtml',
+        mediaType: 'application/xhtml+xml',
+        properties: ['scripted'],
+      },
       { id: 'nav', href: 'nav.xhtml', mediaType: 'application/xhtml+xml', properties: ['nav'] },
     ]);
 

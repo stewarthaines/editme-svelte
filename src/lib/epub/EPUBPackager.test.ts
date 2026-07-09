@@ -188,7 +188,11 @@ describe('EPUBPackager', () => {
         'SOURCE/settings.json',
       ]);
       const sourceSpy = vi
-        .spyOn((packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } }).sourceManager, 'createSourceZip')
+        .spyOn(
+          (packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } })
+            .sourceManager,
+          'createSourceZip'
+        )
         .mockResolvedValue(new Blob(['source-zip'], { type: 'application/zip' }));
 
       const result = await packager.packageEPUB(mockWorkspaceId);
@@ -203,7 +207,11 @@ describe('EPUBPackager', () => {
         'SOURCE/settings.json',
       ]);
       const sourceSpy = vi
-        .spyOn((packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } }).sourceManager, 'createSourceZip')
+        .spyOn(
+          (packager as unknown as { sourceManager: { createSourceZip: () => Promise<Blob> } })
+            .sourceManager,
+          'createSourceZip'
+        )
         .mockResolvedValue(new Blob(['source-zip'], { type: 'application/zip' }));
 
       const result = await packager.packageEPUB(mockWorkspaceId, { includeSource: false });

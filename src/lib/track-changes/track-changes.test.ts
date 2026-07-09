@@ -41,7 +41,12 @@ describe('changeKey', () => {
       'chapter:ch1'
     );
     expect(
-      changeKey({ kind: 'file-modify', path: 'OEBPS/Styles/s.css', mediaType: 'text/css', newContent: 'x' })
+      changeKey({
+        kind: 'file-modify',
+        path: 'OEBPS/Styles/s.css',
+        mediaType: 'text/css',
+        newContent: 'x',
+      })
     ).toBe('file:OEBPS/Styles/s.css');
   });
 });
@@ -88,7 +93,11 @@ describe('generatePatchset', () => {
     expect(patchset.changes).toHaveLength(2); // chapter02 unchanged → skipped
 
     const chapter = patchset.changes.find(c => c.kind === 'chapter-modify');
-    expect(chapter).toMatchObject({ kind: 'chapter-modify', id: 'chapter01', newText: 'new chapter' });
+    expect(chapter).toMatchObject({
+      kind: 'chapter-modify',
+      id: 'chapter01',
+      newText: 'new chapter',
+    });
 
     const file = patchset.changes.find(c => c.kind === 'file-modify');
     expect(file).toMatchObject({

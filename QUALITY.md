@@ -66,7 +66,7 @@ being paid down opportunistically: when you touch a file, prefer typing its
   `eslint-disable-next-line no-console` with a comment saying why.
 - **`any`**: new or edited code must not introduce `any` — use `unknown` plus
   narrowing, or the real type. Existing `any`s are the tracked debt above.
-- **Empty functions**: empty *arrow* functions are allowed (intentional no-ops
+- **Empty functions**: empty _arrow_ functions are allowed (intentional no-ops
   like a swallowed `.catch(() => {})`); empty named functions/methods warn.
 
 ### Testing Commands

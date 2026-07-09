@@ -50,7 +50,11 @@ describe('diffSegments (editor revert view)', () => {
 
   it('reverting one region restores base there and keeps the other edit', () => {
     const { revertPatch } = diffSegments(base, edited);
-    const next = applySelectedHunks(edited, revertPatch, revertPatch.hunks.map((_, i) => i === 0));
+    const next = applySelectedHunks(
+      edited,
+      revertPatch,
+      revertPatch.hunks.map((_, i) => i === 0)
+    );
     expect(next).toContain('line 2\n');
     expect(next).not.toContain('line 2 EDIT');
     expect(next).toContain('line 5 EDIT');
@@ -58,6 +62,12 @@ describe('diffSegments (editor revert view)', () => {
 
   it('reverting all regions restores the base exactly', () => {
     const { revertPatch } = diffSegments(base, edited);
-    expect(applySelectedHunks(edited, revertPatch, revertPatch.hunks.map(() => true))).toBe(base);
+    expect(
+      applySelectedHunks(
+        edited,
+        revertPatch,
+        revertPatch.hunks.map(() => true)
+      )
+    ).toBe(base);
   });
 });

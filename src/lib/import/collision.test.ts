@@ -11,7 +11,9 @@ import { sanitizeChapterId, chapterCollision, manifestCollision } from './collis
 import { generateEPUBPath } from '../epub/opf-utils.js';
 import type { WorkspaceState } from '../services/workspace/workspace.service.js';
 
-function workspaceWith(manifest: { id: string; href: string; mediaType: string }[]): WorkspaceState {
+function workspaceWith(
+  manifest: { id: string; href: string; mediaType: string }[]
+): WorkspaceState {
   return { opf: { manifest } } as unknown as WorkspaceState;
 }
 

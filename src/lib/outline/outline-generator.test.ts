@@ -67,7 +67,11 @@ describe('OutlineGenerator nav language/direction', () => {
 });
 
 describe('OutlineGenerator.generateFromSpine linear filtering', () => {
-  const pathInfo = { rootfilePath: 'OEBPS/content.opf', basePath: 'OEBPS', opfFileName: 'content.opf' };
+  const pathInfo = {
+    rootfilePath: 'OEBPS/content.opf',
+    basePath: 'OEBPS',
+    opfFileName: 'content.opf',
+  };
 
   it('excludes spine items with linear="no" from the table of contents', async () => {
     const spine = [

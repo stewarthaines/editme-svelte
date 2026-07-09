@@ -10,7 +10,10 @@ import type { FileStorageAPI } from '../storage/index.js';
 import type { ExtensionManager } from '../extensions/extension-manager.js';
 import type { SettingsService } from '../services/settings/settings.service.js';
 import type { BlobURLManager } from '../blob-url/blob-url-manager.js';
-import type { TransformEngine, TransformBrokerContext } from '../infrastructure/transform-engine.js';
+import type {
+  TransformEngine,
+  TransformBrokerContext,
+} from '../infrastructure/transform-engine.js';
 import type { TransformResult, TransformScripts } from '../types/spine-editor.js';
 import { resolveTransformPath } from '../settings/dom-transforms.js';
 

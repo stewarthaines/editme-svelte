@@ -58,9 +58,12 @@
     // (a fresh capture context) that's instant, but a browser holding the
     // seeded stories' projects loads slower — wait for enabled, or the click
     // is swallowed and no dialog opens.
-    await waitFor(() => {
-      if (createNew.disabled) throw new Error('project list still loading');
-    }, { timeout: 20000 });
+    await waitFor(
+      () => {
+        if (createNew.disabled) throw new Error('project list still loading');
+      },
+      { timeout: 20000 }
+    );
     await userEvent.click(createNew);
 
     // The dialog is the photograph. Fill the illustration's example book —
@@ -100,9 +103,12 @@
     await userEvent.click(projects);
 
     const catalog = await canvas.findByTestId('import-from-catalog', {}, { timeout: 20000 });
-    await waitFor(() => {
-      if (catalog.disabled) throw new Error('project list still loading');
-    }, { timeout: 20000 });
+    await waitFor(
+      () => {
+        if (catalog.disabled) throw new Error('project list still loading');
+      },
+      { timeout: 20000 }
+    );
     await userEvent.click(catalog);
 
     // The dialog fetches the feed; wait for a sample book to render before the shot.

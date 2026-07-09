@@ -15,10 +15,7 @@
 
 import { BlobURLManager } from '../blob-url/blob-url-manager.js';
 import type { FileStorageAPI } from '../storage/index.js';
-import type {
-  WorkspaceService,
-  WorkspaceState,
-} from '../services/workspace/workspace.service.js';
+import type { WorkspaceService, WorkspaceState } from '../services/workspace/workspace.service.js';
 import type { PrintSettings } from '../services/settings/settings.service.js';
 import type { ManifestItem } from '../epub/opf-utils.js';
 import { isRtlLanguage } from '../epub/language-direction.js';
@@ -260,15 +257,11 @@ export function buildPagedDocument(
     headExtra = '',
     afterMode = 'message',
   } = opts;
-  const links = stylesheetHrefs
-    .map(href => `<link rel="stylesheet" href="${href}" />`)
-    .join('\n');
+  const links = stylesheetHrefs.map(href => `<link rel="stylesheet" href="${href}" />`).join('\n');
   // Carry the book/chapter language onto <html> so the paginated document (and
   // the print preview that shares this builder) is accessible — without it,
   // axe/EPUBCheck flag a missing lang. Both lang and xml:lang for XHTML.
-  const langAttr = lang
-    ? ` lang="${xmlEscape(lang)}" xml:lang="${xmlEscape(lang)}"`
-    : '';
+  const langAttr = lang ? ` lang="${xmlEscape(lang)}" xml:lang="${xmlEscape(lang)}"` : '';
   // Right-to-left books need the base direction in markup on <html> (a lang
   // declaration doesn't imply direction), so the paginated PDF reads correctly.
   const dirAttr = isRtlLanguage(lang) ? ' dir="rtl"' : '';

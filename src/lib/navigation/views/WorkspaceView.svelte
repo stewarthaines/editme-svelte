@@ -459,7 +459,9 @@
                           onclick={onPackageWithoutSeed}
                           disabled={packaging || isReadOnly}
                           title={isReadOnly
-                            ? $t("This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged.")
+                            ? $t(
+                                "This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged."
+                              )
                             : undefined}
                         >
                           {packaging ? $t('Packaging…') : $t('Package EPUB without SEED')}

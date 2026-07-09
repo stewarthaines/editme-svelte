@@ -228,7 +228,12 @@ export class OutlineGenerator {
 
     // Transform user text through transform pipeline, supplying the workspace-scoped
     // file-access context so nav transforms get the same `ctx` as chapter transforms.
-    const result = await transformPipeline.executeTransform(navText, 2000, 'nav', opts.brokerContext);
+    const result = await transformPipeline.executeTransform(
+      navText,
+      2000,
+      'nav',
+      opts.brokerContext
+    );
 
     // Coerce the transformed HTML into what an EPUB toc nav allows (heading? + <ol>).
     let xhtmlContent = this.normalizeNavContent(result.html);

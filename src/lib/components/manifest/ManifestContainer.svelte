@@ -170,9 +170,17 @@
   const resolvePath = (href: string): string =>
     workspace!.pathInfo.basePath ? `${workspace!.pathInfo.basePath}/${href}` : href;
 
-  const writeBytes = async (filePath: string, mediaType: string, bytes: Uint8Array): Promise<void> => {
+  const writeBytes = async (
+    filePath: string,
+    mediaType: string,
+    bytes: Uint8Array
+  ): Promise<void> => {
     if (isTextLike(mediaType)) {
-      await workspaceService.writeFile(workspace!.id, filePath, new TextDecoder('utf-8').decode(bytes));
+      await workspaceService.writeFile(
+        workspace!.id,
+        filePath,
+        new TextDecoder('utf-8').decode(bytes)
+      );
     } else {
       const buffer = new ArrayBuffer(bytes.byteLength);
       new Uint8Array(buffer).set(bytes);
@@ -294,7 +302,9 @@
       const incoming = await readStagedBytes(staged[i].stagedPath);
       let current: Uint8Array | null = null;
       try {
-        current = new Uint8Array(await workspaceService.readFile(workspace!.id, resolvePath(existingHref)));
+        current = new Uint8Array(
+          await workspaceService.readFile(workspace!.id, resolvePath(existingHref))
+        );
       } catch {
         // Existing file unreadable — diff/preview against empty content.
       }

@@ -39,7 +39,10 @@ export function buildReviewGroups(
     const start = Math.max(0, h.oldStart - 1); // 0-based first old line of this hunk
     const ctxStart = Math.max(prevEnd, start - context, 0);
     const contextBefore = lines.slice(ctxStart, start);
-    const changes = h.lines.map(l => ({ sign: (l[0] === '+' ? '+' : '-') as '+' | '-', text: l.slice(1) }));
+    const changes = h.lines.map(l => ({
+      sign: (l[0] === '+' ? '+' : '-') as '+' | '-',
+      text: l.slice(1),
+    }));
     prevEnd = start + h.oldLines;
     return { index, contextBefore, changes };
   });
@@ -77,7 +80,12 @@ export function diffSegments(
   const flush = () => {
     if (!pending) return;
     changeIndex += 1;
-    segments.push({ type: 'change', index: changeIndex, removed: pending.removed, added: pending.added });
+    segments.push({
+      type: 'change',
+      index: changeIndex,
+      removed: pending.removed,
+      added: pending.added,
+    });
     pending = null;
   };
   for (const part of diffLines(base, current)) {
@@ -101,11 +109,7 @@ export function diffSegments(
  * text. None selected → `current` unchanged; all selected → the full incoming
  * content. Falls back to `current` if the patch unexpectedly fails to apply.
  */
-export function applySelectedHunks(
-  current: string,
-  patch: FilePatch,
-  selected: boolean[]
-): string {
+export function applySelectedHunks(current: string, patch: FilePatch, selected: boolean[]): string {
   const hunks = patch.hunks.filter((_, i) => selected[i]);
   if (hunks.length === 0) return current;
   const result = applyPatch(current, { ...patch, hunks });

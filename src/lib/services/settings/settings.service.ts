@@ -768,7 +768,10 @@ export class SettingsService {
         errors.push('Invalid text color format');
       }
 
-      if (hue !== undefined && (typeof hue !== 'number' || !Number.isFinite(hue) || hue < 0 || hue > 359)) {
+      if (
+        hue !== undefined &&
+        (typeof hue !== 'number' || !Number.isFinite(hue) || hue < 0 || hue > 359)
+      ) {
         errors.push('Cover hue must be a number between 0 and 359');
       }
 

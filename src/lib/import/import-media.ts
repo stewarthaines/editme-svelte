@@ -11,10 +11,7 @@
  * audio_clip_template via AudioClipService).
  */
 
-import type {
-  WorkspaceService,
-  WorkspaceState,
-} from '../services/workspace/workspace.service.js';
+import type { WorkspaceService, WorkspaceState } from '../services/workspace/workspace.service.js';
 import { ManifestUtils } from '../manifest/utils.js';
 import { generateEPUBPath, ensureUniqueHref } from '../epub/opf-utils.js';
 import { manifestCollision } from './collision.js';
@@ -146,10 +143,7 @@ export function filenameStem(name: string): string {
 }
 
 /** Substitute an image insertion template: `<href>` and `<alt>`. */
-export function formatImageSnippet(
-  template: string,
-  data: { href: string; alt: string }
-): string {
+export function formatImageSnippet(template: string, data: { href: string; alt: string }): string {
   return template.replace(/<href>/g, data.href).replace(/<alt>/g, data.alt);
 }
 

@@ -143,10 +143,7 @@
       // force the stored-cover blob to reload (the file was overwritten in place).
       resetCover();
       coverVersion++;
-      showToast(
-        wasUpdate ? $t('Cover image updated') : $t('Cover image generated'),
-        'success'
-      );
+      showToast(wasUpdate ? $t('Cover image updated') : $t('Cover image generated'), 'success');
     } finally {
       generating = false;
     }
@@ -267,12 +264,7 @@
               {/if}
             </button>
             {#if hasDraft}
-              <button
-                type="button"
-                class="btn btn-link"
-                disabled={generating}
-                onclick={resetCover}
-              >
+              <button type="button" class="btn btn-link" disabled={generating} onclick={resetCover}>
                 {$t('Reset')}
               </button>
             {/if}

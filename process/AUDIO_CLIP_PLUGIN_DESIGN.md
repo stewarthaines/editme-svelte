@@ -18,15 +18,15 @@ This design adds a richer, waveform-based alternative as a plugin so the wavesur
 - VAD failure aborts session creation outright, so it cannot degrade gracefully when isolation is absent.
 - Its unit of work is a transcript (many segments, speaker tiers); ours is clip directives.
 
-Cockatiel remains useful *alongside* SEED.html via file-based hand-off (export SRT/CSV, import as clip-tagged text) — a possible later feature, out of scope here.
+Cockatiel remains useful _alongside_ SEED.html via file-based hand-off (export SRT/CSV, import as clip-tagged text) — a possible later feature, out of scope here.
 
 ## Decisions
 
 These were settled in design review:
 
 1. **Panel plugin, supersede model.** The plugin is the second plugin in the existing architecture (`presentation: "panel"`, already defined in `src/lib/plugins/contract.ts` but never wired). When enabled and handshaken, it replaces the built-in editor surface in the spine editor; on load failure, timeout, `file:` protocol, or when disabled, the built-in `AudioClipEditor` renders as the fallback — the same supersede-with-fallback pattern `PublishView.svelte` uses for publish-to-remote.
-2. **Plugin-side audio file picker; plugin reads the workspace directly.** `init.opfsDirHandle` carries the *project workspace root* handle. The plugin locates the OPF via the EPUB-standard `META-INF/container.xml`, filters the manifest for `audio/*` items, presents its own file picker, and reads audio bytes through the handle. A plugin is a trusted extension of the core app, not a security boundary — no brokered file access, no host-side picker.
-3. **Insertion uses the existing generic `insert` message.** The plugin formats the clip directive itself and sends a plain string; the host's only job is the cursor splice. The template is NOT duplicated: since the plugin holds the workspace root handle (decision 2), it reads `SOURCE/settings.json` → `audio_clip_template` directly — the same setting the built-in editor uses, now exposed in the EPUB Settings UI — falling back to the built-in default, and re-reading at insert time so mid-session settings changes apply. Read-only: settings writes stay host-side. What the plugin mirrors by hand is *code* (the placeholder-substitution/time-format logic of `formatClipDirective`), like it already mirrors the contract types. (Considered and rejected: a plugin-private template — user-visible config drift; pushing the template via `context` — contract surface for something the trusted plugin can read itself.)
+2. **Plugin-side audio file picker; plugin reads the workspace directly.** `init.opfsDirHandle` carries the _project workspace root_ handle. The plugin locates the OPF via the EPUB-standard `META-INF/container.xml`, filters the manifest for `audio/*` items, presents its own file picker, and reads audio bytes through the handle. A plugin is a trusted extension of the core app, not a security boundary — no brokered file access, no host-side picker.
+3. **Insertion uses the existing generic `insert` message.** The plugin formats the clip directive itself and sends a plain string; the host's only job is the cursor splice. The template is NOT duplicated: since the plugin holds the workspace root handle (decision 2), it reads `SOURCE/settings.json` → `audio_clip_template` directly — the same setting the built-in editor uses, now exposed in the EPUB Settings UI — falling back to the built-in default, and re-reading at insert time so mid-session settings changes apply. Read-only: settings writes stay host-side. What the plugin mirrors by hand is _code_ (the placeholder-substitution/time-format logic of `formatClipDirective`), like it already mirrors the contract types. (Considered and rejected: a plugin-private template — user-visible config drift; pushing the template via `context` — contract surface for something the trusted plugin can read itself.)
 4. **Persistent per-file clip library, project-resident.** The plugin manages a set of named clip regions per audio file and persists them itself, publish-plugin-style, as JSON written through its workspace handle at `SOURCE/plugins/audio-clip-editor/clips.json`. Unlike publish's device-local credentials, the library lives inside the project so it rides along in `SEED.zip` — it survives packaging, export/import, and moving between machines. Clip definitions are authoring data, not secrets; they should travel with the project.
 5. **Plugin creates its own data directory on demand.** The plugin creates `SOURCE/plugins/audio-clip-editor/` via its workspace handle on first save. This is an approved, deliberate design choice (noted explicitly because auto-creating files is otherwise against project policy).
 
@@ -36,7 +36,7 @@ These were settled in design review:
 
 What differs from publish-to-remote is only what the existing fields carry:
 
-- `init.opfsDirHandle` — the *active project workspace root* handle (via `getWorkspaceDirectoryHandle(activeWorkspaceId)`), not the shared `publish` output directory.
+- `init.opfsDirHandle` — the _active project workspace root_ handle (via `getWorkspaceDirectoryHandle(activeWorkspaceId)`), not the shared `publish` output directory.
 - `init.projectId` — the real workspace id.
 
 Plugin → main insertion uses the existing `insert` message (`{ type: 'insert', text: string }`) with the fully-formatted directive string. The host wires the first `isInsertMessage` handler, routing into the existing `insertClipDirective()`-style splice (cursor read, insert, `setSelectionRange`, synthetic `input` event for persistence).
