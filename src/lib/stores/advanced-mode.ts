@@ -9,4 +9,4 @@ import { persisted, asBoolean } from '../state/persisted.svelte.js';
  * individual SOURCE files, the Plugins / Available Extensions / EPUB / Extensions /
  * Generators settings, JavaScript files in the editor, and the catalog URL import.
  */
-export const advancedMode = persisted('editme_advanced_mode', false, asBoolean);
+export const advancedMode = persisted('seedhtml_advanced_mode', false, asBoolean);

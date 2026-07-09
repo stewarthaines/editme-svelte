@@ -102,10 +102,10 @@ export async function validateEpub(
 
 /**
  * Shared localStorage key the core reads to mirror the latest report into the
- * spine editor (same-origin host ↔ plugin). Mirrors the `editme_` convention used
+ * spine editor (same-origin host ↔ plugin). Mirrors the `seedhtml_` convention used
  * by the core's navigation/layout stores.
  */
-const LATEST_REPORT_KEY = 'editme_validation_report';
+const LATEST_REPORT_KEY = 'seedhtml_validation_report';
 
 /**
  * Drop the latest report where the same-origin host can read it (the spine

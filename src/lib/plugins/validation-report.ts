@@ -8,11 +8,11 @@
  * `plugins/publish-to-remote/src/types.ts` mirrors the postMessage `contract.ts`.
  */
 
-/** localStorage key the plugin writes and the core reads (the `editme_` convention). */
-export const VALIDATION_REPORT_STORAGE_KEY = 'editme_validation_report';
+/** localStorage key the plugin writes and the core reads (the `seedhtml_` convention). */
+export const VALIDATION_REPORT_STORAGE_KEY = 'seedhtml_validation_report';
 
 /** localStorage key for the author's self-tracked "addressed" ticks. */
-export const VALIDATION_ADDRESSED_STORAGE_KEY = 'editme_validation_addressed';
+export const VALIDATION_ADDRESSED_STORAGE_KEY = 'seedhtml_validation_addressed';
 
 export interface ValidationMessage {
   level: 'error' | 'warning' | 'info';

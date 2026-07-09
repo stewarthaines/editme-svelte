@@ -19,7 +19,7 @@ import {
 } from './http-catalog-source.js';
 
 /** localStorage key for the persisted locale preference (load-bearing — do not rename) */
-const LOCALE_STORAGE_KEY = 'editme-locale';
+const LOCALE_STORAGE_KEY = 'seedhtml-locale';
 
 /**
  * Manifest entries from the last http fetch this session, keyed by locale code.

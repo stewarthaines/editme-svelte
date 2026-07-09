@@ -86,7 +86,7 @@ saveGlobalSettings(settings: GlobalSettings): void
 
 **Side Effects:**
 
-- Writes to localStorage key `editme_global_settings`
+- Writes to localStorage key `seedhtml_global_settings`
 - Updates theme store if theme changed
 - Updates locale if language changed
 
@@ -578,7 +578,7 @@ import { themeStore } from '$lib/stores/theme';
 // When saving global settings
 function saveGlobalSettings(settings: GlobalSettings): void {
   // Save to localStorage
-  localStorage.setItem('editme_global_settings', JSON.stringify(settings));
+  localStorage.setItem('seedhtml_global_settings', JSON.stringify(settings));
 
   // Update theme store (enhanced to support 'system')
   if (settings.theme === 'system') {
@@ -599,7 +599,7 @@ import { get } from 'svelte/store';
 
 // Load current locale for display
 function loadGlobalSettings(): GlobalSettings {
-  const stored = localStorage.getItem('editme_global_settings');
+  const stored = localStorage.getItem('seedhtml_global_settings');
   const settings = stored ? JSON.parse(stored) : getDefaultGlobalSettings();
 
   // Sync with i18n system
@@ -609,7 +609,7 @@ function loadGlobalSettings(): GlobalSettings {
 
 // Save locale change
 async function saveGlobalSettings(settings: GlobalSettings): Promise<void> {
-  localStorage.setItem('editme_global_settings', JSON.stringify(settings));
+  localStorage.setItem('seedhtml_global_settings', JSON.stringify(settings));
 
   // Update i18n system (also saves to its own localStorage)
   await setLocale(settings.locale);
@@ -838,9 +838,9 @@ Settings are stored in these locations:
 
 ```
 localStorage:
-  editme_global_settings     # Global settings
-  editme_theme_preference    # Theme store (existing)
-  editme-locale              # i18n system (existing)
+  seedhtml_global_settings     # Global settings
+  seedhtml_theme_preference    # Theme store (existing)
+  seedhtml-locale              # i18n system (existing)
 
 Workspace:
   .workspace-metadata.json   # Workspace settings (extended)

@@ -41,9 +41,9 @@ users is **"Simple EPUB Editor"**.
   comments, sample content, or docs — always use **"SEED.html"** / **"Simple EPUB Editor"**.
 - **Do NOT rename existing functional identifiers that contain `editme`** — they are
   load-bearing and renaming them breaks saved user workspaces and the build. This
-  includes: the `editme_*` localStorage keys (e.g. `editme_app_workspace_id`,
-  `editme_nav_*`), the `__EDITME_I18N_BUNDLE__` window global, the `editme-storage`
-  IndexedDB database, the `editme-content-panes` PaneForge id, the `editmePlugin`
+  includes: the `seedhtml_*` localStorage keys (e.g. `seedhtml_app_workspace_id`,
+  `seedhtml_nav_*`), the `__EDITME_I18N_BUNDLE__` window global, the `editme-storage`
+  IndexedDB database, the `seedhtml-content-panes` PaneForge id, the `editmePlugin`
   package metadata key, and the `editme-svelte` package / git-repo name.
 - Some older docs still say "EDITME" / "EDITME.html". **SEED.html is canonical** — ignore
   those lingering references; a full docs rebrand is intentionally not done.
@@ -113,7 +113,7 @@ The build process creates a single `index.html` file (~1MB) with all assets inli
 
 Browser reload state management follows the **navigationStore pattern** for consistency:
 
-- **Storage Keys**: Prefixed constants (`editme_app_workspace_id`, `editme_nav_current_view`)
+- **Storage Keys**: Prefixed constants (`seedhtml_app_workspace_id`, `seedhtml_nav_current_view`)
 - **Auto-Persistence**: State changes automatically persist to localStorage with try/catch error handling
 - **Restoration**: Components restore state during initialization, falling back to defaults on errors
 - **Cleanup**: Invalid state is cleared when conflicts occur

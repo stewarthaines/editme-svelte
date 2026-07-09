@@ -304,7 +304,7 @@ Two gotchas the recipes have to respect:
 
 Workflow stories exist to capture screenshots and videos of real author workflows. They seed a **real project in the real storage backend**, mount the **full `App`**, and drive it with `play()`.
 
-The key: `App.svelte` has no injection seam, but it restores persisted state on boot. `src/stories/utils/seed-project.ts` builds the same service graph App wires itself (`FileStorageAPI` → `WorkspaceService` → `SpineService`), creates a project with chapters, and sets the persisted `editme_app_workspace_id` — so when the story mounts `App`, it opens on the seeded book exactly as a reload would.
+The key: `App.svelte` has no injection seam, but it restores persisted state on boot. `src/stories/utils/seed-project.ts` builds the same service graph App wires itself (`FileStorageAPI` → `WorkspaceService` → `SpineService`), creates a project with chapters, and sets the persisted `seedhtml_app_workspace_id` — so when the story mounts `App`, it opens on the seeded book exactly as a reload would.
 
 `seedProject` also takes `extensions: string[]` (e.g. `['markdown-it', 'prism']`) to install catalog extensions — it fetches them from the same-origin `/extensions/` the app uses, writes the project's default transform scripts plus a `settings.json` wiring the pipeline (text transform from the first format extension, DOM transforms appended), mirroring `App.installCatalogExtension`. Extension EPUB assets (e.g. a Prism theme CSS) aren't registered into the manifest yet — enough for the settings form and structural transforms, not asset-dependent styling.
 

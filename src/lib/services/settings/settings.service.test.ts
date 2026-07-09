@@ -97,7 +97,7 @@ describe('SettingsService Contract Tests', () => {
     test('loadGlobalSettings returns stored settings', () => {
       // Setup localStorage
       localStorage.setItem(
-        'editme_global_settings',
+        'seedhtml_global_settings',
         JSON.stringify({
           theme: 'dark',
           locale: 'fr',
@@ -141,7 +141,7 @@ describe('SettingsService Contract Tests', () => {
       service.saveGlobalSettings(settings);
 
       // CONTRACT: MUST persist to localStorage
-      const stored = JSON.parse(localStorage.getItem('editme_global_settings')!);
+      const stored = JSON.parse(localStorage.getItem('seedhtml_global_settings')!);
       expect(stored).toEqual(settings);
     });
 

@@ -37,10 +37,10 @@ export type SidebarSection =
 
 // Storage keys for persistence
 const STORAGE_KEYS = {
-  SIDEBAR_EXPANDED: 'editme_sidebar_expanded',
-  SIDEBAR_SECTION: 'editme_sidebar_section',
-  SIDEBAR_PROJECT_EXPANDED: 'editme_sidebar_project_expanded',
-  SPINE_PREVIEW_COLLAPSED: 'editme_spine_preview_collapsed',
+  SIDEBAR_EXPANDED: 'seedhtml_sidebar_expanded',
+  SIDEBAR_SECTION: 'seedhtml_sidebar_section',
+  SIDEBAR_PROJECT_EXPANDED: 'seedhtml_sidebar_project_expanded',
+  SPINE_PREVIEW_COLLAPSED: 'seedhtml_spine_preview_collapsed',
 } as const;
 
 // Default layout state

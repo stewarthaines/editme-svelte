@@ -242,7 +242,7 @@
     serialize: s => JSON.stringify([...s]),
   };
   const collapsedGroups = persisted(
-    'editme_manifest_collapsed_groups',
+    'seedhtml_manifest_collapsed_groups',
     new Set<string>(),
     collapsedCodec
   );

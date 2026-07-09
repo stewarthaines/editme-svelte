@@ -896,7 +896,7 @@
 
   <!-- Shares the editor's pane key so the split proportion is one global value. -->
   <div class="settings-panes-wrap">
-    <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
+    <PaneGroup direction="horizontal" autoSaveId="seedhtml-content-panes">
       <!-- App settings: global, usable without a project. -->
       <Pane defaultSize={50} minSize={25}>
         <div class="settings-pane">

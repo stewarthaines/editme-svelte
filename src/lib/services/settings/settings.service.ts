@@ -181,7 +181,7 @@ interface ExtensionManager {
  * SettingsService - Single responsibility for settings management across three tiers
  */
 export class SettingsService {
-  private static readonly GLOBAL_SETTINGS_KEY = 'editme_global_settings';
+  private static readonly GLOBAL_SETTINGS_KEY = 'seedhtml_global_settings';
   private static readonly SUPPORTED_LOCALES = new Set([
     'en',
     'de',

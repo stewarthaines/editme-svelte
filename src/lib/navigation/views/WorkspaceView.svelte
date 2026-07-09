@@ -358,7 +358,7 @@
 <div class="workspace-view">
   <!-- Shares the editor's pane key so the split proportion is one global value. -->
   <div class="workspace-panes-wrap">
-    <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
+    <PaneGroup direction="horizontal" autoSaveId="seedhtml-content-panes">
       <!-- Left: the list of existing projects. -->
       <Pane defaultSize={50} minSize={25}>
         <div class="workspace-pane">

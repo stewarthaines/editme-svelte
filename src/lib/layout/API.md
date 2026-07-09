@@ -129,7 +129,7 @@ initialize(): void
 
 **Side Effects:**
 
-- Reads from localStorage keys: `editme_sidebar_expanded`, `editme_sidebar_section`
+- Reads from localStorage keys: `seedhtml_sidebar_expanded`, `seedhtml_sidebar_section`
 - Sets `isInitialized` to `true`
 - Handles localStorage errors gracefully with console warnings
 
@@ -207,7 +207,7 @@ The layout system uses PaneForge components with specific configuration:
 ```typescript
 interface PaneForgeConfig {
   direction: 'horizontal'; // Left/right split
-  autoSaveId: 'editme-content-panes'; // localStorage persistence key
+  autoSaveId: 'seedhtml-content-panes'; // localStorage persistence key
   defaultSize: 50; // 50% initial split
   minSize: 25; // 25% minimum for left pane
   // Right pane minimum handled by constraint calculation
@@ -273,16 +273,16 @@ The layout system uses specific localStorage keys for persistence:
 
 ```typescript
 const STORAGE_KEYS = {
-  SIDEBAR_EXPANDED: 'editme_sidebar_expanded', // boolean as JSON
-  SIDEBAR_SECTION: 'editme_sidebar_section', // string value
+  SIDEBAR_EXPANDED: 'seedhtml_sidebar_expanded', // boolean as JSON
+  SIDEBAR_SECTION: 'seedhtml_sidebar_section', // string value
 } as const;
 ```
 
 **Key Details:**
 
-- `editme_sidebar_expanded`: Stores `boolean` as JSON string (`"true"` / `"false"`)
-- `editme_sidebar_section`: Stores section ID as plain string
-- PaneForge uses `editme-content-panes` for split ratio persistence
+- `seedhtml_sidebar_expanded`: Stores `boolean` as JSON string (`"true"` / `"false"`)
+- `seedhtml_sidebar_section`: Stores section ID as plain string
+- PaneForge uses `seedhtml-content-panes` for split ratio persistence
 
 ## Common Integration Patterns
 

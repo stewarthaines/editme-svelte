@@ -182,7 +182,7 @@ describe.skip('i18n integration workflow', () => {
     expect(get(currentLocale)).toBe('de');
     expect(get(documentDirection)).toBe('ltr');
     expect(get(t)('Save')).toBe('Speichern');
-    expect(mockLocalStorage.getItem('editme-locale')).toBe('de');
+    expect(mockLocalStorage.getItem('seedhtml-locale')).toBe('de');
 
     // Switch to Arabic (RTL)
     await setLocale('ar');
@@ -230,7 +230,7 @@ describe.skip('i18n integration workflow', () => {
 
   it('should persist and restore locale preference', async () => {
     // Setup with existing locale preference
-    mockLocalStorage.setItem('editme-locale', 'de');
+    mockLocalStorage.setItem('seedhtml-locale', 'de');
     mockLocalStorage.setItem('editme-i18n-version', '1.0.0');
 
     mockFileStorage.listFiles.mockResolvedValue([

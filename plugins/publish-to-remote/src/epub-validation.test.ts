@@ -119,7 +119,7 @@ describe('summarizeReport', () => {
 });
 
 describe('latest-report mirror (localStorage)', () => {
-  const KEY = 'editme_validation_report';
+  const KEY = 'seedhtml_validation_report';
   const report: ValidationReport = {
     filename: 'book.epub',
     isValid: false,
