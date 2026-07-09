@@ -252,4 +252,4 @@ To backup:
 ## Getting Help
 
 - **Documentation**: Check other guides in project
-- **Bug Reports**: [Project on Github](https://codeberg.org/stewarthaines/seed-html)
+- **Bug Reports**: [Project on Github](https://github.com/stewarthaines/seed-html)

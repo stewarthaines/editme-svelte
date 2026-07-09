@@ -68,7 +68,7 @@ This section is for developers maintaining or extending SEED.html.
 
 ```bash
 # Clone the repository
-git clone https://codeberg.org/stewarthaines/seed-html.git
+git clone https://github.com/stewarthaines/seed-html.git
 cd seed-html
 
 # Install dependencies
@@ -131,4 +131,4 @@ This software is open source under the terms of the MIT license. See [LICENSE.tx
 
 ## Support
 
-For bug reports and feature requests, please use [github](https://codeberg.org/stewarthaines/seed-html).
+For bug reports and feature requests, please use [github](https://github.com/stewarthaines/seed-html).

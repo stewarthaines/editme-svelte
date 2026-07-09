@@ -3036,8 +3036,8 @@ msgid "Source"
 msgstr "Quelltext"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
-msgid "Source on Codeberg"
-msgstr "Quellcode auf Codeberg"
+msgid "Source on GitHub"
+msgstr "Quellcode auf GitHub"
 
 #: src/App.svelte
 msgid "Spine"

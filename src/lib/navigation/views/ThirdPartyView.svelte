@@ -132,12 +132,12 @@
       <p class="license-meta">
         {$t('Developed by Stewart Haines.')} · {$t('Version')}: {VERSION} ·
         <a
-          href="https://codeberg.org/stewarthaines/seed-html"
+          href="https://github.com/stewarthaines/seed-html"
           target="_blank"
           rel="noopener noreferrer"
           class="external-link"
         >
-          {$t('Source on Codeberg')}
+          {$t('Source on GitHub')}
         </a>
       </p>
       <details class="disclosure">

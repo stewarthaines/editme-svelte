@@ -90,6 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Retired the standalone `opds-server` development tool, superseded by the Publish-to-Remote plugin.
 
-[Unreleased]: https://codeberg.org/stewarthaines/seed-html/compare/v0.7.0...HEAD
-[0.7.0]: https://codeberg.org/stewarthaines/seed-html/releases/tag/v0.7.0
-[0.6.0]: https://codeberg.org/stewarthaines/seed-html/releases/tag/v0.6.0
+[Unreleased]: https://github.com/stewarthaines/seed-html/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.7.0
+[0.6.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.6.0

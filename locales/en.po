@@ -3017,7 +3017,7 @@ msgid "Source"
 msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
-msgid "Source on Codeberg"
+msgid "Source on GitHub"
 msgstr ""
 
 #: src/App.svelte
