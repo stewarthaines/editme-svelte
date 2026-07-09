@@ -43,7 +43,7 @@ export interface PackageProgress {
 
 export interface PackageOptions {
   compressionLevel?: 'fast' | 'balanced' | 'maximum';
-  includeEditmeFiles?: boolean;
+  includeSeedFiles?: boolean;
   /** Embed the editor build (SEED.html) at the EPUB root as a non-manifest payload. */
   includeSeedHtml?: boolean;
   /** Bundle the SOURCE/ tree as the editor-source archive (SEED.zip). Default true;

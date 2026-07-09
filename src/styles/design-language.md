@@ -1,6 +1,6 @@
 # Design language
 
-EDITME's visual identity references **Craigslist**: flat colour, a white ground, hairline
+SEED.html's visual identity references **Craigslist**: flat colour, a white ground, hairline
 borders, blue links as the primary affordance, and hierarchy that comes from grouping,
 weight, and size — not from cards, shadows, or chrome. The palette still reflects this
 (`--color-primary-600` is `#0000ee` on white + neutral greys), but the reference had faded

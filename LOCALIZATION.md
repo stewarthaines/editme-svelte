@@ -1,6 +1,6 @@
 # Localization Guide
 
-This document explains how to add new locales to EDITME.html, which supports internationalization through a gettext-based workflow.
+This document explains how to add new locales to SEED.html, which supports internationalization through a gettext-based workflow.
 
 ## Current Locales
 
@@ -55,7 +55,7 @@ This creates `locales/fr.po` with all translatable strings ready for translation
 
 **Recommended**: Use our hosted Weblate instance for collaborative translation:
 
-🌐 **[translate.codeberg.org/projects/editme-html](https://translate.codeberg.org/projects/editme-html/)**
+🌐 **[translate.codeberg.org/projects/seed-html](https://translate.codeberg.org/projects/seed-html/)**
 
 Weblate provides:
 

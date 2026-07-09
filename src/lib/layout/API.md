@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Layout System provides the foundational UI structure for the EDITME EPUB editor with a collapsible sidebar, resizable content panes, and persistent state management. The system is built using Svelte's reactive patterns integrated with PaneForge for robust pane resizing functionality.
+The Layout System provides the foundational UI structure for the SEED.html EPUB editor with a collapsible sidebar, resizable content panes, and persistent state management. The system is built using Svelte's reactive patterns integrated with PaneForge for robust pane resizing functionality.
 
 **Key Components:**
 

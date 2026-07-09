@@ -2,7 +2,7 @@
  * @license Paged.js v0.4.3 | MIT | https://gitlab.coko.foundation/pagedjs/pagedjs
  */
 /*
- * LOCAL PATCH (EDITME) — re-apply if this vendored file is ever updated.
+ * LOCAL PATCH (SEED.html) — re-apply if this vendored file is ever updated.
  * See patches/paged.polyfill.md for the full rationale.
  *
  * The built-in print page rule was changed from:

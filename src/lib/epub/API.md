@@ -349,7 +349,7 @@ interface AnalysisResult {
 ```typescript
 interface PackageOptions {
   compressionLevel?: 'fast' | 'balanced' | 'maximum';
-  includeEditmeFiles?: boolean;
+  includeSeedFiles?: boolean;
   validateStructure?: boolean;
   progressCallback?: (progress: PackageProgress) => void;
 }

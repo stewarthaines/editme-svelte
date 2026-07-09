@@ -5,7 +5,7 @@
 
 if [ $# -ne 2 ]; then
     echo "Usage: $0 <worktree-path> <branch-name>"
-    echo "Example: $0 ../editme-feature-branch feature/my-feature"
+    echo "Example: $0 ../seed-html-feature-branch feature/my-feature"
     exit 1
 fi
 

@@ -33,7 +33,7 @@
     "worktree": "bash scripts/new-worktree.sh",
     "lint": "eslint . --ext .js,.ts,.svelte --max-warnings 171",
     "lint:fix": "eslint . --ext .js,.ts,.svelte --fix",
-    "validate": "npm run check && npm run lint && npm run format:check && npm run test",
+    "validate": "npm run check && npm run lint && npm run format:check && npm run check:rename && npm run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "i18n:extract": "node build-scripts/i18n-extract.js",
@@ -41,6 +41,7 @@
     "i18n:compress": "node build-scripts/i18n-compress.js",
     "i18n:build": "npm run i18n:extract && npm run i18n:convert",
     "lint:i18n": "node scripts/i18n-lint.mjs",
+    "check:rename": "node scripts/check-rename.mjs",
     "translate:demo": "node scripts/auto-translate.js",
     "translate:populate": "node scripts/populate-demo-translations.js",
     "analyze": "ANALYZE=1 vite build && open dist/stats.html"

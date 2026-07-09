@@ -105,7 +105,7 @@ OPDS extends standard Atom link relations:
 - **Ex Libris Alma** - Academic library management
 - **SirsiDynix** - Library automation with OPDS modules
 
-## Integration Possibilities with EDITME
+## Integration Possibilities with SEED.html
 
 ### Direct Export
 
@@ -128,7 +128,7 @@ OPDS extends standard Atom link relations:
 ### Example Integration
 
 ```javascript
-// Generate OPDS entry for EDITME workspace
+// Generate OPDS entry for SEED.html workspace
 function generateOPDSEntry(workspace, epubMetadata) {
   return {
     id: `urn:uuid:${workspace.id}`,
@@ -193,4 +193,4 @@ function generateOPDSEntry(workspace, epubMetadata) {
 - **Project Gutenberg**: https://www.gutenberg.org/ebooks/search.opds/
 - **Feedbooks**: https://catalog.feedbooks.com/catalog/index.xml
 
-This document provides the foundation for understanding OPDS and its potential integration with EDITME's EPUB editing and distribution capabilities.
+This document provides the foundation for understanding OPDS and its potential integration with SEED.html's EPUB editing and distribution capabilities.

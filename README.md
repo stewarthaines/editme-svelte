@@ -68,8 +68,8 @@ This section is for developers maintaining or extending SEED.html.
 
 ```bash
 # Clone the repository
-git clone https://github.com/stewarthaines/editme-svelte.git
-cd editme-svelte
+git clone https://codeberg.org/stewarthaines/seed-html.git
+cd seed-html
 
 # Install dependencies
 npm install
@@ -101,7 +101,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) for comprehensive development guidelines.
 ### Project Structure
 
 ```
-editme-svelte/
+seed-html/
 ├── src/
 │   ├── lib/           # Core libraries with API documentation
 │   ├── routes/        # Application views
@@ -131,4 +131,4 @@ This software is open source under the terms of the MIT license. See [LICENSE.tx
 
 ## Support
 
-For bug reports and feature requests, please use [github](https://github.com/stewarthaines/editme-svelte).
+For bug reports and feature requests, please use [github](https://codeberg.org/stewarthaines/seed-html).

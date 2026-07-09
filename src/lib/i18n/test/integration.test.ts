@@ -167,7 +167,7 @@ describe.skip('i18n integration workflow', () => {
       );
 
     // Don't need update (existing installation)
-    mockLocalStorage.setItem('editme-i18n-version', '1.0.0');
+    mockLocalStorage.setItem('seedhtml-i18n-version', '1.0.0');
 
     await initI18n();
 
@@ -231,7 +231,7 @@ describe.skip('i18n integration workflow', () => {
   it('should persist and restore locale preference', async () => {
     // Setup with existing locale preference
     mockLocalStorage.setItem('seedhtml-locale', 'de');
-    mockLocalStorage.setItem('editme-i18n-version', '1.0.0');
+    mockLocalStorage.setItem('seedhtml-i18n-version', '1.0.0');
 
     mockFileStorage.listFiles.mockResolvedValue([
       { name: 'en.json', size: 100 },
@@ -260,7 +260,7 @@ describe.skip('i18n integration workflow', () => {
 
   it('should handle partial translation catalogs', async () => {
     // Mock scenario where some locale files are missing or corrupted
-    mockLocalStorage.setItem('editme-i18n-version', '1.0.0');
+    mockLocalStorage.setItem('seedhtml-i18n-version', '1.0.0');
 
     mockFileStorage.listFiles.mockResolvedValue([
       { name: 'en.json', size: 100 },
@@ -296,7 +296,7 @@ describe.skip('i18n integration workflow', () => {
   });
 
   it('should handle interpolation across different locales', async () => {
-    mockLocalStorage.setItem('editme-i18n-version', '1.0.0');
+    mockLocalStorage.setItem('seedhtml-i18n-version', '1.0.0');
 
     mockFileStorage.listFiles.mockResolvedValue([
       { name: 'en.json', size: 100 },

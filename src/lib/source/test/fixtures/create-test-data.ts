@@ -279,7 +279,7 @@ export function createWorkspaceWithEPUBFiles(): Record<string, string> {
   return {
     // EPUB structure files
     'OEBPS/content.opf': '<?xml version="1.0"?><package></package>',
-    'OEBPS/EDITME.html': '<html><body>EDITME Editor</body></html>',
+    'OEBPS/SEED.html': '<html><body>SEED.html Editor</body></html>',
     'OEBPS/Text/chapter1.xhtml': '<html><body><h1>Chapter 1</h1></body></html>',
     'OEBPS/Styles/stylesheet.css': 'body { font-family: serif; }',
     'OEBPS/Images/cover.jpg': 'FAKE_JPEG_DATA',

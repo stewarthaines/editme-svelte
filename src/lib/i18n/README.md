@@ -469,4 +469,4 @@ test('handles RTL layout correctly', async () => {
 });
 ```
 
-This system ensures consistent, maintainable internationalization across the entire EDITME application while providing excellent performance and user experience in all supported languages.
+This system ensures consistent, maintainable internationalization across the entire SEED.html application while providing excellent performance and user experience in all supported languages.

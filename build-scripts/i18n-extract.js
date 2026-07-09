@@ -388,7 +388,7 @@ async function extractStrings() {
       'MIME-Version': '1.0',
       'Content-Type': 'text/plain; charset=UTF-8',
       'Content-Transfer-Encoding': '8bit',
-      'Project-Id-Version': 'EDITME EPUB Editor',
+      'Project-Id-Version': 'SEED.html',
       'Report-Msgid-Bugs-To': '',
       'POT-Creation-Date': now,
       'PO-Revision-Date': now,

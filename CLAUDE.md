@@ -37,16 +37,16 @@ The product is **SEED.html** (short for _Simple EPUB EDitor_). The distributable
 file is `SEED.html`, the editor-source archive is `SEED.zip`, and the UI name shown to
 users is **"Simple EPUB Editor"**.
 
-- **"EDITME" is a former name.** Do NOT introduce "EDITME" into new UI text, code
-  comments, sample content, or docs — always use **"SEED.html"** / **"Simple EPUB Editor"**.
-- **Do NOT rename existing functional identifiers that contain `editme`** — they are
-  load-bearing and renaming them breaks saved user workspaces and the build. This
-  includes: the `seedhtml_*` localStorage keys (e.g. `seedhtml_app_workspace_id`,
-  `seedhtml_nav_*`), the `__SEEDHTML_I18N_BUNDLE__` window global, the `editme-storage`
-  IndexedDB database, the `seedhtml-content-panes` PaneForge id, the `seedhtmlPlugin`
-  package metadata key, and the `editme-svelte` package / git-repo name.
-- Some older docs still say "EDITME" / "EDITME.html". **SEED.html is canonical** — ignore
-  those lingering references; a full docs rebrand is intentionally not done.
+- Functional identifiers use the `seedhtml` prefix: `seedhtml_*` localStorage keys,
+  the `seedhtml-storage` IndexedDB database, the `__SEEDHTML_I18N_BUNDLE__` window
+  global, the `seedhtml-content-panes` PaneForge id, the `seedhtmlPlugin` package
+  metadata key. The package / repo name is `seed-html`.
+- The pre-2026 product name was retired in a full rename (see
+  `process/RENAME_SEED_HTML.md`). Do NOT reintroduce it anywhere;
+  `scripts/check-rename.mjs` (part of `npm run validate`) enforces this. The single
+  sanctioned exception is `src/lib/storage/legacy-migration.ts`, which must name the
+  legacy IndexedDB database it adopts projects from — delete that module and its
+  allowlist entry together when the migration window closes.
 
 ### Svelte 5 & Runes Mode
 
