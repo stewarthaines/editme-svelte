@@ -62,3 +62,13 @@ Home: the **publish-to-remote plugin** — this is a publishing destination, and
 4. The questions it answers: does "Allow on every visit" stick for a removable volume; does the handle survive unplug/replug (same session and across reloads); write latency for a ~1MB file.
 
 Results from the spike decide whether the plugin integration proceeds as designed or needs a "re-pick each session" fallback posture.
+
+## Spike results (2026-07-09, real hardware)
+
+Run against a Kobo (serial N50633C253348, firmware 4.38.23697, model id …386) in Chrome:
+
+- Detection worked as designed: `.kobo/version` parsed to serial/firmware; root listing showed the expected volume layout (`.kobo`, `.adobe-digital-editions`, author folders, macOS metadata dirs).
+- Write + re-read succeeded; the book **appeared in the Kobo library after eject**. Write latency ~1s for a 1.8KB file — MSC flush overhead dominates, so the publish UI should show a progress state (a real book will take seconds, not milliseconds).
+- **Persistence confirmed: the handle revived from IndexedDB with `queryPermission: granted`** — no re-prompt across reload and replug. Durable device destinations are viable as designed; the "Reconnect" button is only the fallback for the `prompt` case.
+
+**Verdict: integration green-lit as designed** (the `type: 'device'` remote in publish-to-remote, "Add Destination" reframe, IndexedDB handle store).
