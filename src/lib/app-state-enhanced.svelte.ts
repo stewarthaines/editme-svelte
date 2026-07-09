@@ -622,10 +622,6 @@ export class EnhancedAppState {
       const result = await this.epubProcessor.packageEPUB(this.workspace.id, {
         compressionLevel: 'balanced',
         validateStructure: true,
-        progressCallback: progress => {
-          // Could emit progress events here
-          console.log('Package progress:', progress);
-        },
       });
 
       if (!result.success) {

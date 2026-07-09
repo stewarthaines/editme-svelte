@@ -918,10 +918,6 @@
       if (paneState.pane1.fileType === 'text' && paneState.pane2.fileType === 'text') {
         // Conflict: keep text in pane 1, find alternative for pane 2
         defaultFile = availableFiles.find(f => f.type !== 'text');
-        console.log(
-          '🔄 Text conflict resolved: moving pane 2 from text to',
-          defaultFile?.label || 'empty'
-        );
       } else if (!paneState.pane2.selectedFileValue || paneState.pane2.selectedFileValue === '') {
         // No conflict, but pane 2 needs default selection - use first available file
         defaultFile = availableFiles[0];
@@ -1176,7 +1172,6 @@
   export function handlePreviewClick(
     event: CustomEvent<{ text: string; documentPosition: number; elementType: string }>
   ) {
-    console.log('handlePreviewClick', event.detail.text);
     if (editorPaneRef && typeof editorPaneRef.findAndSelectText === 'function') {
       editorPaneRef.findAndSelectText(event.detail);
     }

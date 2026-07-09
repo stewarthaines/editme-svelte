@@ -255,7 +255,6 @@
       );
       highlightViolations(doc, violations);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('Accessibility check failed:', error);
       a11yIssueCount = null;
     } finally {

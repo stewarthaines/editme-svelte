@@ -274,7 +274,6 @@
 
   // Handle navigation anchor clicks
   function handleNavigationClick(chapterId: string) {
-    console.log('handleNavigationClick', chapterId);
     // Find manifest item by matching href
     const manifestItem = currentWorkspaceState?.opf?.manifest?.find(item =>
       item.href?.includes(`${chapterId}.xhtml`)
@@ -320,7 +319,6 @@
     // Dispatch custom event to SpineView to handle text selection
     const spineViewElement = document.querySelector('[data-spine-view]');
     if (spineViewElement) {
-      console.log('handlePreviewClick', detail);
       spineViewElement.dispatchEvent(
         new CustomEvent('preview-click', {
           detail,
@@ -416,7 +414,6 @@
         epubFile = file;
       } else if (sourceUrl) {
         // Remote URL provided - fetch the EPUB directly
-        console.log(`Downloading EPUB from: ${sourceUrl}`);
         const response = await fetch(sourceUrl);
 
         if (!response.ok) {
@@ -438,18 +435,12 @@
       // Generate unique workspace ID
       const workspaceId = 'workspace-' + crypto.randomUUID();
 
-      console.log(`Importing EPUB: ${epubFile.name} to workspace: ${workspaceId}`);
-
       // Unpack EPUB to workspace
       const result = await epubUnpacker.unpackEPUB(epubFile, workspaceId);
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to unpack EPUB');
       }
-
-      console.log(
-        `✅ Successfully imported EPUB: ${result.extractedFiles?.length} files extracted`
-      );
 
       // Load the new workspace
       await appState.loadWorkspace(workspaceId);
@@ -1075,7 +1066,6 @@
         // URL-encoded EPUB URL in hash fragment
         try {
           const decodedUrl = decodeURIComponent(fragment);
-          console.log(`Hash change detected: importing EPUB from ${decodedUrl}`);
           handleEpubImport(undefined, decodedUrl);
         } catch (error) {
           console.error('Failed to decode URL from hash:', error);

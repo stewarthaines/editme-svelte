@@ -11,7 +11,7 @@ import { readFileSync } from 'fs';
 const dir = 'extensions/list-of-figures';
 const load = (file: string, fnName: string) => {
   const src = readFileSync(`${dir}/${file}`, 'utf8');
-  // eslint-disable-next-line no-new-func
+
   return new Function(`${src}\nreturn ${fnName};`)();
 };
 
@@ -67,8 +67,12 @@ describe('listFigures (generator)', () => {
     { id: 'cover-img', mediaType: 'image/png' },
   ];
   const data: Record<string, string> = {
-    'SOURCE/data/figures/chapter1.json': JSON.stringify([{ src: 'Images/a.png', caption: 'Cap A' }]),
-    'SOURCE/data/figures/chapter2.json': JSON.stringify([{ src: 'Images/b.png', caption: 'Cap B' }]),
+    'SOURCE/data/figures/chapter1.json': JSON.stringify([
+      { src: 'Images/a.png', caption: 'Cap A' },
+    ]),
+    'SOURCE/data/figures/chapter2.json': JSON.stringify([
+      { src: 'Images/b.png', caption: 'Cap B' },
+    ]),
   };
   const ctx = {
     manifest,

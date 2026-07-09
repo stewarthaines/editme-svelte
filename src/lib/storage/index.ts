@@ -881,7 +881,8 @@ export class FileStorageAPI {
 
   private async doInit(): Promise<void> {
     await this.manager.init();
-    // Useful diagnostic log - keep for debugging storage backend selection
+    // Deliberate startup diagnostic: which storage backend (OPFS/IndexedDB) won.
+    // eslint-disable-next-line no-console
     console.log('FileStorageAPI initialized with backend:', this.manager.getBackendType());
   }
 

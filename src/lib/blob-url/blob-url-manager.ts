@@ -355,7 +355,6 @@ export class BlobURLManager {
 
     // Visual assets get error icons
     if (['img', 'video', 'audio', 'object', 'image'].includes(tagName)) {
-      // eslint-disable-next-line no-console
       console.warn(`Missing image: ${resolvedPath} (referenced by <${tagName}> element)`);
 
       // Set error icon and descriptive alt text
@@ -369,7 +368,6 @@ export class BlobURLManager {
     }
     // Non-visual assets preserve original URL
     else if (['script', 'link'].includes(tagName)) {
-      // eslint-disable-next-line no-console
       console.warn(`Missing asset: ${resolvedPath} (referenced by <${tagName}> element)`);
       // Leave original URL - will show 404
     }

@@ -21,8 +21,12 @@ const sharedRules = {
     { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
   ],
   '@typescript-eslint/no-explicit-any': 'warn',
-  '@typescript-eslint/no-empty-function': 'warn',
-  'no-console': 'warn',
+  // Empty arrows are intentional no-ops (swallowed .catch(), vi.fn stubs);
+  // empty named functions/methods still warn.
+  '@typescript-eslint/no-empty-function': ['warn', { allow: ['arrowFunctions'] }],
+  // warn/error are the sanctioned failure-path logging (see QUALITY.md);
+  // console.log never ships.
+  'no-console': ['warn', { allow: ['warn', 'error'] }],
   '@typescript-eslint/prefer-as-const': 'warn',
 };
 

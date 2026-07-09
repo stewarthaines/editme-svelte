@@ -18,7 +18,7 @@ This document defines the quality standards, validation requirements, and coding
 All code changes must pass these validation steps before commit:
 
 1. ✅ **TypeScript Validation**: `npm run check` (zero errors)
-2. ✅ **ESLint Compliance**: `npm run lint` (< 500 problems, zero critical errors)
+2. ✅ **ESLint Compliance**: `npm run lint` (zero errors; warnings under the `--max-warnings` cap — see "Lint warning ratchet" below)
 3. ✅ **Unit Tests**: `npm test` (all tests passing)
 4. ✅ **Build Verification**: `npm run build` (successful build)
 
@@ -41,9 +41,33 @@ npm run check && npm run lint && npm run format && npm test
 ### Required Quality Commands
 
 - `npm run check` - **REQUIRED** TypeScript validation (must pass)
-- `npm run lint` - **REQUIRED** ESLint check (zero warnings, zero errors)
+- `npm run lint` - **REQUIRED** ESLint check (zero errors; warnings under the ratchet cap)
 - `npm run format` - **REQUIRED** Prettier code formatting for consistency
 - `npm test` - **REQUIRED** Run unit tests (must pass)
+
+### Lint warning ratchet
+
+`npm run lint` enforces `--max-warnings` (set in `package.json`). The cap is a
+**ratchet — it only goes down**:
+
+- A change must not add warnings. Fix them before committing.
+- When a change removes warnings, lower the cap to the new count in the same commit.
+- Never raise the cap.
+
+The remaining warnings are `@typescript-eslint/no-explicit-any` — typed debt
+being paid down opportunistically: when you touch a file, prefer typing its
+`any`s (several carry comments naming the intended type).
+
+**Rule policies:**
+
+- **Console**: `console.warn` / `console.error` are permitted on failure paths
+  (the persistence-pattern try/catch). `console.log` never ships — delete debug
+  logging before commit; a deliberate diagnostic log needs an inline
+  `eslint-disable-next-line no-console` with a comment saying why.
+- **`any`**: new or edited code must not introduce `any` — use `unknown` plus
+  narrowing, or the real type. Existing `any`s are the tracked debt above.
+- **Empty functions**: empty *arrow* functions are allowed (intentional no-ops
+  like a swallowed `.catch(() => {})`); empty named functions/methods warn.
 
 ### Testing Commands
 
@@ -81,7 +105,7 @@ npm run check && npm run lint && npm run format && npm test
 
 1. Run `npm run check` after any code modification
 2. Resolve ALL TypeScript errors before considering any task complete
-3. Ensure ESLint compliance (< 500 problems, zero critical errors)
+3. Ensure ESLint compliance (zero errors; do not add warnings — the cap is a ratchet)
 4. Verify all tests pass
 5. Confirm successful build
 

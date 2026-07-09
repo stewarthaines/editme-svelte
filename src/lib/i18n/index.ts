@@ -57,7 +57,6 @@ async function sweepOrphanCatalogs(
     removed.push(code);
   }
   if (removed.length > 0) {
-    // eslint-disable-next-line no-console
     console.warn(`Removed cached locale catalog(s) with no active source: ${removed.join(', ')}`);
   }
   return removed;
@@ -288,7 +287,6 @@ export async function initI18n(): Promise<void> {
     // blocks on the network — remote availability lands as a later store update.
     if (isHttpSourceAvailable()) {
       remoteRefreshPromise = refreshRemoteAvailability().catch(error => {
-        // eslint-disable-next-line no-console
         console.warn('Failed to refresh remote locale availability:', error);
       });
     }
@@ -428,7 +426,6 @@ export async function setLocale(locale: string): Promise<void> {
   if (availability === 'remote') {
     const entry = remoteEntries[locale];
     if (!entry) {
-      // eslint-disable-next-line no-console
       console.warn(`No manifest entry for locale ${locale}; ignoring switch.`);
       return;
     }
@@ -437,7 +434,6 @@ export async function setLocale(locale: string): Promise<void> {
     try {
       const jsonText = await fetchCatalogFile(entry);
       if (jsonText === null) {
-        // eslint-disable-next-line no-console
         console.warn(`Failed to fetch catalog for ${locale}; staying on current locale.`);
         return;
       }
@@ -445,7 +441,6 @@ export async function setLocale(locale: string): Promise<void> {
       await loader.cacheCatalog(locale, jsonText);
       const catalog = await loader.loadCatalog(locale);
       if (!catalog) {
-        // eslint-disable-next-line no-console
         console.warn(`Fetched catalog for ${locale} is unreadable; staying on current locale.`);
         return;
       }

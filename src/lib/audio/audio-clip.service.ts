@@ -117,15 +117,12 @@ export class AudioClipService {
    */
   async loadAudioFile(workspaceId: string, href: string): Promise<string> {
     try {
-      console.log('🎵 Service: Loading audio file - workspaceId:', workspaceId, 'href:', href);
-
       // Get workspace-configured BlobURLManager
       const blobURLManager = this.getBlobURLManager(workspaceId);
 
       // Create blob URL using the audio file path
       // BlobURLManager will handle loading the actual file from workspace
       const blobUrl = await blobURLManager.createBlobURL(href);
-      console.log('🎵 Service: BlobURL created:', blobUrl);
 
       return blobUrl;
     } catch (error) {

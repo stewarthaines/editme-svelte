@@ -14,6 +14,7 @@ When the user asks you to document a plan or write a new document describing det
 
 - **Quality First**: Always prioritize TypeScript compliance and test validity
 - **Error Resolution**: Fix type errors immediately, never defer or ignore
+- **Lint ratchet**: Never raise the `--max-warnings` cap; don't add warnings, and lower the cap when you remove them (see QUALITY.md)
 - **Documentation**: When planning under-specified work, ask the user for clarification
 - **IMPORTANT:** Ask the user one question at a time, not a list of questions
 

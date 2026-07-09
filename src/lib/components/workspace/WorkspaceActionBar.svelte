@@ -36,7 +36,6 @@
   // Future: import from folder functionality
   const _handleImportFolder = () => {
     // Placeholder for future implementation
-    console.log('Import from folder - coming soon');
   };
 </script>
 

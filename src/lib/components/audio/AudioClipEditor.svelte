@@ -130,18 +130,10 @@
     if (selectedAudioHref && workspace.id) {
       (async () => {
         try {
-          console.log(
-            '🎵 Component: Loading audio - href:',
-            selectedAudioHref,
-            'workspace:',
-            workspace.id
-          );
           isLoading = true;
           error = null;
 
           const newAudioSrc = await audioClipService.loadAudioFile(workspace.id, selectedAudioHref);
-          console.log('🎵 Component: Audio src received:', newAudioSrc);
-          console.log('🎵 Component: Setting audioSrc, will trigger audio element load');
           audioSrc = newAudioSrc;
         } catch (err) {
           console.error('🎵 Component: Audio loading error:', err);
@@ -157,22 +149,11 @@
   // Handle audio metadata loading
   $effect(() => {
     if (audioElement && audioSrc) {
-      console.log('🎵 Component: Audio element and src available:', {
-        audioSrc,
-        audioElementSrc: audioElement.src,
-        readyState: audioElement.readyState,
-      });
-
       const handleLoadedMetadata = () => {
         if (!audioElement) return;
-        console.log('🎵 Component: loadedmetadata event fired');
-        console.log('🎵 Component: Audio duration:', audioElement.duration);
-        console.log('🎵 Component: Audio ready state:', audioElement.readyState);
 
         const metadata = audioClipService.getAudioMetadata(audioElement);
-        console.log('🎵 Component: Extracted metadata:', metadata);
         audioDuration = metadata.duration;
-        console.log('🎵 Component: Set audioDuration to:', audioDuration);
 
         // Update clip range in service
         audioClipService.setClipRange(startSeconds, endSeconds);

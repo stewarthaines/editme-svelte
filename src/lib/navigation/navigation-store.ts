@@ -96,7 +96,7 @@ function createNavigationStore(): NavigationStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use defaults
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load navigation state:', error);
       }
 
@@ -273,7 +273,6 @@ function createNavigationStore(): NavigationStore {
         try {
           localStorage.setItem(STORAGE_KEYS.VIEW_DATA, JSON.stringify(newViewData));
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save view data:', error);
         }
 
@@ -310,7 +309,6 @@ function createNavigationStore(): NavigationStore {
         try {
           localStorage.setItem(STORAGE_KEYS.VIEW_DATA, JSON.stringify(newViewData));
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save view data:', error);
         }
 
@@ -423,7 +421,6 @@ function createNavigationStore(): NavigationStore {
       localStorage.setItem(STORAGE_KEYS.CURRENT_VIEW, view);
       localStorage.setItem(STORAGE_KEYS.VIEW_HISTORY, JSON.stringify(newHistory));
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to save navigation state:', error);
     }
 
@@ -437,7 +434,6 @@ function createNavigationStore(): NavigationStore {
     try {
       layoutStore.setSidebarSection(view as SidebarSection);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to sync to layout store:', error);
     }
   }

@@ -192,7 +192,7 @@ export class EPUBPackager {
         });
       } catch (error) {
         // Skip files that can't be read but don't fail the entire operation
-        // eslint-disable-next-line no-console
+
         console.warn(`Failed to read file ${path}:`, error);
       }
     }
@@ -213,7 +213,6 @@ export class EPUBPackager {
           });
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.warn(`Failed to create ${SOURCE_ARCHIVE_NAME}:`, error);
       }
     }
@@ -237,7 +236,6 @@ export class EPUBPackager {
               seedHtml = injectI18nBundle(seedHtml, localeBundle);
             }
           } catch (error) {
-            // eslint-disable-next-line no-console
             console.warn(`Embedding ${SEED_HTML_NAME} without locale catalogs:`, error);
           }
 
@@ -249,7 +247,6 @@ export class EPUBPackager {
           });
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.warn(`Failed to embed ${SEED_HTML_NAME}:`, error);
       }
     }

@@ -76,7 +76,7 @@ function createLayoutStore(): LayoutStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load sidebar expanded state:', error);
       }
 
@@ -87,7 +87,7 @@ function createLayoutStore(): LayoutStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load sidebar project-nav state:', error);
       }
 
@@ -98,7 +98,7 @@ function createLayoutStore(): LayoutStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load sidebar section:', error);
       }
 
@@ -110,7 +110,7 @@ function createLayoutStore(): LayoutStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use default
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load spine preview state:', error);
       }
 
@@ -134,7 +134,6 @@ function createLayoutStore(): LayoutStore {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_PROJECT_EXPANDED, JSON.stringify(newValue));
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save sidebar project-nav state:', error);
         }
 
@@ -156,7 +155,6 @@ function createLayoutStore(): LayoutStore {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_EXPANDED, JSON.stringify(newExpanded));
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save sidebar expanded state:', error);
         }
 
@@ -178,7 +176,6 @@ function createLayoutStore(): LayoutStore {
         try {
           localStorage.setItem(STORAGE_KEYS.SPINE_PREVIEW_COLLAPSED, JSON.stringify(newCollapsed));
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save spine preview state:', error);
         }
 
@@ -195,7 +192,6 @@ function createLayoutStore(): LayoutStore {
         try {
           localStorage.setItem(STORAGE_KEYS.SIDEBAR_SECTION, section);
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save sidebar section:', error);
         }
 

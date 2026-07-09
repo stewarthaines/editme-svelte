@@ -60,7 +60,7 @@ function createThemeStore(): ThemeStore {
         }
       } catch (error) {
         // Ignore localStorage errors and use system preference
-        // eslint-disable-next-line no-console
+
         console.warn('Failed to load theme preference:', error);
       }
 
@@ -102,7 +102,6 @@ function createThemeStore(): ThemeStore {
         try {
           localStorage.setItem(STORAGE_KEY, theme);
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save theme preference:', error);
         }
 
@@ -124,7 +123,6 @@ function createThemeStore(): ThemeStore {
         try {
           localStorage.setItem(STORAGE_KEY, newTheme);
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to save theme preference:', error);
         }
 
@@ -144,7 +142,6 @@ function createThemeStore(): ThemeStore {
         try {
           localStorage.removeItem(STORAGE_KEY);
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.warn('Failed to clear theme preference:', error);
         }
 
