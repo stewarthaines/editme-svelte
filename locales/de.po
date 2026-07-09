@@ -2634,6 +2634,10 @@ msgstr "Verlag"
 msgid "Rate"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Re-check the device and refresh its book list"
+msgstr "Gerät neu prüfen und die Buchliste aktualisieren"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit."
 msgstr "Rendert die Vorschau beim Bearbeiten live neu."
@@ -2681,6 +2685,10 @@ msgstr "Lesesystem"
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Recommended"
 msgstr "Empfohlen"
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Reconnect"
+msgstr "Neu verbinden"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Reconnect device"

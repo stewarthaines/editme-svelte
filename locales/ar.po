@@ -2615,6 +2615,10 @@ msgstr ""
 msgid "Rate"
 msgstr ""
 
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Re-check the device and refresh its book list"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit."
 msgstr ""
@@ -2661,6 +2665,10 @@ msgstr ""
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Recommended"
+msgstr ""
+
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Reconnect"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte

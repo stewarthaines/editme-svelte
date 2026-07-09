@@ -449,6 +449,27 @@
     return () => document.removeEventListener('visibilitychange', onVisible);
   });
 
+  /** Map a device sentinel error to its UI state. Returns true when handled. */
+  function handleDeviceError(error: string | undefined): boolean {
+    if (error === DEVICE_NOT_CONNECTED) {
+      remoteObjects = [];
+      showStatus(
+        translate(
+          '"{name}" is not connected — plug in the device and refresh',
+          { name: activeRemote?.name ?? '' },
+        ),
+        'info',
+      );
+      return true;
+    }
+    if (error === DEVICE_RECONNECT_REQUIRED) {
+      remoteObjects = [];
+      deviceReconnectRequired = true;
+      return true;
+    }
+    return false;
+  }
+
   async function onReconnectDevice() {
     if (!activeRemote || activeRemote.type !== 'device') return;
     const conn = await connectDevice(activeRemote, { interactive: true });
@@ -612,19 +633,7 @@
           'success',
         );
         await refreshObjectList();
-      } else if (result.error === DEVICE_NOT_CONNECTED) {
-        remoteObjects = [];
-        showStatus(
-          translate(
-            '"{name}" is not connected — plug in the device and refresh',
-            { name: activeRemote.name },
-          ),
-          'info',
-        );
-      } else if (result.error === DEVICE_RECONNECT_REQUIRED) {
-        remoteObjects = [];
-        deviceReconnectRequired = true;
-      } else {
+      } else if (!handleDeviceError(result.error)) {
         showStatus(result.error || translate('Upload failed'), 'error');
       }
     } catch (error) {
@@ -658,7 +667,7 @@
       if (result.success) {
         remoteObjects = remoteObjects.filter((o) => o.key !== key);
         showStatus(translate('{key} deleted', { key }), 'success');
-      } else {
+      } else if (!handleDeviceError(result.error)) {
         showStatus(result.error || translate('Delete failed'), 'error');
       }
     } catch (error) {

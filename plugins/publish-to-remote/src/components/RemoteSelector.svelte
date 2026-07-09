@@ -49,13 +49,24 @@
                 ? remote.folderName
                 : remote.type === 'dropbox'
                   ? remote.folderPath
-                  : remote.url}
+                  : remote.type === 'device'
+                    ? remote.volumeLabel
+                    : remote.url}
           {/if}
         </option>
       {/each}
     </select>
     <button class="btn btn-secondary" onclick={onAdd}>{$t('Add Remote')}</button
     >
+    {#if activeRemote?.type === 'device'}
+      <button
+        class="btn btn-secondary"
+        onclick={onReconnectDevice}
+        title={$t('Re-check the device and refresh its book list')}
+      >
+        {$t('Reconnect')}
+      </button>
+    {/if}
     <button
       class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
@@ -71,6 +82,15 @@
     <span>{$t('Remote:')} <strong>{activeRemote?.name}</strong></span>
     <button class="btn btn-secondary" onclick={onAdd}>{$t('Add Remote')}</button
     >
+    {#if activeRemote?.type === 'device'}
+      <button
+        class="btn btn-secondary"
+        onclick={onReconnectDevice}
+        title={$t('Re-check the device and refresh its book list')}
+      >
+        {$t('Reconnect')}
+      </button>
+    {/if}
     <button
       class="btn btn-secondary"
       onclick={() => activeRemote && onEdit(activeRemote.id)}
