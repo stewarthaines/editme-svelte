@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Publish straight to a USB e-reader: in the Publish plugin, "Add Remote Storage" is now "Add Destination" and (on Chromium-based desktop browsers) offers USB e-readers alongside cloud storage. Pick the mounted device once — a Kobo is recognised automatically — and it stays configured across sessions; published books copy straight onto it, with a reminder to eject so the reader indexes them.
 - Text formats carry their own media-insertion templates: adopting a format — at project creation, from the App Settings catalog, or by switching the text transform in EPUB Settings — sets the project's image, video and audio-clip templates to format-appropriate defaults (Djot projects, for example, get the quoted clip directive and a raw-HTML video wrapper automatically).
 - New **abcjs+jsyaml** extension (Code blocks): ` ```abcjs ` code blocks render as SVG music scores. YAML frontmatter names staff-width variants (narrow/wide/full) and the one that fits the reading column displays — pure CSS via container queries with media-query fallbacks, no reading-system JavaScript.
 - Both music extensions (abc2svg, abcjs) ship a reworked ABC Sample generator: choose the block wrapper (Markdown/Textile), voices (1, 2, 3 or SATB), key, tempo, sample lyrics, and whether to include the responsive variants frontmatter.

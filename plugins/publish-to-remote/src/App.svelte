@@ -20,6 +20,12 @@
     uploadTextFile,
     downloadTextFile,
   } from './remote-ops.js';
+  import {
+    DEVICE_RECONNECT_REQUIRED,
+    DEVICE_NOT_CONNECTED,
+    connectDevice,
+    deleteDeviceHandle,
+  } from './device-upload.js';
   import { loadGoogleScripts, authorizeGoogleDrive } from './google-drive.js';
   import {
     generateOpdsFeed,
@@ -200,6 +206,8 @@
   let validationModalReport: ValidationReport | null = $state(null);
   let generatingFeed = $state(false);
   let googleAuthRequired = $state(false);
+  // Device destination lost its handle/permission (mirror of googleAuthRequired).
+  let deviceReconnectRequired = $state(false);
   let editingRemote: RemoteConfig | null = $state(null);
   let statusMessage: {
     text: string;
@@ -329,6 +337,25 @@
       remoteObjects = [];
       await loadLocalEpubs();
       view = 'ready';
+    } else if (result.error === DEVICE_RECONNECT_REQUIRED) {
+      deviceReconnectRequired = true;
+      remoteObjects = [];
+      await loadLocalEpubs();
+      view = 'ready';
+    } else if (result.error === DEVICE_NOT_CONNECTED) {
+      deviceReconnectRequired = false;
+      remoteObjects = [];
+      showStatus(
+        translate(
+          '"{name}" is not connected — plug in the device and refresh',
+          {
+            name: target.name,
+          },
+        ),
+        'info',
+      );
+      await loadLocalEpubs();
+      view = 'ready';
     } else if (result.error) {
       showStatus(result.error, 'error');
       // Open the failing remote for fixing, in the right pane.
@@ -338,6 +365,7 @@
       view = 'ready';
     } else {
       googleAuthRequired = false;
+      deviceReconnectRequired = false;
       remoteObjects = result.objects;
       // Initialise the catalog selection once per remote (from its existing
       // catalog, or all epubs). Later refreshes preserve the user's choices.
@@ -408,6 +436,31 @@
         'error',
       );
     }
+  }
+
+  async function onReconnectDevice() {
+    if (!activeRemote || activeRemote.type !== 'device') return;
+    const conn = await connectDevice(activeRemote, { interactive: true });
+    if (conn.handle) {
+      deviceReconnectRequired = false;
+      await refreshObjectList();
+      return;
+    }
+    if (conn.error === DEVICE_NOT_CONNECTED) {
+      showStatus(
+        translate(
+          '"{name}" is not connected — plug in the device and refresh',
+          {
+            name: activeRemote.name,
+          },
+        ),
+        'info',
+      );
+      return;
+    }
+    // No usable handle at all: re-pick via the configure form.
+    editingRemote = activeRemote;
+    configuring = true;
   }
 
   async function onValidateEpub(epub: File) {
@@ -539,7 +592,12 @@
       );
       if (result.success) {
         showStatus(
-          translate('{name} uploaded successfully', { name: epub.name }),
+          activeRemote.type === 'device'
+            ? translate(
+                '{name} copied — eject the device to finish adding the book',
+                { name: epub.name },
+              )
+            : translate('{name} uploaded successfully', { name: epub.name }),
           'success',
         );
         await refreshObjectList();
@@ -592,6 +650,9 @@
     if (!activeRemote) return;
     try {
       const name = activeRemote.name;
+      if (activeRemote.type === 'device') {
+        await deleteDeviceHandle(activeRemote.id);
+      }
       const updated = remotesStore.remotes.filter(
         (r) => r.id !== activeRemote!.id,
       );
@@ -862,11 +923,13 @@
                   {remotesStore}
                   {activeRemote}
                   {googleAuthRequired}
+                  {deviceReconnectRequired}
                   onAdd={() => onOpenConfigure()}
                   onEdit={(id) => onOpenConfigure(id)}
                   onRemove={onSignOut}
                   onSelect={onSetActiveRemote}
                   onReconnect={onReconnectGoogleDrive}
+                  {onReconnectDevice}
                 />
 
                 <RemoteFileList
@@ -889,7 +952,7 @@
                      feed (Google serves public files as an HTML scan interstitial /
                      generic types that readers reject). See AGENTS.md. Drive still
                      works for publishing individual books. -->
-                {#if activeRemote && activeRemote.type !== 'google-drive'}
+                {#if activeRemote && activeRemote.type !== 'google-drive' && activeRemote.type !== 'device'}
                   <div class="catalog-editor">
                     <div class="catalog-fields">
                       <label class="catalog-field catalog-field-file">

@@ -295,7 +295,9 @@ describe('getPublicUrl', () => {
 describe('getThumbnailUrl', () => {
   it('uses the Drive image-thumbnail endpoint for google-drive', () => {
     const url = getThumbnailUrl(googleConfig, 'book.thumb.png', 'thumb-1');
-    expect(vi.mocked(getGoogleDriveThumbnailUrl)).toHaveBeenCalledWith('thumb-1');
+    expect(vi.mocked(getGoogleDriveThumbnailUrl)).toHaveBeenCalledWith(
+      'thumb-1',
+    );
     expect(url).toBe('https://drive.google.com/thumbnail?id=x&sz=w400');
   });
 

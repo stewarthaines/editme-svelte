@@ -61,7 +61,8 @@ export async function readSidecars(
   // Collect file handles by name first so we can pair `.json` with `.thumb.png`.
   const byName = new Map<string, FileSystemFileHandle>();
   for await (const entry of dirHandle.values()) {
-    if (entry.kind === 'file') byName.set(entry.name, entry as FileSystemFileHandle);
+    if (entry.kind === 'file')
+      byName.set(entry.name, entry as FileSystemFileHandle);
   }
 
   for (const [name, handle] of byName) {
@@ -69,7 +70,9 @@ export async function readSidecars(
     const base = name.replace(/\.json$/i, '');
     try {
       const text = await (await handle.getFile()).text();
-      const meta = JSON.parse(text) as CatalogEntryMeta & { thumbnail?: string };
+      const meta = JSON.parse(text) as CatalogEntryMeta & {
+        thumbnail?: string;
+      };
 
       const thumbName = meta.thumbnail || `${base}.thumb.png`;
       const thumbHandle = byName.get(thumbName);

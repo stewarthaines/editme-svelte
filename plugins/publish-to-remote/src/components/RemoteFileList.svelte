@@ -63,10 +63,16 @@
 
   // Grouped for display, mirroring the manifest table: catalogs (.xml) first,
   // then EPUBs, then anything else. Each group renders under its own heading.
-  const catalogObjects = $derived(visibleObjects.filter((o) => isXml(o.key)).sort(byNewest));
-  const epubObjects = $derived(visibleObjects.filter((o) => isEpub(o.key)).sort(byNewest));
+  const catalogObjects = $derived(
+    visibleObjects.filter((o) => isXml(o.key)).sort(byNewest),
+  );
+  const epubObjects = $derived(
+    visibleObjects.filter((o) => isEpub(o.key)).sort(byNewest),
+  );
   const otherObjects = $derived(
-    visibleObjects.filter((o) => !isXml(o.key) && !isEpub(o.key)).sort(byNewest),
+    visibleObjects
+      .filter((o) => !isXml(o.key) && !isEpub(o.key))
+      .sort(byNewest),
   );
 </script>
 

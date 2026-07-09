@@ -107,11 +107,26 @@ export interface WebDAVRemoteConfig {
   routeViaProxy?: boolean;
 }
 
+export interface DeviceRemoteConfig {
+  id: string;
+  name: string;
+  type: 'device';
+  /** What the volume sniff identified (drives labels and copy). */
+  deviceKind: 'kobo' | 'generic';
+  /** Volume name as picked (e.g. "KOBOeReader"). */
+  volumeLabel: string;
+  /** Folder on the volume to write into; '' = volume root. */
+  targetFolder: string;
+  /** Human detail from the sniff, e.g. "Kobo · firmware 4.38.23697". */
+  detail?: string;
+}
+
 export type RemoteConfig =
   | S3RemoteConfig
   | GoogleDriveRemoteConfig
   | DropboxRemoteConfig
-  | WebDAVRemoteConfig;
+  | WebDAVRemoteConfig
+  | DeviceRemoteConfig;
 
 export interface RemotesStore {
   remotes: RemoteConfig[];

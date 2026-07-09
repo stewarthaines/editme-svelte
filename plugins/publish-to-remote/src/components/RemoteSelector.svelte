@@ -6,20 +6,24 @@
     remotesStore,
     activeRemote,
     googleAuthRequired,
+    deviceReconnectRequired = false,
     onAdd,
     onEdit,
     onRemove,
     onSelect,
     onReconnect,
+    onReconnectDevice = () => {},
   }: {
     remotesStore: RemotesStore;
     activeRemote: RemoteConfig | null;
     googleAuthRequired: boolean;
+    deviceReconnectRequired?: boolean;
     onAdd: () => void;
     onEdit: (id: string) => void;
     onRemove: () => void;
     onSelect: (id: string) => void;
     onReconnect: () => void;
+    onReconnectDevice?: () => void;
   } = $props();
 </script>
 
@@ -76,6 +80,15 @@
     <button class="btn btn-danger btn-sm" onclick={onRemove}
       >{$t('Remove')}</button
     >
+  </div>
+{/if}
+
+{#if deviceReconnectRequired && activeRemote?.type === 'device'}
+  <div class="auth-required-banner">
+    <span>{$t('The saved device connection needs to be re-granted.')}</span>
+    <button class="btn btn-primary" onclick={onReconnectDevice}>
+      {$t('Reconnect device')}
+    </button>
   </div>
 {/if}
 

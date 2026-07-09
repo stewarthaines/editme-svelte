@@ -33,7 +33,10 @@ async function getValidToken(config: GoogleDriveRemoteConfig): Promise<string> {
  * files, so no extra consent is needed. Throws on failure (an unshared file is a
  * broken publish); the caller's catch surfaces it as an UploadResult error.
  */
-async function makeGoogleDriveFilePublic(token: string, fileId: string): Promise<void> {
+async function makeGoogleDriveFilePublic(
+  token: string,
+  fileId: string,
+): Promise<void> {
   const response = await fetch(
     `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,
     {
@@ -182,7 +185,9 @@ export async function findGoogleDriveFileId(
 ): Promise<string | null> {
   const listResult = await listGoogleDriveFiles(config);
   if (listResult.error) throw new Error(listResult.error);
-  return listResult.objects.find((obj) => obj.key === objectKey)?.fileId ?? null;
+  return (
+    listResult.objects.find((obj) => obj.key === objectKey)?.fileId ?? null
+  );
 }
 
 export async function deleteGoogleDriveFile(
@@ -244,7 +249,10 @@ export async function deleteGoogleDriveFile(
  * in an image tag), the thumbnail endpoint returns a real image. `sz=w<width>` sizes
  * it. Only resolves for files shared publicly (see makeGoogleDriveFilePublic).
  */
-export function getGoogleDriveThumbnailUrl(fileId: string, width = 400): string {
+export function getGoogleDriveThumbnailUrl(
+  fileId: string,
+  width = 400,
+): string {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${width}`;
 }
 

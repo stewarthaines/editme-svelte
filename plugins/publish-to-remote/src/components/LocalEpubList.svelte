@@ -26,7 +26,10 @@
     onRead,
   }: {
     epubs: File[];
-    meta: Map<string, { title?: string; authors?: string[]; thumbnailUrl?: string }>;
+    meta: Map<
+      string,
+      { title?: string; authors?: string[]; thumbnailUrl?: string }
+    >;
     activeFilenames: Set<string>;
     remoteObjects: S3Object[];
     epubValidationStatus: Map<
@@ -50,7 +53,9 @@
   } = $props();
 
   // Most recently packaged first (File.lastModified is the OPFS write time).
-  const sortedEpubs = $derived([...epubs].sort((a, b) => b.lastModified - a.lastModified));
+  const sortedEpubs = $derived(
+    [...epubs].sort((a, b) => b.lastModified - a.lastModified),
+  );
 
   let confirmOverwrite: { [key: string]: boolean } = $state({});
   let deleteConfirm: string | null = $state(null);

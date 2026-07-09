@@ -43,7 +43,9 @@ export function acquisitionUrl(creds: RemoteConfig, o: S3Object): string {
     return getPublicUrl(creds as S3RemoteConfig, o.key);
   } else if (creds.type === 'google-drive') {
     // Single source of truth for the Drive download URL (see google-drive-upload).
-    return o.fileId ? getGoogleDrivePublicUrl(creds as GoogleDriveRemoteConfig, o.fileId) : '';
+    return o.fileId
+      ? getGoogleDrivePublicUrl(creds as GoogleDriveRemoteConfig, o.fileId)
+      : '';
   } else if (creds.type === 'dropbox') {
     return o.fileId || '';
   } else if (creds.type === 'webdav') {

@@ -24,6 +24,10 @@ msgstr ".. (nach oben)"
 msgid "· validated {ago}"
 msgstr "· validiert {ago}"
 
+#: plugins/publish-to-remote/src/App.svelte
+msgid "\"{name}\" is not connected — plug in the device and refresh"
+msgstr "\"{name}\" ist nicht verbunden — Gerät anschließen und aktualisieren"
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{count} accessibility issues"
 msgstr "{count} Barrierefreiheitsprobleme"
@@ -128,6 +132,10 @@ msgstr "{n} Warnungen"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n}/3 auto-update"
 msgstr "{n}/3 automatisch aktualisiert"
+
+#: plugins/publish-to-remote/src/App.svelte
+msgid "{name} copied — eject the device to finish adding the book"
+msgstr "{name} kopiert — Gerät auswerfen, um das Buch fertig hinzuzufügen"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} deleted"
@@ -324,6 +332,10 @@ msgstr "Weiteres Thema hinzufügen"
 msgid "Add another title"
 msgstr "Weiteren Titel hinzufügen"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Add Destination"
+msgstr "Ziel hinzufügen"
+
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Add Language"
 msgstr "Sprache hinzufügen"
@@ -335,10 +347,6 @@ msgstr "Option hinzufügen"
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Add Remote"
 msgstr "Remote hinzufügen"
-
-#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
-msgid "Add Remote Storage"
-msgstr "Remote-Speicher hinzufügen"
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 msgid "Add role"
@@ -683,9 +691,17 @@ msgstr "Prüfungen"
 msgid "Choices"
 msgstr "Auswahlmöglichkeiten"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Choose a device first"
+msgstr "Zuerst ein Gerät auswählen"
+
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Choose a generator"
 msgstr "Generator auswählen"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Choose device again…"
+msgstr "Gerät erneut auswählen…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Choose the SEED.html file to embed."
@@ -1100,10 +1116,15 @@ msgstr "Demo-Steuerung"
 msgid "Description"
 msgstr "Beschreibung"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Detected: {detail} on volume \"{volume}\""
+msgstr "Erkannt: {detail} auf Laufwerk \"{volume}\""
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Developed by Stewart Haines."
 msgstr "Entwickelt von Stewart Haines."
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Device"
 msgstr "Gerät"
@@ -1484,6 +1505,10 @@ msgid "Flow"
 msgstr "Seitenfluss"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Folder on device"
+msgstr "Ordner auf dem Gerät"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Folder selected:"
 msgstr "Ausgewählter Ordner:"
 
@@ -1832,6 +1857,10 @@ msgstr "Layout"
 msgid "learn more"
 msgstr "mehr erfahren"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Leave empty to copy books to the top of the device."
+msgstr "Leer lassen, um Bücher auf die oberste Ebene des Geräts zu kopieren."
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Left to Right"
 msgstr "Links nach rechts"
@@ -2059,6 +2088,7 @@ msgid "n/a"
 msgstr "k. A."
 
 #: plugins/publish-to-remote/src/App.svelte
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Name"
@@ -2282,6 +2312,10 @@ msgstr "An – Überprüfungsmodus"
 #: src/lib/navigation/views/AboutView.svelte
 msgid "One EPUB made with the editor, opening on phones, tablets, and e-readers."
 msgstr "Ein mit dem Editor erstelltes EPUB, das sich auf Smartphones, Tablets und E-Readern öffnet."
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Only needed if the saved connection stops working."
+msgstr "Nur nötig, wenn die gespeicherte Verbindung nicht mehr funktioniert."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Only the EPUB — with SEED.zip inside — can be reopened, edited, and republished."
@@ -2648,6 +2682,10 @@ msgstr "Lesesystem"
 msgid "Recommended"
 msgstr "Empfohlen"
 
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "Reconnect device"
+msgstr "Gerät neu verbinden"
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Redirect URI"
 msgstr "Weiterleitungs-URI"
@@ -2677,6 +2715,10 @@ msgstr "Lassen Sie die Datei an einer beliebigen Stelle los, um sie hinzuzufüge
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Remote Name (optional)"
 msgstr "Remote-Name (optional)"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Remote storage"
+msgstr "Remote-Speicher"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Remote:"
@@ -3174,6 +3216,10 @@ msgstr ""
 msgid "The publishing plugin could not be loaded — you may be offline. Showing local publishing instead."
 msgstr "Das Veröffentlichungs-Plugin konnte nicht geladen werden — möglicherweise sind Sie offline. Stattdessen wird die lokale Veröffentlichung angezeigt."
 
+#: plugins/publish-to-remote/src/components/RemoteSelector.svelte
+msgid "The saved device connection needs to be re-granted."
+msgstr "Die gespeicherte Geräteverbindung muss neu bestätigt werden."
+
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Theme"
@@ -3377,6 +3423,18 @@ msgstr "URI"
 msgid "URL copied to clipboard"
 msgstr "URL in die Zwischenablage kopiert"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "USB device"
+msgstr "USB-Gerät"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "USB e-reader"
+msgstr "USB-E-Reader"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "USB e-reader (browse…)"
+msgstr "USB-E-Reader (durchsuchen…)"
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Use the download button to access the file"
 msgstr "Verwenden Sie die Schaltfläche „Herunterladen“, um auf die Datei zuzugreifen"
@@ -3476,6 +3534,10 @@ msgstr "Viewport-Höhe in Pixeln"
 #: src/lib/components/metadata/fields/ViewportField.svelte
 msgid "Viewport width in pixels"
 msgstr "Viewport-Breite in Pixeln"
+
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Volume \"{volume}\" (no reader markers found — books are copied to it as-is)"
+msgstr "Laufwerk \"{volume}\" (keine Reader-Kennung gefunden — Bücher werden unverändert kopiert)"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "warnings"

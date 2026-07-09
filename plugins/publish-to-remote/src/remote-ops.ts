@@ -23,6 +23,11 @@ import {
   uploadTextToDropbox,
 } from './dropbox-upload.js';
 import {
+  uploadToDevice,
+  listDeviceFiles,
+  deleteDeviceFile,
+} from './device-upload.js';
+import {
   uploadToWebDAV,
   listWebDAVFiles,
   deleteWebDAVFile,
@@ -52,6 +57,8 @@ export async function uploadFile(
     return uploadToDropbox(remote, objectKey, blob, contentType, onProgress);
   } else if (remote.type === 'webdav') {
     return uploadToWebDAV(remote, objectKey, blob, contentType, onProgress);
+  } else if (remote.type === 'device') {
+    return uploadToDevice(remote, objectKey, blob, onProgress);
   }
   return { success: false, error: 'Unknown remote type' };
 }
@@ -67,6 +74,8 @@ export async function listFiles(
     return listDropboxFiles(remote);
   } else if (remote.type === 'webdav') {
     return listWebDAVFiles(remote);
+  } else if (remote.type === 'device') {
+    return listDeviceFiles(remote);
   }
   return { objects: [], error: 'Unknown remote type' };
 }
@@ -83,6 +92,8 @@ export async function deleteFile(
     return deleteDropboxFile(remote, objectKey);
   } else if (remote.type === 'webdav') {
     return deleteWebDAVFile(remote, objectKey);
+  } else if (remote.type === 'device') {
+    return deleteDeviceFile(remote, objectKey);
   }
   return { success: false, error: 'Unknown remote type' };
 }
@@ -101,6 +112,7 @@ export function getPublicUrl(
   } else if (remote.type === 'webdav') {
     return getWebDAVPublicUrl(remote, objectKey);
   }
+  // 'device': files on a reader's filesystem have no URL.
   return '';
 }
 
@@ -135,7 +147,7 @@ export async function downloadTextFile(
   } else if (remote.type === 'webdav') {
     return getWebDAVText(remote, objectKey);
   }
-  return null; // Drive/Dropbox: not supported for catalog pre-population.
+  return null; // Drive/Dropbox/device: not supported for catalog pre-population.
 }
 
 export async function uploadTextFile(
@@ -153,5 +165,6 @@ export async function uploadTextFile(
   } else if (remote.type === 'webdav') {
     return uploadTextToWebDAV(remote, objectKey, text, contentType);
   }
+  // 'device': no OPDS catalog on a reader's filesystem.
   return { success: false, error: 'Unknown remote type' };
 }

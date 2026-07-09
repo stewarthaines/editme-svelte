@@ -136,8 +136,16 @@ describe('uploadToGoogleDrive', () => {
     // Sequence: list (no existing) → POST create → permissions (anyone/reader).
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ files: [] }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ files: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'new-file-id' }),
+      })
       .mockResolvedValueOnce({ ok: true, status: 200 });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -162,7 +170,10 @@ describe('uploadToGoogleDrive', () => {
     expect(permUrl).toBe(
       'https://www.googleapis.com/drive/v3/files/new-file-id/permissions',
     );
-    expect(JSON.parse(permInit.body)).toEqual({ role: 'reader', type: 'anyone' });
+    expect(JSON.parse(permInit.body)).toEqual({
+      role: 'reader',
+      type: 'anyone',
+    });
   });
 
   it('updates an existing file in place (PATCH, no duplicate, no re-share)', async () => {
@@ -172,9 +183,15 @@ describe('uploadToGoogleDrive', () => {
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ files: [{ id: 'existing-id', name: 'book.epub' }] }),
+        json: async () => ({
+          files: [{ id: 'existing-id', name: 'book.epub' }],
+        }),
       })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'existing-id' }) });
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'existing-id' }),
+      });
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await uploadToGoogleDrive(
@@ -197,9 +214,22 @@ describe('uploadToGoogleDrive', () => {
     // list (none) → create ok → permissions 403.
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ files: [] }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'new-file-id' }) })
-      .mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden', text: async () => 'denied' });
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ files: [] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'new-file-id' }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+        text: async () => 'denied',
+      });
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await uploadToGoogleDrive(

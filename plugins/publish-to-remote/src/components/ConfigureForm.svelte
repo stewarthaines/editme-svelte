@@ -7,6 +7,11 @@
     pickGoogleDriveFolder,
   } from '../google-drive.js';
   import { authorizeDropbox, listDropboxFolders } from '../dropbox.js';
+  import {
+    pickDevice,
+    saveDeviceHandle,
+    isDeviceSupported,
+  } from '../device-upload.js';
   import { ArrowLeft } from 'phosphor-svelte';
   import type { RemoteConfig, DropboxRemoteConfig } from '../types.js';
 
@@ -48,7 +53,8 @@
     | 's3-compatible'
     | 'google-drive'
     | 'dropbox'
-    | 'webdav';
+    | 'webdav'
+    | 'device';
 
   let remoteType: RemoteType = $state('none');
   let form = $state({
@@ -81,8 +87,7 @@
 
   // This app's origin — the value to register as a Google "Authorized JavaScript
   // origin" (Google wants an origin, not a full URL).
-  const appOrigin =
-    typeof window !== 'undefined' ? window.location.origin : '';
+  const appOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   // The plugin's OWN page URL (origin + path, no query). The Dropbox OAuth callback
   // must land here — where App.svelte's onMount handles `?code=&state=` and posts it
   // back to the opener — NOT on the host app's root, which has no such handler.
@@ -119,6 +124,31 @@
   let dbxBrowserError: string | null = $state(null);
   let dbxBrowserActive: boolean = $state(false);
 
+  // Device destinations (Chromium-only; see ../device-upload.ts). The picked
+  // handle is held here until Save persists it to IndexedDB under the remote id.
+  const deviceSupported = isDeviceSupported();
+  let pickedDeviceHandle: FileSystemDirectoryHandle | null = $state(null);
+  let deviceKind: 'kobo' | 'generic' = $state('generic');
+  let deviceVolumeLabel = $state('');
+  let deviceDetail = $state('');
+  let deviceTargetFolder = $state('');
+
+  async function onPickDevice() {
+    try {
+      const { handle, sniff } = await pickDevice();
+      pickedDeviceHandle = handle;
+      deviceKind = sniff.kind;
+      deviceVolumeLabel = handle.name;
+      deviceDetail = sniff.detail ?? '';
+      deviceTargetFolder = '';
+      form.name =
+        sniff.kind === 'kobo' ? (sniff.detail ?? 'Kobo') : handle.name;
+      remoteType = 'device';
+    } catch {
+      // Picker dismissed — stay on the chooser.
+    }
+  }
+
   $effect(() => {
     if (editingRemote) {
       populateForm(editingRemote);
@@ -128,6 +158,7 @@
   });
 
   function populateForm(remote: RemoteConfig) {
+    if (populateDeviceForm(remote)) return;
     if (remote.type === 's3-compatible') {
       remoteType = 's3-compatible';
       form = {
@@ -223,6 +254,18 @@
     }
   }
 
+  function populateDeviceForm(remote: RemoteConfig) {
+    if (remote.type !== 'device') return false;
+    remoteType = 'device';
+    form.name = remote.name;
+    deviceKind = remote.deviceKind;
+    deviceVolumeLabel = remote.volumeLabel;
+    deviceDetail = remote.detail ?? '';
+    deviceTargetFolder = remote.targetFolder;
+    pickedDeviceHandle = null; // stored handle stays valid unless re-picked
+    return true;
+  }
+
   function resetForm() {
     remoteType = 'none';
     form = {
@@ -244,6 +287,11 @@
       catalogFilename: '',
     };
     pickedFolderName = null;
+    pickedDeviceHandle = null;
+    deviceKind = 'generic';
+    deviceVolumeLabel = '';
+    deviceDetail = '';
+    deviceTargetFolder = '';
     previousBucketForAutoName = '';
     googleClientId = '';
     googleApiKey = '';
@@ -434,21 +482,42 @@
         catalogFilename: form.catalogFilename.trim() || undefined,
         routeViaProxy,
       };
+    } else if (remoteType === 'device') {
+      if (!pickedDeviceHandle && !editingRemote) {
+        onStatus(translate('Choose a device first'), 'error');
+        return null;
+      }
+      return {
+        id: editingRemote?.id || crypto.randomUUID(),
+        name: form.name.trim() || deviceVolumeLabel || translate('USB device'),
+        type: 'device',
+        deviceKind,
+        volumeLabel: deviceVolumeLabel,
+        targetFolder: deviceTargetFolder.trim().replace(/^\/+|\/+$/g, ''),
+        detail: deviceDetail || undefined,
+      };
     }
     onStatus(translate('Please select a remote type'), 'error');
     return null;
   }
 
-  function handleSave() {
+  async function handleSave() {
     const remote = buildRemote();
-    if (remote) onSave(remote, !editingRemote);
+    if (!remote) return;
+    // The directory handle is not JSON-serialisable: persist it separately,
+    // BEFORE announcing the remote (saving triggers a listing that needs it).
+    if (remote.type === 'device' && pickedDeviceHandle) {
+      await saveDeviceHandle(remote.id, pickedDeviceHandle);
+    }
+    onSave(remote, !editingRemote);
   }
 </script>
 
 <div class="form-container">
   {#if remoteType === 'none'}
     <div class="type-selector">
-      <h3>{$t('Add Remote Storage')}</h3>
+      <h3>{$t('Add Destination')}</h3>
+      <p class="type-cluster-label">{$t('Remote storage')}</p>
       <div class="type-buttons">
         <button class="btn-type" onclick={() => (remoteType = 's3-compatible')}>
           {$t('S3-Compatible')}
@@ -463,6 +532,14 @@
           {$t('WebDAV')}
         </button>
       </div>
+      {#if deviceSupported}
+        <p class="type-cluster-label">{$t('Device')}</p>
+        <div class="type-buttons">
+          <button class="btn-type" onclick={onPickDevice}>
+            {$t('USB e-reader (browse…)')}
+          </button>
+        </div>
+      {/if}
       {#if canCancel}
         <div class="form-actions">
           <button class="btn btn-secondary" onclick={onCancel}
@@ -688,7 +765,11 @@
 
       <div class="form-group">
         <label for="db-redirect-uri">{$t('Redirect URI')}</label>
-        <input id="db-redirect-uri" type="url" bind:value={dropboxRedirectUri} />
+        <input
+          id="db-redirect-uri"
+          type="url"
+          bind:value={dropboxRedirectUri}
+        />
         <small class="field-note">
           {$t(
             'Use your own Dropbox app: create one in the Dropbox App Console (scoped access), enable files.content.write and files.metadata.read, and register this exact redirect URI in the app’s settings.',
@@ -885,10 +966,87 @@
         >{$t('Cancel')}</button
       >
     </div>
+  {:else if remoteType === 'device'}
+    <div class="form-header">
+      <button class="btn btn-link" onclick={() => (remoteType = 'none')}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {$t('Back')}
+      </button>
+      <h3>{$t('USB e-reader')}</h3>
+    </div>
+
+    <p class="device-summary">
+      {#if deviceKind === 'kobo'}
+        {$t('Detected: {detail} on volume "{volume}"', {
+          detail: deviceDetail || 'Kobo',
+          volume: deviceVolumeLabel,
+        })}
+      {:else}
+        {$t(
+          'Volume "{volume}" (no reader markers found — books are copied to it as-is)',
+          {
+            volume: deviceVolumeLabel,
+          },
+        )}
+      {/if}
+    </p>
+
+    <div class="form-group">
+      <label for="dev-name">{$t('Name')}</label>
+      <input id="dev-name" type="text" bind:value={form.name} />
+    </div>
+
+    <div class="form-group">
+      <label for="dev-folder">{$t('Folder on device')}</label>
+      <!-- i18n-ignore -->
+      <input
+        id="dev-folder"
+        type="text"
+        placeholder="/"
+        bind:value={deviceTargetFolder}
+      />
+      <small class="field-note">
+        {$t('Leave empty to copy books to the top of the device.')}
+      </small>
+    </div>
+
+    {#if editingRemote && !pickedDeviceHandle}
+      <div class="form-group">
+        <button class="btn btn-secondary" onclick={onPickDevice}>
+          {$t('Choose device again…')}
+        </button>
+        <small class="field-note">
+          {$t('Only needed if the saved connection stops working.')}
+        </small>
+      </div>
+    {/if}
+
+    <div class="form-actions">
+      <button onclick={handleSave} class="btn btn-primary"
+        >{$t('Save & Connect')}</button
+      >
+      <button onclick={onCancel} class="btn btn-secondary"
+        >{$t('Cancel')}</button
+      >
+    </div>
   {/if}
 </div>
 
 <style>
+  .type-cluster-label {
+    margin: 12px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+  }
+
+  .device-summary {
+    margin: 0 0 12px;
+    color: var(--color-text-secondary);
+  }
+
   .form-container {
     background: var(--color-surface-secondary);
     padding: 20px;
