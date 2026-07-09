@@ -234,7 +234,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      inline-size: 66px;
+      inline-size: 44px;
       block-size: 44px;
       border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-full);
