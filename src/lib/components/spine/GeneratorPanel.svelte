@@ -242,10 +242,14 @@
     color: var(--color-text-secondary);
   }
 
+  /* Narrow label/control columns that flow to fill the pane width — the form
+     is a single column in a narrow pane and packs side by side as space
+     allows, with no per-generator layout configuration. */
   .gp-options {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
     gap: var(--space-3);
+    align-items: end;
   }
 
   .gp-field {
@@ -257,6 +261,8 @@
   .gp-field.inline {
     flex-direction: row;
     align-items: center;
+    /* Sit level with the neighbouring controls, not their floating labels. */
+    padding-block-end: var(--space-2);
   }
 
   .gp-label {
@@ -302,5 +308,4 @@
     justify-content: flex-end;
     gap: var(--space-2);
   }
-
 </style>
