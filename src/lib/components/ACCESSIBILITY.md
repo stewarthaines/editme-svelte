@@ -1,6 +1,6 @@
 # Component Accessibility Guidelines
 
-This guide documents accessibility patterns for EDITME components, leveraging Svelte's built-in a11y features and native browser behavior.
+This guide documents accessibility patterns for SEED.html components, leveraging Svelte's built-in a11y features and native browser behavior.
 
 ## Core Principles
 

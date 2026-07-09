@@ -271,7 +271,7 @@ describe('i18n runtime system', () => {
     });
 
     it('should restore the persisted locale preference', async () => {
-      mockLocalStorage.setItem('editme-locale', 'de');
+      mockLocalStorage.setItem('seedhtml-locale', 'de');
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
       await initI18n();
@@ -283,7 +283,7 @@ describe('i18n runtime system', () => {
     it('should restore a persisted non-enabled locale when its catalog is available', async () => {
       // Explicit user choice: ar was picked before (its catalog was delivered),
       // so the preference is honored even though ar is not in ENABLED_LOCALES.
-      mockLocalStorage.setItem('editme-locale', 'ar');
+      mockLocalStorage.setItem('seedhtml-locale', 'ar');
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
       await initI18n();
@@ -293,7 +293,7 @@ describe('i18n runtime system', () => {
     });
 
     it('should ignore a persisted locale no source can supply', async () => {
-      mockLocalStorage.setItem('editme-locale', 'ja');
+      mockLocalStorage.setItem('seedhtml-locale', 'ja');
       mockLoader.loadTranslations.mockResolvedValue(mockTranslationCatalogs);
 
       await initI18n();
@@ -375,7 +375,7 @@ describe('i18n runtime system', () => {
     it('should store locale preference', async () => {
       await setLocale('de');
 
-      expect(mockLocalStorage.getItem('editme-locale')).toBe('de');
+      expect(mockLocalStorage.getItem('seedhtml-locale')).toBe('de');
     });
 
     it('should throw error for unsupported locale', async () => {
@@ -405,11 +405,11 @@ describe('i18n runtime system', () => {
 
     it('should not persist the preference when the switch is refused', async () => {
       await setLocale('de');
-      expect(mockLocalStorage.getItem('editme-locale')).toBe('de');
+      expect(mockLocalStorage.getItem('seedhtml-locale')).toBe('de');
 
       await setLocale('ja'); // refused — unavailable
 
-      expect(mockLocalStorage.getItem('editme-locale')).toBe('de');
+      expect(mockLocalStorage.getItem('seedhtml-locale')).toBe('de');
       expect(get(currentLocale)).toBe('de');
     });
   });
@@ -603,13 +603,13 @@ describe('i18n runtime system', () => {
       await setLocale('de');
 
       expect(get(currentLocale)).toBe('en');
-      expect(mockLocalStorage.getItem('editme-locale')).toBeNull();
+      expect(mockLocalStorage.getItem('seedhtml-locale')).toBeNull();
     });
 
     it('should resolve a persisted remote-only locale after the manifest lands', async () => {
       // Very first hosted load with a persisted 'de': init starts on English,
       // the background refresh then fetches and applies the preference.
-      mockLocalStorage.setItem('editme-locale', 'de');
+      mockLocalStorage.setItem('seedhtml-locale', 'de');
       mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
       mockHttpSource.fetchCatalogFile.mockResolvedValue(deCatalogJson);
       mockLoader.loadTranslations.mockResolvedValue({});
@@ -742,7 +742,7 @@ describe('i18n runtime system', () => {
     it('should keep the active locale working in-session when its cache is swept', async () => {
       // The user is ON the orphaned locale: storage is cleared (next startup
       // falls back) but the running session keeps its catalog and picker entry.
-      mockLocalStorage.setItem('editme-locale', 'ka');
+      mockLocalStorage.setItem('seedhtml-locale', 'ka');
       mockHttpSource.fetchLocalesManifest.mockResolvedValue(deManifest);
       mockLoader.listCachedLocales.mockResolvedValue(['ka']);
       mockLoader.loadTranslations.mockResolvedValue({ ka: kaCatalog });

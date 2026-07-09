@@ -100,8 +100,8 @@ describe('Storage Integration Tests', () => {
         'OEBPS/content.opf',
         'OEBPS/Text/chapter01.xhtml',
         'OEBPS/Images/cover.jpg',
-        'EDITME/src/chapter01.txt',
-        'EDITME/scripts/transform.js',
+        'LEGACY/src/chapter01.txt',
+        'LEGACY/scripts/transform.js',
       ];
 
       for (const path of testPaths) {

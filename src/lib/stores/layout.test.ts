@@ -57,12 +57,12 @@ describe('Layout Store', () => {
       expect(state.sidebar.isExpanded).toBe(true);
       expect(state.sidebar.activeSection).toBe('about');
       expect(state.isInitialized).toBe(true);
-      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('editme_sidebar_expanded');
-      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('editme_sidebar_section');
+      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('seedhtml_sidebar_expanded');
+      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('seedhtml_sidebar_section');
     });
 
     it('should load saved expanded state from localStorage', () => {
-      mockLocalStorage.setItem('editme_sidebar_expanded', JSON.stringify(false));
+      mockLocalStorage.setItem('seedhtml_sidebar_expanded', JSON.stringify(false));
 
       layoutStore.initialize();
       const state = get(layoutStore);
@@ -72,7 +72,7 @@ describe('Layout Store', () => {
     });
 
     it('should load saved section from localStorage', () => {
-      mockLocalStorage.setItem('editme_sidebar_section', 'metadata');
+      mockLocalStorage.setItem('seedhtml_sidebar_section', 'metadata');
 
       layoutStore.initialize();
       const state = get(layoutStore);
@@ -82,8 +82,8 @@ describe('Layout Store', () => {
     });
 
     it('should load both saved values from localStorage', () => {
-      mockLocalStorage.setItem('editme_sidebar_expanded', JSON.stringify(false));
-      mockLocalStorage.setItem('editme_sidebar_section', 'settings');
+      mockLocalStorage.setItem('seedhtml_sidebar_expanded', JSON.stringify(false));
+      mockLocalStorage.setItem('seedhtml_sidebar_section', 'settings');
 
       layoutStore.initialize();
       const state = get(layoutStore);
@@ -94,7 +94,7 @@ describe('Layout Store', () => {
     });
 
     it('should handle invalid JSON in localStorage gracefully', () => {
-      mockLocalStorage.setItem('editme_sidebar_expanded', 'invalid-json');
+      mockLocalStorage.setItem('seedhtml_sidebar_expanded', 'invalid-json');
 
       // Should not throw and should use default value
       layoutStore.initialize();
@@ -122,7 +122,7 @@ describe('Layout Store', () => {
       const newState = get(layoutStore);
       expect(newState.sidebar.isExpanded).toBe(false);
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'editme_sidebar_expanded',
+        'seedhtml_sidebar_expanded',
         JSON.stringify(false)
       );
     });
@@ -135,7 +135,7 @@ describe('Layout Store', () => {
       const state = get(layoutStore);
       expect(state.sidebar.isExpanded).toBe(true);
       expect(mockLocalStorage.setItem).toHaveBeenLastCalledWith(
-        'editme_sidebar_expanded',
+        'seedhtml_sidebar_expanded',
         JSON.stringify(true)
       );
     });
@@ -164,7 +164,7 @@ describe('Layout Store', () => {
 
       const state = get(layoutStore);
       expect(state.sidebar.activeSection).toBe('metadata');
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('editme_sidebar_section', 'metadata');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('seedhtml_sidebar_section', 'metadata');
     });
 
     it('should handle all valid section types', () => {
@@ -182,7 +182,7 @@ describe('Layout Store', () => {
 
         const state = get(layoutStore);
         expect(state.sidebar.activeSection).toBe(section);
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith('editme_sidebar_section', section);
+        expect(mockLocalStorage.setItem).toHaveBeenCalledWith('seedhtml_sidebar_section', section);
       });
     });
 
@@ -206,7 +206,7 @@ describe('Layout Store', () => {
       layoutStore.toggleSidebar();
 
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'editme_sidebar_expanded',
+        'seedhtml_sidebar_expanded',
         JSON.stringify(false)
       );
     });
@@ -215,7 +215,7 @@ describe('Layout Store', () => {
       layoutStore.initialize();
       layoutStore.setSidebarSection('spine');
 
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('editme_sidebar_section', 'spine');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('seedhtml_sidebar_section', 'spine');
     });
 
     it('should persist state across store recreations', () => {
@@ -228,8 +228,8 @@ describe('Layout Store', () => {
       const _newStore = get(layoutStore);
 
       // Mock what would be in localStorage
-      mockLocalStorage.setItem('editme_sidebar_expanded', JSON.stringify(false));
-      mockLocalStorage.setItem('editme_sidebar_section', 'settings');
+      mockLocalStorage.setItem('seedhtml_sidebar_expanded', JSON.stringify(false));
+      mockLocalStorage.setItem('seedhtml_sidebar_section', 'settings');
 
       layoutStore.initialize();
       const loadedState = get(layoutStore);

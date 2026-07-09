@@ -10,8 +10,8 @@ export interface SavedFeed {
   title?: string;
 }
 
-const STORAGE_KEY = 'editme_opds_feeds';
-const SELECTED_KEY = 'editme_opds_selected_feed';
+const STORAGE_KEY = 'seedhtml_opds_feeds';
+const SELECTED_KEY = 'seedhtml_opds_selected_feed';
 
 /**
  * The built-in catalogs pinned to the top of the feed list. They are not

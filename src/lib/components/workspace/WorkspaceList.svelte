@@ -41,7 +41,7 @@
 
   // Remember the list scroll position across reloads/navigation. Restored once,
   // after the rows have rendered (so there's height to scroll to).
-  const SCROLL_KEY = 'editme_projects_scroll';
+  const SCROLL_KEY = 'seedhtml_projects_scroll';
   let listEl = $state<HTMLDivElement>();
   let scrollRestored = false;
 

@@ -43,8 +43,8 @@
 
   // Remembered across sessions: repeat authors don't re-type, and the cover toggle
   // keeps the user's last choice (defaulting ON the first time).
-  const author = persisted('editme_new_project_author', '', asString);
-  const generateCover = persisted('editme_new_project_generate_cover', true, asBoolean);
+  const author = persisted('seedhtml_new_project_author', '', asString);
+  const generateCover = persisted('seedhtml_new_project_generate_cover', true, asBoolean);
 
   // The dialog is mounted fresh each time it opens, so these seed the form's
   // initial values once; untrack makes that intent explicit (no reactive capture).

@@ -21,7 +21,7 @@ export interface ThemeStore extends Writable<ThemeState> {
 export type ThemeMode = 'light' | 'dark';
 
 // Storage key for persistence
-const STORAGE_KEY = 'editme_theme_preference';
+const STORAGE_KEY = 'seedhtml_theme_preference';
 
 // Default theme state
 const DEFAULT_STATE: ThemeState = {

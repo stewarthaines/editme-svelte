@@ -11,7 +11,7 @@
  *
  * Usage:
  * ```ts
- * const tab = persisted('editme_metadata_left_tab', 'basic', asEnum(TAB_IDS));
+ * const tab = persisted('seedhtml_metadata_left_tab', 'basic', asEnum(TAB_IDS));
  * // read (reactive): tab.current   write (persists): tab.current = 'advanced'
  * ```
  * Setting `current` to `null`/`undefined` removes the key.

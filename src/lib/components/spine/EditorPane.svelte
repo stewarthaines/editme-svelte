@@ -57,7 +57,7 @@
   const FONT_SIZES = [12, 13, 14, 16, 18, 20, 24];
   const DEFAULT_FONT_SIZE = 14;
   const editorFontSize = persisted(
-    'editme_editor_font_size',
+    'seedhtml_editor_font_size',
     DEFAULT_FONT_SIZE,
     asInt({ min: FONT_SIZES[0], max: FONT_SIZES[FONT_SIZES.length - 1] })
   );

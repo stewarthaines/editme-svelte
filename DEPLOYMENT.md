@@ -68,13 +68,13 @@ The build produces:
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name editme.example.com;
+    server_name seedhtml.example.com;
 
     # SSL configuration
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
 
-    root /var/www/editme;
+    root /var/www/seed-html;
 
     location / {
         try_files $uri /index.html;
@@ -100,8 +100,8 @@ server {
 
 ```apache
 <VirtualHost *:443>
-    ServerName editme.example.com
-    DocumentRoot /var/www/editme
+    ServerName seedhtml.example.com
+    DocumentRoot /var/www/seed-html
 
     # SSL configuration
     SSLEngine on

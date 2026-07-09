@@ -1,6 +1,6 @@
 # Quality Standards & Validation
 
-This document defines the quality standards, validation requirements, and coding practices for the editme-svelte project. All contributors and AI coding agents must follow these standards.
+This document defines the quality standards, validation requirements, and coding practices for the seed-html project. All contributors and AI coding agents must follow these standards.
 
 ## 🚨 Zero-Tolerance Quality Policy
 
@@ -198,4 +198,4 @@ being paid down opportunistically: when you touch a file, prefer typing its
 - Pull request requirements include passing all quality gates
 - No merge without successful quality validation
 
-This document serves as the single source of truth for all quality requirements in the editme-svelte project. All other documentation should reference this document rather than duplicating these requirements.
+This document serves as the single source of truth for all quality requirements in the seed-html project. All other documentation should reference this document rather than duplicating these requirements.

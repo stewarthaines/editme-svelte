@@ -17,7 +17,7 @@
   // Open/closed state for every section, remembered across reloads under one key
   // (keyed by each section's persist key). Module-scope shared state across all
   // SettingsSection instances; the setter write-through persists without $effect.
-  const sectionOpen = persisted<Record<string, boolean>>('editme_section_open', {}, asJSON());
+  const sectionOpen = persisted<Record<string, boolean>>('seedhtml_section_open', {}, asJSON());
 </script>
 
 <script lang="ts">

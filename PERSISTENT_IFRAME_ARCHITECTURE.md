@@ -6,7 +6,7 @@ This architecture provides a simple, spike-inspired approach to spine item editi
 
 **Core Principle**: Text content → Transform Text → Transform DOM → Auto-save Assets → Save XHTML to Manifest → Blob URL Processing → XHTML preview, with all edits feeding into a unified real-time preview and generating the actual spine item content.
 
-**Single-File Build Constraint**: Since EDITME.html runs as a single file in the browser, workspace assets (CSS, JavaScript, images) are stored in OPFS/IndexedDB and cannot be accessed via normal file paths by the preview iframe. The BlobURLManager converts these file references to blob URLs that the iframe can access.
+**Single-File Build Constraint**: Since SEED.html runs as a single file in the browser, workspace assets (CSS, JavaScript, images) are stored in OPFS/IndexedDB and cannot be accessed via normal file paths by the preview iframe. The BlobURLManager converts these file references to blob URLs that the iframe can access.
 
 ## Editor Layout
 
@@ -653,7 +653,7 @@ for (const domTransformScript of domTransformScripts) {
 
 ### Single-File Build Constraint
 
-Since EDITME.html runs as a single file, workspace assets cannot be accessed via normal file paths. The workflow addresses this:
+Since SEED.html runs as a single file, workspace assets cannot be accessed via normal file paths. The workflow addresses this:
 
 1. **User edits content** → Auto-save to FileStorageAPI (OPFS/IndexedDB)
 2. **Transform pipeline executes** → Generates XHTML with relative asset references

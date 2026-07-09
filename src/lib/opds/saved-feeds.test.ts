@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { loadSavedFeeds, upsertSavedFeed, removeSavedFeed } from './saved-feeds.js';
 
-const KEY = 'editme_opds_feeds';
+const KEY = 'seedhtml_opds_feeds';
 
 beforeEach(() => {
   localStorage.clear();

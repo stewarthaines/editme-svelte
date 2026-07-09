@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document serves as the **single source of truth** for all TypeScript interfaces used across the EDITME.html project. It provides complete type definitions extracted from the existing codebase, tracks their source locations, and establishes guidelines for type management in the clean service architecture.
+This document serves as the **single source of truth** for all TypeScript interfaces used across the SEED.html project. It provides complete type definitions extracted from the existing codebase, tracks their source locations, and establishes guidelines for type management in the clean service architecture.
 
 ## Design Principles
 

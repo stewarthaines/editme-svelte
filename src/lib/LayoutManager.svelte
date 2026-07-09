@@ -107,7 +107,7 @@
         </div>
       </div>
     {:else if showPreviewPane}
-      <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
+      <PaneGroup direction="horizontal" autoSaveId="seedhtml-content-panes">
         <Pane defaultSize={50} minSize={25}>
           <div class="pane-content">
             {@render leftContent?.()}

@@ -417,7 +417,7 @@
   // value is validated against the presets (and the onMount guard below drops a
   // stale 'print' under file://); falls back to 'desktop'.
   const selectedDevice = persisted(
-    'editme_preview_device',
+    'seedhtml_preview_device',
     'desktop',
     asEnum(DEVICE_PRESETS.map(d => d.id))
   );
@@ -458,16 +458,16 @@
   // Reader-mode preview state (theme + font size + force-colours). View-only — never
   // written to the generated/exported XHTML; persisted app-wide like the device.
   const previewTheme = persisted<'light' | 'sepia' | 'dark'>(
-    'editme_preview_theme',
+    'seedhtml_preview_theme',
     'light',
     asEnum(['light', 'sepia', 'dark'])
   );
   const fontStep = persisted(
-    'editme_preview_font_step',
+    'seedhtml_preview_font_step',
     2,
     asInt({ min: 0, max: FONT_STEPS.length - 1 })
   );
-  const forceColors = persisted('editme_preview_force_colors', false, asBoolean);
+  const forceColors = persisted('seedhtml_preview_force_colors', false, asBoolean);
 
   // Whether the reader-mode controls apply: reflowable previews only (not the print
   // preset, not fixed-layout chapters — readers disable user theming/sizing there).

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Navigation Router provides centralized navigation management for the EDITME EPUB editor, handling view switching, state persistence, and navigation guards. It extends the existing layout system to manage both sidebar sections and main content area routing.
+The Navigation Router provides centralized navigation management for the SEED.html EPUB editor, handling view switching, state persistence, and navigation guards. It extends the existing layout system to manage both sidebar sections and main content area routing.
 
 ### Main Classes
 
@@ -599,9 +599,9 @@ interface GuardManager {
 ```typescript
 // localStorage keys and data structure
 const STORAGE_KEYS = {
-  CURRENT_VIEW: 'editme_nav_current_view',
-  VIEW_HISTORY: 'editme_nav_view_history',
-  VIEW_DATA: 'editme_nav_view_data',
+  CURRENT_VIEW: 'seedhtml_nav_current_view',
+  VIEW_HISTORY: 'seedhtml_nav_view_history',
+  VIEW_DATA: 'seedhtml_nav_view_data',
 } as const;
 ```
 
@@ -616,4 +616,4 @@ interface ViewRegistry {
 }
 ```
 
-This API provides a comprehensive foundation for navigation management while preparing for future feature integration and maintaining consistency with the existing EDITME architecture.
+This API provides a comprehensive foundation for navigation management while preparing for future feature integration and maintaining consistency with the existing SEED.html architecture.

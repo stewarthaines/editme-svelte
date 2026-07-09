@@ -43,7 +43,7 @@
   // metadata summary (so the cover generator stays reachable in advanced mode).
   // Remember the selected tab (content.opf vs Summary) across reloads.
   const activeTab = persisted<'opf' | 'summary'>(
-    'editme_metadata_right_tab',
+    'seedhtml_metadata_right_tab',
     'opf',
     asEnum(['opf', 'summary'])
   );

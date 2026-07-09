@@ -11,9 +11,9 @@ import type {
 
 // Storage keys for persistence
 const STORAGE_KEYS = {
-  CURRENT_VIEW: 'editme_nav_current_view',
-  VIEW_HISTORY: 'editme_nav_view_history',
-  VIEW_DATA: 'editme_nav_view_data',
+  CURRENT_VIEW: 'seedhtml_nav_current_view',
+  VIEW_HISTORY: 'seedhtml_nav_view_history',
+  VIEW_DATA: 'seedhtml_nav_view_data',
 } as const;
 
 // Maximum history entries to prevent memory leaks

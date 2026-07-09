@@ -1,6 +1,6 @@
 # Shared Test Utilities
 
-This directory contains shared testing utilities and mocks used across multiple feature modules in the editme-svelte project.
+This directory contains shared testing utilities and mocks used across multiple feature modules in the seed-html project.
 
 ## Purpose
 

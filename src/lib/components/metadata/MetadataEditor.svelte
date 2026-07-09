@@ -40,7 +40,7 @@
 
   // Remember the selected tab across reloads (validated against the known ids).
   const TAB_IDS = ['basic', 'advanced', 'accessibility'];
-  const activeTab = persisted('editme_metadata_left_tab', 'basic', asEnum(TAB_IDS));
+  const activeTab = persisted('seedhtml_metadata_left_tab', 'basic', asEnum(TAB_IDS));
   let saving = $state(false);
   let error = $state<string | null>(null);
 

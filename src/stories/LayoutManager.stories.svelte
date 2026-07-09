@@ -11,7 +11,7 @@
       docs: {
         description: {
           component:
-            'The main layout component providing collapsible sidebar and resizable content panes for the EDITME EPUB editor.',
+            'The main layout component providing collapsible sidebar and resizable content panes for the SEED.html EPUB editor.',
         },
       },
     },

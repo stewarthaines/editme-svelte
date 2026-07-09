@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive guidance for writing tests in the editme-svelte project. It covers our testing strategy, framework configuration, and patterns for unit tests, integration tests, and Storybook tests. For quality standards and validation requirements, see [QUALITY.md](./QUALITY.md).
+This document provides comprehensive guidance for writing tests in the seed-html project. It covers our testing strategy, framework configuration, and patterns for unit tests, integration tests, and Storybook tests. For quality standards and validation requirements, see [QUALITY.md](./QUALITY.md).
 
 ## Modern Testing Strategy
 

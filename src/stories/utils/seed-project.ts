@@ -4,7 +4,7 @@
  * Builds the same service graph App.svelte wires at boot, creates a real
  * project in the real storage backend (OPFS or IndexedDB — whatever the
  * story browser supports), and points the app at it via the persisted
- * `editme_app_workspace_id` key. A story can then mount the real <App/> and
+ * `seedhtml_app_workspace_id` key. A story can then mount the real <App/> and
  * it restores onto the seeded project exactly as a browser reload would —
  * no injection seam into App required.
  *
@@ -25,8 +25,8 @@ import pageCSS from '../../assets/universal/page.css?raw';
 import transformTextJS from '../../assets/universal/transformText.js?raw';
 import transformDomJS from '../../assets/universal/transformDom.js?raw';
 
-const WORKSPACE_ID_KEY = 'editme_app_workspace_id';
-const NAV_VIEW_KEY = 'editme_nav_current_view';
+const WORKSPACE_ID_KEY = 'seedhtml_app_workspace_id';
+const NAV_VIEW_KEY = 'seedhtml_nav_current_view';
 
 const BASE_TEXT_TRANSFORM = 'SOURCE/scripts/transformText.js';
 const BASE_DOM_TRANSFORM = 'SOURCE/scripts/transformDom.js';
@@ -183,9 +183,9 @@ export async function seedProject(options: SeedProjectOptions = {}): Promise<See
   // Neutralise persisted UI state other stories may have left behind (e.g. the
   // LayoutManager stories persist a collapsed sidebar, which would hide the
   // section buttons from this story's App mount).
-  localStorage.setItem('editme_sidebar_expanded', 'true');
-  localStorage.setItem('editme_sidebar_project_expanded', 'true');
-  localStorage.removeItem('editme_sidebar_section');
+  localStorage.setItem('seedhtml_sidebar_expanded', 'true');
+  localStorage.setItem('seedhtml_sidebar_project_expanded', 'true');
+  localStorage.removeItem('seedhtml_sidebar_section');
 
   return {
     workspaceId: workspace.id,

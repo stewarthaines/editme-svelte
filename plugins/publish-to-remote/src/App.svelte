@@ -818,7 +818,7 @@
       <!-- Shares the host app's pane key (same-origin, un-sandboxed iframe) so
            the split proportion matches the editor/Settings/Projects splits.
            Pane constraints must match the host's for paneforge to reuse it. -->
-      <PaneGroup direction="horizontal" autoSaveId="editme-content-panes">
+      <PaneGroup direction="horizontal" autoSaveId="seedhtml-content-panes">
         <Pane defaultSize={50} minSize={25}>
           <div class="pane">
             <PaneHeader>{$t('Local Packaged EPUBs')}</PaneHeader>

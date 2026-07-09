@@ -37,8 +37,8 @@ describe('SampleContentGenerator', () => {
         messages: {
           [SAMPLE_MSGIDS.bookTitle]: 'Introduction to EPUB',
           [SAMPLE_MSGIDS.bookDescription]: 'A comprehensive guide to EPUB creation',
-          [SAMPLE_MSGIDS.authorName]: 'EDITME Editorial Team',
-          [SAMPLE_MSGIDS.publisherName]: 'EDITME Publishing',
+          [SAMPLE_MSGIDS.authorName]: 'SEED.html Editorial Team',
+          [SAMPLE_MSGIDS.publisherName]: 'SEED.html Publishing',
           [SAMPLE_MSGIDS.chapter1Title]: 'Getting Started',
           [SAMPLE_MSGIDS.chapter1Content]:
             '# This is a Heading 1\n\nA heading 1 (H1) is the main title of a document, created with a single hash mark.\n\n## This is a Heading 2\n\nA heading 2 (H2) is a section heading, created with two hash marks.\n\n**This text is bold** - Bold text adds strong emphasis and is created by wrapping text in double asterisks.\n\n*This text is emphasized* - Emphasized text (usually italic) adds mild emphasis and is created by wrapping text in single asterisks.',
@@ -50,8 +50,8 @@ describe('SampleContentGenerator', () => {
         messages: {
           [SAMPLE_MSGIDS.bookTitle]: 'Introduction à EPUB',
           [SAMPLE_MSGIDS.bookDescription]: 'Un guide complet pour la création EPUB',
-          [SAMPLE_MSGIDS.authorName]: 'Équipe éditoriale EDITME',
-          [SAMPLE_MSGIDS.publisherName]: 'Éditions EDITME',
+          [SAMPLE_MSGIDS.authorName]: 'Équipe éditoriale SEED.html',
+          [SAMPLE_MSGIDS.publisherName]: 'Éditions SEED.html',
           [SAMPLE_MSGIDS.chapter1Title]: 'Premiers pas',
           [SAMPLE_MSGIDS.chapter1Content]:
             "# Ceci est un titre 1\n\nUn titre 1 (H1) est le titre principal d'un document, créé avec un seul dièse.\n\n## Ceci est un titre 2\n\nUn titre 2 (H2) est un titre de section, créé avec deux dièses.\n\n**Ce texte est en gras** - Le texte en gras ajoute une forte emphase et est créé en encadrant le texte de doubles astérisques.\n\n*Ce texte est mis en emphase* - Le texte mis en emphase (généralement italique) ajoute une emphase légère et est créé en encadrant le texte d'astérisques simples.",
@@ -63,8 +63,8 @@ describe('SampleContentGenerator', () => {
         messages: {
           [SAMPLE_MSGIDS.bookTitle]: 'Einführung in EPUB',
           [SAMPLE_MSGIDS.bookDescription]: 'Ein umfassender Leitfaden zur EPUB-Erstellung',
-          [SAMPLE_MSGIDS.authorName]: 'EDITME Redaktionsteam',
-          [SAMPLE_MSGIDS.publisherName]: 'EDITME Publikationen',
+          [SAMPLE_MSGIDS.authorName]: 'SEED.html Redaktionsteam',
+          [SAMPLE_MSGIDS.publisherName]: 'SEED.html Publikationen',
           [SAMPLE_MSGIDS.chapter1Title]: 'Erste Schritte',
           [SAMPLE_MSGIDS.chapter1Content]:
             '# Das ist eine Überschrift 1\n\nEine Überschrift 1 (H1) ist der Haupttitel eines Dokuments, erstellt mit einem einzigen Rautezeichen.\n\n## Das ist eine Überschrift 2\n\nEine Überschrift 2 (H2) ist eine Abschnittsüberschrift, erstellt mit zwei Rautezeichen.\n\n**Dieser Text ist fett** - Fetter Text fügt starke Betonung hinzu und wird erstellt, indem Text in doppelte Sternchen eingeschlossen wird.\n\n*Dieser Text ist hervorgehoben* - Hervorgehobener Text (normalerweise kursiv) fügt leichte Betonung hinzu und wird erstellt, indem Text in einfache Sternchen eingeschlossen wird.',
@@ -76,8 +76,8 @@ describe('SampleContentGenerator', () => {
         messages: {
           [SAMPLE_MSGIDS.bookTitle]: 'مقدمة إلى EPUB',
           [SAMPLE_MSGIDS.bookDescription]: 'دليل شامل لإنشاء EPUB',
-          [SAMPLE_MSGIDS.authorName]: 'فريق تحرير EDITME',
-          [SAMPLE_MSGIDS.publisherName]: 'منشورات EDITME',
+          [SAMPLE_MSGIDS.authorName]: 'فريق تحرير SEED.html',
+          [SAMPLE_MSGIDS.publisherName]: 'منشورات SEED.html',
           [SAMPLE_MSGIDS.chapter1Title]: 'البداية',
           [SAMPLE_MSGIDS.chapter1Content]:
             '# هذا عنوان 1\n\nالعنوان 1 (H1) هو العنوان الرئيسي للوثيقة، يُنشأ بعلامة مربع واحدة.\n\n## هذا عنوان 2\n\nالعنوان 2 (H2) هو عنوان قسم، يُنشأ بعلامتي مربع.\n\n**هذا النص غامق** - النص الغامق يضيف تأكيداً قوياً ويُنشأ بوضع النص بين نجمتين مزدوجتين.\n\n*هذا النص مؤكد* - النص المؤكد (عادة مائل) يضيف تأكيداً خفيفاً ويُنشأ بوضع النص بين نجمتين مفردتين.',
@@ -132,7 +132,7 @@ describe('SampleContentGenerator', () => {
         expect(result.isRTL).toBe(false);
         expect(result.pageProgressionDirection).toBe('ltr');
         expect(result.metadata.title).toBe('Einführung in EPUB');
-        expect(result.metadata.author).toBe('EDITME Redaktionsteam');
+        expect(result.metadata.author).toBe('SEED.html Redaktionsteam');
       });
 
       it('should generate complete Arabic content with RTL support', async () => {
@@ -143,7 +143,7 @@ describe('SampleContentGenerator', () => {
         expect(result.isRTL).toBe(true);
         expect(result.pageProgressionDirection).toBe('rtl');
         expect(result.metadata.title).toBe('مقدمة إلى EPUB');
-        expect(result.metadata.author).toBe('فريق تحرير EDITME');
+        expect(result.metadata.author).toBe('فريق تحرير SEED.html');
       });
     });
 
@@ -214,8 +214,8 @@ describe('SampleContentGenerator', () => {
         expectEPUBMetadata(result, 'en');
         expect(result.title).toBe('Introduction to EPUB');
         expect(result.language).toEqual(['en']);
-        expect(result.creator).toEqual([{ name: 'EDITME Editorial Team', roles: [] }]);
-        expect(result.publisher).toBe('EDITME Publishing');
+        expect(result.creator).toEqual([{ name: 'SEED.html Editorial Team', roles: [] }]);
+        expect(result.publisher).toBe('SEED.html Publishing');
         expect(result.pageProgressionDirection).toBe('ltr');
       });
 
@@ -225,7 +225,7 @@ describe('SampleContentGenerator', () => {
         expectEPUBMetadata(result, 'ar');
         expect(result.title).toBe('مقدمة إلى EPUB');
         expect(result.language).toEqual(['ar']);
-        expect(result.creator).toEqual([{ name: 'فريق تحرير EDITME', roles: [] }]);
+        expect(result.creator).toEqual([{ name: 'فريق تحرير SEED.html', roles: [] }]);
         expect(result.pageProgressionDirection).toBe('rtl');
       });
 
@@ -268,8 +268,8 @@ describe('SampleContentGenerator', () => {
 
         expectEPUBMetadata(result, 'fr');
         expect(result.title).toBe('Introduction à EPUB');
-        expect(result.creator).toEqual([{ name: 'Équipe éditoriale EDITME', roles: [] }]);
-        expect(result.publisher).toBe('Éditions EDITME');
+        expect(result.creator).toEqual([{ name: 'Équipe éditoriale SEED.html', roles: [] }]);
+        expect(result.publisher).toBe('Éditions SEED.html');
       });
     });
   });

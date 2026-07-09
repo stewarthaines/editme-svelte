@@ -3,7 +3,7 @@
   "name": "Impressum",
   "description": "Replaces a []{.autology} marker with a self-describing summary of the EPUB's extensions (name, description, link, license) and embedded fonts \u2014 compiled automatically at render time.",
   "category": "chapter-content",
-  "url": "https://codeberg.org/stewarthaines/editme-svelte",
+  "url": "https://codeberg.org/stewarthaines/seed-html",
   "license": "LICENSE.txt",
   "scripts": [],
   "domTransforms": [

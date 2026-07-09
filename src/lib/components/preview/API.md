@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ContentPreview component provides iframe-based rendering of complete XHTML documents within the EDITME editor. It serves as a reusable preview component for displaying EPUB navigation documents and spine item content with full fidelity to the original styling and scripting.
+The ContentPreview component provides iframe-based rendering of complete XHTML documents within the SEED.html editor. It serves as a reusable preview component for displaying EPUB navigation documents and spine item content with full fidelity to the original styling and scripting.
 
 ## Component Interface
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides the structured development process for features in the editme-svelte project. For quality standards and validation requirements, see [QUALITY.md](./QUALITY.md).
+This document provides the structured development process for features in the seed-html project. For quality standards and validation requirements, see [QUALITY.md](./QUALITY.md).
 
 ## Feature Development Process
 

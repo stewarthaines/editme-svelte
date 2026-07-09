@@ -89,7 +89,7 @@ describe('Theme Store', () => {
   describe('localStorage Persistence', () => {
     it('should save theme preference to localStorage', () => {
       themeStore.setTheme('dark');
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('editme_theme_preference', 'dark');
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('seedhtml_theme_preference', 'dark');
     });
 
     it('should load saved theme preference from localStorage', () => {
@@ -97,7 +97,7 @@ describe('Theme Store', () => {
 
       themeStore.initialize();
 
-      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('editme_theme_preference');
+      expect(mockLocalStorage.getItem).toHaveBeenCalledWith('seedhtml_theme_preference');
       expect(get(themeStore).current).toBe('dark');
     });
 
@@ -126,7 +126,7 @@ describe('Theme Store', () => {
 
     it('should remove theme preference when using system preference', () => {
       themeStore.useSystemPreference();
-      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('editme_theme_preference');
+      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('seedhtml_theme_preference');
     });
   });
 

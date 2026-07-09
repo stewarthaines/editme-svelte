@@ -62,7 +62,6 @@ const ALLOW_EXACT = new Set([
   'SEED.html',
   'SEED.zip',
   'EPUB+SEED.zip',
-  'EDITME',
   'WebDAV',
   'S3',
   'R2',

@@ -153,7 +153,7 @@ export function expectGlobalSettingsSaved(
   settings: any
 ) {
   expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-    'editme_global_settings',
+    'seedhtml_global_settings',
     JSON.stringify(settings)
   );
 }

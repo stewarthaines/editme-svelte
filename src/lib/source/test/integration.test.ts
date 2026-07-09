@@ -237,7 +237,7 @@ describe('SourceManager Integration Tests', () => {
       // 1. Extract regular EPUB files (simulated)
       await mockFileStorage.addTestFiles(extractWorkspaceId, {
         'OEBPS/content.opf': '<?xml version="1.0"?><package></package>',
-        'OEBPS/EDITME.html': '<html><body>EDITME Editor</body></html>',
+        'OEBPS/SEED.html': '<html><body>SEED.html Editor</body></html>',
         'OEBPS/Text/chapter1.xhtml': '<html><body><h1>Chapter 1</h1></body></html>',
       });
 
@@ -315,7 +315,7 @@ describe('SourceManager Integration Tests', () => {
       await mockFileStorage.addTestFiles(workspaceId, {
         // EPUB structure
         'OEBPS/content.opf': '<?xml version="1.0"?><package></package>',
-        'OEBPS/EDITME.html': '<html><body>EDITME Editor</body></html>',
+        'OEBPS/SEED.html': '<html><body>SEED.html Editor</body></html>',
         mimetype: 'application/epub+zip',
         // SOURCE structure
         ...createCompleteSourceStructure(),
@@ -334,11 +334,11 @@ describe('SourceManager Integration Tests', () => {
     it('should handle workspace structure migration scenarios', async () => {
       const workspaceId = TEST_WORKSPACE_IDS.INVALID;
 
-      // Simulate old workspace with EDITME/ structure (should not be supported)
+      // Simulate old workspace with SEED.html/ structure (should not be supported)
       await mockFileStorage.addTestFiles(workspaceId, {
         'OEBPS/content.opf': '<?xml version="1.0"?><package></package>',
-        'EDITME/settings.json': JSON.stringify(DEFAULT_SETTINGS, null, 2), // Old structure
-        'EDITME/text/chapter1.txt': 'Old content',
+        'LEGACY/settings.json': JSON.stringify(DEFAULT_SETTINGS, null, 2), // Old structure
+        'LEGACY/text/chapter1.txt': 'Old content',
       });
 
       // SOURCE/ validation should show no SOURCE files
@@ -352,8 +352,8 @@ describe('SourceManager Integration Tests', () => {
       const hasSourceAfterInit = await sourceManager.hasSourceFiles(workspaceId);
       expect(hasSourceAfterInit).toBe(true);
 
-      // Old EDITME/ files should still exist but are ignored
-      expect(await mockFileStorage.fileExists(workspaceId, 'EDITME/settings.json')).toBe(true);
+      // Old SEED.html/ files should still exist but are ignored
+      expect(await mockFileStorage.fileExists(workspaceId, 'LEGACY/settings.json')).toBe(true);
       expect(await mockFileStorage.fileExists(workspaceId, 'SOURCE/settings.json')).toBe(true);
     });
   });

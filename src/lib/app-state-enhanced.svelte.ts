@@ -35,8 +35,8 @@ declare const __VERSION__: string;
 
 // Storage keys for workspace state persistence (following navigationStore pattern)
 const STORAGE_KEYS = {
-  WORKSPACE_ID: 'editme_app_workspace_id',
-  SPINE_ITEM_ID: 'editme_app_spine_item_id',
+  WORKSPACE_ID: 'seedhtml_app_workspace_id',
+  SPINE_ITEM_ID: 'seedhtml_app_spine_item_id',
 } as const;
 
 interface I18nSystem {

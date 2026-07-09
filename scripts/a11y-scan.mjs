@@ -18,7 +18,7 @@ import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 
 const URL = process.env.A11Y_URL || 'http://localhost:5173';
-const THEME_KEY = 'editme_theme_preference';
+const THEME_KEY = 'seedhtml_theme_preference';
 const failOnArg = process.argv.find(a => a.startsWith('--fail-on='));
 const failOn = failOnArg ? failOnArg.split('=')[1] : null;
 const IMPACT_ORDER = ['minor', 'moderate', 'serious', 'critical'];

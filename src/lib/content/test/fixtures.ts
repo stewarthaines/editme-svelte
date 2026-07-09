@@ -20,8 +20,8 @@ export const mockSampleContentCatalogs = {
       [SAMPLE_MSGIDS.bookTitle]: 'Introduction to EPUB',
       [SAMPLE_MSGIDS.bookDescription]:
         'A comprehensive guide to creating and editing EPUB files with Active EPUB technology.',
-      [SAMPLE_MSGIDS.authorName]: 'EDITME Editorial Team',
-      [SAMPLE_MSGIDS.publisherName]: 'EDITME Publishing',
+      [SAMPLE_MSGIDS.authorName]: 'SEED.html Editorial Team',
+      [SAMPLE_MSGIDS.publisherName]: 'SEED.html Publishing',
 
       // Chapter content
       [SAMPLE_MSGIDS.chapter1Title]: 'Getting Started',
@@ -50,8 +50,8 @@ A heading 2 (H2) is a section heading, created with two hash marks.
       [SAMPLE_MSGIDS.bookTitle]: 'Einführung in EPUB',
       [SAMPLE_MSGIDS.bookDescription]:
         'Ein umfassender Leitfaden zur Erstellung und Bearbeitung von EPUB-Dateien mit Active EPUB-Technologie.',
-      [SAMPLE_MSGIDS.authorName]: 'EDITME Redaktionsteam',
-      [SAMPLE_MSGIDS.publisherName]: 'EDITME Verlag',
+      [SAMPLE_MSGIDS.authorName]: 'SEED.html Redaktionsteam',
+      [SAMPLE_MSGIDS.publisherName]: 'SEED.html Verlag',
 
       // Chapter content
       [SAMPLE_MSGIDS.chapter1Title]: 'Erste Schritte',
@@ -80,8 +80,8 @@ Eine Überschrift 2 (H2) ist eine Abschnittsüberschrift, erstellt mit zwei Raut
       [SAMPLE_MSGIDS.bookTitle]: 'مقدمة إلى EPUB',
       [SAMPLE_MSGIDS.bookDescription]:
         'دليل شامل لإنشاء وتحرير ملفات EPUB باستخدام تقنية Active EPUB.',
-      [SAMPLE_MSGIDS.authorName]: 'فريق تحرير EDITME',
-      [SAMPLE_MSGIDS.publisherName]: 'دار نشر EDITME',
+      [SAMPLE_MSGIDS.authorName]: 'فريق تحرير SEED.html',
+      [SAMPLE_MSGIDS.publisherName]: 'دار نشر SEED.html',
 
       // Chapter content
       [SAMPLE_MSGIDS.chapter1Title]: 'البداية',
@@ -113,8 +113,8 @@ export const expectedContentPatterns = {
       title: 'Introduction to EPUB',
       description:
         'A comprehensive guide to creating and editing EPUB files with Active EPUB technology.',
-      author: 'EDITME Editorial Team',
-      publisher: 'EDITME Publishing',
+      author: 'SEED.html Editorial Team',
+      publisher: 'SEED.html Publishing',
     },
     chapters: {
       chapter1: {
@@ -129,8 +129,8 @@ export const expectedContentPatterns = {
       title: 'Einführung in EPUB',
       description:
         'Ein umfassender Leitfaden zur Erstellung und Bearbeitung von EPUB-Dateien mit Active EPUB-Technologie.',
-      author: 'EDITME Redaktionsteam',
-      publisher: 'EDITME Verlag',
+      author: 'SEED.html Redaktionsteam',
+      publisher: 'SEED.html Verlag',
     },
     chapters: {
       chapter1: {
@@ -144,8 +144,8 @@ export const expectedContentPatterns = {
     metadata: {
       title: 'مقدمة إلى EPUB',
       description: 'دليل شامل لإنشاء وتحرير ملفات EPUB باستخدام تقنية Active EPUB.',
-      author: 'فريق تحرير EDITME',
-      publisher: 'دار نشر EDITME',
+      author: 'فريق تحرير SEED.html',
+      publisher: 'دار نشر SEED.html',
     },
     chapters: {
       chapter1: {
@@ -238,8 +238,8 @@ export const incompleteCatalogs = {
       // Only partial content
       [SAMPLE_MSGIDS.bookTitle]: 'Introduction à EPUB',
       [SAMPLE_MSGIDS.bookDescription]: 'Un guide complet pour créer et éditer des fichiers EPUB.',
-      [SAMPLE_MSGIDS.authorName]: 'Équipe éditoriale EDITME',
-      [SAMPLE_MSGIDS.publisherName]: 'Éditions EDITME',
+      [SAMPLE_MSGIDS.authorName]: 'Équipe éditoriale SEED.html',
+      [SAMPLE_MSGIDS.publisherName]: 'Éditions SEED.html',
       // Missing: chapter1 content
     },
     headers: {
@@ -253,8 +253,8 @@ export const incompleteCatalogs = {
     messages: {
       [SAMPLE_MSGIDS.bookTitle]: '', // Empty content
       [SAMPLE_MSGIDS.bookDescription]: 'Una guía completa para crear y editar archivos EPUB.',
-      [SAMPLE_MSGIDS.authorName]: 'Equipo Editorial EDITME',
-      [SAMPLE_MSGIDS.publisherName]: 'Editorial EDITME',
+      [SAMPLE_MSGIDS.authorName]: 'Equipo Editorial SEED.html',
+      [SAMPLE_MSGIDS.publisherName]: 'Editorial SEED.html',
       [SAMPLE_MSGIDS.chapter1Title]: 'Comenzando',
       [SAMPLE_MSGIDS.chapter1Content]: 'Este capítulo te guiará a través de los conceptos básicos.',
     },
