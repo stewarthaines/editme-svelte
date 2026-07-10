@@ -198,9 +198,7 @@
   let workspaceTitle = $derived(workspaceMetadata?.title);
 
   // Dynamic window title based on workspace
-  let windowTitle = $derived.by(() => {
-    return workspaceTitle ? `${workspaceTitle}` : 'SEED.html';
-  });
+  let windowTitle = $derived(workspaceTitle ? `${workspaceTitle} · SEED.html` : 'SEED.html');
 
   // Manifest item selection state
   let selectedManifestItem = $state<any>(null);
