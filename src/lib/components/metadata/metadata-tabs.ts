@@ -21,7 +21,7 @@ export function getTabFields(tabId: string): string[] {
         'format',
         'contributor',
         'collections',
-        'ibooksSpecifiedFonts',
+        'customMeta',
       ];
     case 'accessibility':
       return [

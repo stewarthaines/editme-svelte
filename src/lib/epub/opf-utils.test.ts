@@ -989,18 +989,20 @@ describe('OPFUtils', () => {
   });
 
   describe('Apple Books vendor metadata', () => {
-    it('emits ibooks:specified-fonts only when enabled', () => {
+    it('round-trips ibooks:specified-fonts as a customMeta entry', () => {
       const testDoc = createTestOPFDocument();
 
-      testDoc.metadata.ibooksSpecifiedFonts = true;
-      expect(OPFUtils.generateOPFXML(testDoc)).toContain(
-        '<meta property="ibooks:specified-fonts">true</meta>'
-      );
+      testDoc.metadata.customMeta = [
+        { syntax: 'property', key: 'ibooks:specified-fonts', value: 'true' },
+      ];
+      const xml = OPFUtils.generateOPFXML(testDoc);
+      expect(xml).toContain('<meta property="ibooks:specified-fonts">true</meta>');
+      const doc = expectValidXML(xml, 'OPF with ibooks meta');
+      expect(extractCustomMeta(doc).customMeta).toEqual(testDoc.metadata.customMeta);
+      // ibooks is part of the fixed package declaration — never re-declared.
+      expect(extractCustomMeta(doc).customMetaPrefixes).toBeUndefined();
 
-      testDoc.metadata.ibooksSpecifiedFonts = false;
-      expect(OPFUtils.generateOPFXML(testDoc)).not.toContain('ibooks:specified-fonts');
-
-      testDoc.metadata.ibooksSpecifiedFonts = undefined;
+      testDoc.metadata.customMeta = [];
       expect(OPFUtils.generateOPFXML(testDoc)).not.toContain('ibooks:specified-fonts');
     });
   });
@@ -1123,9 +1125,7 @@ describe('OPFUtils', () => {
 
     it('appends captured prefix declarations to the fixed package prefix attribute', () => {
       const testDoc = createTestOPFDocument();
-      testDoc.metadata.customMeta = [
-        { syntax: 'property', key: 'example:flag', value: 'yes' },
-      ];
+      testDoc.metadata.customMeta = [{ syntax: 'property', key: 'example:flag', value: 'yes' }];
       testDoc.metadata.customMetaPrefixes = { example: 'https://example.org/vocab#' };
 
       const xml = OPFUtils.generateOPFXML(testDoc);
@@ -1314,9 +1314,7 @@ describe('ensureUniqueHref', () => {
 describe('prefix attribute helpers', () => {
   it('parsePrefixAttribute parses whitespace-separated pairs', () => {
     expect(
-      parsePrefixAttribute(
-        'foo: http://example.org/foo# bar: https://example.org/bar/vocab#'
-      )
+      parsePrefixAttribute('foo: http://example.org/foo# bar: https://example.org/bar/vocab#')
     ).toEqual({
       foo: 'http://example.org/foo#',
       bar: 'https://example.org/bar/vocab#',

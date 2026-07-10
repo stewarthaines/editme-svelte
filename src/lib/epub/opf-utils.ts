@@ -204,9 +204,6 @@ export interface EPUBMetadata {
   // EPUB-specific metadata
   modifiedDate?: string;
   epubVersion?: string;
-  // Apple Books vendor hint (ibooks:specified-fonts): the publication provides
-  // its own fonts and should be rendered with them rather than re-styled.
-  ibooksSpecifiedFonts?: boolean;
 
   // EPUB 3 rendition metadata
   renditionLayout?: string;
@@ -355,7 +352,6 @@ export const KNOWN_META_PROPERTIES: ReadonlySet<string> = new Set([
   'rendition:viewport',
   'rendition:flow',
   'belongs-to-collection',
-  'ibooks:specified-fonts',
   'schema:accessMode',
   'schema:accessModeSufficient',
   'schema:accessibilityFeature',
@@ -487,8 +483,7 @@ export function extractCustomMeta(doc: Document): {
 
   return {
     customMeta: customMeta.length > 0 ? customMeta : undefined,
-    customMetaPrefixes:
-      Object.keys(customMetaPrefixes).length > 0 ? customMetaPrefixes : undefined,
+    customMetaPrefixes: Object.keys(customMetaPrefixes).length > 0 ? customMetaPrefixes : undefined,
   };
 }
 
@@ -636,9 +631,6 @@ export class OPFUtils {
     // Parse dcterms:modified meta element (EPUB 3 specific)
     const modifiedElements = doc.querySelectorAll('meta[property="dcterms:modified"]');
 
-    // Apple Books specified-fonts hint (round-tripped as a boolean).
-    const specifiedFontsMeta = doc.querySelector('meta[property="ibooks:specified-fonts"]');
-
     // Build a general refines index (id -> list of {property, value}) from every
     // `<meta refines>` element, then read specific refinements off it by id.
     const refinementsById = new Map<string, { property: string; value: string }[]>();
@@ -780,9 +772,6 @@ export class OPFUtils {
       collections: collections.length > 0 ? collections : undefined,
       modifiedDate:
         modifiedElements.length > 0 ? modifiedElements[0].textContent?.trim() : undefined,
-      ibooksSpecifiedFonts: specifiedFontsMeta
-        ? specifiedFontsMeta.textContent?.trim() === 'true'
-        : undefined,
       renditionLayout: layoutMeta?.textContent?.trim() || undefined,
       renditionOrientation: orientationMeta?.textContent?.trim() || undefined,
       renditionSpread: spreadMeta?.textContent?.trim() || undefined,
@@ -1140,10 +1129,6 @@ export class OPFUtils {
 
     if (metadata.renditionFlow && metadata.renditionFlow !== 'auto') {
       xml += `\n    <meta property="rendition:flow">${escapeXML(metadata.renditionFlow)}</meta>`;
-    }
-
-    if (metadata.ibooksSpecifiedFonts) {
-      xml += '\n    <meta property="ibooks:specified-fonts">true</meta>';
     }
 
     // Accessibility metadata (Schema.org discovery + EPUB Accessibility 1.1).
