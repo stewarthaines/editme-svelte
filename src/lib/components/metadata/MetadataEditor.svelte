@@ -1,12 +1,16 @@
 <script lang="ts">
   import { t } from '../../i18n';
   import { persisted, asEnum } from '../../state/persisted.svelte.js';
+  import { getTabFields } from './metadata-tabs.js';
   import MetadataTabBar from './MetadataTabBar.svelte';
   import PaneHeader from '../layout/PaneHeader.svelte';
   import BasicInfoFields from './BasicInfoFields.svelte';
   import AdvancedFields from './AdvancedFields.svelte';
   import AccessibilityFields from './AccessibilityFields.svelte';
+  import { customMetaCatalog } from '../../metadata/custom-meta-catalog.svelte.js';
+  import { RESERVED_PREFIXES } from '../../epub/opf-utils.js';
   import type { EPUBMetadata } from '../../epub';
+  import type { CustomMetaEntry } from '../../epub/opf-utils.js';
 
   // Service layer imports
   import { MetadataService } from '../../services/metadata/metadata.service.js';
@@ -37,6 +41,10 @@
   let metadata = $derived(workspace?.opf.metadata ?? { title: '', language: [], identifier: '' });
   let validationErrors = $derived(metadataService.validateMetadata(metadata));
   let loading = $derived(!workspace);
+  // The cover-image manifest item id — the Custom metadata cover row's derived default.
+  let coverImageId = $derived(
+    workspace?.opf.manifest.find(item => item.properties?.includes('cover-image'))?.id
+  );
 
   // Remember the selected tab across reloads (validated against the known ids).
   const TAB_IDS = ['basic', 'advanced', 'accessibility'];
@@ -64,45 +72,6 @@
     }
   });
 
-  const getTabFields = (tabId: string) => {
-    switch (tabId) {
-      case 'basic':
-        return ['title', 'language', 'identifier', 'creator'];
-      case 'advanced':
-        return [
-          'publisher',
-          'date',
-          'description',
-          'subject',
-          'rights',
-          'source',
-          'relation',
-          'coverage',
-          'type',
-          'format',
-          'contributor',
-          'collections',
-          'ibooksSpecifiedFonts',
-        ];
-      case 'accessibility':
-        return [
-          'accessMode',
-          'accessModeSufficient',
-          'accessibilityFeature',
-          'accessibilityHazard',
-          'accessibilityControl',
-          'accessibilityAPI',
-          'accessibilitySummary',
-          'accessibilityConformance',
-          'accessibilityCertifiedBy',
-          'accessibilityCertifierCredential',
-          'accessibilityCertifierReport',
-        ];
-      default:
-        return [];
-    }
-  };
-
   const handleFieldChange = (_event: { detail: any }) => {
     // Field changes are handled by the input component's internal state
     // No action needed here since we only persist on blur/save
@@ -129,8 +98,29 @@
     }
 
     try {
-      // Only save valid data to workspace
-      workspace = await metadataService.updateField(workspace, field, value);
+      if (field === 'customMeta') {
+        // Writing a catalog field into a book that never declared its prefix:
+        // carry the declaration the catalog captured at adoption time.
+        const currentPrefixes = workspace.opf.metadata.customMetaPrefixes;
+        const additions: Record<string, string> = {};
+        for (const entry of (value as CustomMetaEntry[]) ?? []) {
+          if (entry.syntax !== 'property' || !entry.key.includes(':')) continue;
+          const prefix = entry.key.split(':')[0];
+          if (RESERVED_PREFIXES.has(prefix) || currentPrefixes?.[prefix] || additions[prefix]) {
+            continue;
+          }
+          const uri = customMetaCatalog.find(entry.key, entry.syntax)?.prefixUri;
+          if (uri) additions[prefix] = uri;
+        }
+        const updates: Partial<EPUBMetadata> =
+          Object.keys(additions).length > 0
+            ? { customMeta: value, customMetaPrefixes: { ...currentPrefixes, ...additions } }
+            : { customMeta: value };
+        workspace = await metadataService.updateMetadata(workspace, updates);
+      } else {
+        // Only save valid data to workspace
+        workspace = await metadataService.updateField(workspace, field, value);
+      }
 
       // Notify that metadata has changed
       onMetadataChanged?.({ field, value });
@@ -246,11 +236,14 @@
       </div>
     {:else}
       <!-- Read-only EPUB: a disabled fieldset greys out every field/control in
-           one shot, while the tab bar (outside it) stays switchable. -->
+           one shot, while the tab bar (outside it) stays switchable. The
+           Advanced tab gates per-column instead (see AdvancedFields) so the
+           Custom metadata section's adopt buttons — which write app settings,
+           not the book — stay usable on read-only books. -->
       <fieldset
         class="fields-fieldset"
         class:is-readonly={readOnly}
-        disabled={readOnly}
+        disabled={readOnly && activeTab.current !== 'advanced'}
         id="metadata-panel-{activeTab.current}"
         aria-labelledby="metadata-tab-{activeTab.current}"
         tabindex="-1"
@@ -274,6 +267,8 @@
             {validationErrors}
             {saving}
             {advancedMode}
+            {readOnly}
+            {coverImageId}
             onfieldChange={handleFieldChange}
             onfieldSave={handleFieldSave}
             onfieldFocus={handleFieldFocus}

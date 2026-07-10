@@ -11,6 +11,7 @@
  * package tags) are de-emphasised as structural.
  */
 
+import { KNOWN_META_PROPERTIES, KNOWN_META_NAMES } from '../epub/opf-utils.js';
 import type { EPUBMetadata } from '../epub/opf-utils.js';
 
 type HighlightLevel = 'focused' | 'tab' | 'none';
@@ -61,7 +62,6 @@ const PRIMARY_MAPPINGS: PrimaryMapping[] = [
   { field: 'accessibilityCertifiedBy', metaProperty: 'a11y:certifiedBy' },
   { field: 'accessibilityCertifierCredential', metaProperty: 'a11y:certifierCredential' },
   { field: 'accessibilityCertifierReport', linkRel: 'a11y:certifierReport' },
-  { field: 'ibooksSpecifiedFonts', metaProperty: 'ibooks:specified-fonts' },
 ];
 
 export interface HighlightingOptions {
@@ -154,7 +154,14 @@ export class XMLHighlighter {
       if (el.getAttribute('refines')) return null; // refinements resolve by id
       const property = el.getAttribute('property');
       const byProp = PRIMARY_MAPPINGS.find(m => m.metaProperty && m.metaProperty === property);
-      return byProp?.field ?? null;
+      if (byProp) return byProp.field;
+      // Any other standalone meta belongs to the dynamic customMeta group —
+      // unknown properties and EPUB 2 name/content pairs alike (except the
+      // keys the generator owns, which no editor field maps to).
+      if (property) return KNOWN_META_PROPERTIES.has(property) ? null : 'customMeta';
+      const name = el.getAttribute('name');
+      if (name) return KNOWN_META_NAMES.has(name) ? null : 'customMeta';
+      return null;
     }
     if (el.tagName === 'link') {
       const rel = el.getAttribute('rel');

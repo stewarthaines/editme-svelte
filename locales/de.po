@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09\n"
-"PO-Revision-Date: 2026-07-09\n"
+"POT-Creation-Date: 2026-07-10\n"
+"PO-Revision-Date: 2026-07-10\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -360,6 +360,10 @@ msgstr "Zweiten Editor-Bereich hinzufügen"
 msgid "Add SEED.html to package"
 msgstr "SEED.html zum Paket hinzufügen"
 
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "Add to catalog"
+msgstr "Zum Katalog hinzufügen"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add to project"
 msgstr "Hinzufügen"
@@ -430,9 +434,37 @@ msgstr "App-Einstellungen"
 msgid "Append Item"
 msgstr "Element anhängen"
 
-#: src/lib/components/metadata/AdvancedFields.svelte
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books"
 msgstr "Apple Books"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: book version"
+msgstr "Apple Books: Buchversion"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: iPad orientation lock"
+msgstr "Apple Books: iPad-Ausrichtungssperre"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: iPhone orientation lock"
+msgstr "Apple Books: iPhone-Ausrichtungssperre"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: respect image size for CSS class"
+msgstr "Apple Books: Bildgröße für CSS-Klasse beibehalten"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: scroll axis"
+msgstr "Apple Books: Scrollrichtung"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: show binding between spread pages"
+msgstr "Apple Books: Bindung zwischen Doppelseiten anzeigen"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Apple Books: use the publication’s own fonts (do not re-style)"
+msgstr "Apple Books: die eigenen Schriften der Publikation verwenden (nicht neu gestalten)"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Applied {n} change(s)."
@@ -511,6 +543,10 @@ msgstr "Automatisch aus dem Ordnernamen ausgefüllt"
 msgid "Auto-filled from URL"
 msgstr "Automatisch aus der URL ausgefüllt"
 
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "Automatic: {id}"
+msgstr "Automatisch: {id}"
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Available when running online"
 msgstr "Verfügbar im Online-Betrieb"
@@ -563,6 +599,10 @@ msgstr "Bucket-Name"
 #. Dropdown group for build-time transform scripts (not shipped)
 msgid "Build scripts"
 msgstr "Build-Skripte"
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Built-in"
+msgstr "Integriert"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
@@ -671,6 +711,7 @@ msgstr "Kapiteltitel – wird im <title> des Inhaltsdokuments verwendet; Standar
 msgid "Chapters"
 msgstr "Kapitel"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Checkbox"
 msgstr "Kontrollkästchen"
@@ -1021,6 +1062,14 @@ msgstr "Derzeit geöffnet"
 msgid "Custom margin"
 msgstr ""
 
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "Custom metadata"
+msgstr "Benutzerdefinierte Metadaten"
+
+#: src/lib/navigation/views/SettingsView.svelte
+msgid "Custom metadata catalog"
+msgstr "Katalog benutzerdefinierter Metadaten"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Custom page size"
 msgstr ""
@@ -1133,6 +1182,10 @@ msgstr "Gerät"
 msgid "Device:"
 msgstr "Gerät:"
 
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "Discovered in this book"
+msgstr "In diesem Buch entdeckt"
+
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/Toast.svelte
 msgid "Dismiss"
@@ -1230,6 +1283,10 @@ msgstr "z. B. urn:isbn:9780000000001"
 msgid "Each row is one combination of modes that is enough on its own to read the whole publication."
 msgstr "Jede Zeile ist eine Kombination von Modi, die für sich genommen ausreicht, um die gesamte Publikation zu lesen."
 
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "EBPAJ production guide version"
+msgstr "Version des EBPAJ-Produktionsleitfadens"
+
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Edit"
@@ -1310,6 +1367,20 @@ msgstr "Titel eingeben"
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "EPUB"
 msgstr "EPUB"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "EPUB 2 cover image (Google Play Books)"
+msgstr "EPUB-2-Coverbild (Google Play Books)"
+
+#: src/lib/components/metadata/CustomMetaSection.svelte
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "EPUB 2 name"
+msgstr "EPUB-2-Name"
+
+#: src/lib/components/metadata/CustomMetaSection.svelte
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "EPUB 3 property"
+msgstr "EPUB-3-Eigenschaft"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "EPUB is the open standard for digital books: a self-contained file of text, styles, and images that any Reading System app can open. Because the format is open, your book can be read anywhere. It reflows to fit any screen and adapts to each reader's chosen size, font, and contrast."
@@ -1800,6 +1871,10 @@ msgstr "iPhone SE (375×667)"
 msgid "Item controls"
 msgstr "Element-Steuerung"
 
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Japanese publishing"
+msgstr "Japanisches Verlagswesen"
+
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Just now"
 msgstr "Gerade eben"
@@ -1815,6 +1890,42 @@ msgstr "Beide behalten (als neues Element importieren)"
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Key"
 msgstr "Schlüssel"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle"
+msgstr "Kindle"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle comics: no gutter"
+msgstr "Kindle-Comics: kein Bundsteg"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle comics: no margin"
+msgstr "Kindle-Comics: kein Seitenrand"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle comics: publisher panel regions"
+msgstr "Kindle-Comics: Panelbereiche des Verlags"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle: book type"
+msgstr "Kindle: Buchtyp"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle: fixed layout"
+msgstr "Kindle: festes Layout"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle: orientation lock"
+msgstr "Kindle: Ausrichtungssperre"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle: original resolution (e.g. 1024x600)"
+msgstr "Kindle: Originalauflösung (z. B. 1024x600)"
+
+#: src/lib/metadata/custom-meta-catalog.svelte.ts
+msgid "Kindle: primary writing mode"
+msgstr "Kindle: primäre Schreibrichtung"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Label"
@@ -2170,6 +2281,10 @@ msgstr "Kein Inhalt"
 msgid "No content available"
 msgstr "Kein Inhalt verfügbar"
 
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "No custom metadata found in this book"
+msgstr "Keine benutzerdefinierten Metadaten in diesem Buch gefunden"
+
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "No differences."
 msgstr "Keine Unterschiede."
@@ -2268,6 +2383,10 @@ msgstr "Keine"
 msgid "Normal"
 msgstr "Normal"
 
+#: plugins/publish-to-remote/src/components/ConfigureForm.svelte
+msgid "Not available in this browser — connecting a USB device needs the File System Access API (Chrome, Edge)"
+msgstr "In diesem Browser nicht verfügbar — zum Verbinden eines USB-Geräts wird die File System Access API benötigt (Chrome, Edge)"
+
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Not created in the Simple EPUB Editor — viewable but not editable."
 msgstr "Nicht im Simple EPUB Editor erstellt — anzeigbar, aber nicht bearbeitbar."
@@ -2275,6 +2394,10 @@ msgstr "Nicht im Simple EPUB Editor erstellt — anzeigbar, aber nicht bearbeitb
 #: src/lib/components/SpineItem.svelte
 msgid "Not in the linear reading order"
 msgstr "Nicht in der linearen Lesereihenfolge"
+
+#: src/lib/components/metadata/CustomMetaSection.svelte
+msgid "Not set"
+msgstr "Nicht gesetzt"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Not specified"
@@ -2556,6 +2679,10 @@ msgstr "Position"
 msgid "Pre-paginated"
 msgstr "Vorpaginiert"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Prefix URI"
+msgstr "Präfix-URI"
+
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Preparing…"
 msgstr "Wird vorbereitet…"
@@ -2682,6 +2809,10 @@ msgstr "Einstellungen für die Lesevorschau"
 msgid "Reading System"
 msgstr "Lesesystem"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Recognized fields are offered on every book you edit. The catalog is stored in this browser and does not travel with your EPUBs."
+msgstr "Erkannte Felder werden in jedem Buch angeboten, das Sie bearbeiten. Der Katalog wird in diesem Browser gespeichert und reist nicht mit Ihren EPUBs mit."
+
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Recommended"
 msgstr "Empfohlen"
@@ -2739,6 +2870,7 @@ msgstr "Remote:"
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 #: src/lib/components/metadata/IdentifierEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -3180,6 +3312,7 @@ msgstr "Technische Informationen"
 msgid "Term (e.g. FIC028000)"
 msgstr "Begriff (z. B. FIC028000)"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Text"
 msgstr "Text"
@@ -3447,10 +3580,6 @@ msgstr "USB-E-Reader (durchsuchen…)"
 msgid "Use the download button to access the file"
 msgstr "Verwenden Sie die Schaltfläche „Herunterladen“, um auf die Datei zuzugreifen"
 
-#: src/lib/components/metadata/AdvancedFields.svelte
-msgid "Use the publication’s own fonts (do not re-style)"
-msgstr "Die eigenen Schriften der Publikation verwenden (nicht neu gestalten)"
-
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Use your own Dropbox app: create one in the Dropbox App Console (scoped access), enable files.content.write and files.metadata.read, and register this exact redirect URI in the app’s settings."
 msgstr "Verwenden Sie Ihre eigene Dropbox-App: Erstellen Sie eine App in der Dropbox App Console (Scoped Access), aktivieren Sie files.content.write und files.metadata.read und registrieren Sie genau diese Weiterleitungs-URI in den App-Einstellungen."
@@ -3510,6 +3639,10 @@ msgstr "Validierungsbericht (epubcheck) für dieses Kapitel"
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Validation Report: {filename}"
 msgstr "Validierungsbericht: {filename}"
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Value type"
+msgstr "Werttyp"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "value:Label, value:Label"
