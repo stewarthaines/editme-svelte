@@ -532,14 +532,26 @@
           {$t('WebDAV')}
         </button>
       </div>
-      {#if deviceSupported}
-        <p class="type-cluster-label">{$t('Device')}</p>
-        <div class="type-buttons">
-          <button class="btn-type" onclick={onPickDevice}>
-            {$t('USB e-reader (browse…)')}
-          </button>
-        </div>
-      {/if}
+      <p class="type-cluster-label">{$t('Device')}</p>
+      <div class="type-buttons">
+        <!-- aria-disabled (not disabled) keeps the button hoverable and focusable
+             so the title explaining WHY is reachable in the very browsers that
+             lack the API. -->
+        <button
+          class="btn-type"
+          aria-disabled={!deviceSupported}
+          title={deviceSupported
+            ? undefined
+            : $t(
+                'Not available in this browser — connecting a USB device needs the File System Access API (Chrome, Edge)'
+              )}
+          onclick={() => {
+            if (deviceSupported) onPickDevice();
+          }}
+        >
+          {$t('USB e-reader (browse…)')}
+        </button>
+      </div>
       {#if canCancel}
         <div class="form-actions">
           <button class="btn btn-secondary" onclick={onCancel}

@@ -263,6 +263,17 @@ button {
   background: var(--color-hover-accent);
 }
 
+.btn-type[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-type[aria-disabled='true']:hover {
+  color: inherit;
+  border-color: var(--color-border-default);
+  background: var(--color-surface-primary);
+}
+
 .empty-message {
   color: var(--color-text-tertiary);
   text-align: center;

@@ -4,8 +4,9 @@
  * An MSC e-reader (Kobo, Tolino, PocketBook…) mounts as an ordinary drive;
  * WebUSB cannot touch it (mass storage is a protected interface class), but
  * `showDirectoryPicker()` can — see process/DEVICE_DESTINATIONS.md and the
- * validated spike. Chromium desktop only; callers gate on
- * `isDeviceSupported()` so the option never renders elsewhere.
+ * validated spike. Chromium desktop only; callers check
+ * `isDeviceSupported()` and render the option disabled elsewhere, with a
+ * tooltip explaining why.
  *
  * The remote's JSON config (DeviceRemoteConfig) lives in the ordinary OPFS
  * remotes store; the FileSystemDirectoryHandle is NOT JSON-serialisable and
