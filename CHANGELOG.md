@@ -13,8 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-11
+
 ### Added
 
+- Custom metadata for the book: the Advanced metadata tab's new **Custom metadata** section (replacing the single-purpose Apple Books group) edits vendor-specific fields, and any unrecognised metadata found in an imported book — Calibre series info, for example — can be added to your catalog with one click, even on read-only books. Recognised fields are then offered on every book you edit; manage them under App Settings → Custom metadata catalog.
+- A starter pack of real-world publishing fields ships with the catalog, disabled until you need them: Kindle fixed-layout and comics settings (including right-to-left page turn for manga and vertical Japanese text), Apple Books options (scroll axis, spread binding, orientation locks), and the Japanese EBPAJ production-guide marker. Fields with a fixed vocabulary present a dropdown so a typo can't slip into the book.
+- The EPUB 2 cover marker (used by Google Play Books) is now visible and editable in Custom metadata; it still fills in automatically from the cover image when you haven't set it yourself.
+- Link a folder of text files to your chapters (Chrome and Edge): write in any editor you like, then one click brings the changes in. Every sync shows what changed before anything is written — edited files, new files, and chapters whose file has gone — and nothing is removed unless you say so. New chapters join the end of the list; syncing never reorders the chapters you've arranged. Change or unlink the folder from the same window.
 - Publish straight to a USB e-reader: in the Publish plugin, "Add Remote Storage" is now "Add Destination" and (on Chromium-based desktop browsers) offers USB e-readers alongside cloud storage. Pick the mounted device once — a Kobo is recognised automatically — and it stays configured across sessions; published books copy straight onto it, with a reminder to eject so the reader indexes them.
 - Text formats carry their own media-insertion templates: adopting a format — at project creation, from the App Settings catalog, or by switching the text transform in EPUB Settings — sets the project's image, video and audio-clip templates to format-appropriate defaults (Djot projects, for example, get the quoted clip directive and a raw-HTML video wrapper automatically).
 - New **abcjs+jsyaml** extension (Code blocks): ` ```abcjs ` code blocks render as SVG music scores. YAML frontmatter names staff-width variants (narrow/wide/full) and the one that fits the reading column displays — pure CSS via container queries with media-query fallbacks, no reading-system JavaScript.
@@ -24,10 +30,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The browser tab now reads "Book Title · SEED.html" instead of the bare book title.
+- Chromium-only options no longer vanish on other browsers: the USB e-reader destination (Publish) and the Link folder button (Chapters) stay visible everywhere, disabled with a plain explanation of what they need (Chrome, Edge).
+- The user manual covers linking a folder, and the OPF preview highlights custom metadata alongside the standard fields.
 - The last traces of the app's former internal name are gone (the project is now `seed-html` throughout). One-time effects on upgrade: interface preferences reset once (theme, language, advanced mode, pane sizes and similar — projects are not affected), and on browsers that store projects in IndexedDB (e.g. Safari) the project database is adopted into its new home automatically, with the old copy left in place for one release as a backstop.
 - The abc2svg extension's scale variants now switch with the same pure-CSS container-query approach as the new abcjs extension — the reading-system `responsive.js` script is gone, and scores no longer need JavaScript enabled in the reader.
 - Shorter, clearer interface text throughout — the About page, settings descriptions, and notices say less, and the instructional detail they carried now lives in the user manual.
 - Basic mode now shows only the Basic Info metadata tab; the Advanced and Accessibility tabs appear with Advanced mode (previously individual groups within them were hidden piecemeal).
+
+### Fixed
+
+- Metadata the app doesn't model — from Calibre, publisher toolchains, or hand editing — is preserved when a book is saved instead of being silently dropped, including the vendor prefix declarations it needs to stay valid.
 
 ## [0.7.0] - 2026-07-07
 
@@ -91,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Retired the standalone `opds-server` development tool, superseded by the Publish-to-Remote plugin.
 
-[Unreleased]: https://github.com/stewarthaines/seed-html/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/stewarthaines/seed-html/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.8.0
 [0.7.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.7.0
 [0.6.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.6.0
