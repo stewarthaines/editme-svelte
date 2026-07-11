@@ -162,6 +162,8 @@ export default [
       'storybook-static/',
       'coverage/',
       '.claude/',
+      // wrangler pages dev scratch bundles (untracked; generated worker code).
+      '.wrangler/',
       // Local Python virtualenv (untracked) — not app code.
       '.venv/',
       // Workspace plugin sources are linted by this config; only their build

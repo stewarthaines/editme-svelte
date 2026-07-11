@@ -12,7 +12,10 @@ const CACHE_VERSION = '__SW_VERSION__';
 const CACHE_NAME = `seed-shell-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
-  '/',
+  // The app document. The bare origin '/' redirects here (public/_redirects) and
+  // must NOT be precached: cache.addAll rejects redirected responses, which
+  // would fail the whole install.
+  '/SEED.html',
   '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -78,23 +81,33 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return; // leave cross-origin requests alone
 
-  // App-shell navigation (the SPA root only): network-first (fresh when online),
-  // falling back to the cached shell offline. Refresh the cached shell on success.
+  // App-shell navigation (/SEED.html is the app; '/' and '/index.html' redirect
+  // to it): network-first (fresh when online), falling back to the cached shell
+  // offline. Refresh the cached shell on success.
   //
-  // Crucially, ONLY the root path is treated as the shell. Plugin views load their
+  // Crucially, ONLY these paths are treated as the shell. Plugin views load their
   // own HTML document in an iframe (e.g. /plugins/<id>/plugin.html) — also a
   // `navigate` request. Those must NOT overwrite the cached shell, or an offline
   // reload would serve the last-loaded plugin page instead of the app. They fall
   // through to the per-URL asset cache below and are served under their own URL.
-  if (request.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html')) {
+  if (
+    request.mode === 'navigate' &&
+    (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/SEED.html')
+  ) {
     event.respondWith(
       fetch(request)
         .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('/', copy));
+          // Only a direct /SEED.html load refreshes the cached shell. A '/'
+          // navigation arrives here as a followed redirect, and the Cache API
+          // refuses to serve redirected responses to later navigations — caching
+          // one would break offline boot.
+          if (url.pathname === '/SEED.html' && !response.redirected) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put('/SEED.html', copy));
+          }
           return response;
         })
-        .catch(() => caches.match('/'))
+        .catch(() => caches.match('/SEED.html'))
     );
     return;
   }

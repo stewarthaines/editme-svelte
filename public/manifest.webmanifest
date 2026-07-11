@@ -2,7 +2,7 @@
   "name": "SEED.html",
   "short_name": "SEED.html",
   "description": "Create and edit EPUB files from plain text, entirely in your browser.",
-  "start_url": "/",
+  "start_url": "/SEED.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
