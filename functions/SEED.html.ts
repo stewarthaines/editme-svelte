@@ -17,5 +17,13 @@ interface Env {
 // preserves the original method.
 export async function onRequest(context: { request: Request; env: Env }): Promise<Response> {
   const root = new URL('/', context.request.url);
-  return context.env.ASSETS.fetch(new Request(root, context.request));
+  const response = await context.env.ASSETS.fetch(new Request(root, context.request));
+  // Browsers derive the Save As filename from Content-Disposition before the
+  // URL or the document title (which is "Book Title · SEED.html" and would
+  // otherwise name the file). `inline` keeps normal rendering; the filename
+  // only applies when saving — and a saved page IS the standalone-HTML
+  // distribution of the app, so it should be called SEED.html.
+  const headers = new Headers(response.headers);
+  headers.set('Content-Disposition', 'inline; filename="SEED.html"');
+  return new Response(response.body, { status: response.status, headers });
 }
