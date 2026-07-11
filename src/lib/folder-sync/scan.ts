@@ -51,6 +51,11 @@ export interface FolderSyncPlan {
   unchangedCount: number;
 }
 
+/** Stable identity for a plan row — shared by the review dialog and the commit. */
+export function folderSyncRowKey(row: FolderSyncRow): string {
+  return row.kind === 'skipped' ? `skipped:${row.name}` : `${row.kind}:${row.targetId}`;
+}
+
 /** Numeric-aware order so `2-title.md` precedes `10-epilogue.md`. */
 export function naturalCompare(a: string, b: string): number {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });

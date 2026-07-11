@@ -342,6 +342,8 @@ export class SettingsService {
         editor: {
           preview_delay_ms: metadata.editor?.preview_delay_ms ?? defaults.editor!.preview_delay_ms,
         },
+        // Linked sync folder display metadata (absent when never linked).
+        folder_sync: metadata.folder_sync ?? undefined,
       };
     } catch {
       // Return defaults when file doesn't exist or is corrupted
@@ -366,12 +368,15 @@ export class SettingsService {
         // File doesn't exist, use empty object
       }
 
-      // Merge settings with existing metadata
+      // Merge settings with existing metadata. folder_sync is written
+      // explicitly so an unlink (undefined) removes the stored key —
+      // JSON.stringify drops undefined properties.
       const updatedMetadata = {
         ...existingMetadata,
         bust_cache: settings.bust_cache,
         draft_id: settings.draft_id,
         editor: settings.editor,
+        folder_sync: settings.folder_sync,
       };
 
       await this.fileStorage.writeTextFile(
