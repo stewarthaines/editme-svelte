@@ -81,6 +81,9 @@ export interface ExtensionCatalogEntry {
   url?: string;
   /** Extension-wide license file (e.g. 'LICENSE.txt'). */
   license?: string;
+  /** Human-readable license name (SPDX-style, e.g. 'MIT') — display copy for
+      the impressum and catalog UI; the file above carries the legal text. */
+  licenseName?: string;
   /** 3rd-party lib files loaded into the transform iframe as globals (filenames). */
   scripts: string[];
   /** Suggested DOM-transform scripts (candidates for the dom_transforms list). */

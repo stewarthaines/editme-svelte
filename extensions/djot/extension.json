@@ -3,11 +3,16 @@
   "name": "Djot",
   "description": "Djot is a clean, Markdown-like markup with a consistent syntax, suited to most books. Rendered by djot.js.",
   "url": "https://github.com/jgm/djot.js",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
-  "scripts": ["djot.js"],
+  "scripts": [
+    "djot.js"
+  ],
   "chapter": "chapter.txt",
   "domTransforms": [],
-  "textTransforms": ["transformDjot.js"],
+  "textTransforms": [
+    "transformDjot.js"
+  ],
   "templates": {
     "image": "![<alt>](<href>)",
     "video": "`<video src=\"<href>\" controls=\"controls\"></video>`{=html}",

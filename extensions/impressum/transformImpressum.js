@@ -42,7 +42,9 @@ async function transformDOM(htmlDocument, idref, ctx) {
         name: meta.name || id,
         description: meta.description || '',
         url: meta.url || '',
-        license: meta.license || '', // a filename within the extension dir
+        // Human-readable license name (SPDX-style, e.g. "MIT"). The `license`
+        // field is a filename (the text bundled into SOURCE/), not display copy.
+        license: meta.licenseName || '',
       });
     } catch (e) {
       // Skip an unreadable extension.

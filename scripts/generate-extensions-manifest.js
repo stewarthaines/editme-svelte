@@ -53,7 +53,7 @@ for (const dirent of dirents) {
     continue; // not an extension (no extension.json)
   }
 
-  const { id, name, description, url, license } = meta;
+  const { id, name, description, url, license, licenseName } = meta;
   // Editorial sub-group key for the settings catalog (presentational only).
   const category = typeof meta.category === 'string' ? meta.category : undefined;
   // A scripts entry is a bare filename or { file, license? }; flatten to filenames.
@@ -162,6 +162,7 @@ for (const dirent of dirents) {
     category,
     url,
     license,
+    licenseName,
     scripts,
     domTransforms,
     textTransforms,

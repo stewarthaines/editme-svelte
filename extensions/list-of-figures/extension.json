@@ -2,6 +2,7 @@
   "id": "list-of-figures",
   "name": "List of Figures",
   "description": "Records the images used in each chapter and adds a generator that inserts a list of figures.",
+  "licenseName": "MIT",
   "category": "chapter-content",
   "scripts": [],
   "domTransforms": [

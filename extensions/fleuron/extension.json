@@ -4,6 +4,7 @@
   "description": "Replace thematic breaks with a centred fleuron ornament that inherits the text colour.",
   "category": "typesetting",
   "url": "https://en.wikipedia.org/wiki/Fleuron_(typography)",
+  "licenseName": "MIT",
   "scripts": [],
   "domTransforms": [
     "transformFleuron.js"

@@ -3,11 +3,16 @@
   "name": "Textile",
   "description": "Textile is a concise wiki-style markup from the blogging and CMS world. Rendered by textile.js.",
   "url": "https://textile-lang.com/",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
   "chapter": "chapter.txt",
-  "scripts": ["textile.min.js"],
+  "scripts": [
+    "textile.min.js"
+  ],
   "domTransforms": [],
-  "textTransforms": ["transformTextile.js"],
+  "textTransforms": [
+    "transformTextile.js"
+  ],
   "templates": {
     "image": "!<href>(<alt>)!",
     "video": "<video src=\"<href>\" controls=\"controls\"></video>"

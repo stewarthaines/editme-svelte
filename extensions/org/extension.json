@@ -3,11 +3,16 @@
   "name": "Org",
   "description": "Org is Emacs's plain-text format for notes, outlines and documents. Rendered by org-js.",
   "url": "https://orgmode.org/",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
   "chapter": "chapter.txt",
-  "scripts": ["org.js"],
+  "scripts": [
+    "org.js"
+  ],
   "domTransforms": [],
-  "textTransforms": ["transformOrg.js"],
+  "textTransforms": [
+    "transformOrg.js"
+  ],
   "templates": {
     "image": "[[<href>]]"
   },

@@ -2,6 +2,7 @@
   "id": "audio-clips",
   "name": "AudioClips",
   "description": "Tap-to-play audio clips in the packaged EPUB: a reading-system script and styles for the span.clip markup that the Djot and MarkdownIt transforms produce from the :clip directive.",
+  "licenseName": "MIT",
   "category": "chapter-content",
   "scripts": [],
   "domTransforms": [],

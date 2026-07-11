@@ -2,6 +2,7 @@
   "id": "katex",
   "name": "KaTeX",
   "description": "The fastest math typesetting library for the web.",
+  "licenseName": "MIT",
   "category": "code-blocks",
   "license": "LICENSE.txt",
   "scripts": [

@@ -4,6 +4,8 @@
   "description": "Reformat JavaScript code blocks at narrow/wide/full widths with Prettier.",
   "category": "typesetting",
   "url": "https://prettier.io/",
+  "licenseName": "MIT",
+  "license": "LICENSE.txt",
   "scripts": [
     "prettier.js",
     "babel.js",

@@ -4,6 +4,7 @@
   "description": "Render ABC music notation code blocks as SVG scores with abcjs; js-yaml reads each block's frontmatter options. Pre-rendered staff-width variants switch to fit the reading column.",
   "category": "code-blocks",
   "url": "https://www.abcjs.net/",
+  "licenseName": "MIT",
   "scripts": [
     {
       "file": "abcjs-basic-min.js",

@@ -3,11 +3,17 @@
   "name": "MarkdownIt",
   "description": "Markdown is the widely used plain-text markup for general writing — articles, notes and books. Rendered by markdown-it with markdown-it-attrs.",
   "url": "https://markdown-it.github.io/markdown-it/",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
-  "scripts": ["markdown-it-attrs.browser.min.js", "markdown-it.min.js"],
+  "scripts": [
+    "markdown-it-attrs.browser.min.js",
+    "markdown-it.min.js"
+  ],
   "chapter": "chapter.txt",
   "domTransforms": [],
-  "textTransforms": ["transformMarkdown.js"],
+  "textTransforms": [
+    "transformMarkdown.js"
+  ],
   "templates": {
     "image": "![<alt>](<href>)",
     "video": "<video src=\"<href>\" controls=\"controls\"></video>",

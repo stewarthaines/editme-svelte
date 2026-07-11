@@ -4,8 +4,11 @@
   "description": "Adapt chapter layout to the reading column: an em-based reading measure that works everywhere, e-ink and width adjustments via media queries, and container-query refinements for figures where the reading system supports them.",
   "category": "typesetting",
   "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries",
+  "licenseName": "MIT",
   "scripts": [],
-  "domTransforms": ["transformResponsive.js"],
+  "domTransforms": [
+    "transformResponsive.js"
+  ],
   "textTransforms": [],
   "assets": [
     {

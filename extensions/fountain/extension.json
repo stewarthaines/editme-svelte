@@ -3,11 +3,16 @@
   "name": "Fountain",
   "description": "Fountain is the plain-text format for screenplays — scene headings, dialogue and transitions. Rendered by Fountain.js.",
   "url": "https://fountain.io/",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
   "chapter": "chapter.txt",
-  "scripts": ["fountain.js"],
+  "scripts": [
+    "fountain.js"
+  ],
   "domTransforms": [],
-  "textTransforms": ["transformFountain.js"],
+  "textTransforms": [
+    "transformFountain.js"
+  ],
   "assets": [
     {
       "file": "fountain.css",

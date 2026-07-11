@@ -3,11 +3,16 @@
   "name": "AsciiDoc",
   "description": "AsciiDoc is a plain-text format for technical writing — documentation, articles and books. Rendered by Asciidoctor.js.",
   "url": "https://asciidoc.org/",
+  "licenseName": "MIT",
   "license": "LICENSE.txt",
   "chapter": "chapter.txt",
-  "scripts": ["asciidoctor.min.js"],
+  "scripts": [
+    "asciidoctor.min.js"
+  ],
   "domTransforms": [],
-  "textTransforms": ["transformAsciidoc.js"],
+  "textTransforms": [
+    "transformAsciidoc.js"
+  ],
   "templates": {
     "image": "image::<href>[<alt>]",
     "video": "video::<href>[]"

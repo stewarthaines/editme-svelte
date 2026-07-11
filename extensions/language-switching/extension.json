@@ -4,6 +4,7 @@
   "description": "Promote lang-* classes to lang / xml:lang attributes for correct multilingual rendering. Ships a sample generator and a copyable preview flag overlay.",
   "category": "accessibility",
   "url": "https://www.w3.org/International/questions/qa-html-language-declarations",
+  "licenseName": "MIT",
   "scripts": [],
   "domTransforms": [
     "transformLanguageSwitching.js"
@@ -41,7 +42,7 @@
     {
       "id": "flag-overlay",
       "name": "Flag overlay (preview)",
-      "description": "Copy this, then paste into preview/head.xml (choose it from the file dropdown above). Overlays a flag + language title on [lang] elements in the preview only \u2014 never packaged. Use Copy, not Insert.",
+      "description": "Copy this, then paste into preview/head.xml (choose it from the file dropdown above). Overlays a flag + language title on [lang] elements in the preview only — never packaged. Use Copy, not Insert.",
       "script": "generateFlagOverlay.js"
     }
   ]

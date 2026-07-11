@@ -2,6 +2,7 @@
   "id": "prism",
   "name": "Prism",
   "description": "Syntax highlighting for code blocks via Prism.",
+  "licenseName": "MIT",
   "category": "typesetting",
   "license": "LICENSE.txt",
   "scripts": [

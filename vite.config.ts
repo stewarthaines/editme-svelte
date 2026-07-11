@@ -250,6 +250,7 @@ export default defineConfig({
                   category,
                   url: m.url,
                   license: m.license,
+                  licenseName: m.licenseName,
                   scripts,
                   domTransforms,
                   textTransforms,
