@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { untrack } from 'svelte';
   import { t } from '../../i18n';
+  import { manifestSignature } from '../../manifest/signatures.js';
   import ManifestTable from './ManifestTable.svelte';
   import ImportReviewDialog from '../import/ImportReviewDialog.svelte';
   import { generateEPUBPath, ensureUniqueHref } from '../../epub/opf-utils.js';
@@ -68,12 +69,21 @@
     { stagedPath: string; originalName: string; mediaType: string; existingHref: string }[]
   >([]);
 
-  const loadManifest = async () => {
+  // File sizes cached across reloads so a metadata-only manifest edit doesn't
+  // re-stat every file. Keyed by workspace id + resolved path; cleared when a
+  // reload is asked for fresh sizes (bytes may have changed on disk).
+  const sizeCache = new Map<string, number>();
+
+  const loadManifest = async ({ freshSizes = false }: { freshSizes?: boolean } = {}) => {
     if (!workspace) return;
 
     try {
-      loading = true;
+      // Stale-while-revalidate: keep the current table rendered while
+      // refreshing; only show the loading state when there is nothing yet.
+      if (manifestItems.length === 0) loading = true;
       error = null;
+
+      if (freshSizes) sizeCache.clear();
 
       // Load manifest items directly from workspace state
       const baseManifestItems = workspace.opf.manifest;
@@ -87,12 +97,18 @@
               ? `${workspace!.pathInfo.basePath}/${item.href}`
               : item.href;
 
-            // Get file info using workspace service method
-            const fileInfo = await workspaceService.getFileInfo(workspace!.id, resolvedPath);
+            const cacheKey = `${workspace!.id}\u0001${resolvedPath}`;
+            let size = sizeCache.get(cacheKey);
+            if (size === undefined) {
+              // Get file info using workspace service method
+              const fileInfo = await workspaceService.getFileInfo(workspace!.id, resolvedPath);
+              size = fileInfo.size;
+              sizeCache.set(cacheKey, size);
+            }
 
             return {
               ...item,
-              size: fileInfo.size,
+              size,
             };
           } catch {
             // If file doesn't exist or can't be accessed, keep item without size
@@ -244,7 +260,7 @@
       }
     }
     if (successfulFiles.length > 0) onWorkspaceUpdate?.(workspace);
-    await loadManifest();
+    await loadManifest({ freshSizes: true });
 
     if (clean.length > 0 && successfulFiles.length === 0) {
       error = $t('Failed to upload all files');
@@ -352,7 +368,9 @@
         }
       }
       onWorkspaceUpdate?.(workspace);
-      await loadManifest();
+      // Overwrites replace bytes at existing hrefs without touching the
+      // manifest, so the size cache must not serve the stale values.
+      await loadManifest({ freshSizes: true });
     } finally {
       await closeManifestReview();
     }
@@ -364,44 +382,24 @@
     await clearImportStaging();
   };
 
-  // Load manifest when component mounts or dependencies change
-  onMount(loadManifest);
-
-  // React to workspace changes (e.g., after delete/add operations) and to an
-  // explicit refresh nudge (SOURCE/data deletes don't change the workspace ref).
+  // Reload the file list only when something it displays could have changed:
+  // the workspace itself, the manifest's content (id/href/media-type/properties
+  // — a signature string, so a save that replaces the workspace object without
+  // changing the manifest does not re-fire this), the advanced-mode toggle, or
+  // an explicit refresh nudge (SOURCE/data deletes and patchset applies don't
+  // change the manifest but do change bytes on disk, so they get fresh sizes).
+  // loadManifest is called through untrack so its deep workspace reads don't
+  // re-broaden the dependencies this gate narrows.
+  const workspaceId = $derived(workspace?.id);
+  const manifestSig = $derived(workspace ? manifestSignature(workspace.opf.manifest) : null);
+  let lastRefreshToken: number | null = null;
   $effect(() => {
-    void refreshToken;
-    if (workspace) {
-      loadManifest();
-    }
-  });
-
-  // React to advancedMode changes
-  $effect(() => {
-    if (!workspace) return;
-
-    // When advancedMode changes, reload source items
-    if (advancedMode) {
-      // Load SOURCE items if advanced mode is enabled
-      workspaceService
-        .listSourceFiles(workspace)
-        .then(items => {
-          sourceItems = items;
-        })
-        .catch(error => {
-          console.warn('Failed to load SOURCE items:', error);
-          sourceItems = [];
-        });
-    } else {
-      // Clear SOURCE items if advanced mode is disabled
-      sourceItems = [];
-    }
-  });
-
-  // React to workspace changes
-  $effect(() => {
-    if (workspace) {
-      loadManifest();
+    void manifestSig;
+    void advancedMode;
+    const freshSizes = lastRefreshToken !== null && refreshToken !== lastRefreshToken;
+    lastRefreshToken = refreshToken;
+    if (workspaceId) {
+      untrack(() => loadManifest({ freshSizes }));
     }
   });
 
@@ -457,7 +455,11 @@
 {:else if error}
   <div class="error-state">
     <p class="error-message">{error}</p>
-    <button type="button" class="btn btn-primary" onclick={loadManifest}>
+    <button
+      type="button"
+      class="btn btn-primary"
+      onclick={() => loadManifest({ freshSizes: true })}
+    >
       {$t('Retry')}
     </button>
   </div>

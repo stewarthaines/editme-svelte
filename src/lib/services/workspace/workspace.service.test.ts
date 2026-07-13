@@ -82,6 +82,7 @@ function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
       return Promise.resolve('');
     }),
     fileExists: vi.fn().mockResolvedValue(false),
+    renameFile: vi.fn().mockResolvedValue(undefined),
     getFileInfo: vi.fn().mockResolvedValue({ size: 0, lastModified: new Date() }),
     getQuota: vi.fn().mockResolvedValue({ used: 0, available: 1000000 }),
     estimateWorkspaceSize: vi.fn().mockResolvedValue(0),
@@ -759,6 +760,69 @@ describe('WorkspaceService Contract Tests', () => {
       await expect(service.updateManifestItem(ws, 'b', { href: 'Images/A.png' })).rejects.toThrow(
         /already exists/
       );
+    });
+  });
+
+  // The manifest edit UI keeps its content preview across id/href edits on the
+  // assumption that neither edit touches the item's bytes. Lock that in.
+  describe('updateManifestItem: id and href edits leave bytes alone', () => {
+    test('an id edit of a non-spine item changes no spine content and touches no file', async () => {
+      const workspace = await service.createWorkspace({
+        title: 'Test',
+        language: ['en'],
+        identifier: 'test',
+      });
+      const withImage = await service.addManifestItem(workspace, {
+        id: 'img',
+        href: 'Images/cover.png',
+        mediaType: 'image/png',
+      });
+
+      const spineBefore = withImage.opf.spine.map(s => ({ ...s }));
+      const writesBefore = mockFileStorage.writeTextFile.mock.calls.length;
+      const updated = await service.updateManifestItem(withImage, 'img', { id: 'cover-img' });
+
+      expect(updated.opf.manifest.find(i => i.id === 'cover-img')?.href).toBe('Images/cover.png');
+      expect(updated.opf.spine).toEqual(spineBefore);
+      expect(mockFileStorage.renameFile).not.toHaveBeenCalled();
+      // Only the OPF itself is rewritten by the edit.
+      const editWrites = mockFileStorage.writeTextFile.mock.calls
+        .slice(writesBefore)
+        .map(call => call[1]);
+      expect(editWrites).toEqual(['OEBPS/content.opf']);
+    });
+
+    test('an href edit renames the file rather than rewriting its bytes', async () => {
+      const workspace = await service.createWorkspace({
+        title: 'Test',
+        language: ['en'],
+        identifier: 'test',
+      });
+      const withImage = await service.addManifestItem(workspace, {
+        id: 'img',
+        href: 'Images/cover.png',
+        mediaType: 'image/png',
+      });
+      mockFileStorage.fileExists.mockResolvedValue(true);
+      const writesBefore = mockFileStorage.writeTextFile.mock.calls.length;
+
+      const updated = await service.updateManifestItem(withImage, 'img', {
+        href: 'Images/front.png',
+      });
+
+      expect(updated.opf.manifest.find(i => i.id === 'img')?.href).toBe('Images/front.png');
+      expect(mockFileStorage.renameFile).toHaveBeenCalledWith(
+        workspace.id,
+        'OEBPS/Images/cover.png',
+        'OEBPS/Images/front.png'
+      );
+      // The item's bytes are never written — a rename moves them intact; the
+      // edit rewrites only the OPF.
+      expect(mockFileStorage.writeFile).not.toHaveBeenCalled();
+      const editWrites = mockFileStorage.writeTextFile.mock.calls
+        .slice(writesBefore)
+        .map(call => call[1]);
+      expect(editWrites).toEqual(['OEBPS/content.opf']);
     });
   });
 });

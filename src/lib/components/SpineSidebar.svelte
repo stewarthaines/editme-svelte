@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { t } from '../i18n';
+  import { spineSignature } from '../manifest/signatures.js';
   import SpineItem from './SpineItem.svelte';
   import EditSpineItemDialog from './EditSpineItemDialog.svelte';
   import ImportReviewDialog from './import/ImportReviewDialog.svelte';
@@ -117,13 +118,19 @@
     };
   });
 
-  // Reactive: Load spine items when workspace ID changes (not metadata updates)
-  // Using workspace?.id to avoid reloading on metadata-only changes
+  // Reactive: reload the chapter list only when the spine's content actually
+  // changes (membership, order, linearity) or the workspace itself changes —
+  // not on every workspace save. The signature string recomputes equal for
+  // manifest-only edits, so this effect doesn't re-fire; loadSpineItems runs
+  // through untrack because its synchronous workspace reads would otherwise
+  // re-broaden the dependencies to the whole workspace object.
   const workspaceId = $derived(workspace?.id);
+  const spineSig = $derived(workspace ? spineSignature(workspace.opf.spine) : null);
   $effect(() => {
+    void spineSig;
     if (workspaceId && spineService) {
-      loadSpineItems();
-    } else if (!workspace) {
+      untrack(() => loadSpineItems());
+    } else if (!workspaceId) {
       // No workspace selected - show empty state
       spineItems = [];
       isLoading = false;
@@ -142,7 +149,9 @@
   async function loadSpineItems() {
     if (!workspace) return;
 
-    isLoading = true;
+    // Keep the current list rendered while refreshing; only show the loading
+    // state when there is nothing to show yet.
+    if (spineItems.length === 0) isLoading = true;
     error = null;
 
     try {
