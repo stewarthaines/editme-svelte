@@ -892,6 +892,10 @@ msgstr ""
 msgid "Connecting to storage..."
 msgstr ""
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Content is {cw}×{ch}px; the declared page is {pw}×{ph}px"
+msgstr ""
+
 #: src/lib/components/preview/ContentPreview.svelte
 msgid "Content Preview"
 msgstr ""
@@ -1105,6 +1109,10 @@ msgstr ""
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Dark text on a light cover"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Declared fixed-layout page size"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -2614,6 +2622,10 @@ msgstr ""
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Other formats"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "overflows {size}"
 msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte

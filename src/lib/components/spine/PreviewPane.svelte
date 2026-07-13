@@ -40,6 +40,7 @@
   } from 'phosphor-svelte';
   import { layoutStore } from '../../stores/layout';
   import { persisted, asBoolean, asInt, asEnum } from '../../state/persisted.svelte.js';
+  import { parseFxlViewport } from '$lib/epub/fixed-layout.js';
 
   // Props using Svelte 5 runes syntax
   let {
@@ -58,6 +59,7 @@
     previewAutoUpdate = DEFAULT_PREVIEW.autoUpdate,
     previewIncludeHead = DEFAULT_PREVIEW.includeHead,
     isFixedLayout = false,
+    renditionViewport = undefined,
     advancedMode = false,
   }: {
     xhtmlContent?: string;
@@ -90,6 +92,9 @@
     /** Fixed-layout (pre-paginated) chapter: reader theme/font controls don't apply,
      *  so they're hidden (readers disable user font sizing for fixed layout). */
     isFixedLayout?: boolean;
+    /** rendition:viewport string ("width=W, height=H") — drives the fixed-layout
+     *  page box in the device presets. Defaults apply when absent or invalid. */
+    renditionViewport?: string;
     /** Advanced mode: the generated-Source view is hidden from the dropdown in basic mode. */
     advancedMode?: boolean;
   } = $props();
@@ -427,6 +432,37 @@
   let previewContainer: HTMLDivElement | undefined = $state();
   let previewContentEl: HTMLDivElement | undefined = $state();
   let deviceScale = $state(1);
+
+  // --- Fixed-layout page box -------------------------------------------------
+  // For pre-paginated books the device presets behave like a real FXL reading
+  // system: the page renders at its DECLARED viewport size and is contain-fit
+  // into the device frame (letterboxed). This inner page scale is orthogonal
+  // to the outer deviceScale frame fit and depends only on fixed pixel sizes,
+  // so it needs no resize handling.
+  const fxlActive = $derived(isFixedLayout && !isFillDevice(selectedDevice.current));
+  const fxlPage = $derived(parseFxlViewport(renditionViewport));
+  const fxlPageLabel = $derived(`${fxlPage.width}×${fxlPage.height}`);
+  const fxlGeometry = $derived.by(() => {
+    const device = DEVICE_PRESETS.find(d => d.id === selectedDevice.current);
+    if (!fxlActive || !device) return null;
+    const { width: dw, height: dh } = getDeviceDimensions(device); // tracks deviceOrientation
+    // Contain-fit; deliberately unclamped — real readers upscale small pages.
+    const scale = Math.min(dw / fxlPage.width, dh / fxlPage.height);
+    return {
+      scale,
+      offsetX: (dw - fxlPage.width * scale) / 2,
+      offsetY: (dh - fxlPage.height * scale) / 2,
+    };
+  });
+  // Measured content extent of the FXL page document (null = not measured).
+  let fxlContentSize = $state<{ width: number; height: number } | null>(null);
+  const fxlOverflow = $derived(
+    fxlContentSize &&
+      (fxlContentSize.width > fxlPage.width + 1 || fxlContentSize.height > fxlPage.height + 1)
+      ? fxlContentSize
+      : null
+  );
+
   let pendingScrollRestore: {
     anchor: { element: Element | null; id: string | null; offset: number } | null;
     fallbackScrollTop: number;
@@ -792,6 +828,7 @@
    */
   function renderNow(): void {
     const content = xhtmlContent;
+    fxlContentSize = null; // stale overflow badge must not survive a rewrite
     if (selectedDevice.current === 'print') writePagedDoc(content);
     else updatePreviewContent(withPreviewHead(content));
     renderedContent = content;
@@ -1138,7 +1175,9 @@
     // Add click event listener to the iframe document
     iframeDoc.addEventListener('click', handlePreviewClick);
 
-    // Add any global styles or scripts for preview enhancement
+    // Add any global styles or scripts for preview enhancement.
+    // Fixed-layout pages skip the responsive-img rule: shrinking oversized art
+    // to fit would mask exactly the composition overflow being diagnosed.
     const style = iframeDoc.createElement('style');
     style.textContent = `
       body {
@@ -1148,10 +1187,14 @@
         /* line-height: 1.6; */
       }
 
-      /* Ensure images are responsive */
+      ${
+        fxlActive
+          ? ''
+          : `/* Ensure images are responsive */
       img {
         max-width: 100%;
         height: auto;
+      }`
       }
 
       /* Add some visual feedback for empty content */
@@ -1190,6 +1233,31 @@
   }
 
   /**
+   * Fixed-layout composition feedback: record the content's true extent against
+   * the declared page box, then clip like a real FXL reader (no scrollbars in
+   * the page — the badge carries the overflow diagnosis, so nothing is lost).
+   */
+  function measureFxlPage(iframeDoc: Document): void {
+    if (!fxlActive) {
+      fxlContentSize = null;
+      return;
+    }
+    if (!iframeDoc.documentElement || !iframeDoc.body) return;
+    // Measure BEFORE injecting the clip style — root scroll sizes with
+    // overflow:hidden applied vary across engines.
+    fxlContentSize = {
+      width: Math.max(iframeDoc.documentElement.scrollWidth, iframeDoc.body.scrollWidth),
+      height: Math.max(iframeDoc.documentElement.scrollHeight, iframeDoc.body.scrollHeight),
+    };
+    if (!iframeDoc.querySelector('style[data-fxl-clip]')) {
+      const clip = iframeDoc.createElement('style');
+      clip.setAttribute('data-fxl-clip', '');
+      clip.textContent = 'html { overflow: hidden; }';
+      iframeDoc.head.appendChild(clip);
+    }
+  }
+
+  /**
    * Handle iframe load event
    */
   function handleIframeLoad(): void {
@@ -1198,6 +1266,9 @@
 
       // Set up interactivity first
       setupIframeInteractivity(iframeDoc);
+
+      // Fixed-layout: measure the page against its declared viewport, then clip.
+      measureFxlPage(iframeDoc);
 
       // Re-apply the reader-mode theme + font size (the fresh document dropped them).
       applyPreviewAppearance();
@@ -1330,6 +1401,28 @@
           >
             <ArrowsClockwise size={16} aria-hidden="true" />
           </button>
+        {/if}
+
+        <!-- Fixed-layout page box: the declared size the author is composing
+             against; warning-coloured when the chapter's content exceeds it. -->
+        {#if fxlActive}
+          <div
+            class="status-indicator fxl-badge"
+            class:warning={fxlOverflow}
+            title={fxlOverflow
+              ? $t('Content is {cw}×{ch}px; the declared page is {pw}×{ph}px', {
+                  cw: fxlOverflow.width,
+                  ch: fxlOverflow.height,
+                  pw: fxlPage.width,
+                  ph: fxlPage.height,
+                })
+              : $t('Declared fixed-layout page size')}
+          >
+            {#if fxlOverflow}<span class="status-icon">⚠️</span>{/if}
+            <span
+              >{fxlOverflow ? $t('overflows {size}', { size: fxlPageLabel }) : fxlPageLabel}</span
+            >
+          </div>
         {/if}
 
         <!-- View selector: the generated Source view + the device presets. Source and
@@ -1651,6 +1744,7 @@
           <div
             class="preview-frame-container"
             class:device-frame={!isFillDevice(selectedDevice.current)}
+            class:fxl-letterbox={fxlActive}
             style:transform={!isFillDevice(selectedDevice.current)
               ? `scale(${deviceScale})`
               : 'none'}
@@ -1678,10 +1772,22 @@
                    document.body transiently null mid-rewrite, which an embedded chapter
                    script's pending window handler can fire into; a fresh iframe gives
                    each render its own clean document lifecycle. -->
+              <!-- Fixed layout: the iframe IS the page — sized to the declared
+                   viewport and contain-fit into the device frame (translate
+                   centers the scaled box; transforms don't affect layout, so
+                   flex-centering can't). Undefined bindings fall back to the
+                   100%×100% CSS for reflowable/fill modes. -->
               {#key selectedDevice.current}
                 <iframe
                   bind:this={previewIframe}
                   class="preview-iframe"
+                  class:fxl-page={fxlActive}
+                  style:width={fxlGeometry ? `${fxlPage.width}px` : undefined}
+                  style:height={fxlGeometry ? `${fxlPage.height}px` : undefined}
+                  style:transform={fxlGeometry
+                    ? `translate(${fxlGeometry.offsetX}px, ${fxlGeometry.offsetY}px) scale(${fxlGeometry.scale})`
+                    : undefined}
+                  style:transform-origin={fxlGeometry ? 'top left' : undefined}
                   title={$t('XHTML Preview')}
                   onload={handleIframeLoad}
                 ></iframe>
@@ -2291,6 +2397,24 @@
     height: 100%;
     border: none;
     background: white;
+  }
+
+  /* FXL: the device frame becomes a letterbox stage — the checkerboard reads
+     as "not part of the page", so aspect mismatch between the declared page
+     and the device is immediately visible. */
+  .preview-frame-container.fxl-letterbox {
+    background: repeating-conic-gradient(
+        var(--color-bg-secondary) 0% 25%,
+        var(--color-bg-tertiary) 0% 50%
+      )
+      0 0 / 16px 16px;
+  }
+
+  /* The page edge; box-shadow (not outline) so it scales with the transform. */
+  .preview-iframe.fxl-page {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-border-strong) 60%, transparent),
+      var(--shadow-md);
   }
 
   .preview-error,

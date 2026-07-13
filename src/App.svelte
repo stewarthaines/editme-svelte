@@ -1389,6 +1389,7 @@
             previewIncludeHead={appState?.epubSettings?.preview?.includeHead}
             isFixedLayout={currentWorkspaceState?.opf?.metadata?.renditionLayout ===
               'pre-paginated'}
+            renditionViewport={currentWorkspaceState?.opf?.metadata?.renditionViewport}
             advancedMode={advancedMode.current}
           />
         {:else}

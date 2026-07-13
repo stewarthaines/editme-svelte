@@ -911,6 +911,10 @@ msgstr "Mit Google Drive verbinden, um Dateien anzuzeigen."
 msgid "Connecting to storage..."
 msgstr "Verbindung zum Speicher wird hergestellt..."
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Content is {cw}×{ch}px; the declared page is {pw}×{ph}px"
+msgstr "Inhalt ist {cw}×{ch}px; die deklarierte Seite ist {pw}×{ph}px"
+
 #: src/lib/components/preview/ContentPreview.svelte
 msgid "Content Preview"
 msgstr "Inhaltsvorschau"
@@ -1125,6 +1129,10 @@ msgstr "Dunkel"
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Dark text on a light cover"
 msgstr "Dunkler Text auf hellem Cover"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Declared fixed-layout page size"
+msgstr "Deklarierte Seitengröße (Fixed Layout)"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Decrease text size"
@@ -2634,6 +2642,10 @@ msgstr "Andere Kapitel mit Problemen"
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Other formats"
 msgstr "Weitere Formate"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "overflows {size}"
+msgstr "überläuft {size}"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
