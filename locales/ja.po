@@ -1229,6 +1229,10 @@ msgid "Download EPUB to disk"
 msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
+msgid "Download failed — try again"
+msgstr ""
+
+#: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Download SEED.html"
 msgstr ""
 
@@ -2802,6 +2806,7 @@ msgstr ""
 msgid "Prefix URI"
 msgstr ""
 
+#: src/lib/navigation/views/ThirdPartyView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Preparing…"
 msgstr ""

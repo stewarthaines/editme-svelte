@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeAll } from 'vitest';
-import { buildLocaleBundleDataUrl, injectI18nBundle } from '../seed-html.js';
+import { buildLocaleBundleDataUrl, injectI18nBundle, localizedSeedHtml } from '../seed-html.js';
 import type { FileStorageAPI } from '../../storage/index.js';
 import { Zip } from '../../zip/index.js';
 
@@ -189,5 +189,33 @@ describe('buildLocaleBundleDataUrl', () => {
     const match = /window\.__SEEDHTML_I18N_BUNDLE__='([^']+)';/.exec(injected);
     expect(match).not.toBeNull();
     expect(match![1]).toBe(dataUrl);
+  });
+});
+
+// The shared best-effort wrapper used by EPUB packaging and the About-page
+// download link: localize when catalogs are cached, never fail.
+describe('localizedSeedHtml', () => {
+  const deCatalog = JSON.stringify({ Hello: 'Hallo' });
+
+  it('splices cached catalogs into the anchor', async () => {
+    const storage = mockLocalesStorage({ 'de.json': deCatalog });
+
+    const result = decode(await localizedSeedHtml(encode(MARKER_HTML), storage));
+
+    expect(result).toMatch(/window\.__SEEDHTML_I18N_BUNDLE__='data:application\/zip;base64,/);
+  });
+
+  it('returns pristine bytes when nothing is cached', async () => {
+    const storage = mockLocalesStorage({ 'en.json': deCatalog });
+
+    const bytes = encode(MARKER_HTML);
+    expect(await localizedSeedHtml(bytes, storage)).toBe(bytes);
+  });
+
+  it('returns pristine bytes for a build with no anchor (never throws)', async () => {
+    const storage = mockLocalesStorage({ 'de.json': deCatalog });
+
+    const bytes = encode(NO_ANCHOR_HTML);
+    expect(await localizedSeedHtml(bytes, storage)).toBe(bytes);
   });
 });

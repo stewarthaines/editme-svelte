@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   // Version injected at build time from package.json
   declare const __VERSION__: string;
 </script>
@@ -6,10 +6,40 @@
 <script lang="ts">
   import { t } from '../../i18n';
   import PaneHeader from '$lib/components/layout/PaneHeader.svelte';
-  import { canFetchSelfHtml } from '$lib/epub/seed-html.js';
+  import {
+    canFetchSelfHtml,
+    fetchSelfHtml,
+    localizedSeedHtml,
+    SEED_HTML_NAME,
+  } from '$lib/epub/seed-html.js';
+  import { FileStorageAPI } from '$lib/storage/index.js';
   import LICENSE_TEXT from '../../../../LICENSE.txt?raw';
 
   const VERSION = __VERSION__;
+
+  // Download the running app as a single file, with the user's cached locale
+  // catalogs spliced in (the same transformation as embedding SEED.html into
+  // an EPUB) — a plain <a download> would save the hosted English base build.
+  let downloading = $state(false);
+  let downloadError = $state(false);
+  async function downloadApp() {
+    if (downloading) return;
+    downloading = true;
+    downloadError = false;
+    try {
+      const bytes = await localizedSeedHtml(await fetchSelfHtml(), FileStorageAPI.getInstance());
+      const url = URL.createObjectURL(new Blob([bytes], { type: 'text/html' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = SEED_HTML_NAME;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      downloadError = true;
+    } finally {
+      downloading = false;
+    }
+  }
 
   // Online-only libraries are fetched at runtime (vendored polyfills + the
   // publish plugin) and aren't present in the offline file:// build.
@@ -163,10 +193,24 @@
           )}
         </p>
         <p class="license-meta">
-          <a href="SEED.html" download="SEED.html" class="external-link">
-            {$t('Download SEED.html')}
+          <a
+            href="SEED.html"
+            download="SEED.html"
+            class="external-link"
+            aria-busy={downloading}
+            onclick={event => {
+              // Intercept: fetch + localize + save as a blob. The plain href
+              // stays as the no-JS / mid-failure fallback.
+              event.preventDefault();
+              void downloadApp();
+            }}
+          >
+            {downloading ? $t('Preparing…') : $t('Download SEED.html')}
           </a>
           · {$t('Version')}: {VERSION}
+          {#if downloadError}
+            · <span class="download-error">{$t('Download failed — try again')}</span>
+          {/if}
         </p>
       </section>
     {/if}
@@ -260,6 +304,10 @@
     font-size: var(--text-sm);
     color: var(--color-text-tertiary);
     margin: 0 0 var(--space-3) 0;
+  }
+
+  .download-error {
+    color: var(--color-status-error);
   }
 
   /* License blocks are de-emphasized: small, muted, monospace. */

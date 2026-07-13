@@ -106,6 +106,28 @@ export function injectI18nBundle(seedHtmlBytes: ArrayBuffer, dataUrl: string): A
   return new TextEncoder().encode(injected).buffer as ArrayBuffer;
 }
 
+/**
+ * Splice the user's cached locale catalogs into SEED.html bytes so the copy
+ * speaks their language when opened from file://. Best-effort: when there is
+ * nothing to carry (English-only) or injection fails (a pre-i18n build), the
+ * pristine bytes are returned unchanged — localization never blocks the copy.
+ * Shared by EPUB packaging and the About-page download link.
+ */
+export async function localizedSeedHtml(
+  seedHtmlBytes: ArrayBuffer,
+  fileStorage: FileStorageAPI
+): Promise<ArrayBuffer> {
+  try {
+    const localeBundle = await buildLocaleBundleDataUrl(fileStorage);
+    if (localeBundle) {
+      return injectI18nBundle(seedHtmlBytes, localeBundle);
+    }
+  } catch (error) {
+    console.warn(`Carrying ${SEED_HTML_NAME} without locale catalogs:`, error);
+  }
+  return seedHtmlBytes;
+}
+
 /** Whether the running page can fetch its own HTML (hosted http(s); not file://). */
 export function canFetchSelfHtml(): boolean {
   return typeof location !== 'undefined' && location.protocol.startsWith('http');
