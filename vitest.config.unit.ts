@@ -34,5 +34,20 @@ export default defineConfig({
       // Browser-mode contract tests run separately (npm run test:plugins).
       '**/*.browser.{test,spec}.{js,ts}',
     ],
+    // On-demand diagnostic (npm run test:coverage) — not part of validate.
+    coverage: {
+      include: ['src/**', 'functions/**'],
+      exclude: [
+        // Story fixtures and mock data measure nothing about the app.
+        'src/stories/**',
+        '**/*.stories.*',
+        // Book-side demo assets and the iframe editor run inside EPUBs, not the app.
+        'src/assets/**',
+        // Build-time service-worker template; never executes in this suite.
+        'src/pwa/**',
+        '**/*.{test,spec}.*',
+      ],
+      reporter: ['text-summary', 'html'],
+    },
   },
 });
