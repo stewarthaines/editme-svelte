@@ -69,6 +69,11 @@
      * workspace + transform engine); a no-op when SettingsView is used standalone.
      */
     onExtensionAssets?: (assets: Array<{ target: string; media?: string }>) => Promise<void>;
+    /**
+     * Extension install/uninstall writes files without touching the OPF, so the
+     * Projects-list cache can't see it — this lets App drop the stale entry.
+     */
+    onWorkspaceFilesChanged?: (id: string) => void;
     /** Read-only EPUB: advanced mode is locked and extensions can't be added. */
     readOnly?: boolean;
     /** Whether any project exists — the app-level Advanced mode toggle only shows
@@ -90,6 +95,7 @@
     availableExtensions = [],
     onTogglePlugin,
     onExtensionAssets,
+    onWorkspaceFilesChanged,
     readOnly = false,
     hasProjects = false,
     onSettingsChanged,
@@ -190,6 +196,7 @@
     try {
       const detectedName = extensionManager.detectExtensionName(file.name);
       await extensionManager.importExtension(workspaceId, file, detectedName);
+      onWorkspaceFilesChanged?.(workspaceId);
 
       // Reload extensions list
       extensions = await extensionManager.listWorkspaceExtensions(workspaceId);
@@ -596,6 +603,7 @@
 
     try {
       await extensionManager.deleteWorkspaceExtension(workspaceId, extensionName);
+      onWorkspaceFilesChanged?.(workspaceId);
 
       // Prune the removed extension's transforms from settings.json — otherwise the
       // stale dom_transforms entry lingers and the spine editor's file dropdown lists
@@ -629,6 +637,7 @@
     importingExtensionId = entry.id;
     try {
       const assets = await extensionManager.importCatalogExtension(workspaceId, entry);
+      onWorkspaceFilesChanged?.(workspaceId);
       await transformEngine.setWorkspaceExtensions(workspaceId);
       extensions = await extensionManager.listWorkspaceExtensions(workspaceId);
       availableTransforms = await settingsService.getAvailableTransforms(workspaceId);

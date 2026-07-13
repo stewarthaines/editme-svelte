@@ -284,11 +284,16 @@ export class ExtensionManager {
    * Lists all extensions in a workspace
    *
    * @param workspaceId - Target workspace identifier
+   * @param knownFiles - Optional pre-listed workspace file paths; avoids a
+   *   second recursive directory walk when the caller already has one
    * @returns Promise resolving to array of extensions in workspace
    */
-  async listWorkspaceExtensions(workspaceId: string): Promise<ExtensionInfo[]> {
+  async listWorkspaceExtensions(
+    workspaceId: string,
+    knownFiles?: string[]
+  ): Promise<ExtensionInfo[]> {
     try {
-      const files = await this.fileStorage.listFiles(workspaceId);
+      const files = knownFiles ?? (await this.fileStorage.listFiles(workspaceId));
       const extensionFiles = files.filter(f => f.startsWith('SOURCE/extensions/'));
 
       const extensionDirs = new Set<string>();

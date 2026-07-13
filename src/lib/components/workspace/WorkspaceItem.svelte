@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, untrack } from 'svelte';
+  import { onMount } from 'svelte';
   import { t } from '../../i18n';
   import type {
     WorkspaceInfo,
@@ -22,33 +22,20 @@
     onDeleteRequested?: (detail: { workspaceId: string }) => void;
   } = $props();
 
-  // Per-row details (file count, extensions) are loaded lazily after the list
-  // renders, so the Projects view appears instantly. Prefer eager values if a
-  // caller already populated them on the workspace object.
-  let details = $state<WorkspaceRowDetails | null>(
-    untrack(() =>
-      workspace.fileCount !== undefined
-        ? { fileCount: workspace.fileCount, extensionIds: workspace.extensionIds, readOnly: false }
-        : null
-    )
-  );
-  let coverUrl = $state<string | null>(null);
+  // Per-row details (file count, extensions, cover thumbnail) are loaded
+  // lazily after the list renders, so the Projects view appears instantly.
+  // The thumbnail is a data URL (persistently cached in the service layer),
+  // so there is no blob-URL lifecycle to manage here.
+  let details = $state<WorkspaceRowDetails | null>(null);
+  const coverUrl = $derived(details?.coverThumbUrl ?? null);
 
   onMount(async () => {
-    if (details || !onLoadWorkspaceDetails) return;
+    if (!onLoadWorkspaceDetails) return;
     try {
       details = await onLoadWorkspaceDetails(workspace.id);
-      if (details.coverImageData) {
-        const { buffer, mediaType } = details.coverImageData;
-        coverUrl = URL.createObjectURL(new Blob([buffer], { type: mediaType }));
-      }
     } catch {
       // Row details are non-critical; leave them unshown on failure.
     }
-  });
-
-  onDestroy(() => {
-    if (coverUrl) URL.revokeObjectURL(coverUrl);
   });
 
   const handleSelect = () => {

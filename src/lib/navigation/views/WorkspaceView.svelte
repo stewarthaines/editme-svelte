@@ -25,6 +25,7 @@
     onDuplicateWorkspace,
     onLoadWorkspace,
     onLoadWorkspaceDetails,
+    onLoadCoverImage,
     onEpubImportRequested,
     onWorkspaceChange = null,
     onWorkspaceOpened,
@@ -44,6 +45,8 @@
     onDuplicateWorkspace: (id: string, title?: string) => Promise<string>;
     onLoadWorkspace: (id: string) => Promise<void>;
     onLoadWorkspaceDetails: (id: string) => Promise<WorkspaceRowDetails>;
+    /** Full-resolution cover bytes for the detail panel (cards use the cached thumbnail). */
+    onLoadCoverImage: (id: string) => Promise<{ buffer: ArrayBuffer; mediaType: string } | null>;
     onEpubImportRequested: (file?: File, sourceUrl?: string) => Promise<void>;
     onWorkspaceChange?: ((workspaceId: string | null) => void) | null;
     onWorkspaceOpened?: (workspaceId: string) => void;
@@ -76,12 +79,10 @@
     let stale = false;
     let blobUrl: string | null = null;
 
-    void onLoadWorkspaceDetails(id)
-      .then(d => {
-        if (stale || !d.coverImageData) return;
-        blobUrl = URL.createObjectURL(
-          new Blob([d.coverImageData.buffer], { type: d.coverImageData.mediaType })
-        );
+    void onLoadCoverImage(id)
+      .then(cover => {
+        if (stale || !cover) return;
+        blobUrl = URL.createObjectURL(new Blob([cover.buffer], { type: cover.mediaType }));
         currentCoverUrl = blobUrl;
       })
       .catch(() => {});

@@ -60,6 +60,7 @@ describe('WorkspaceService.listWorkspaces (parallel, metadata-only)', () => {
   let service: WorkspaceService;
 
   beforeEach(async () => {
+    localStorage.clear(); // the persistent Projects cache must not leak between tests
     storage = new MockFileStorage();
     service = new WorkspaceService(storage as unknown as FileStorageAPI);
 
@@ -97,6 +98,90 @@ describe('WorkspaceService.listWorkspaces (parallel, metadata-only)', () => {
     expect(details.fileCount).toBe(3);
     // No SOURCE/ files were seeded → a regular (read-only) EPUB.
     expect(details.readOnly).toBe(true);
+  });
+
+  it('serves row details to a fresh service instance without re-walking the tree', async () => {
+    // First instance pays the cold cost and persists what it derived.
+    await service.getWorkspaceRowDetails('ws-a');
+
+    // A new instance (= a page reload) must hydrate from the persistent cache:
+    // one stat for freshness, zero directory walks.
+    const reloaded = new WorkspaceService(storage as unknown as FileStorageAPI);
+    const listFilesSpy = vi.spyOn(storage, 'listFiles');
+    const details = await reloaded.getWorkspaceRowDetails('ws-a');
+
+    expect(details.fileCount).toBe(3);
+    expect(details.readOnly).toBe(true);
+    expect(listFilesSpy).not.toHaveBeenCalled();
+  });
+
+  it('rebuilds row details when the OPF changes after hydration', async () => {
+    await service.getWorkspaceRowDetails('ws-a');
+
+    // Touch the OPF (new mtime) and add a file: the persisted entry is stale.
+    // The mock stamps writes with the current time — make sure it ticks.
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await storage.addTestFiles('ws-a', {
+      'OEBPS/content.opf': JSON.stringify({ title: 'Book A', language: 'en' }),
+      'OEBPS/ch2.xhtml': 'x',
+    });
+
+    const reloaded = new WorkspaceService(storage as unknown as FileStorageAPI);
+    const listFilesSpy = vi.spyOn(storage, 'listFiles');
+    const details = await reloaded.getWorkspaceRowDetails('ws-a');
+
+    expect(details.fileCount).toBe(4);
+    expect(listFilesSpy).toHaveBeenCalled();
+  });
+
+  it('walks the tree only once per cold row (extensions reuse the listing)', async () => {
+    const listFilesSpy = vi.spyOn(storage, 'listFiles');
+    await service.getWorkspaceRowDetails('ws-a');
+    expect(listFilesSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('invalidateWorkspaceCache removes the persistent entry', async () => {
+    await service.getWorkspaceRowDetails('ws-a');
+    expect(localStorage.getItem('seedhtml_projcache_ws-a')).not.toBeNull();
+
+    service.invalidateWorkspaceCache('ws-a');
+    expect(localStorage.getItem('seedhtml_projcache_ws-a')).toBeNull();
+  });
+
+  it('overwriting the cached cover path drops the cached row data', async () => {
+    // Build + persist the entry, then graft a cover path onto it (the JSON OPF
+    // used by these orchestration tests never yields one via DOMParser).
+    await service.getWorkspaceRowDetails('ws-a');
+    const key = 'seedhtml_projcache_ws-a';
+    const entry = JSON.parse(localStorage.getItem(key)!);
+    entry.rowMeta.cover = { path: 'OEBPS/images/cover.png', mediaType: 'image/png' };
+    localStorage.setItem(key, JSON.stringify(entry));
+
+    // A fresh instance hydrates the grafted cover into its in-memory slot.
+    const reloaded = new WorkspaceService(storage as unknown as FileStorageAPI);
+    await reloaded.getWorkspaceRowDetails('ws-a');
+
+    // Overwriting bytes at the cover path (no OPF change) must invalidate…
+    await reloaded.writeBinaryFile('ws-a', 'OEBPS/images/cover.png', new ArrayBuffer(4));
+    expect(localStorage.getItem(key)).toBeNull();
+
+    // …while writing any other file leaves the rebuilt cache alone.
+    await reloaded.getWorkspaceRowDetails('ws-a');
+    await reloaded.writeFile('ws-a', 'SOURCE/text/ch1.txt', 'hello');
+    expect(localStorage.getItem(key)).not.toBeNull();
+  });
+
+  it('listWorkspaces prunes persistent entries for deleted workspaces', async () => {
+    await service.getWorkspaceRowDetails('ws-a');
+    localStorage.setItem(
+      'seedhtml_projcache_ws-gone',
+      JSON.stringify({ v: 1, opfMtime: 1, rowMeta: { fileCount: 1, readOnly: false } })
+    );
+
+    await service.listWorkspaces();
+
+    expect(localStorage.getItem('seedhtml_projcache_ws-gone')).toBeNull();
+    expect(localStorage.getItem('seedhtml_projcache_ws-a')).not.toBeNull();
   });
 
   it('excludes reserved workspaces (publish, locales)', async () => {

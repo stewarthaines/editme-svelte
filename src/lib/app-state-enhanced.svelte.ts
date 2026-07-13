@@ -324,11 +324,26 @@ export class EnhancedAppState {
   }
 
   /**
-   * Load the per-row details (file count, extensions) for a single workspace.
-   * Used by the Projects list to fill in each row after the fast initial render.
+   * Load the per-row details (file count, extensions, cover thumbnail) for a
+   * single workspace. Used by the Projects list to fill in each row after the
+   * fast initial render.
    */
   async getWorkspaceRowDetails(id: string) {
     return this.workspaceService.getWorkspaceRowDetails(id);
+  }
+
+  /** Full-resolution cover bytes (Projects detail panel; cards use the thumbnail). */
+  async getWorkspaceCoverImage(id: string) {
+    return this.workspaceService.getWorkspaceCoverImage(id);
+  }
+
+  /**
+   * Drop the cached Projects-list data for a workspace. Needed after writes
+   * that don't touch the OPF (e.g. extension install/uninstall), which the
+   * OPF-mtime freshness check can't see.
+   */
+  invalidateWorkspaceCache(id: string): void {
+    this.workspaceService.invalidateWorkspaceCache(id);
   }
 
   async createWorkspace(title: string, language: string = 'en'): Promise<string> {

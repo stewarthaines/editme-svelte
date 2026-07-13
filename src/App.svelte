@@ -780,6 +780,8 @@
     if (!transformEngine || !extensionManager || !appState) return;
 
     const assets = await extensionManager.importCatalogExtension(workspaceId, entry);
+    // Extension files land outside the OPF's view — drop the cached row data.
+    appState.invalidateWorkspaceCache(workspaceId);
     await transformEngine.setWorkspaceExtensions(workspaceId);
 
     const settingsService = appState.getSettingsService();
@@ -921,7 +923,7 @@
         // packaged epub so the publish plugin can build rich OPDS entries.
         // Best-effort: never let a sidecar failure break packaging.
         try {
-          const cover = (await workspaceService.getWorkspaceRowDetails(workspaceId)).coverImageData;
+          const cover = (await workspaceService.getWorkspaceCoverImage(workspaceId)) ?? undefined;
           await writePublishSidecar(fileStorage, cover, navWorkspace.opf.metadata, result.filename);
         } catch (sidecarError) {
           console.warn('Failed to write publish sidecar:', sidecarError);
@@ -1196,6 +1198,7 @@
           onLoadWorkspaceDetails={id =>
             appState?.getWorkspaceRowDetails(id) ??
             Promise.resolve({ fileCount: 0, readOnly: false })}
+          onLoadCoverImage={id => appState?.getWorkspaceCoverImage(id) ?? Promise.resolve(null)}
           onEpubImportRequested={handleEpubImport}
           {currentWorkspaceId}
           advancedMode={advancedMode.current}
@@ -1300,6 +1303,7 @@
           readOnly={isReadOnly}
           {hasProjects}
           onExtensionAssets={handleExtensionAssets}
+          onWorkspaceFilesChanged={id => appState?.invalidateWorkspaceCache(id)}
           onTogglePlugin={(id, enabled) => {
             appState?.getSettingsService().setPluginEnabled(id, enabled);
             enabledPluginIds = appState?.getSettingsService().getEnabledPlugins() ?? [];

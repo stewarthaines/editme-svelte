@@ -63,14 +63,17 @@ export interface WorkspaceRowDetails {
   extensionIds?: string[];
   /** A regular EPUB (no SOURCE/ files) — viewable but not editable. */
   readOnly: boolean;
-  /** Raw bytes of the cover-image manifest item, if the workspace has one. */
-  coverImageData?: { buffer: ArrayBuffer; mediaType: string };
+  /** Small PNG data URL of the cover, sized for the project card. */
+  coverThumbUrl?: string;
 }
 
 /**
  * Cached row metadata — the lightweight, derived parts of WorkspaceRowDetails.
  * Excludes the cover ArrayBuffer: only the resolved cover path + media type are
  * kept, and the bytes are re-read on demand so the cache stays memory-flat.
+ *
+ * Known accepted staleness: SOURCE-only writes (chapter text edits) don't
+ * touch the OPF, so fileCount can be off by a file until the next OPF write.
  */
 interface CachedRowMeta {
   fileCount: number;
@@ -153,6 +156,14 @@ export class ValidationError extends WorkspaceServiceError {
 import { OPFUtils } from '../../epub/opf-utils.js';
 import { ExtensionManager } from '../../extensions/extension-manager.js';
 import { RESERVED_WORKSPACE_IDS } from '../../workspace/types.js';
+import { coverThumbDataUrl } from '../../epub/image-thumbnail.js';
+import {
+  readEntry,
+  writeEntry,
+  removeEntry,
+  pruneEntries,
+  entryFreshFor,
+} from './projects-cache.js';
 
 /**
  * WorkspaceService - Single responsibility for workspace lifecycle and EPUB structure
@@ -165,9 +176,11 @@ export class WorkspaceService {
 
   // OPF-mtime-validated cache of the Projects-list data. The shared mtime token
   // means a single OPF write invalidates both the summary and the row metadata.
+  // Backed by a persistent localStorage layer (projects-cache.ts) so page
+  // reloads skip the per-project directory walks and cover reads.
   private summaryCache = new Map<
     string,
-    { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta }
+    { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta; thumb?: string }
   >();
 
   constructor(private fileStorage: FileStorageAPI) {
@@ -180,7 +193,7 @@ export class WorkspaceService {
    */
   private async cacheSlot(id: string): Promise<{
     pathInfo: WorkspacePathInfo;
-    slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta };
+    slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta; thumb?: string };
   }> {
     const pathInfo = await this.getWorkspacePathInfo(id);
     let opfMtime = 0;
@@ -194,9 +207,59 @@ export class WorkspaceService {
     let slot = this.summaryCache.get(id);
     if (!slot || slot.opfMtime !== opfMtime) {
       slot = { opfMtime };
+      // Hydrate from the persistent layer when its entry was derived from the
+      // same OPF version — this is what makes reloads warm.
+      const entry = readEntry(id);
+      if (entry && entryFreshFor(entry, opfMtime)) {
+        if (entry.info) {
+          slot.info = {
+            id,
+            title: entry.info.title,
+            language: entry.info.language,
+            lastModified: new Date(entry.info.lastModified),
+            author: entry.info.author,
+            authors: entry.info.authors,
+            description: entry.info.description,
+            date: entry.info.date,
+            hasError: false,
+            epubVersion: '3.0',
+          };
+        }
+        slot.rowMeta = entry.rowMeta;
+        slot.thumb = entry.thumb;
+      }
       this.summaryCache.set(id, slot);
     }
     return { pathInfo, slot };
+  }
+
+  /**
+   * Merge this workspace's in-memory slot into its persistent entry
+   * (read-modify-write so data written by the other load path survives).
+   */
+  private persistSlot(
+    id: string,
+    slot: { opfMtime: number; info?: WorkspaceInfo; rowMeta?: CachedRowMeta; thumb?: string }
+  ): void {
+    const existing = readEntry(id);
+    const base = existing && entryFreshFor(existing, slot.opfMtime) ? existing : undefined;
+    writeEntry(id, {
+      v: 1,
+      opfMtime: slot.opfMtime,
+      info: slot.info
+        ? {
+            title: slot.info.title,
+            language: slot.info.language,
+            lastModified: slot.info.lastModified.getTime(),
+            author: slot.info.author,
+            authors: slot.info.authors,
+            description: slot.info.description,
+            date: slot.info.date,
+          }
+        : base?.info,
+      rowMeta: slot.rowMeta ?? base?.rowMeta,
+      thumb: slot.thumb ?? base?.thumb,
+    });
   }
 
   /** Drop cached data for one workspace (or all when no id is given). */
@@ -204,7 +267,9 @@ export class WorkspaceService {
     if (id) {
       this.pathInfoCache.delete(id);
       this.summaryCache.delete(id);
+      removeEntry(id);
     } else {
+      pruneEntries([]); // removes every persistent entry
       this.pathInfoCache.clear();
       this.summaryCache.clear();
     }
@@ -782,6 +847,10 @@ export class WorkspaceService {
     // projects and have no OPF to parse.
     const visibleIds = workspaceIds.filter(id => !RESERVED_WORKSPACE_IDS.has(id));
 
+    // Housekeeping for the persistent cache: drop entries for deleted
+    // workspaces and keep the total size within budget.
+    pruneEntries(visibleIds);
+
     // Parse all workspaces in parallel; a corrupted workspace resolves to null
     // (one bad workspace must not abort the whole list) and is filtered out.
     const results = await Promise.all(
@@ -827,77 +896,107 @@ export class WorkspaceService {
       hasError: false,
       epubVersion: '3.0',
     };
+    this.persistSlot(id, slot);
     return slot.info;
   }
 
   /**
+   * Rebuild the heavy, derived row metadata on a miss (one directory scan,
+   * extensions from the same listing, OPF parse to locate the cover). The
+   * cover's resolved path is kept; its bytes are not, so the cache stays
+   * memory-flat.
+   */
+  private async ensureRowMeta(
+    id: string,
+    pathInfo: WorkspacePathInfo,
+    slot: { opfMtime: number; rowMeta?: CachedRowMeta }
+  ): Promise<CachedRowMeta> {
+    if (slot.rowMeta) return slot.rowMeta;
+
+    const files = await this.fileStorage.listFiles(id);
+
+    let extensionIds: string[] | undefined;
+    try {
+      // Pass the listing along so extensions don't trigger a second walk.
+      const extensions = await this.extensionManager.listWorkspaceExtensions(id, files);
+      if (extensions.length > 0) {
+        extensionIds = extensions.map(ext => ext.name);
+      }
+    } catch {
+      // Extensions are optional — don't fail the row if they can't be loaded.
+    }
+
+    let cover: CachedRowMeta['cover'];
+    try {
+      const opfPath = pathInfo.rootfilePath;
+      const opfXml = await this.fileStorage.readTextFile(id, opfPath);
+      const doc = new DOMParser().parseFromString(opfXml, 'application/xml');
+      const coverEl = doc.querySelector('[properties~="cover-image"]');
+      const href = coverEl?.getAttribute('href');
+      const mediaType = coverEl?.getAttribute('media-type') ?? 'image/png';
+      if (href) {
+        const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/'));
+        cover = { path: `${opfDir}/${href}`, mediaType };
+      }
+    } catch {
+      // Cover image is optional — don't fail the row.
+    }
+
+    slot.rowMeta = {
+      fileCount: files.length,
+      extensionIds,
+      readOnly: workspaceIsReadOnly(files),
+      cover,
+    };
+    return slot.rowMeta;
+  }
+
+  /**
    * Load the per-row details that are too expensive for the fast list path:
-   * file count (directory scan) and extension ids. Called lazily once a row
-   * is rendered.
+   * file count (directory scan), extension ids, and a small cover thumbnail.
+   * Called lazily once a row is rendered.
    */
   async getWorkspaceRowDetails(id: string): Promise<WorkspaceRowDetails> {
-    const { slot } = await this.cacheSlot(id);
+    const { pathInfo, slot } = await this.cacheSlot(id);
+    const rowMeta = await this.ensureRowMeta(id, pathInfo, slot);
 
-    // Rebuild the heavy, derived metadata on a miss (directory scan, extensions,
-    // OPF parse to locate the cover). The cover's resolved path is kept; its
-    // bytes are not, so the cache stays memory-flat.
-    if (!slot.rowMeta) {
-      const files = await this.fileStorage.listFiles(id);
-
-      let extensionIds: string[] | undefined;
+    // Generate the card thumbnail once from the full cover bytes, then serve
+    // it from the (persisted) cache. Canvas failure just means no thumbnail.
+    if (!slot.thumb && rowMeta.cover) {
       try {
-        const extensions = await this.extensionManager.listWorkspaceExtensions(id);
-        if (extensions.length > 0) {
-          extensionIds = extensions.map(ext => ext.name);
-        }
+        const buffer = await this.fileStorage.readFile(id, rowMeta.cover.path);
+        slot.thumb = await coverThumbDataUrl(buffer, rowMeta.cover.mediaType);
       } catch {
-        // Extensions are optional — don't fail the row if they can't be loaded.
-      }
-
-      let cover: CachedRowMeta['cover'];
-      try {
-        const opfPath = files.find(f => f.endsWith('.opf'));
-        if (opfPath) {
-          const opfXml = await this.fileStorage.readTextFile(id, opfPath);
-          const doc = new DOMParser().parseFromString(opfXml, 'application/xml');
-          const coverEl = doc.querySelector('[properties~="cover-image"]');
-          const href = coverEl?.getAttribute('href');
-          const mediaType = coverEl?.getAttribute('media-type') ?? 'image/png';
-          if (href) {
-            const opfDir = opfPath.substring(0, opfPath.lastIndexOf('/'));
-            cover = { path: `${opfDir}/${href}`, mediaType };
-          }
-        }
-      } catch {
-        // Cover image is optional — don't fail the row.
-      }
-
-      slot.rowMeta = {
-        fileCount: files.length,
-        extensionIds,
-        readOnly: workspaceIsReadOnly(files),
-        cover,
-      };
-    }
-
-    // Read the cover bytes fresh from the cached path each call (always current,
-    // and nothing large held in the cache).
-    let coverImageData: WorkspaceRowDetails['coverImageData'];
-    if (slot.rowMeta.cover) {
-      try {
-        const buffer = await this.fileStorage.readFile(id, slot.rowMeta.cover.path);
-        coverImageData = { buffer, mediaType: slot.rowMeta.cover.mediaType };
-      } catch {
-        // Cover went missing since it was discovered — omit it.
+        // Cover missing or not rasterizable — the card shows its fallback icon.
       }
     }
+
+    this.persistSlot(id, slot);
 
     return {
-      fileCount: slot.rowMeta.fileCount,
-      extensionIds: slot.rowMeta.extensionIds,
-      readOnly: slot.rowMeta.readOnly,
-      coverImageData,
+      fileCount: rowMeta.fileCount,
+      extensionIds: rowMeta.extensionIds,
+      readOnly: rowMeta.readOnly,
+      coverThumbUrl: slot.thumb,
     };
+  }
+
+  /**
+   * Full-resolution cover bytes for the detail pane and the publish sidecar —
+   * the Projects-list cards use the cached thumbnail instead.
+   */
+  async getWorkspaceCoverImage(
+    id: string
+  ): Promise<{ buffer: ArrayBuffer; mediaType: string } | null> {
+    const { pathInfo, slot } = await this.cacheSlot(id);
+    const rowMeta = await this.ensureRowMeta(id, pathInfo, slot);
+    if (!rowMeta.cover) return null;
+    try {
+      const buffer = await this.fileStorage.readFile(id, rowMeta.cover.path);
+      return { buffer, mediaType: rowMeta.cover.mediaType };
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -1152,6 +1251,21 @@ export class WorkspaceService {
   }
 
   /**
+   * Cache hygiene for direct file writes: overwriting the bytes at the cached
+   * cover path (e.g. an overwrite-import of the cover image) must drop the
+   * cached thumbnail, since neither the OPF mtime nor the cover path changes.
+   * Other writes (chapter text, SOURCE files) stay cache-neutral.
+   */
+  private noteFileWritten(workspaceId: string, filePath: string): void {
+    const slot = this.summaryCache.get(workspaceId);
+    if (slot?.rowMeta?.cover?.path === filePath) {
+      slot.rowMeta = undefined;
+      slot.thumb = undefined;
+      removeEntry(workspaceId);
+    }
+  }
+
+  /**
    * Write a file to the workspace
    */
   async writeFile(workspaceId: string, filePath: string, content: string): Promise<void> {
@@ -1166,6 +1280,7 @@ export class WorkspaceService {
       const contentBuffer = new ArrayBuffer(uint8Array.length);
       new Uint8Array(contentBuffer).set(uint8Array);
       await this.fileStorage.writeFile(workspaceId, filePath, contentBuffer);
+      this.noteFileWritten(workspaceId, filePath);
     } catch (error) {
       throw new WorkspaceServiceError(
         `Failed to write file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -1185,6 +1300,7 @@ export class WorkspaceService {
   ): Promise<void> {
     try {
       await this.fileStorage.writeFile(workspaceId, filePath, content);
+      this.noteFileWritten(workspaceId, filePath);
     } catch (error) {
       throw new WorkspaceServiceError(
         `Failed to write binary file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,

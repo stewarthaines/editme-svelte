@@ -45,3 +45,23 @@ export async function resizeImageToPng(
     URL.revokeObjectURL(url);
   }
 }
+
+/**
+ * Renders a cover image as a small PNG data URL for the Projects-list card.
+ * Data URLs are directly persistable (localStorage) and need no blob-URL
+ * lifecycle in the component. Must be called in a window context.
+ */
+export async function coverThumbDataUrl(
+  buffer: ArrayBuffer,
+  mediaType: string,
+  maxDim = 128
+): Promise<string> {
+  const png = await resizeImageToPng(buffer, mediaType, maxDim);
+  let binary = '';
+  const bytes = new Uint8Array(png);
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return `data:image/png;base64,${btoa(binary)}`;
+}
