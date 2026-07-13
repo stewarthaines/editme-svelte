@@ -5,6 +5,7 @@
     catalogEntryLabel,
   } from '../../metadata/custom-meta-catalog.svelte.js';
   import type { CatalogEntry } from '../../metadata/custom-meta-catalog.svelte.js';
+  import { RESERVED_PREFIXES } from '../../epub/opf-utils';
   import type { CustomMetaSyntax } from '../../epub/opf-utils';
   import { X } from 'phosphor-svelte';
 
@@ -28,6 +29,46 @@
     }
     return buckets.sort((a, b) => Number(!!a.group) - Number(!!b.group));
   });
+
+  // --- "Add field" form: declare a field before any book carries it ----------
+  let newKey = $state('');
+  let newSyntax = $state<CustomMetaSyntax>('property');
+  let newValueType = $state<'boolean' | 'text'>('text');
+  let newPrefixUri = $state('');
+  let addError = $state<string | null>(null);
+
+  // A property key under an undeclared, non-reserved prefix is the one case
+  // that needs a prefix URI to write valid EPUB 3 — only then show the input.
+  const newKeyPrefix = $derived.by(() => {
+    const trimmed = newKey.trim();
+    const colon = trimmed.indexOf(':');
+    return colon > 0 ? trimmed.slice(0, colon) : null;
+  });
+  const needsPrefixUri = $derived(
+    newSyntax === 'property' && !!newKeyPrefix && !RESERVED_PREFIXES.has(newKeyPrefix)
+  );
+
+  const addField = () => {
+    const key = newKey.trim();
+    if (!key) return;
+    if (/\s/.test(key)) {
+      addError = $t('Key must not contain spaces');
+      return;
+    }
+    const result = customMetaCatalog.addUserEntry({
+      key,
+      syntax: newSyntax,
+      valueType: newValueType,
+      prefixUri: needsPrefixUri ? newPrefixUri : undefined,
+    });
+    if (result === 'exists') {
+      addError = $t('Already in the catalog');
+      return;
+    }
+    newKey = '';
+    newPrefixUri = '';
+    addError = null;
+  };
 </script>
 
 <p class="setting-description">
@@ -76,6 +117,17 @@
 
       {#if entry.source === 'user'}
         <div class="catalog-entry-controls">
+          <label class="control-field control-field-grow">
+            <span class="control-label">{$t('Label')}</span>
+            <input
+              id="{entryDomId(entry)}-label"
+              type="text"
+              value={entry.label ?? ''}
+              placeholder={entry.key}
+              onblur={e =>
+                customMetaCatalog.setLabel(entry.key, entry.syntax, e.currentTarget.value)}
+            />
+          </label>
           <label class="control-field">
             <span class="control-label">{$t('Value type')}</span>
             <select
@@ -110,6 +162,56 @@
     </div>
   {/each}
 {/each}
+
+<div class="add-field">
+  <div class="catalog-entry-controls">
+    <label class="control-field control-field-grow">
+      <span class="control-label">{$t('Key')}</span>
+      <input
+        id="catalog-add-key"
+        type="text"
+        class="key-input"
+        bind:value={newKey}
+        placeholder="calibre:series"
+        onkeydown={e => {
+          if (e.key === 'Enter') addField();
+        }}
+        oninput={() => (addError = null)}
+      />
+    </label>
+    <label class="control-field">
+      <span class="control-label">{$t('Syntax')}</span>
+      <select id="catalog-add-syntax" bind:value={newSyntax}>
+        <option value="property">{$t('EPUB 3 property')}</option>
+        <option value="name">{$t('EPUB 2 name')}</option>
+      </select>
+    </label>
+    <label class="control-field">
+      <span class="control-label">{$t('Value type')}</span>
+      <select id="catalog-add-type" bind:value={newValueType}>
+        <option value="text">{$t('Text')}</option>
+        <option value="boolean">{$t('Checkbox')}</option>
+      </select>
+    </label>
+    {#if needsPrefixUri}
+      <label class="control-field control-field-grow">
+        <span class="control-label">{$t('Prefix URI')}</span>
+        <input
+          id="catalog-add-prefix"
+          type="text"
+          bind:value={newPrefixUri}
+          placeholder="https://…"
+        />
+      </label>
+    {/if}
+    <button type="button" class="btn add-button" onclick={addField} disabled={!newKey.trim()}>
+      {$t('Add')}
+    </button>
+  </div>
+  {#if addError}
+    <p class="add-error">{addError}</p>
+  {/if}
+</div>
 
 <style>
   .setting-description {
@@ -229,5 +331,31 @@
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
     width: 100%;
+  }
+
+  .add-field {
+    padding: var(--space-2);
+    margin-block-start: 0.75rem;
+    border: 1px dashed var(--color-border-default);
+    border-radius: var(--radius-sm);
+  }
+
+  .add-field .catalog-entry-controls {
+    margin-block-start: 0;
+    flex-wrap: wrap;
+  }
+
+  .key-input {
+    font-family: var(--font-mono, monospace);
+  }
+
+  .add-button {
+    flex: none;
+  }
+
+  .add-error {
+    margin: 0.375rem 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-status-error);
   }
 </style>

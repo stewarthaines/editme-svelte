@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11\n"
-"PO-Revision-Date: 2026-07-11\n"
+"POT-Creation-Date: 2026-07-13\n"
+"PO-Revision-Date: 2026-07-13\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -301,6 +301,7 @@ msgid "Active Remote:"
 msgstr "Aktives Remote:"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -433,6 +434,10 @@ msgstr "Für die Erweiterungsverwaltung ist der erweiterte Modus erforderlich"
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
 msgstr "KI-Hinweis"
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Already in the catalog"
+msgstr "Bereits im Katalog"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "API Key"
@@ -1965,9 +1970,14 @@ msgstr "Beide behalten (als neues Element importieren)"
 msgid "Keep the chapter"
 msgstr "Kapitel behalten"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Key"
 msgstr "Schlüssel"
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Key must not contain spaces"
+msgstr "Schlüssel darf keine Leerzeichen enthalten"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle"
@@ -2005,6 +2015,7 @@ msgstr "Kindle: Originalauflösung (z. B. 1024x600)"
 msgid "Kindle: primary writing mode"
 msgstr "Kindle: primäre Schreibrichtung"
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Label"
 msgstr "Beschriftung"
@@ -3440,6 +3451,10 @@ msgstr "Zu Einzelbereich wechseln"
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Sync folder"
 msgstr "Ordner synchronisieren"
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Syntax"
+msgstr "Syntax"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "System"

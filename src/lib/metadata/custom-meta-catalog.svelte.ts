@@ -320,6 +320,18 @@ export interface CustomMetaCatalog {
     prefixUri?: string;
     label?: string;
   }): void;
+  /**
+   * Create a field by hand (the Settings "Add field" form). Unlike adopt(),
+   * a (syntax, key) collision — including with builtins — is reported so the
+   * form can say so instead of silently doing nothing.
+   */
+  addUserEntry(input: {
+    key: string;
+    syntax: CustomMetaSyntax;
+    valueType: 'boolean' | 'text';
+    prefixUri?: string;
+    label?: string;
+  }): 'added' | 'exists';
   /** Remove a user entry. No-op for builtins. */
   remove(key: string, syntax: CustomMetaSyntax): void;
   setEnabled(key: string, syntax: CustomMetaSyntax, enabled: boolean): void;
@@ -327,6 +339,8 @@ export interface CustomMetaCatalog {
   setValueType(key: string, syntax: CustomMetaSyntax, valueType: 'boolean' | 'text'): void;
   /** Supply the prefix URI a user property-syntax entry is missing. No-op for builtins. */
   setPrefixUri(key: string, syntax: CustomMetaSyntax, prefixUri: string): void;
+  /** Set a user entry's display label; empty clears (display falls back to the key). */
+  setLabel(key: string, syntax: CustomMetaSyntax, label: string): void;
 }
 
 /**
@@ -379,6 +393,21 @@ export function createCustomMetaCatalog(
       store.current = { ...store.current, user: [...store.current.user, entry] };
     },
 
+    addUserEntry({ key, syntax, valueType, prefixUri, label }) {
+      const trimmedKey = key.trim();
+      if (this.find(trimmedKey, syntax)) return 'exists';
+      const entry: UserEntry = {
+        key: trimmedKey,
+        syntax,
+        valueType,
+        label: label?.trim() || undefined,
+        prefixUri: prefixUri?.trim() || undefined,
+        enabled: true,
+      };
+      store.current = { ...store.current, user: [...store.current.user, entry] };
+      return 'added';
+    },
+
     remove(key, syntax) {
       const current = store.current;
       const user = current.user.filter(e => !(e.key === key && e.syntax === syntax));
@@ -403,6 +432,10 @@ export function createCustomMetaCatalog(
 
     setPrefixUri(key, syntax, prefixUri) {
       updateUser(key, syntax, entry => ({ ...entry, prefixUri: prefixUri.trim() || undefined }));
+    },
+
+    setLabel(key, syntax, label) {
+      updateUser(key, syntax, entry => ({ ...entry, label: label.trim() || undefined }));
     },
   };
 }

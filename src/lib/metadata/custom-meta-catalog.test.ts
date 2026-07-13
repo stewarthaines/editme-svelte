@@ -166,6 +166,74 @@ describe('customMetaCatalog', () => {
     expect(catalog.find('vendor:x', 'property')?.prefixUri).toBeUndefined();
   });
 
+  it('addUserEntry creates an enabled entry with the given shape and persists it', () => {
+    const catalog = createCustomMetaCatalog(KEY);
+    const result = catalog.addUserEntry({
+      key: '  calibre:rating  ',
+      syntax: 'property',
+      valueType: 'text',
+      prefixUri: ' https://calibre-ebook.com ',
+    });
+
+    expect(result).toBe('added');
+    expect(catalog.find('calibre:rating', 'property')).toMatchObject({
+      source: 'user',
+      valueType: 'text',
+      enabled: true,
+      prefixUri: 'https://calibre-ebook.com',
+    });
+    expect(createCustomMetaCatalog(KEY).find('calibre:rating', 'property')).toBeDefined();
+  });
+
+  it('addUserEntry reports collisions with user entries and builtins', () => {
+    const catalog = createCustomMetaCatalog(KEY);
+    catalog.addUserEntry({ key: 'calibre:series', syntax: 'name', valueType: 'text' });
+
+    expect(
+      catalog.addUserEntry({ key: 'calibre:series', syntax: 'name', valueType: 'boolean' })
+    ).toBe('exists');
+    expect(catalog.addUserEntry({ key: 'cover', syntax: 'name', valueType: 'text' })).toBe(
+      'exists'
+    );
+    // The other syntax is a distinct field.
+    expect(
+      catalog.addUserEntry({ key: 'calibre:series', syntax: 'property', valueType: 'text' })
+    ).toBe('added');
+    expect(catalog.entries.filter(e => e.key === 'calibre:series')).toHaveLength(2);
+    expect(catalog.find('calibre:series', 'name')?.valueType).toBe('text');
+  });
+
+  it('addUserEntry stores blank optional fields as undefined', () => {
+    const catalog = createCustomMetaCatalog(KEY);
+    catalog.addUserEntry({
+      key: 'vendor:x',
+      syntax: 'property',
+      valueType: 'text',
+      prefixUri: '  ',
+      label: ' ',
+    });
+
+    const entry = catalog.find('vendor:x', 'property');
+    expect(entry?.prefixUri).toBeUndefined();
+    expect(entry?.label).toBeUndefined();
+  });
+
+  it('setLabel sets and clears user labels, never builtins', () => {
+    const catalog = createCustomMetaCatalog(KEY);
+    catalog.addUserEntry({ key: 'vendor:x', syntax: 'name', valueType: 'text' });
+
+    catalog.setLabel('vendor:x', 'name', 'Series');
+    expect(catalog.find('vendor:x', 'name')?.label).toBe('Series');
+    // Label survives re-instantiation.
+    expect(createCustomMetaCatalog(KEY).find('vendor:x', 'name')?.label).toBe('Series');
+
+    catalog.setLabel('vendor:x', 'name', '  ');
+    expect(catalog.find('vendor:x', 'name')?.label).toBeUndefined();
+
+    catalog.setLabel('cover', 'name', 'Nope');
+    expect(catalog.find('cover', 'name')?.label).not.toBe('Nope');
+  });
+
   it('falls back to defaults on corrupt or malformed stored values', () => {
     localStorage.setItem(KEY, '{not json');
     expect(createCustomMetaCatalog(KEY).entries).toHaveLength(BUILTIN_CATALOG_ENTRIES.length);

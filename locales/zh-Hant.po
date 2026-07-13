@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-11\n"
-"PO-Revision-Date: 2026-07-11\n"
+"POT-Creation-Date: 2026-07-13\n"
+"PO-Revision-Date: 2026-07-13\n"
 "Language: zh-Hant\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -282,6 +282,7 @@ msgid "Active Remote:"
 msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Add"
 msgstr ""
 
@@ -413,6 +414,10 @@ msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
+msgstr ""
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Already in the catalog"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -1946,8 +1951,13 @@ msgstr ""
 msgid "Keep the chapter"
 msgstr ""
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Key"
+msgstr ""
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Key must not contain spaces"
 msgstr ""
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
@@ -1986,6 +1996,7 @@ msgstr ""
 msgid "Kindle: primary writing mode"
 msgstr ""
 
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Label"
 msgstr ""
@@ -3420,6 +3431,10 @@ msgstr ""
 #: src/lib/Sidebar.svelte
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Sync folder"
+msgstr ""
+
+#: src/lib/components/settings/CustomMetaCatalogSettings.svelte
+msgid "Syntax"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
