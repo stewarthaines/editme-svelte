@@ -14,162 +14,162 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "-- Choose a preset --"
-msgstr ""
+msgstr "-- აირჩიეთ პრესეტი --"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid ".. (up)"
-msgstr ""
+msgstr ".. (ზემოთ)"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "· validated {ago}"
-msgstr ""
+msgstr "· შემოწმდა {ago}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "\"{name}\" is not connected — plug in the device and refresh"
-msgstr ""
+msgstr "\\"{name}\\" არ არის დაკავშირებული — შეაერთეთ მოწყობილობა და განაახლეთ"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{count} accessibility issues"
-msgstr ""
+msgstr "{count} წვდომადობის პრობლემა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count} days ago"
-msgstr ""
+msgstr "{count} დღის წინ"
 
 #: src/lib/components/metadata/MetadataTab.svelte
 msgid "{count} errors"
-msgstr ""
+msgstr "{count} შეცდომა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "{count} Warnings"
-msgstr ""
+msgstr "{count} გაფრთხილება"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count}h ago"
-msgstr ""
+msgstr "{count} სთ წინ"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "{count}w ago"
-msgstr ""
+msgstr "{count} კვ. წინ"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "{done}/{total} addressed"
-msgstr ""
+msgstr "{done}/{total} მოგვარებულია"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "{href} already exists with different content. Overwrite it?"
-msgstr ""
+msgstr "{href} უკვე არსებობს განსხვავებული შიგთავსით. გსურთ გადაწერა?"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{key} deleted"
-msgstr ""
+msgstr "{key} წაიშალა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} available"
-msgstr ""
+msgstr "{n} ხელმისაწვდომია"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "{n} bytes"
-msgstr ""
+msgstr "{n} ბაიტი"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "{n} change(s)"
-msgstr ""
+msgstr "{n} ცვლილება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transform"
-msgstr ""
+msgstr "{n} DOM გარდაქმნა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} DOM transforms"
-msgstr ""
+msgstr "{n} DOM გარდაქმნა"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} error"
-msgstr ""
+msgstr "{n} შეცდომა"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} errors"
-msgstr ""
+msgstr "{n} შეცდომა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "{n} file(s) unchanged"
-msgstr ""
+msgstr "{n} ფაილი უცვლელია"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "{n} files added to the manifest"
-msgstr ""
+msgstr "მანიფესტს დაემატა {n} ფაილი"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "{n} generator"
-msgstr ""
+msgstr "{n} გენერატორი"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "{n} generators"
-msgstr ""
+msgstr "{n} გენერატორი"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} info"
-msgstr ""
+msgstr "{n} ინფო"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n} installed"
-msgstr ""
+msgstr "{n} დაყენებულია"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "{n} KB"
-msgstr ""
+msgstr "{n} კბ"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "{n} MB"
-msgstr ""
+msgstr "{n} მბ"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "{n} warning"
-msgstr ""
+msgstr "{n} გაფრთხილება"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "{n} warnings"
-msgstr ""
+msgstr "{n} გაფრთხილება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{n}/3 auto-update"
-msgstr ""
+msgstr "{n}/3 ავტოგანახლება"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} copied — eject the device to finish adding the book"
-msgstr ""
+msgstr "{name} დაკოპირდა — წიგნის დამატების დასასრულებლად გამოაერთეთ მოწყობილობა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name} წაიშალა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name} uploaded successfully"
-msgstr ""
+msgstr "{name} წარმატებით აიტვირთა"
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "{name} website"
-msgstr ""
+msgstr "{name}-ის ვებგვერდი"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "{name}: {errors} errors, {warnings} warnings"
-msgstr ""
+msgstr "{name}: {errors} შეცდომა, {warnings} გაფრთხილება"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "{path} (line {line}, col {col})"
-msgstr ""
+msgstr "{path} (ხაზი {line}, სვეტი {col})"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "{path} (line {line})"
-msgstr ""
+msgstr "{path} (ხაზი {line})"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "{sel}/{total}"
-msgstr ""
+msgstr "{sel}/{total}"
 
 #: src/lib/content/types.ts
 msgid ""
@@ -192,424 +192,443 @@ msgid ""
 "For richer formatting options there are third party javascript extensions that are not currently present in this project.\n"
 "\n"
 "For real writing projects the best way to start is to choose a sample EPUB that's pre-configured for generating semantic, accessible xhtml from *plain text source*.\n"
-msgstr ""
+msgstr "# მიღწევა *განბლოკილია!*
+
+ეს არის მინიმალური სანიმუშო EPUB, შექმნილი Simple EPUB Editor აპში — **SEED.html**.
+
+ეს სანიმუშო პროექტი გთავაზობთ markdown ფორმატის მხოლოდ მცირე ქვესიმრავლეს (სათაურები, მუქი და დახრილი).
+
+## Markdown-ის ქვესიმრავლე
+
+**ეს მუქია**  და იქმნება ტექსტის ორმაგ ვარსკვლავებში ჩასმით.
+
+*ეს დახრილია* და იქმნება ტექსტის ერთმაგ ვარსკვლავებში ჩასმით.
+
+შეგიძლიათ xhtml პირდაპირ ჩაწეროთ <em><strong>ამ</strong> EPUB-ში</em>, თუმცა ეს გარკვეულწილად აცდენს SEED.html აპის დანიშნულებას.
+
+## უკეთესი გზა
+
+უფრო მდიდარი ფორმატირებისთვის არსებობს მესამე მხარის javascript გაფართოებები, რომლებიც ამჟამად ამ პროექტში არ არის.
+
+ნამდვილი საწერი პროექტისთვის საუკეთესო დასაწყისია ისეთი სანიმუშო EPUB-ის არჩევა, რომელიც წინასწარ არის მორგებული *უბრალო ტექსტური წყაროდან* სემანტიკური, წვდომადი xhtml-ის შესაქმნელად.
+"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "1 day ago"
-msgstr ""
+msgstr "1 დღის წინ"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "1 file added to the manifest"
-msgstr ""
+msgstr "მანიფესტს დაემატა 1 ფაილი"
 
 #: src/lib/components/SpineItem.svelte
 msgid "A book needs at least one chapter"
-msgstr ""
+msgstr "წიგნს სულ მცირე ერთი თავი სჭირდება"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "A copy opened from your computer edits and packages books as usual. Features that need a web host are unavailable: publishing plugins, PDF export, the built-in reader, and installing new extensions."
-msgstr ""
+msgstr "თქვენი კომპიუტერიდან გახსნილი ასლი წიგნებს ჩვეულებრივ ჩაასწორებს და შეკრავს. ვებჰოსტზე დამოკიდებული ფუნქციები მიუწვდომელია: გამოქვეყნების მოდულები, PDF ექსპორტი, ჩაშენებული წამკითხველი და ახალი გაფართოებების დაყენება."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "A generator is a script that produces source text to insert at the editor caret."
-msgstr ""
+msgstr "გენერატორი არის სკრიპტი, რომელიც ქმნის წყაროს ტექსტს რედაქტორის კურსორის პოზიციაზე ჩასასმელად."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "A generator with that name already exists."
-msgstr ""
+msgstr "ამ სახელით გენერატორი უკვე არსებობს."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "A name is required."
-msgstr ""
+msgstr "სახელი აუცილებელია."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "A SEED EPUB is a living document rather than a publishing dead-end, suited to distribution, contribution and long-term preservation."
-msgstr ""
+msgstr "SEED EPUB ცოცხალი დოკუმენტია და არა გამოცემის ჩიხი — გამოსადეგი გავრცელებისთვის, წვლილის შეტანისთვის და გრძელვადიანი შენახვისთვის."
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "About SEED.html"
-msgstr ""
+msgstr "SEED.html-ის შესახებ"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Accept all changes in {name}"
-msgstr ""
+msgstr "ყველა ცვლილების მიღება {name}-ში"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Accept this change"
-msgstr ""
+msgstr "ამ ცვლილების მიღება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Access Key"
-msgstr ""
+msgstr "წვდომის გასაღები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Access Key ID"
-msgstr ""
+msgstr "წვდომის გასაღების ID"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Access modes"
-msgstr ""
+msgstr "წვდომის რეჟიმები"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility"
-msgstr ""
+msgstr "წვდომადობა"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Accessibility API"
-msgstr ""
+msgstr "წვდომადობის API"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility check (axe-core) — re-runs as you edit while open"
-msgstr ""
+msgstr "წვდომადობის შემოწმება (axe-core) — სანამ ღიაა, ჩასწორებისას ხელახლა ეშვება"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Accessibility features"
-msgstr ""
+msgstr "წვდომადობის მახასიათებლები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility issues"
-msgstr ""
+msgstr "წვდომადობის პრობლემები"
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Actions"
-msgstr ""
+msgstr "მოქმედებები"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Active Remote:"
-msgstr ""
+msgstr "აქტიური remote:"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Add"
-msgstr ""
+msgstr "დამატება"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Add a collection"
-msgstr ""
+msgstr "კოლექციის დამატება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add a DOM transform"
-msgstr ""
+msgstr "DOM გარდაქმნის დამატება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add a DOM transform…"
-msgstr ""
+msgstr "DOM გარდაქმნის დამატება…"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Add a generator"
-msgstr ""
+msgstr "გენერატორის დამატება"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Add a sufficient set"
-msgstr ""
+msgstr "საკმარისი ნაკრების დამატება"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Add Another Contributor"
-msgstr ""
+msgstr "კიდევ ერთი მონაწილის დამატება"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Add Another Creator"
-msgstr ""
+msgstr "კიდევ ერთი შემქმნელის დამატება"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Add another identifier"
-msgstr ""
+msgstr "კიდევ ერთი იდენტიფიკატორის დამატება"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Add Another Subject"
-msgstr ""
+msgstr "კიდევ ერთი თემის დამატება"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Add another title"
-msgstr ""
+msgstr "კიდევ ერთი სათაურის დამატება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Add as a new chapter"
-msgstr ""
+msgstr "ახალი თავის სახით დამატება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Add Destination"
-msgstr ""
+msgstr "დანიშნულების დამატება"
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Add Language"
-msgstr ""
+msgstr "ენის დამატება"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Add option"
-msgstr ""
+msgstr "ვარიანტის დამატება"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Add Remote"
-msgstr ""
+msgstr "დისტანციური საცავის დამატება"
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 msgid "Add role"
-msgstr ""
+msgstr "როლის დამატება"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Add second editor pane"
-msgstr ""
+msgstr "რედაქტორის მეორე პანელის დამატება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add SEED.html to package"
-msgstr ""
+msgstr "SEED.html-ის დამატება პაკეტში"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "Add to catalog"
-msgstr ""
+msgstr "კატალოგში დამატება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add to project"
-msgstr ""
+msgstr "პროექტში დამატება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Add to the current project, then enable under Project Settings."
-msgstr ""
+msgstr "დაამატეთ მიმდინარე პროექტში, შემდეგ ჩართეთ პროექტის პარამეტრებში."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Added"
-msgstr ""
+msgstr "დამატებულია"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Adding…"
-msgstr ""
+msgstr "ემატება…"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Additional identifier"
-msgstr ""
+msgstr "დამატებითი იდენტიფიკატორი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Additional Information"
-msgstr ""
+msgstr "დამატებითი ინფორმაცია"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Additional libraries used when the editor runs online."
-msgstr ""
+msgstr "დამატებითი ბიბლიოთეკები, რომლებიც გამოიყენება, როცა რედაქტორი ონლაინ მუშაობს."
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Additional title"
-msgstr ""
+msgstr "დამატებითი სათაური"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Adopt a markup language for the current project."
-msgstr ""
+msgstr "აირჩიეთ მარკირების ენა მიმდინარე პროექტისთვის."
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced"
-msgstr ""
+msgstr "გაფართოებული"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced mode"
-msgstr ""
+msgstr "გაფართოებული რეჟიმი"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Advanced Mode required for extension management"
-msgstr ""
+msgstr "გაფართოებების მართვისთვის საჭიროა გაფართოებული რეჟიმი"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
-msgstr ""
+msgstr "განცხადება AI-ის შესახებ"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Already in the catalog"
-msgstr ""
+msgstr "უკვე კატალოგშია"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "API Key"
-msgstr ""
+msgstr "API გასაღები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "App Key"
-msgstr ""
+msgstr "აპლიკაციის გასაღები"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "App Settings"
-msgstr ""
+msgstr "აპლიკაციის პარამეტრები"
 
 #: src/lib/Sidebar.svelte
 msgid "Append Item"
-msgstr ""
+msgstr "ელემენტის დამატება ბოლოში"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books"
-msgstr ""
+msgstr "Apple Books"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: book version"
-msgstr ""
+msgstr "Apple Books: წიგნის ვერსია"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: iPad orientation lock"
-msgstr ""
+msgstr "Apple Books: ორიენტაციის დაფიქსირება iPad-ზე"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: iPhone orientation lock"
-msgstr ""
+msgstr "Apple Books: ორიენტაციის დაფიქსირება iPhone-ზე"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: respect image size for CSS class"
-msgstr ""
+msgstr "Apple Books: გამოსახულების ზომის გათვალისწინება CSS კლასისთვის"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: scroll axis"
-msgstr ""
+msgstr "Apple Books: გადახვევის ღერძი"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: show binding between spread pages"
-msgstr ""
+msgstr "Apple Books: აკინძვის ჩვენება გაშლილ გვერდებს შორის"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books: use the publication’s own fonts (do not re-style)"
-msgstr ""
+msgstr "Apple Books: გამოცემის საკუთარი შრიფტების გამოყენება (სტილის შეუცვლელად)"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Applied {n} change(s)."
-msgstr ""
+msgstr "გადატარდა {n} ცვლილება."
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Apply"
-msgstr ""
+msgstr "გადატარება"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Apply accepted"
-msgstr ""
+msgstr "მიღებულის გადატარება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Applying…"
-msgstr ""
+msgstr "მიმდინარეობს გადატარება…"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Approximate start position"
-msgstr ""
+msgstr "დაწყების სავარაუდო პოზიცია"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Approximates a reading system. Preview only."
-msgstr ""
+msgstr "მიახლოებით ასახავს კითხვის სისტემას. მხოლოდ გადახედვისთვის."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Are you sure you want to delete chapter '{name}'? This will permanently delete the chapter and its source file."
-msgstr ""
+msgstr "ნამდვილად გსურთ თავის '{name}' წაშლა? თავი და მისი წყარო ფაილი სამუდამოდ წაიშლება."
 
 #: src/App.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Are you sure you want to delete this item?"
-msgstr ""
+msgstr "ნამდვილად გსურთ ამ ელემენტის წაშლა?"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Audio Clip Directive"
-msgstr ""
+msgstr "აუდიოკლიპის დირექტივა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Audio Clip Editor"
-msgstr ""
+msgstr "აუდიოკლიპის რედაქტორი"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Audio file"
-msgstr ""
+msgstr "აუდიოფაილი"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Author"
-msgstr ""
+msgstr "ავტორი"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Author name"
-msgstr ""
+msgstr "ავტორის სახელი"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Authority (e.g. BISAC)"
-msgstr ""
+msgstr "ავტორიტეტული წყარო (მაგ. BISAC)"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Authorization failed: {error}"
-msgstr ""
+msgstr "ავტორიზაცია ვერ მოხერხდა: {error}"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Auto"
-msgstr ""
+msgstr "ავტომატური"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Auto Update"
-msgstr ""
+msgstr "ავტომატური განახლება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Auto-filled from bucket name"
-msgstr ""
+msgstr "ავტომატურად შეივსო ბაკეტის სახელიდან"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Auto-filled from folder name"
-msgstr ""
+msgstr "ავტომატურად შეივსო საქაღალდის სახელიდან"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Auto-filled from URL"
-msgstr ""
+msgstr "ავტომატურად შეივსო URL-იდან"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "Automatic: {id}"
-msgstr ""
+msgstr "ავტომატური: {id}"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Available when running online"
-msgstr ""
+msgstr "ხელმისაწვდომია ონლაინ რეჟიმში"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Back"
-msgstr ""
+msgstr "უკან"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Basic"
-msgstr ""
+msgstr "ძირითადი"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Basic Info"
-msgstr ""
+msgstr "ძირითადი ინფორმაცია"
 
 #: src/lib/Sidebar.svelte
 msgid "Basic mode"
-msgstr ""
+msgstr "მარტივი რეჟიმი"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Binary file - preview not available"
-msgstr ""
+msgstr "ბინარული ფაილი - გადახედვა მიუწვდომელია"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Bold, emphasis and heading styles only."
-msgstr ""
+msgstr "მხოლოდ მუქი, კურსივი და სათაურის სტილები."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Both"
-msgstr ""
+msgstr "ორივე"
 
 #: src/lib/components/metadata/fields/ViewportField.svelte
 msgid "Both values are required. rendition:viewport is deprecated in EPUB 3.3."
-msgstr ""
+msgstr "ორივე მნიშვნელობა აუცილებელია. rendition:viewport მოძველებულია EPUB 3.3-ში."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Bring-your-own File Storage"
-msgstr ""
+msgstr "საკუთარი ფაილების საცავი"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Bucket is empty"
-msgstr ""
+msgstr "ბაკეტი ცარიელია"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Bucket Name"
-msgstr ""
+msgstr "ბაკეტის სახელი"
 
 #: src/lib/components/spine/EditorPane.svelte
 #. Dropdown group for build-time transform scripts (not shipped)
 msgid "Build scripts"
-msgstr ""
+msgstr "აგების სკრიპტები"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Built-in"
-msgstr ""
+msgstr "ჩაშენებული"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
@@ -621,166 +640,166 @@ msgstr ""
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Cancel"
-msgstr ""
+msgstr "გაუქმება"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Capture your changes as a patchset to review and apply to the matching project."
-msgstr ""
+msgstr "დააფიქსირეთ თქვენი ცვლილებები ცვლილებათა ნაკრების (patchset) სახით, რომ გადახედოთ და გადაატაროთ შესაბამის პროექტს."
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Captured {n} changed file(s)."
-msgstr ""
+msgstr "დაფიქსირდა {n} შეცვლილი ფაილი."
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Captured change sets. Those matching this project are listed first."
-msgstr ""
+msgstr "დაფიქსირებული ცვლილებათა ნაკრებები. ამ პროექტთან შესაბამისი ნაკრებები ჩამონათვალში პირველია."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog file"
-msgstr ""
+msgstr "კატალოგის ფაილი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Catalog Filename (optional)"
-msgstr ""
+msgstr "კატალოგის ფაილის სახელი (არასავალდებულო)"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog update error: {error}"
-msgstr ""
+msgstr "კატალოგის განახლების შეცდომა: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog update failed"
-msgstr ""
+msgstr "კატალოგის განახლება ვერ მოხერხდა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Catalog updated: {url}"
-msgstr ""
+msgstr "კატალოგი განახლდა: {url}"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Catalog URL"
-msgstr ""
+msgstr "კატალოგის URL"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Catalogs"
-msgstr ""
+msgstr "კატალოგები"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certification"
-msgstr ""
+msgstr "სერტიფიცირება"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certified by"
-msgstr ""
+msgstr "დამმოწმებელი"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certifier credential"
-msgstr ""
+msgstr "დამმოწმებლის კვალიფიკაცია"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certifier report (URL)"
-msgstr ""
+msgstr "დამმოწმებლის ანგარიში (URL)"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Change Folder"
-msgstr ""
+msgstr "საქაღალდის შეცვლა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Change folder…"
-msgstr ""
+msgstr "საქაღალდის შეცვლა…"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Changed files"
-msgstr ""
+msgstr "შეცვლილი ფაილები"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Changes"
-msgstr ""
+msgstr "ცვლილებები"
 
 #: src/lib/content/types.ts
 msgid "Chapter 1: Getting Started"
-msgstr ""
+msgstr "თავი 1: პირველი ნაბიჯები"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Chapter Content"
-msgstr ""
+msgstr "თავის შინაარსი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Chapter content generation"
-msgstr ""
+msgstr "თავის შინაარსის გენერაცია"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Chapter PDF"
-msgstr ""
+msgstr "თავის PDF"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Chapter title"
-msgstr ""
+msgstr "თავის სათაური"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Chapter title — used in the content document <title>; defaults to the spine id"
-msgstr ""
+msgstr "თავის სათაური — გამოიყენება შინაარსის დოკუმენტის <title> ელემენტში; ნაგულისხმევად spine-ის id-ს იღებს"
 
 #: src/lib/Sidebar.svelte
 msgid "Chapters"
-msgstr ""
+msgstr "თავები"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Checkbox"
-msgstr ""
+msgstr "მოსანიშნი ველი"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Checked:"
-msgstr ""
+msgstr "შემოწმდა:"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Checking…"
-msgstr ""
+msgstr "მოწმდება…"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Checks"
-msgstr ""
+msgstr "შემოწმებები"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Choices"
-msgstr ""
+msgstr "ვარიანტები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Choose a device first"
-msgstr ""
+msgstr "ჯერ აირჩიეთ მოწყობილობა"
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Choose a generator"
-msgstr ""
+msgstr "აირჩიეთ გენერატორი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Choose device again…"
-msgstr ""
+msgstr "მოწყობილობის ხელახლა არჩევა…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Choose the SEED.html file to embed."
-msgstr ""
+msgstr "აირჩიეთ ჩასაშენებელი SEED.html ფაილი."
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Clear filter"
-msgstr ""
+msgstr "ფილტრის გასუფთავება"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Clear search"
-msgstr ""
+msgstr "ძებნის გასუფთავება"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Click on any row in the table to see details"
-msgstr ""
+msgstr "დეტალების სანახავად დააწკაპუნეთ ცხრილის ნებისმიერ მწკრივზე"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Clip"
-msgstr ""
+msgstr "კლიპი"
 
 #: plugins/audio-clip-editor/src/App.svelte
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Clip label"
-msgstr ""
+msgstr "კლიპის სახელი"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 #: src/lib/components/EditSpineItemDialog.svelte
@@ -795,342 +814,342 @@ msgstr ""
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/pdf/pdf-export.ts
 msgid "Close"
-msgstr ""
+msgstr "დახურვა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Close {name}"
-msgstr ""
+msgstr "{name}-ის დახურვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close accessibility panel"
-msgstr ""
+msgstr "წვდომადობის პანელის დახურვა"
 
 #: src/lib/components/reader/ReaderOverlay.svelte
 msgid "Close reader"
-msgstr ""
+msgstr "წამკითხველის დახურვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close reading preview panel"
-msgstr ""
+msgstr "კითხვის გადახედვის პანელის დახურვა"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Close validation panel"
-msgstr ""
+msgstr "ვალიდაციის პანელის დახურვა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Code block processing"
-msgstr ""
+msgstr "კოდის ბლოკების დამუშავება"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Collection"
-msgstr ""
+msgstr "კოლექცია"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Collection name"
-msgstr ""
+msgstr "კოლექციის სახელი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Collections"
-msgstr ""
+msgstr "კოლექციები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for mobile phone reading while traveling or commuting
 msgid "Commute (phone)"
-msgstr ""
+msgstr "მგზავრობა (ტელეფონი)"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for smaller tablet screens
 msgid "Compact"
-msgstr ""
+msgstr "კომპაქტური"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Complex Interactive"
-msgstr ""
+msgstr "რთული ინტერაქტიული"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Confirm delete?"
-msgstr ""
+msgstr "დაადასტურეთ წაშლა?"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Conflicting files"
-msgstr ""
+msgstr "კონფლიქტური ფაილები"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Conflicts with {label}"
-msgstr ""
+msgstr "კონფლიქტშია {label}-თან"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Conformance"
-msgstr ""
+msgstr "შესაბამისობა"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Conformance level"
-msgstr ""
+msgstr "შესაბამისობის დონე"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Connect & Pick Folder"
-msgstr ""
+msgstr "დაკავშირება და საქაღალდის არჩევა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Connect to Dropbox"
-msgstr ""
+msgstr "Dropbox-თან დაკავშირება"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Connect to Google Drive"
-msgstr ""
+msgstr "Google Drive-თან დაკავშირება"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Connect to Google Drive to view files."
-msgstr ""
+msgstr "ფაილების სანახავად დაუკავშირდით Google Drive-ს."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Connecting to storage..."
-msgstr ""
+msgstr "საცავთან დაკავშირება..."
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Content is {cw}×{ch}px; the declared page is {pw}×{ph}px"
-msgstr ""
+msgstr "შიგთავსი {cw}×{ch}px-ია; გამოცხადებული გვერდი — {pw}×{ph}px"
 
 #: src/lib/components/preview/ContentPreview.svelte
 msgid "Content Preview"
-msgstr ""
+msgstr "შიგთავსის გადახედვა"
 
 #: src/App.svelte
 msgid "Content preview will appear here based on the current view"
-msgstr ""
+msgstr "შიგთავსის გადახედვა აქ გამოჩნდება მიმდინარე ხედის მიხედვით"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Content transforms"
-msgstr ""
+msgstr "შიგთავსის გარდაქმნები"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Content Type"
-msgstr ""
+msgstr "შიგთავსის ტიპი"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Content Type:"
-msgstr ""
+msgstr "შიგთავსის ტიპი:"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Contributor name"
-msgstr ""
+msgstr "მონაწილის სახელი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Contributors"
-msgstr ""
+msgstr "მონაწილეები"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Control methods"
-msgstr ""
+msgstr "მართვის მეთოდები"
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Copied"
-msgstr ""
+msgstr "დაკოპირდა"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Copy"
-msgstr ""
+msgstr "კოპირება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Copy the library's license text into the License field below."
-msgstr ""
+msgstr "დააკოპირეთ ბიბლიოთეკის ლიცენზიის ტექსტი ქვემოთ მოცემულ ლიცენზიის ველში."
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Copy URL"
-msgstr ""
+msgstr "URL-ის კოპირება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Could not capture the editor"
-msgstr ""
+msgstr "რედაქტორის სურათის გადაღება ვერ მოხერხდა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Could not load catalog: {error}"
-msgstr ""
+msgstr "კატალოგის ჩატვირთვა ვერ მოხერხდა: {error}"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed: {error}. The server may not allow cross-origin requests."
-msgstr ""
+msgstr "ფიდის ჩატვირთვა ვერ მოხერხდა: {error}. შესაძლოა, სერვერი cross-origin მოთხოვნებს არ უშვებდეს."
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed."
-msgstr ""
+msgstr "ფიდის ჩატვირთვა ვერ მოხერხდა."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Could not read that catalog"
-msgstr ""
+msgstr "ამ კატალოგის წაკითხვა ვერ მოხერხდა"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Could not read the project: {error}"
-msgstr ""
+msgstr "პროექტის წაკითხვა ვერ მოხერხდა: {error}"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Cover"
-msgstr ""
+msgstr "ყდა"
 
 #: src/lib/components/HueSelector.svelte
 msgid "Cover background hue"
-msgstr ""
+msgstr "ყდის ფონის ელფერი"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Cover image"
-msgstr ""
+msgstr "ყდის გამოსახულება"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Cover image generated"
-msgstr ""
+msgstr "ყდის გამოსახულება შეიქმნა"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Cover image updated"
-msgstr ""
+msgstr "ყდის გამოსახულება განახლდა"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Cover text style"
-msgstr ""
+msgstr "ყდის ტექსტის სტილი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Coverage"
-msgstr ""
+msgstr "მოცვა"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Create"
-msgstr ""
+msgstr "შექმნა"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Create a new minimal EPUB project"
-msgstr ""
+msgstr "ახალი მინიმალური EPUB პროექტის შექმნა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Create Catalog"
-msgstr ""
+msgstr "კატალოგის შექმნა"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Create generator"
-msgstr ""
+msgstr "გენერატორის შექმნა"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Create New"
-msgstr ""
+msgstr "ახლის შექმნა"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Create scaffolds a starter script, editable from the chapter editor's file menu."
-msgstr ""
+msgstr "„შექმნა“ ქმნის საწყის სკრიპტს, რომლის ჩასწორებაც შესაძლებელია თავის რედაქტორის ფაილის მენიუდან."
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Create your first item using the buttons above"
-msgstr ""
+msgstr "შექმენით პირველი ელემენტი ზემოთ მოცემული ღილაკებით"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Creates a cover with the colour and theme above."
-msgstr ""
+msgstr "ქმნის ყდას ზემოთ არჩეული ფერითა და თემით."
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Creating…"
-msgstr ""
+msgstr "იქმნება…"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Creator name"
-msgstr ""
+msgstr "შემქმნელის სახელი"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Creators"
-msgstr ""
+msgstr "შემქმნელები"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Credential of the certifier"
-msgstr ""
+msgstr "დამმოწმებლის კვალიფიკაცია"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "CSS @page size, e.g. \"140mm 216mm\" or \"A4 landscape\"."
-msgstr ""
+msgstr "CSS @page-ის ზომა, მაგ. \\"140mm 216mm\\" ან \\"A4 landscape\\"."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "CSS margin, e.g. \"20mm 15mm 25mm 15mm\"."
-msgstr ""
+msgstr "CSS-ის მინდვრები (margin), მაგ. \\"20mm 15mm 25mm 15mm\\"."
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Current"
-msgstr ""
+msgstr "მიმდინარე"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Current cover image"
-msgstr ""
+msgstr "ამჟამინდელი ყდის გამოსახულება"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Current Settings:"
-msgstr ""
+msgstr "მიმდინარე პარამეტრები:"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Currently Active Project"
-msgstr ""
+msgstr "ამჟამად აქტიური პროექტი"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Currently open"
-msgstr ""
+msgstr "ამჟამად გახსნილი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Custom margin"
-msgstr ""
+msgstr "მორგებული მინდვრები"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "Custom metadata"
-msgstr ""
+msgstr "მორგებული მეტამონაცემები"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Custom metadata catalog"
-msgstr ""
+msgstr "მორგებული მეტამონაცემების კატალოგი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Custom page size"
-msgstr ""
+msgstr "გვერდის მორგებული ზომა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Custom…"
-msgstr ""
+msgstr "მორგებული…"
 
 #: src/lib/ThemeToggle.svelte
 msgid "dark"
-msgstr ""
+msgstr "მუქი"
 
 #: src/lib/ThemeToggle.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Dark"
-msgstr ""
+msgstr "მუქი"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Dark text on a light cover"
-msgstr ""
+msgstr "მუქი ტექსტი ღია ყდაზე"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Declared fixed-layout page size"
-msgstr ""
+msgstr "ფიქსირებული განლაგების გამოცხადებული გვერდის ზომა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Decrease text size"
-msgstr ""
+msgstr "ტექსტის ზომის შემცირება"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default"
-msgstr ""
+msgstr "ნაგულისხმევი"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default on"
-msgstr ""
+msgstr "ნაგულისხმევად ჩართული"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default value"
-msgstr ""
+msgstr "ნაგულისხმევი მნიშვნელობა"
 
 #: plugins/audio-clip-editor/src/App.svelte
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -1140,1026 +1159,1026 @@ msgstr ""
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete"
-msgstr ""
+msgstr "წაშლა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Delete \"{title}\"? This cannot be undone."
-msgstr ""
+msgstr "წაიშალოს \\"{title}\\"? ამ მოქმედების დაბრუნება შეუძლებელია."
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Delete {filename}? This cannot be undone."
-msgstr ""
+msgstr "წაიშალოს {filename}? ამ მოქმედების დაბრუნება შეუძლებელია."
 
 #: src/App.svelte
 msgid "Delete {name}? This cannot be undone."
-msgstr ""
+msgstr "წაიშალოს {name}? ამ მოქმედების დაბრუნება შეუძლებელია."
 
 #: src/lib/components/SpineItem.svelte
 msgid "Delete chapter {name}"
-msgstr ""
+msgstr "თავის წაშლა: {name}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Delete error: {error}"
-msgstr ""
+msgstr "წაშლის შეცდომა: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Delete failed"
-msgstr ""
+msgstr "წაშლა ვერ მოხერხდა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Delete project"
-msgstr ""
+msgstr "პროექტის წაშლა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Delete project: {title}"
-msgstr ""
+msgstr "პროექტის წაშლა: {title}"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Delete the selected clip from the library"
-msgstr ""
+msgstr "მონიშნული კლიპის წაშლა ბიბლიოთეკიდან"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Demo Controls"
-msgstr ""
+msgstr "დემოს მართვის ელემენტები"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Description"
-msgstr ""
+msgstr "აღწერა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Detected: {detail} on volume \"{volume}\""
-msgstr ""
+msgstr "აღმოჩენილია: {detail} ტომზე \\"{volume}\\""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Developed by Stewart Haines."
-msgstr ""
+msgstr "შექმნილია Stewart Haines-ის მიერ."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Device"
-msgstr ""
+msgstr "მოწყობილობა"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Device:"
-msgstr ""
+msgstr "მოწყობილობა:"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "Discovered in this book"
-msgstr ""
+msgstr "ამ წიგნში აღმოჩენილი"
 
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/Toast.svelte
 msgid "Dismiss"
-msgstr ""
+msgstr "დახურვა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "DOM Transforms"
-msgstr ""
+msgstr "DOM გარდაქმნები"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Download"
-msgstr ""
+msgstr "ჩამოტვირთვა"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Download EPUB to disk"
-msgstr ""
+msgstr "EPUB-ის დისკზე ჩამოტვირთვა"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Download failed — try again"
-msgstr ""
+msgstr "ჩამოტვირთვა ვერ მოხერხდა — სცადეთ თავიდან"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Download SEED.html"
-msgstr ""
+msgstr "SEED.html-ის ჩამოტვირთვა"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Download the app"
-msgstr ""
+msgstr "აპლიკაციის ჩამოტვირთვა"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Drag on the waveform to define a clip."
-msgstr ""
+msgstr "კლიპის მოსანიშნად გადაათრიეთ ტალღის გამოსახულებაზე."
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Drop to add to the manifest"
-msgstr ""
+msgstr "ჩააგდეთ მანიფესტში დასამატებლად"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox"
-msgstr ""
+msgstr "Dropbox"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox app key not configured"
-msgstr ""
+msgstr "Dropbox-ის აპლიკაციის გასაღები არ არის კონფიგურირებული"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Dropbox authorization failed: {error}"
-msgstr ""
+msgstr "Dropbox-ის ავტორიზაცია ვერ მოხერხდა: {error}"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Dropdown"
-msgstr ""
+msgstr "ჩამოსაშლელი სია"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Duplicate"
-msgstr ""
+msgstr "დუბლირება"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Duplicate Project"
-msgstr ""
+msgstr "პროექტის დუბლირება"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Duplicate the current project: {name}"
-msgstr ""
+msgstr "მიმდინარე პროექტის დუბლირება: {name}"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Duplicating…"
-msgstr ""
+msgstr "დუბლირდება…"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Duration"
-msgstr ""
+msgstr "ხანგრძლივობა"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "e.g. 2"
-msgstr ""
+msgstr "მაგ. 2"
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "e.g. en, en-US, zh-Hant, gsw"
-msgstr ""
+msgstr "მაგ. en, en-US, zh-Hant, gsw"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "e.g. fiction, dictionary, textbook"
-msgstr ""
+msgstr "მაგ. მხატვრული ლიტერატურა, ლექსიკონი, სახელმძღვანელო"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "e.g. Hobbit, The"
-msgstr ""
+msgstr "მაგ. Hobbit, The"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "e.g. The Chronicles of Narnia"
-msgstr ""
+msgstr "მაგ. ნარნიის ქრონიკები"
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 msgid "e.g. Tolkien, J. R. R."
-msgstr ""
+msgstr "მაგ. Tolkien, J. R. R."
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "e.g. urn:isbn:9780000000001"
-msgstr ""
+msgstr "მაგ. urn:isbn:9780000000001"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Each row is one combination of modes that is enough on its own to read the whole publication."
-msgstr ""
+msgstr "თითოეული სტრიქონი არის რეჟიმების ერთი კომბინაცია, რომელიც თავისთავად საკმარისია მთელი პუბლიკაციის წასაკითხად."
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "EBPAJ production guide version"
-msgstr ""
+msgstr "EBPAJ-ის წარმოების სახელმძღვანელოს ვერსია"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Edit"
-msgstr ""
+msgstr "ჩასწორება"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Edit {item}"
-msgstr ""
+msgstr "{item} — ჩასწორება"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 msgid "Edit chapter"
-msgstr ""
+msgstr "თავის ჩასწორება"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Edit generator"
-msgstr ""
+msgstr "გენერატორის ჩასწორება"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Edition"
-msgstr ""
+msgstr "გამოცემა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Editor text size"
-msgstr ""
+msgstr "რედაქტორის ტექსტის ზომა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "element"
-msgstr ""
+msgstr "ელემენტი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Embed the editor in the EPUB so the book can be reopened and edited."
-msgstr ""
+msgstr "რედაქტორის ჩაშენება EPUB-ში, რათა წიგნის ხელახლა გახსნა და ჩასწორება შესაძლებელი იყოს."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Endpoint URL"
-msgstr ""
+msgstr "ბოლო წერტილის URL"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Enter a unique identifier"
-msgstr ""
+msgstr "შეიყვანეთ უნიკალური იდენტიფიკატორი"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Enter book description"
-msgstr ""
+msgstr "შეიყვანეთ წიგნის აღწერა"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Enter book title"
-msgstr ""
+msgstr "შეიყვანეთ წიგნის სათაური"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter copyright information"
-msgstr ""
+msgstr "შეიყვანეთ საავტორო უფლებების ინფორმაცია"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter format information"
-msgstr ""
+msgstr "შეიყვანეთ ფორმატის ინფორმაცია"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter publisher name"
-msgstr ""
+msgstr "შეიყვანეთ გამომცემლის სახელი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter related work information"
-msgstr ""
+msgstr "შეიყვანეთ დაკავშირებული ნაწარმოების ინფორმაცია"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter source information"
-msgstr ""
+msgstr "შეიყვანეთ წყაროს ინფორმაცია"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Enter spatial or temporal coverage"
-msgstr ""
+msgstr "შეიყვანეთ სივრცითი ან დროითი დაფარვა"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Enter title"
-msgstr ""
+msgstr "შეიყვანეთ სათაური"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "EPUB"
-msgstr ""
+msgstr "EPUB"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "EPUB 2 cover image (Google Play Books)"
-msgstr ""
+msgstr "EPUB 2-ის ყდის გამოსახულება (Google Play Books)"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "EPUB 2 name"
-msgstr ""
+msgstr "EPUB 2-ის სახელი"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "EPUB 3 property"
-msgstr ""
+msgstr "EPUB 3-ის თვისება"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "EPUB is the open standard for digital books: a self-contained file of text, styles, and images that any Reading System app can open. Because the format is open, your book can be read anywhere. It reflows to fit any screen and adapts to each reader's chosen size, font, and contrast."
-msgstr ""
+msgstr "EPUB ციფრული წიგნების ღია სტანდარტია: ერთი დამოუკიდებელი ფაილი, რომელიც ტექსტს, სტილებსა და გამოსახულებებს შეიცავს და რომლის გახსნაც კითხვის სისტემის ნებისმიერ აპლიკაციას შეუძლია. რადგან ფორმატი ღიაა, თქვენი წიგნის წაკითხვა ყველგან შეიძლება. ტექსტი ნებისმიერ ეკრანს ერგება და ითვალისწინებს თითოეული მკითხველის მიერ არჩეულ ზომას, შრიფტსა და კონტრასტს."
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "EPUB Properties"
-msgstr ""
+msgstr "EPUB-ის თვისებები"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "EPUB Settings"
-msgstr ""
+msgstr "EPUB-ის პარამეტრები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Error"
-msgstr ""
+msgstr "შეცდომა"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Errors:"
-msgstr ""
+msgstr "შეცდომები:"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Essential Information"
-msgstr ""
+msgstr "ძირითადი ინფორმაცია"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Everything up to date."
-msgstr ""
+msgstr "ყველაფერი განახლებულია."
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Expanded"
-msgstr ""
+msgstr "გაფართოებული"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Extensions"
-msgstr ""
+msgstr "გაფართოებები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for largest tablet screens
 msgid "Extra Large"
-msgstr ""
+msgstr "ძალიან დიდი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to add extension"
-msgstr ""
+msgstr "გაფართოების დამატება ვერ მოხერხდა"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Failed to add metadata item"
-msgstr ""
+msgstr "მეტამონაცემების ელემენტის დამატება ვერ მოხერხდა"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Failed to apply changes"
-msgstr ""
+msgstr "ცვლილებების გადატარება ვერ მოხერხდა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to change language"
-msgstr ""
+msgstr "ენის შეცვლა ვერ მოხერხდა"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Failed to create project."
-msgstr ""
+msgstr "პროექტის შექმნა ვერ მოხერხდა."
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to delete item"
-msgstr ""
+msgstr "ელემენტის წაშლა ვერ მოხერხდა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to delete workspace: {error}"
-msgstr ""
+msgstr "სამუშაო სივრცის წაშლა ვერ მოხერხდა: {error}"
 
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Failed to duplicate project."
-msgstr ""
+msgstr "პროექტის დუბლირება ვერ მოხერხდა."
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Failed to generate patchset"
-msgstr ""
+msgstr "ცვლილებათა ნაკრების გენერაცია ვერ მოხერხდა"
 
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "Failed to generate XML preview"
-msgstr ""
+msgstr "XML-ის გადახედვის გენერაცია ვერ მოხერხდა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Failed to import {n} dropped files"
-msgstr ""
+msgstr "{n} გადმოტანილი ფაილის იმპორტი ვერ მოხერხდა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Failed to import 1 dropped file"
-msgstr ""
+msgstr "1 გადმოტანილი ფაილის იმპორტი ვერ მოხერხდა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to import EPUB: {error}"
-msgstr ""
+msgstr "EPUB-ის იმპორტი ვერ მოხერხდა: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to import extension"
-msgstr ""
+msgstr "გაფართოების იმპორტი ვერ მოხერხდა"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to import files"
-msgstr ""
+msgstr "ფაილების იმპორტი ვერ მოხერხდა"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Failed to import the selected book."
-msgstr ""
+msgstr "არჩეული წიგნის იმპორტი ვერ მოხერხდა."
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Failed to load content preview"
-msgstr ""
+msgstr "შიგთავსის გადახედვის ჩატვირთვა ვერ მოხერხდა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Failed to load EPUBs: {error}"
-msgstr ""
+msgstr "EPUB ფაილების ჩატვირთვა ვერ მოხერხდა: {error}"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to load manifest"
-msgstr ""
+msgstr "მანიფესტის ჩატვირთვა ვერ მოხერხდა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to load projects"
-msgstr ""
+msgstr "პროექტების ჩატვირთვა ვერ მოხერხდა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to load settings"
-msgstr ""
+msgstr "პარამეტრების ჩატვირთვა ვერ მოხერხდა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Failed to open workspace: {error}"
-msgstr ""
+msgstr "სამუშაო სივრცის გახსნა ვერ მოხერხდა: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to remove extension"
-msgstr ""
+msgstr "გაფართოების მოცილება ვერ მოხერხდა"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Failed to remove metadata item"
-msgstr ""
+msgstr "მეტამონაცემების ელემენტის მოცილება ვერ მოხერხდა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Failed to save config: {error}"
-msgstr ""
+msgstr "კონფიგურაციის შენახვა ვერ მოხერხდა: {error}"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Failed to save EPUB settings"
-msgstr ""
+msgstr "EPUB-ის პარამეტრების შენახვა ვერ მოხერხდა"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Failed to save metadata field"
-msgstr ""
+msgstr "მეტამონაცემების ველის შენახვა ვერ მოხერხდა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Failed to sync the folder"
-msgstr ""
+msgstr "საქაღალდის სინქრონიზაცია ვერ მოხერხდა"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 msgid "Failed to update chapter."
-msgstr ""
+msgstr "თავის განახლება ვერ მოხერხდა."
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Failed to update item"
-msgstr ""
+msgstr "ელემენტის განახლება ვერ მოხერხდა"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Failed to update settings"
-msgstr ""
+msgstr "პარამეტრების განახლება ვერ მოხერხდა"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Failed to upload all files"
-msgstr ""
+msgstr "ყველა ფაილის ატვირთვა ვერ მოხერხდა"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Fetch"
-msgstr ""
+msgstr "ჩატვირთვა"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "File Path"
-msgstr ""
+msgstr "ფაილის ბილიკი"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "files"
-msgstr ""
+msgstr "ფაილი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Responsive view that fills all available preview space
 msgid "Fill"
-msgstr ""
+msgstr "შევსება"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Filter"
-msgstr ""
+msgstr "ფილტრი"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Filter by ID, path, or media type..."
-msgstr ""
+msgstr "გაფილტვრა ID-ის, ბილიკის ან მედიატიპის მიხედვით..."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Flow"
-msgstr ""
+msgstr "ნაკადი"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "folder"
-msgstr ""
+msgstr "საქაღალდე"
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Folder access was not granted."
-msgstr ""
+msgstr "საქაღალდეზე წვდომა არ იქნა მინიჭებული."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Folder on device"
-msgstr ""
+msgstr "საქაღალდე მოწყობილობაზე"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Folder selected:"
-msgstr ""
+msgstr "არჩეული საქაღალდე:"
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Folder sync: {added} added, {updated} updated, {removed} removed."
-msgstr ""
+msgstr "საქაღალდის სინქრონიზაცია: დამატებულია {added}, განახლებულია {updated}, მოცილებულია {removed}."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Folder unlinked. Chapters were not changed."
-msgstr ""
+msgstr "საქაღალდის ბმული მოხსნილია. თავები არ შეცვლილა."
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Font Size:"
-msgstr ""
+msgstr "შრიფტის ზომა:"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Font:"
-msgstr ""
+msgstr "შრიფტი:"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Force reading-system colours"
-msgstr ""
+msgstr "კითხვის სისტემის ფერების იძულებითი გამოყენება"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Format"
-msgstr ""
+msgstr "ფორმატი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "General"
-msgstr ""
+msgstr "ზოგადი"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Generate"
-msgstr ""
+msgstr "გენერაცია"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Generate cover image"
-msgstr ""
+msgstr "ყდის გამოსახულების გენერაცია"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Generate patchset"
-msgstr ""
+msgstr "ცვლილებათა ნაკრების გენერაცია"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Generate PDF"
-msgstr ""
+msgstr "PDF-ის გენერაცია"
 
 #: src/App.svelte
 msgid "Generating navigation from chapters..."
-msgstr ""
+msgstr "თავებიდან ნავიგაციის გენერაცია..."
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Generating…"
-msgstr ""
+msgstr "გენერირდება…"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/GeneratorPanel.svelte
 #. Dropdown group for on-demand content generator scripts
 msgid "Generators"
-msgstr ""
+msgstr "გენერატორები"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Get Started"
-msgstr ""
+msgstr "დაწყება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Cloud API key"
-msgstr ""
+msgstr "Google Cloud API-ის გასაღები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Drive"
-msgstr ""
+msgstr "Google Drive"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Google Drive authorization required."
-msgstr ""
+msgstr "საჭიროა Google Drive-ის ავტორიზაცია."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Drive credentials not configured"
-msgstr ""
+msgstr "Google Drive-ის ავტორიზაციის მონაცემები არ არის კონფიგურირებული"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Drive setup failed: {error}"
-msgstr ""
+msgstr "Google Drive-ის დაყენება ვერ მოხერხდა: {error}"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Hazards"
-msgstr ""
+msgstr "საფრთხეები"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "hidden file"
-msgstr ""
+msgstr "დამალული ფაილი"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Hide {name}"
-msgstr ""
+msgstr "{name}-ის დამალვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Hide preview"
-msgstr ""
+msgstr "გადახედვის დამალვა"
 
 #: src/lib/Sidebar.svelte
 msgid "Hide project sections"
-msgstr ""
+msgstr "პროექტის სექციების დამალვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for tablet reading in comfortable home settings
 msgid "Home (tablet)"
-msgstr ""
+msgstr "სახლი (პლანშეტი)"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Human-readable summary of the accessibility of this publication"
-msgstr ""
+msgstr "ამ პუბლიკაციის წვდომადობის ადამიანისთვის გასაგები შეჯამება"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Identifier"
-msgstr ""
+msgstr "იდენტიფიკატორი"
 
 #: src/lib/components/metadata/IdentifierEditor.svelte
 msgid "Identifier type"
-msgstr ""
+msgstr "იდენტიფიკატორის ტიპი"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Ignore"
-msgstr ""
+msgstr "იგნორირება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Ignore changes"
-msgstr ""
+msgstr "ცვლილებების იგნორირება"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Ignore changes (don't import)"
-msgstr ""
+msgstr "ცვლილებების იგნორირება (იმპორტის გარეშე)"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Image Insertion"
-msgstr ""
+msgstr "გამოსახულების ჩასმა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Images"
-msgstr ""
+msgstr "გამოსახულებები"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Import"
-msgstr ""
+msgstr "იმპორტი"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import an EPUB from a catalog URL"
-msgstr ""
+msgstr "EPUB-ის იმპორტი კატალოგის URL-იდან"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import an existing EPUB file for editing"
-msgstr ""
+msgstr "არსებული EPUB ფაილის იმპორტი ჩასასწორებლად"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import from Catalog"
-msgstr ""
+msgstr "იმპორტი კატალოგიდან"
 
 #: src/lib/components/workspace/WorkspaceActionBar.svelte
 msgid "Import from File"
-msgstr ""
+msgstr "იმპორტი ფაილიდან"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Import JavaScript Extension"
-msgstr ""
+msgstr "JavaScript გაფართოების იმპორტი"
 
 #: src/lib/Sidebar.svelte
 msgid "Import text files as chapters"
-msgstr ""
+msgstr "ტექსტური ფაილების იმპორტი თავებად"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Importing…"
-msgstr ""
+msgstr "მიმდინარეობს იმპორტი…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include cover page"
-msgstr ""
+msgstr "ყდის გვერდის ჩართვა"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Include in catalog"
-msgstr ""
+msgstr "კატალოგში ჩართვა"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 msgid "Include in the linear reading order"
-msgstr ""
+msgstr "კითხვის თანმიმდევრულ რიგში ჩართვა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include page numbers"
-msgstr ""
+msgstr "გვერდის ნომრების ჩართვა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Include preview head"
-msgstr ""
+msgstr "გადახედვის head-ის ჩართვა"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Incoming"
-msgstr ""
+msgstr "შემომავალი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Increase text size"
-msgstr ""
+msgstr "ტექსტის ზომის გაზრდა"
 
 #: src/App.svelte
 msgid "Initializing application..."
-msgstr ""
+msgstr "აპლიკაციის ინიციალიზაცია..."
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Initializing editor..."
-msgstr ""
+msgstr "რედაქტორის ინიციალიზაცია..."
 
 #: src/App.svelte
 msgid "Initializing transform engine..."
-msgstr ""
+msgstr "გარდაქმნის ძრავის ინიციალიზაცია..."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Initializing..."
-msgstr ""
+msgstr "ინიციალიზაცია..."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Inject preview/head.xml into the preview, per preview type. Never exported."
-msgstr ""
+msgstr "preview/head.xml-ის ჩასმა გადახედვაში, გადახედვის ტიპის მიხედვით. ექსპორტში არასდროს ხვდება."
 
 #: plugins/audio-clip-editor/src/App.svelte
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Insert"
-msgstr ""
+msgstr "ჩასმა"
 
 #: src/lib/components/spine/MediaBrowserPanel.svelte
 msgid "Insert {name} at the cursor"
-msgstr ""
+msgstr "{name}-ის ჩასმა კურსორთან"
 
 #: src/lib/components/spine/GeneratorPanel.svelte
 msgid "Insert at cursor"
-msgstr ""
+msgstr "ჩასმა კურსორთან"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Insert Clip Directive"
-msgstr ""
+msgstr "კლიპის დირექტივის ჩასმა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Insert clip directive at cursor position"
-msgstr ""
+msgstr "კლიპის დირექტივის ჩასმა კურსორის პოზიციაზე"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Insert panel"
-msgstr ""
+msgstr "ჩასმის პანელი"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Insert the clip directive at the editor cursor"
-msgstr ""
+msgstr "კლიპის დირექტივის ჩასმა რედაქტორის კურსორთან"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Invalid"
-msgstr ""
+msgstr "არასწორი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Invalid audio clip template"
-msgstr ""
+msgstr "აუდიოკლიპის არასწორი შაბლონი"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Invalid EPUB"
-msgstr ""
+msgstr "არასწორი EPUB"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Invalid media template"
-msgstr ""
+msgstr "მედიის არასწორი შაბლონი"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPad Air (820×1180)"
-msgstr ""
+msgstr "iPad Air (820×1180)"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPad mini (744×1133)"
-msgstr ""
+msgstr "iPad mini (744×1133)"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPad Pro 13\" (1024×1366)"
-msgstr ""
+msgstr "iPad Pro 13\\" (1024×1366)"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPhone 13 (390×844)"
-msgstr ""
+msgstr "iPhone 13 (390×844)"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPhone 15 Pro Max (430×932)"
-msgstr ""
+msgstr "iPhone 15 Pro Max (430×932)"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "iPhone SE (375×667)"
-msgstr ""
+msgstr "iPhone SE (375×667)"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Item controls"
-msgstr ""
+msgstr "ელემენტის მართვის ელემენტები"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Japanese publishing"
-msgstr ""
+msgstr "იაპონური გამოცემა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Just now"
-msgstr ""
+msgstr "ახლახან"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Keep both"
-msgstr ""
+msgstr "ორივეს დატოვება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Keep both (add as a new chapter)"
-msgstr ""
+msgstr "ორივეს დატოვება (ახალი თავის სახით დამატება)"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Keep both (import as a new item)"
-msgstr ""
+msgstr "ორივეს დატოვება (ახალი ელემენტის სახით იმპორტი)"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Keep the chapter"
-msgstr ""
+msgstr "თავის დატოვება"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Key"
-msgstr ""
+msgstr "გასაღები"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Key must not contain spaces"
-msgstr ""
+msgstr "გასაღები არ უნდა შეიცავდეს ინტერვალებს"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle"
-msgstr ""
+msgstr "Kindle"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle comics: no gutter"
-msgstr ""
+msgstr "Kindle კომიქსები: შიდა მინდვრის გარეშე"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle comics: no margin"
-msgstr ""
+msgstr "Kindle კომიქსები: მინდვრების გარეშე"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle comics: publisher panel regions"
-msgstr ""
+msgstr "Kindle კომიქსები: გამომცემლის პანელების არეები"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle: book type"
-msgstr ""
+msgstr "Kindle: წიგნის ტიპი"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle: fixed layout"
-msgstr ""
+msgstr "Kindle: ფიქსირებული განლაგება"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle: orientation lock"
-msgstr ""
+msgstr "Kindle: ორიენტაციის ჩაკეტვა"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle: original resolution (e.g. 1024x600)"
-msgstr ""
+msgstr "Kindle: თავდაპირველი გარჩევადობა (მაგ. 1024x600)"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Kindle: primary writing mode"
-msgstr ""
+msgstr "Kindle: წერის ძირითადი რეჟიმი"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Label"
-msgstr ""
+msgstr "წარწერა"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Landscape"
-msgstr ""
+msgstr "ალბომური"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Language"
-msgstr ""
+msgstr "ენა"
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Language tag"
-msgstr ""
+msgstr "ენის ტეგი"
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Languages"
-msgstr ""
+msgstr "ენები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for larger mobile phones or e-readers
 msgid "Large"
-msgstr ""
+msgstr "დიდი"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Larger editor text"
-msgstr ""
+msgstr "უფრო დიდი ტექსტი რედაქტორში"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Last synced: {time}"
-msgstr ""
+msgstr "ბოლო სინქრონიზაცია: {time}"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Layout"
-msgstr ""
+msgstr "განლაგება"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "learn more"
-msgstr ""
+msgstr "შეიტყვეთ მეტი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Leave empty to copy books to the top of the device."
-msgstr ""
+msgstr "დატოვეთ ცარიელი, რომ წიგნები მოწყობილობის მთავარ საქაღალდეში დაკოპირდეს."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Left to Right"
-msgstr ""
+msgstr "მარცხნიდან მარჯვნივ"
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "License"
-msgstr ""
+msgstr "ლიცენზია"
 
 #: src/lib/ThemeToggle.svelte
 msgid "light"
-msgstr ""
+msgstr "ღია"
 
 #: src/lib/ThemeToggle.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Light"
-msgstr ""
+msgstr "ღია"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Light text on a dark cover"
-msgstr ""
+msgstr "ღია ტექსტი მუქ ყდაზე"
 
 #: src/lib/Sidebar.svelte
 msgid "Link folder…"
-msgstr ""
+msgstr "საქაღალდის მიბმა…"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Linked folder: {name}"
-msgstr ""
+msgstr "მიბმული საქაღალდე: {name}"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Load clip data from selected text"
-msgstr ""
+msgstr "კლიპის მონაცემების ჩატვირთვა მონიშნული ტექსტიდან"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Load File"
-msgstr ""
+msgstr "ფაილის ჩატვირთვა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Load from Selection"
-msgstr ""
+msgstr "მონიშნულიდან ჩატვირთვა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Load SEED.html…"
-msgstr ""
+msgstr "SEED.html-ის ჩატვირთვა…"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Load this catalog into the editor"
-msgstr ""
+msgstr "ამ კატალოგის ჩატვირთვა რედაქტორში"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Loading audio files…"
-msgstr ""
+msgstr "აუდიოფაილები იტვირთება…"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Loading audio..."
-msgstr ""
+msgstr "აუდიო იტვირთება..."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Loading extensions..."
-msgstr ""
+msgstr "გაფართოებები იტვირთება..."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Loading folders..."
-msgstr ""
+msgstr "საქაღალდეები იტვირთება..."
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Loading manifest…"
-msgstr ""
+msgstr "მანიფესტი იტვირთება…"
 
 #: src/lib/components/metadata/MetadataEditor.svelte
 msgid "Loading metadata…"
-msgstr ""
+msgstr "მეტამონაცემები იტვირთება…"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Loading preview…"
-msgstr ""
+msgstr "გადახედვა იტვირთება…"
 
 #: src/App.svelte
 msgid "Loading project…"
-msgstr ""
+msgstr "პროექტი იტვირთება…"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Loading projects…"
-msgstr ""
+msgstr "პროექტები იტვირთება…"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Loading settings…"
-msgstr ""
+msgstr "პარამეტრები იტვირთება…"
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Loading spine item..."
-msgstr ""
+msgstr "თავი იტვირთება..."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "Loading spine items…"
-msgstr ""
+msgstr "თავები იტვირთება…"
 
 #: src/lib/Sidebar.svelte
 msgid "Loading..."
-msgstr ""
+msgstr "იტვირთება..."
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
@@ -2168,828 +2187,828 @@ msgstr ""
 #: src/lib/navigation/views/PublishView.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Loading…"
-msgstr ""
+msgstr "იტვირთება…"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Local Packaged EPUBs"
-msgstr ""
+msgstr "ლოკალური შეფუთული EPUB-ები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Location:"
-msgstr ""
+msgstr "მდებარეობა:"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Lock package structure and track content changes"
-msgstr ""
+msgstr "პაკეტის სტრუქტურის ჩაკეტვა და შიგთავსის ცვლილებების აღრიცხვა"
 
 #: src/lib/Sidebar.svelte
 msgid "Locked while track changes is on"
-msgstr ""
+msgstr "ჩაკეტილია, სანამ ცვლილებების აღრიცხვა ჩართულია"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Loop"
-msgstr ""
+msgstr "ციკლი"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "macOS sidecar file"
-msgstr ""
+msgstr "macOS-ის თანმხლები ფაილი"
 
 #: src/lib/Sidebar.svelte
 msgid "Main navigation"
-msgstr ""
+msgstr "მთავარი ნავიგაცია"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Make ebooks anyone can read — right now in your browser."
-msgstr ""
+msgstr "შექმენით ელწიგნები, რომელთა წაკითხვაც ყველას შეუძლია — ახლავე, თქვენს ბრაუზერში."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Make it once — read it anywhere: phones, tablets, e-readers, and apps."
-msgstr ""
+msgstr "შექმენით ერთხელ — წაიკითხეთ ყველგან: ტელეფონებზე, პლანშეტებზე, ელექტრონულ წამკითხველებზე და აპლიკაციებში."
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Malformed XHTML"
-msgstr ""
+msgstr "არასწორად ფორმირებული XHTML"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "Manifest"
-msgstr ""
+msgstr "მანიფესტი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Margin"
-msgstr ""
+msgstr "მინდორი"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "matches this project"
-msgstr ""
+msgstr "ემთხვევა ამ პროექტს"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Message:"
-msgstr ""
+msgstr "შეტყობინება:"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "Metadata"
-msgstr ""
+msgstr "მეტამონაცემები"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Metadata Summary"
-msgstr ""
+msgstr "მეტამონაცემების შეჯამება"
 
 #: src/lib/components/metadata/MetadataTabBar.svelte
 msgid "metadata.tab.accessibility"
-msgstr ""
+msgstr "წვდომადობა"
 
 #: src/lib/components/metadata/MetadataTabBar.svelte
 msgid "metadata.tab.advanced"
-msgstr ""
+msgstr "დამატებითი"
 
 #: src/lib/components/metadata/MetadataTabBar.svelte
 msgid "metadata.tab.basic"
-msgstr ""
+msgstr "ძირითადი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Mode"
-msgstr ""
+msgstr "რეჟიმი"
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Modified"
-msgstr ""
+msgstr "შეცვლილია"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Move {id} down"
-msgstr ""
+msgstr "{id}-ის ქვემოთ გადატანა"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Move {id} up"
-msgstr ""
+msgstr "{id}-ის ზემოთ გადატანა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Move down"
-msgstr ""
+msgstr "ქვემოთ გადატანა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time back 0.1 seconds"
-msgstr ""
+msgstr "დაწყების დროის 0.1 წამით უკან გადაწევა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time back 1 second"
-msgstr ""
+msgstr "დაწყების დროის 1 წამით უკან გადაწევა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time forward 0.1 seconds"
-msgstr ""
+msgstr "დაწყების დროის 0.1 წამით წინ გადაწევა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Move start time forward 1 second"
-msgstr ""
+msgstr "დაწყების დროის 1 წამით წინ გადაწევა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Move up"
-msgstr ""
+msgstr "ზემოთ გადატანა"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Much of this software was written with AI coding agents, primarily Anthropic's Claude Code."
-msgstr ""
+msgstr "ამ პროგრამის დიდი ნაწილი დაიწერა AI კოდირების აგენტების დახმარებით, ძირითადად Anthropic-ის Claude Code-ით."
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "n/a"
-msgstr ""
+msgstr "არ არის"
 
 #: plugins/publish-to-remote/src/App.svelte
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Name"
-msgstr ""
+msgstr "სახელი"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Name of the certifying party"
-msgstr ""
+msgstr "დამმოწმებელი მხარის სახელი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Narrow"
-msgstr ""
+msgstr "ვიწრო"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "Navigation"
-msgstr ""
+msgstr "ნავიგაცია"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Navigation (TOC)"
-msgstr ""
+msgstr "ნავიგაცია (სარჩევი)"
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Navigation Content"
-msgstr ""
+msgstr "ნავიგაციის შიგთავსი"
 
 #: src/lib/components/outline/OutlineEditor.svelte
 msgid "Navigation content editor"
-msgstr ""
+msgstr "ნავიგაციის შიგთავსის რედაქტორი"
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Navigation content will be auto-generated from your chapters..."
-msgstr ""
+msgstr "ნავიგაციის შიგთავსი ავტომატურად შეიქმნება თქვენი თავებიდან..."
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Navigation editor"
-msgstr ""
+msgstr "ნავიგაციის რედაქტორი"
 
 #: src/App.svelte
 msgid "Navigation Preview"
-msgstr ""
+msgstr "ნავიგაციის გადახედვა"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "New"
-msgstr ""
+msgstr "ახალი"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "New chapter"
-msgstr ""
+msgstr "ახალი თავი"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "New here? Import from Catalog to browse sample books."
-msgstr ""
+msgstr "პირველად ხართ? სანიმუშო წიგნების დასათვალიერებლად გამოიყენეთ იმპორტი კატალოგიდან."
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "New Project"
-msgstr ""
+msgstr "ახალი პროექტი"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No"
-msgstr ""
+msgstr "არა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No accessibility issues found"
-msgstr ""
+msgstr "წვდომადობის პრობლემები ვერ მოიძებნა"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "No audio files in this project."
-msgstr ""
+msgstr "ამ პროექტში აუდიოფაილები არ არის."
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "No changes to capture yet."
-msgstr ""
+msgstr "დასაფიქსირებელი ცვლილებები ჯერ არ არის."
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
-msgstr ""
+msgstr "შიგთავსი არ არის"
 
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "No content available"
-msgstr ""
+msgstr "შიგთავსი ხელმისაწვდომი არ არის"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "No custom metadata found in this book"
-msgstr ""
+msgstr "ამ წიგნში მორგებული მეტამონაცემები ვერ მოიძებნა"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "No differences."
-msgstr ""
+msgstr "განსხვავებები არ არის."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "No DOM transforms configured."
-msgstr ""
+msgstr "DOM-გარდაქმნები კონფიგურირებული არ არის."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "No EPUB files found in this directory"
-msgstr ""
+msgstr "ამ საქაღალდეში EPUB ფაილები ვერ მოიძებნა"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "No EPUBs found in this feed."
-msgstr ""
+msgstr "ამ არხში EPUB-ები ვერ მოიძებნა."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "No extensions installed."
-msgstr ""
+msgstr "გაფართოებები დაყენებული არ არის."
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No generators"
-msgstr ""
+msgstr "გენერატორები არ არის"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "No generators defined."
-msgstr ""
+msgstr "გენერატორები განსაზღვრული არ არის."
 
 #: src/lib/components/spine/MediaBrowserPanel.svelte
 msgid "No images in this project."
-msgstr ""
+msgstr "ამ პროექტში გამოსახულებები არ არის."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "No issues"
-msgstr ""
+msgstr "პრობლემები არ არის"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "No items match your filter"
-msgstr ""
+msgstr "თქვენს ფილტრს არცერთი ელემენტი არ ემთხვევა"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "No manifest items found"
-msgstr ""
+msgstr "მანიფესტის ელემენტები ვერ მოიძებნა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "No matching file in the folder"
-msgstr ""
+msgstr "საქაღალდეში შესაბამისი ფაილი არ არის"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "No metadata available"
-msgstr ""
+msgstr "მეტამონაცემები ხელმისაწვდომი არ არის"
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "No packaged EPUBs yet."
-msgstr ""
+msgstr "შეფუთული EPUB-ები ჯერ არ არის."
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "No patchsets yet."
-msgstr ""
+msgstr "ცვლილებათა ნაკრებები ჯერ არ არის."
 
 #: src/App.svelte
 #: src/lib/components/SpineSidebar.svelte
 msgid "No project selected"
-msgstr ""
+msgstr "პროექტი არჩეული არ არის"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "No projects found"
-msgstr ""
+msgstr "პროექტები ვერ მოიძებნა"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "No projects match your search for \"{query}\""
-msgstr ""
+msgstr "თქვენს ძებნას \\"{query}\\" არცერთი პროექტი არ ემთხვევა"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "No projects yet"
-msgstr ""
+msgstr "პროექტები ჯერ არ არის"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "No proxy was detected on this host, so this only works once the app is deployed with the WebDAV proxy."
-msgstr ""
+msgstr "ამ ჰოსტზე პროქსი ვერ მოიძებნა, ამიტომ ეს იმუშავებს მხოლოდ მაშინ, როცა აპლიკაცია WebDAV პროქსით იქნება განთავსებული."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "No spine items yet"
-msgstr ""
+msgstr "თავები ჯერ არ არის"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "No subfolders here"
-msgstr ""
+msgstr "აქ ქვესაქაღალდეები არ არის"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "No validation issues in this chapter."
-msgstr ""
+msgstr "ამ თავში ვალიდაციის პრობლემები არ არის."
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "None"
-msgstr ""
+msgstr "არცერთი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Normal"
-msgstr ""
+msgstr "ჩვეულებრივი"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "not a text file"
-msgstr ""
+msgstr "არ არის ტექსტური ფაილი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Not available in this browser — connecting a USB device needs the File System Access API (Chrome, Edge)"
-msgstr ""
+msgstr "ამ ბრაუზერში მიუწვდომელია — USB მოწყობილობის დასაკავშირებლად საჭიროა File System Access API (Chrome, Edge)"
 
 #: src/lib/Sidebar.svelte
 msgid "Not available in this browser — linking a folder needs the File System Access API (Chrome, Edge)"
-msgstr ""
+msgstr "ამ ბრაუზერში მიუწვდომელია — საქაღალდის მისაბმელად საჭიროა File System Access API (Chrome, Edge)"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Not created in the Simple EPUB Editor — viewable but not editable."
-msgstr ""
+msgstr "არ არის შექმნილი Simple EPUB Editor-ში — ნახვა შესაძლებელია, ჩასწორება — არა."
 
 #: src/lib/components/SpineItem.svelte
 msgid "Not in the linear reading order"
-msgstr ""
+msgstr "კითხვის ძირითად თანმიმდევრობაში არ შედის"
 
 #: src/lib/components/metadata/CustomMetaSection.svelte
 msgid "Not set"
-msgstr ""
+msgstr "დაყენებული არ არის"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Not specified"
-msgstr ""
+msgstr "მითითებული არ არის"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Not validated"
-msgstr ""
+msgstr "შემოწმებული არ არის"
 
 #: src/lib/components/SpineSidebar.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Nothing to import — the file(s) already match the existing content."
-msgstr ""
+msgstr "იმპორტისთვის არაფერია — ფაილ(ებ)ი უკვე ემთხვევა არსებულ შიგთავსს."
 
 #: src/lib/components/Toast.svelte
 msgid "Notifications"
-msgstr ""
+msgstr "შეტყობინებები"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Number"
-msgstr ""
+msgstr "რიცხვი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "OAuth Client ID"
-msgstr ""
+msgstr "OAuth კლიენტის ID"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Off"
-msgstr ""
+msgstr "გამორთული"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "On — review mode"
-msgstr ""
+msgstr "ჩართული — განხილვის რეჟიმი"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "One EPUB made with the editor, opening on phones, tablets, and e-readers."
-msgstr ""
+msgstr "რედაქტორით შექმნილი ერთი EPUB, რომელიც იხსნება ტელეფონებზე, ტაბლეტებზე და ელწამკითხველებზე."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Only needed if the saved connection stops working."
-msgstr ""
+msgstr "საჭიროა მხოლოდ მაშინ, თუ შენახული კავშირი აღარ მუშაობს."
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Only the EPUB — with SEED.zip inside — can be reopened, edited, and republished."
-msgstr ""
+msgstr "მხოლოდ EPUB — შიგნით SEED.zip-ით — შეიძლება ხელახლა გაიხსნას, ჩასწორდეს და თავიდან გამოქვეყნდეს."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
-msgstr ""
+msgstr "გახსენით პროექტი გაფართოებების დასამატებლად"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to configure its settings."
-msgstr ""
+msgstr "გახსენით პროექტი მისი პარამეტრების გასამართად."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "Open in the reader"
-msgstr ""
+msgstr "გახსნა წამკითხველში"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Open project: {title}"
-msgstr ""
+msgstr "პროექტის გახსნა: {title}"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Open this chapter in the editor"
-msgstr ""
+msgstr "ამ თავის გახსნა რედაქტორში"
 
 #: src/lib/pdf/pdf-export.ts
 msgid "Opens your device's print dialog."
-msgstr ""
+msgstr "ხსნის თქვენი მოწყობილობის ბეჭდვის დიალოგს."
 
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "OPF source preview"
-msgstr ""
+msgstr "OPF წყაროს გადახედვა"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Option key"
-msgstr ""
+msgstr "ოფციის გასაღები"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Option label"
-msgstr ""
+msgstr "ოფციის ჭდე"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Option type"
-msgstr ""
+msgstr "ოფციის ტიპი"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Optional label"
-msgstr ""
+msgstr "არასავალდებულო ჭდე"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Options"
-msgstr ""
+msgstr "ოფციები"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Orientation"
-msgstr ""
+msgstr "ორიენტაცია"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Orientation:"
-msgstr ""
+msgstr "ორიენტაცია:"
 
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Other"
-msgstr ""
+msgstr "სხვა"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Other chapters with issues"
-msgstr ""
+msgstr "სხვა თავები პრობლემებით"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Other formats"
-msgstr ""
+msgstr "სხვა ფორმატები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "overflows {size}"
-msgstr ""
+msgstr "სცდება {size}-ს"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Overwrite"
-msgstr ""
+msgstr "თავზე გადაწერა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Overwrite the chapter"
-msgstr ""
+msgstr "თავის თავზე გადაწერა"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Overwrite the existing item"
-msgstr ""
+msgstr "არსებული ელემენტის თავზე გადაწერა"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Overwrite?"
-msgstr ""
+msgstr "გადავაწეროთ თავზე?"
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Package a project to see it here."
-msgstr ""
+msgstr "შეფუთეთ პროექტი, რომ აქ გამოჩნდეს."
 
 #: src/App.svelte
 msgid "Package EPUB"
-msgstr ""
+msgstr "EPUB-ის შეფუთვა"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package EPUB without SEED"
-msgstr ""
+msgstr "EPUB-ის შეფუთვა SEED-ის გარეშე"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Packaged Filename"
-msgstr ""
+msgstr "შეფუთული ფაილის სახელი"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Packaging…"
-msgstr ""
+msgstr "იფუთება…"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Page Progression"
-msgstr ""
+msgstr "გვერდების მიმდევრობა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Page size"
-msgstr ""
+msgstr "გვერდის ზომა"
 
 #: src/lib/Sidebar.svelte
 msgid "Pages"
-msgstr ""
+msgstr "გვერდები"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Paginated"
-msgstr ""
+msgstr "პაგინირებული"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Paginating…"
-msgstr ""
+msgstr "მიმდინარეობს პაგინაცია…"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 1 content"
-msgstr ""
+msgstr "პანელ 1-ის შიგთავსი"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 2 content"
-msgstr ""
+msgstr "პანელ 2-ის შიგთავსი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Password"
-msgstr ""
+msgstr "პაროლი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "password or app token"
-msgstr ""
+msgstr "პაროლი ან აპლიკაციის ტოკენი"
 
 #: src/lib/components/extensions/ExtensionItem.svelte
 msgid "Paste {name} license text here"
-msgstr ""
+msgstr "ჩასვით {name}-ის ლიცენზიის ტექსტი აქ"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Patchsets"
-msgstr ""
+msgstr "ცვლილებათა ნაკრებები"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Path"
-msgstr ""
+msgstr "ბილიკი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #. Dropdown group label for the paginated PDF page preview
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholder: <href>."
-msgstr ""
+msgstr "ადგილმჭერი: <href>."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholders: <href>, <alt>."
-msgstr ""
+msgstr "ადგილმჭერები: <href>, <alt>."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholders: <href>, <begin>, <end> required; <label>, <rate> optional."
-msgstr ""
+msgstr "ადგილმჭერები: <href>, <begin>, <end> სავალდებულოა; <label>, <rate> — არასავალდებულო."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholders: <title>, <author>, <date>."
-msgstr ""
+msgstr "ადგილმჭერები: <title>, <author>, <date>."
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Plain text"
-msgstr ""
+msgstr "უბრალო ტექსტი"
 
 #: src/lib/components/outline/OutlineEditor.svelte
 msgid "Plain text navigation; leave empty to auto-generate from chapter titles. Press Ctrl+Enter (Cmd+Enter on Mac) to save."
-msgstr ""
+msgstr "უბრალო ტექსტის ნავიგაცია; დატოვეთ ცარიელი, რომ ავტომატურად შეიქმნას თავების სათაურებიდან. შესანახად დააჭირეთ Ctrl+Enter-ს (Mac-ზე Cmd+Enter)."
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Play"
-msgstr ""
+msgstr "დაკვრა"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Playback rate — 1 is normal speed (no rate in the directive)"
-msgstr ""
+msgstr "დაკვრის სიჩქარე — 1 ჩვეულებრივი სიჩქარეა (დირექტივაში rate არ მიეთითება)"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please fill all required fields"
-msgstr ""
+msgstr "გთხოვთ, შეავსოთ ყველა სავალდებულო ველი"
 
 #: src/App.svelte
 msgid "Please refresh the page to try again."
-msgstr ""
+msgstr "გთხოვთ, განაახლოთ გვერდი და სცადოთ თავიდან."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a folder"
-msgstr ""
+msgstr "გთხოვთ, აირჩიოთ საქაღალდე"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a folder and authorize first"
-msgstr ""
+msgstr "გთხოვთ, ჯერ აირჩიოთ საქაღალდე და გაიაროთ ავტორიზაცია"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Please select a remote type"
-msgstr ""
+msgstr "გთხოვთ, აირჩიოთ დისტანციური საცავის ტიპი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Plugins"
-msgstr ""
+msgstr "პლაგინები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for extra large mobile phones
 msgid "Plus"
-msgstr ""
+msgstr "Plus"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for smallest mobile phones that fit in pocket
 msgid "Pocket"
-msgstr ""
+msgstr "ჯიბის"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Portrait"
-msgstr ""
+msgstr "პორტრეტული"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Position"
-msgstr ""
+msgstr "პოზიცია"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Pre-paginated"
-msgstr ""
+msgstr "წინასწარ დაკაბადონებული"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Prefix URI"
-msgstr ""
+msgstr "პრეფიქსის URI"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Preparing…"
-msgstr ""
+msgstr "მზადდება…"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Preset"
-msgstr ""
+msgstr "პრესეტი"
 
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #. Dropdown group for the preview-only head fragment
 msgid "Preview"
-msgstr ""
+msgstr "გადახედვა"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Preview Error"
-msgstr ""
+msgstr "გადახედვის შეცდომა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Preview out of date"
-msgstr ""
+msgstr "გადახედვა მოძველებულია"
 
 #: src/App.svelte
 msgid "Preview Pane"
-msgstr ""
+msgstr "გადახედვის პანელი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. The paginated print-page preview option
 msgid "Print"
-msgstr ""
+msgstr "ბეჭდვა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Project has errors"
-msgstr ""
+msgstr "პროექტი შეცდომებს შეიცავს"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Project Settings"
-msgstr ""
+msgstr "პროექტის პარამეტრები"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "Projects"
-msgstr ""
+msgstr "პროექტები"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Properties"
-msgstr ""
+msgstr "თვისებები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Public URL Base (optional)"
-msgstr ""
+msgstr "საჯარო URL-ის ბაზა (არასავალდებულო)"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publication"
-msgstr ""
+msgstr "გამოცემა"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publication Date"
-msgstr ""
+msgstr "გამოცემის თარიღი"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Publish"
-msgstr ""
+msgstr "გამოქვეყნება"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Published"
-msgstr ""
+msgstr "გამოქვეყნებულია"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
-msgstr ""
+msgstr "გამომცემელი"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Rate"
-msgstr ""
+msgstr "სიჩქარე"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Re-check the device and refresh its book list"
-msgstr ""
+msgstr "მოწყობილობის ხელახლა შემოწმება და მისი წიგნების სიის განახლება"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Re-render the preview live as you edit."
-msgstr ""
+msgstr "ჩასწორების დროს გადახედვა ავტომატურად განახლდება."
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Read"
-msgstr ""
+msgstr "კითხვა"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"
-msgstr ""
+msgstr "მხოლოდ წასაკითხი"
 
 #: src/lib/navigation/views/SpineView.svelte
 msgid "Read-only chapter"
-msgstr ""
+msgstr "მხოლოდ წასაკითხი თავი"
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Read-only navigation"
-msgstr ""
+msgstr "მხოლოდ წასაკითხი ნავიგაცია"
 
 #: src/lib/components/reader/ReaderOverlay.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reader"
-msgstr ""
+msgstr "წამკითხველი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reading preview"
-msgstr ""
+msgstr "კითხვის გადახედვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reading preview (theme and text size)"
-msgstr ""
+msgstr "კითხვის გადახედვა (თემა და ტექსტის ზომა)"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Reading preview settings"
-msgstr ""
+msgstr "კითხვის გადახედვის პარამეტრები"
 
 #: src/lib/components/spine/EditorPane.svelte
 #. Dropdown group for CSS/JS files loaded by the e-reader
 msgid "Reading System"
-msgstr ""
+msgstr "კითხვის სისტემა"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Recognized fields are offered on every book you edit. The catalog is stored in this browser and does not travel with your EPUBs."
-msgstr ""
+msgstr "ცნობილი ველები შემოთავაზებული იქნება ყველა წიგნზე, რომელსაც ჩაასწორებთ. კატალოგი ინახება ამ ბრაუზერში და თქვენს EPUB-ებთან ერთად არ გადადის."
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Recommended"
-msgstr ""
+msgstr "რეკომენდებული"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Reconnect"
-msgstr ""
+msgstr "ხელახლა დაკავშირება"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Reconnect device"
-msgstr ""
+msgstr "მოწყობილობის ხელახლა დაკავშირება"
 
 #: src/lib/Sidebar.svelte
 msgid "Reconnect folder"
-msgstr ""
+msgstr "საქაღალდის ხელახლა დაკავშირება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Redirect URI"
-msgstr ""
+msgstr "გადამისამართების URI"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Reflowable"
-msgstr ""
+msgstr "გადაწყობადი"
 
 #: src/lib/components/SpineSidebar.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Refresh"
-msgstr ""
+msgstr "განახლება"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Region (optional)"
-msgstr ""
+msgstr "რეგიონი (არასავალდებულო)"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Relation"
-msgstr ""
+msgstr "მიმართება"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Release the file anywhere to add it"
-msgstr ""
+msgstr "ფაილის დასამატებლად გაუშვით ის ნებისმიერ ადგილას"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Remote Name (optional)"
-msgstr ""
+msgstr "დაშორებული საცავის სახელი (არასავალდებულო)"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Remote storage"
-msgstr ""
+msgstr "დაშორებული საცავი"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Remote:"
-msgstr ""
+msgstr "დაშორებული საცავი:"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 #: src/lib/components/extensions/ExtensionItem.svelte
@@ -3004,83 +3023,83 @@ msgstr ""
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Remove"
-msgstr ""
+msgstr "მოცილება"
 
 #: src/lib/components/metadata/LanguageEditor.svelte
 msgid "Remove language"
-msgstr ""
+msgstr "ენის მოცილება"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Remove option"
-msgstr ""
+msgstr "ვარიანტის მოცილება"
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 msgid "Remove role"
-msgstr ""
+msgstr "როლის მოცილება"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Remove subject"
-msgstr ""
+msgstr "თემის მოცილება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Remove the chapter"
-msgstr ""
+msgstr "თავის მოცილება"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Remove the selected feed from the list"
-msgstr ""
+msgstr "მონიშნული არხის მოცილება სიიდან"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Removed {name}"
-msgstr ""
+msgstr "{name} მოცილებულია"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Rendered chapter file"
-msgstr ""
+msgstr "თავის დარენდერებული ფაილი"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Rendition Properties"
-msgstr ""
+msgstr "გამოსახვის თვისებები (rendition)"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Replace"
-msgstr ""
+msgstr "ჩანაცვლება"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Report"
-msgstr ""
+msgstr "ანგარიში"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Requests go straight to the server, which must send CORS headers."
-msgstr ""
+msgstr "მოთხოვნები პირდაპირ სერვერთან მიდის, რომელმაც CORS ჰედერები უნდა გამოაგზავნოს."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Requests go through this app’s /dav endpoint; your WebDAV credentials transit the app host."
-msgstr ""
+msgstr "მოთხოვნები ამ აპლიკაციის /dav მისამართს გაივლის; თქვენი WebDAV ავტორიზაციის მონაცემები აპლიკაციის ჰოსტზე გაივლის."
 
 #: src/lib/components/metadata/fields/DateMetadataField.svelte
 #: src/lib/components/metadata/fields/TextareaMetadataField.svelte
 msgid "Required field"
-msgstr ""
+msgstr "სავალდებულო ველი"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Reset"
-msgstr ""
+msgstr "ჩამოყრა"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Reset Demo"
-msgstr ""
+msgstr "დემოს ჩამოყრა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Reset editor text size"
-msgstr ""
+msgstr "რედაქტორის ტექსტის ზომის ჩამოყრა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 #: src/stories/preview/ContentPreviewDemo.svelte
 #. Device category for responsive preview that fills available space
 msgid "Responsive"
-msgstr ""
+msgstr "ადაპტიური"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 #: src/lib/components/SpineSidebar.svelte
@@ -3090,493 +3109,493 @@ msgstr ""
 #: src/lib/components/metadata/OPFPreview.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Retry"
-msgstr ""
+msgstr "თავიდან ცდა"
 
 #: src/lib/components/plugins/PluginPanel.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Retry plugin"
-msgstr ""
+msgstr "მოდულის თავიდან ცდა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Revert this change"
-msgstr ""
+msgstr "ამ ცვლილების გაუქმება"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Review & apply"
-msgstr ""
+msgstr "განხილვა და გადატარება"
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Review changes"
-msgstr ""
+msgstr "ცვლილებების განხილვა"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Review import conflicts"
-msgstr ""
+msgstr "იმპორტის კონფლიქტების განხილვა"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Right to Left"
-msgstr ""
+msgstr "მარჯვნიდან მარცხნივ"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Rights"
-msgstr ""
+msgstr "უფლებები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Route uploads through the app proxy (for servers without CORS)"
-msgstr ""
+msgstr "ატვირთვების გატარება აპლიკაციის პროქსის გავლით (სერვერებისთვის, რომლებსაც CORS არ აქვთ)"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Run top-to-bottom over the generated DOM."
-msgstr ""
+msgstr "ეშვება ზემოდან ქვემოთ გენერირებულ DOM-ზე."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Running header"
-msgstr ""
+msgstr "ზედა კოლონტიტული"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "S3-Compatible"
-msgstr ""
+msgstr "S3-თან თავსებადი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "S3-Compatible Storage"
-msgstr ""
+msgstr "S3-თან თავსებადი საცავი"
 
 #: src/lib/content/types.ts
 msgid "Sample Author"
-msgstr ""
+msgstr "სანიმუშო ავტორი"
 
 #: src/lib/content/types.ts
 msgid "Sample EPUB Book"
-msgstr ""
+msgstr "სანიმუშო EPUB წიგნი"
 
 #: src/lib/content/types.ts
 msgid "Sample Publisher"
-msgstr ""
+msgstr "სანიმუშო გამომცემელი"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 msgid "Save"
-msgstr ""
+msgstr "შენახვა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Save & Connect"
-msgstr ""
+msgstr "შენახვა და დაკავშირება"
 
 #: src/lib/pdf/pdf-export.ts
 msgid "Save as PDF"
-msgstr ""
+msgstr "PDF-ად შენახვა"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Save changes"
-msgstr ""
+msgstr "ცვლილებების შენახვა"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Saved feeds"
-msgstr ""
+msgstr "შენახული არხები"
 
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Saved feeds…"
-msgstr ""
+msgstr "შენახული არხები…"
 
 #: src/lib/components/EditSpineItemDialog.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Saving…"
-msgstr ""
+msgstr "ინახება…"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Scrolled (continuous)"
-msgstr ""
+msgstr "გადახვევადი (უწყვეტი)"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Scrolled (per document)"
-msgstr ""
+msgstr "გადახვევადი (თითო დოკუმენტზე)"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Search projects"
-msgstr ""
+msgstr "პროექტების ძებნა"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Search projects…"
-msgstr ""
+msgstr "პროექტების ძებნა…"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Secret Access Key"
-msgstr ""
+msgstr "საიდუმლო წვდომის გასაღები"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Secret Key"
-msgstr ""
+msgstr "საიდუმლო გასაღები"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "SEED.html exports an EPUB that embeds its own SEED.zip source, and a PDF; only the EPUB can return to the app for further editing."
-msgstr ""
+msgstr "SEED.html-ის ექსპორტი იძლევა EPUB-ს, რომელშიც ჩაშენებულია საკუთარი SEED.zip წყარო, და PDF-ს; აპლიკაციაში შემდგომი ჩასწორებისთვის მხოლოდ EPUB-ის დაბრუნებაა შესაძლებელი."
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "SEED.html is a single file, and this page is the whole app. Keep your own copy and it will keep working even if this website goes away — a fully offline editor."
-msgstr ""
+msgstr "SEED.html ერთი ფაილია და ეს გვერდი მთელი აპლიკაციაა. შეინახეთ საკუთარი ასლი და ის იმუშავებს მაშინაც კი, თუ ეს ვებსაიტი გაქრება — სრულად ოფლაინ რედაქტორი."
 
 #: src/App.svelte
 msgid "Select a spine item to see the preview here"
-msgstr ""
+msgstr "გადახედვის აქ სანახავად აირჩიეთ თავი"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Select audio file"
-msgstr ""
+msgstr "აუდიოფაილის არჩევა"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Select audio..."
-msgstr ""
+msgstr "აუდიოს არჩევა..."
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 1"
-msgstr ""
+msgstr "ფაილის არჩევა 1-ლი პანელისთვის"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Select file for pane 2"
-msgstr ""
+msgstr "ფაილის არჩევა მე-2 პანელისთვის"
 
 #: src/lib/components/outline/OutlineView.svelte
 msgid "Select navigation file"
-msgstr ""
+msgstr "ნავიგაციის ფაილის არჩევა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Select This Folder"
-msgstr ""
+msgstr "ამ საქაღალდის არჩევა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Select view"
-msgstr ""
+msgstr "ხედის არჩევა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Selected folder: {name}"
-msgstr ""
+msgstr "არჩეული საქაღალდე: {name}"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Sepia"
-msgstr ""
+msgstr "სეპია"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Series"
-msgstr ""
+msgstr "სერია"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Session expired — please reconnect"
-msgstr ""
+msgstr "სესიის ვადა ამოიწურა — გთხოვთ, ხელახლა დაუკავშირდეთ"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 msgid "Set"
-msgstr ""
+msgstr "ნაკრები"
 
 #: src/lib/components/metadata/fields/DateMetadataField.svelte
 msgid "Set to today"
-msgstr ""
+msgstr "დღევანდელი თარიღის დაყენება"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
 msgid "Settings"
-msgstr ""
+msgstr "პარამეტრები"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Short"
-msgstr ""
+msgstr "მოკლე"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Show {name}"
-msgstr ""
+msgstr "{name}-ის ჩვენება"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Show panel"
-msgstr ""
+msgstr "პანელის ჩვენება"
 
 #: src/lib/LayoutManager.svelte
 msgid "Show preview"
-msgstr ""
+msgstr "გადახედვის ჩვენება"
 
 #: src/lib/Sidebar.svelte
 msgid "Show project sections"
-msgstr ""
+msgstr "პროექტის განყოფილებების ჩვენება"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Show the full license text"
-msgstr ""
+msgstr "ლიცენზიის სრული ტექსტის ჩვენება"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Show your changes against the saved version"
-msgstr ""
+msgstr "თქვენი ცვლილებების ჩვენება შენახულ ვერსიასთან შედარებით"
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Showing {filtered} of {total} workspaces"
-msgstr ""
+msgstr "ნაჩვენებია {filtered} სამუშაო სივრცე {total}-დან"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Sign out error: {error}"
-msgstr ""
+msgstr "გამოსვლის შეცდომა: {error}"
 
 #: src/lib/Sidebar.svelte
 msgid "Simple EPUB Editor"
-msgstr ""
+msgstr "Simple EPUB Editor"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Simple EPUB Editor (distributed as SEED.html) is free and open-source software, released under the MIT License. You're welcome to use it, modify it, and redistribute it — including embedding it inside the EPUBs you create."
-msgstr ""
+msgstr "Simple EPUB Editor (ვრცელდება როგორც SEED.html) არის უფასო და ღია კოდის პროგრამა, გამოშვებული MIT ლიცენზიით. შეგიძლიათ გამოიყენოთ, შეცვალოთ და გაავრცელოთ — მათ შორის ჩააშენოთ თქვენ მიერ შექმნილ EPUB-ებში."
 
 #: src/lib/components/manifest/ManifestTable.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Size"
-msgstr ""
+msgstr "ზომა"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Skip"
-msgstr ""
+msgstr "გამოტოვება"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Skipped files"
-msgstr ""
+msgstr "გამოტოვებული ფაილები"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Smaller editor text"
-msgstr ""
+msgstr "რედაქტორის ტექსტის შემცირება"
 
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Some files failed to upload - see console for details"
-msgstr ""
+msgstr "ზოგიერთი ფაილის ატვირთვა ვერ მოხერხდა - დეტალები იხილეთ კონსოლში"
 
 #: src/lib/components/spine/MediaBrowserPanel.svelte
 msgid "Some images could not be loaded."
-msgstr ""
+msgstr "ზოგიერთი გამოსახულების ჩატვირთვა ვერ მოხერხდა."
 
 #: src/lib/components/metadata/CreatorRoleEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Sort as"
-msgstr ""
+msgstr "დალაგება როგორც"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Sort by path"
-msgstr ""
+msgstr "დალაგება ბილიკის მიხედვით"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Sort by size"
-msgstr ""
+msgstr "დალაგება ზომის მიხედვით"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Source"
-msgstr ""
+msgstr "წყარო"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Source on GitHub"
-msgstr ""
+msgstr "წყარო GitHub-ზე"
 
 #: src/App.svelte
 msgid "Spine"
-msgstr ""
+msgstr "თავები"
 
 #: src/App.svelte
 msgid "Spine Preview"
-msgstr ""
+msgstr "თავების გადახედვა"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Spread"
-msgstr ""
+msgstr "გაშლილი გვერდები"
 
 #: src/lib/components/spine/EditorPane.svelte
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Stack Trace"
-msgstr ""
+msgstr "სტეკ-ტრეისი"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Stage:"
-msgstr ""
+msgstr "ეტაპი:"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device size for typical/common mobile phone or e-reader screen
 msgid "Standard"
-msgstr ""
+msgstr "სტანდარტული"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Start time"
-msgstr ""
+msgstr "დაწყების დრო"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Start typing in the editor to see your XHTML preview here."
-msgstr ""
+msgstr "დაიწყეთ წერა რედაქტორში, რომ აქ იხილოთ თქვენი XHTML-ის გადახედვა."
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Status:"
-msgstr ""
+msgstr "სტატუსი:"
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Stop"
-msgstr ""
+msgstr "გაჩერება"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Subject authority"
-msgstr ""
+msgstr "თემის ავტორიტეტი"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Subject or keyword"
-msgstr ""
+msgstr "თემა ან საკვანძო სიტყვა"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Subject term"
-msgstr ""
+msgstr "თემის ტერმინი"
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Subjects"
-msgstr ""
+msgstr "თემები"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Subtitle"
-msgstr ""
+msgstr "ქვესათაური"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Sufficient access modes"
-msgstr ""
+msgstr "წვდომის საკმარისი რეჟიმები"
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "Summary"
-msgstr ""
+msgstr "შეჯამება"
 
 #: src/lib/ThemeToggle.svelte
 msgid "Switch to {mode} theme"
-msgstr ""
+msgstr "{mode} თემაზე გადართვა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Switch to single pane"
-msgstr ""
+msgstr "ერთ პანელზე გადართვა"
 
 #: src/lib/Sidebar.svelte
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Sync folder"
-msgstr ""
+msgstr "საქაღალდის სინქრონიზაცია"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Syntax"
-msgstr ""
+msgstr "სინტაქსი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "System"
-msgstr ""
+msgstr "სისტემური"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Technical Info"
-msgstr ""
+msgstr "ტექნიკური ინფორმაცია"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Term (e.g. FIC028000)"
-msgstr ""
+msgstr "ტერმინი (მაგ. FIC028000)"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Text"
-msgstr ""
+msgstr "ტექსტი"
 
 #: src/lib/components/import/InlineTextDiff.svelte
 msgid "Text differences"
-msgstr ""
+msgstr "ტექსტის განსხვავებები"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Text format"
-msgstr ""
+msgstr "ტექსტის ფორმატი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Text formats"
-msgstr ""
+msgstr "ტექსტის ფორმატები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Text size"
-msgstr ""
+msgstr "ტექსტის ზომა"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Text Transform"
-msgstr ""
+msgstr "ტექსტის გარდაქმნა"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "The book you build here is a valid, self-contained EPUB that also carries its own editable source (bundled as SEED.zip) inside it."
-msgstr ""
+msgstr "წიგნი, რომელსაც აქ ქმნით, არის ვალიდური, თვითკმარი EPUB, რომელიც შიგნით საკუთარ ჩასწორებად წყაროსაც ატარებს (SEED.zip-ად შეფუთულს)."
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "The chapter id collides with {label}; it will be added under a new id."
-msgstr ""
+msgstr "თავის id ემთხვევა {label}-ს; ის ახალი id-ით დაემატება."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "The chapter title at the top of each page."
-msgstr ""
+msgstr "თავის სათაური თითოეული გვერდის ზედა ნაწილში."
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "The linked folder isn't available — reconnect the drive or relink the folder."
-msgstr ""
+msgstr "მიბმული საქაღალდე მიუწვდომელია — ხელახლა შეაერთეთ დისკი ან ხელახლა მიაბით საქაღალდე."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "The plain text → XHTML step."
-msgstr ""
+msgstr "უბრალო ტექსტი → XHTML გარდაქმნის ეტაპი."
 
 #: src/lib/components/plugins/PluginPanel.svelte
 msgid "The plugin could not be loaded — you may be offline."
-msgstr ""
+msgstr "მოდულის ჩატვირთვა ვერ მოხერხდა — შესაძლოა ინტერნეტთან კავშირი არ გაქვთ."
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "The publishing plugin could not be loaded — you may be offline. Showing local publishing instead."
-msgstr ""
+msgstr "გამოქვეყნების მოდულის ჩატვირთვა ვერ მოხერხდა — შესაძლოა ინტერნეტთან კავშირი არ გაქვთ. სანაცვლოდ ნაჩვენებია ლოკალური გამოქვეყნება."
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "The saved device connection needs to be re-granted."
-msgstr ""
+msgstr "შენახული მოწყობილობის კავშირს ხელახალი ნებართვა სჭირდება."
 
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Theme"
-msgstr ""
+msgstr "თემა"
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "These files match existing chapters. Choose what to do with each."
-msgstr ""
+msgstr "ეს ფაილები ემთხვევა არსებულ თავებს. აირჩიეთ ქმედება თითოეულისთვის."
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "These files match existing manifest items. Choose what to do with each."
-msgstr ""
+msgstr "ეს ფაილები ემთხვევა მანიფესტის არსებულ ელემენტებს. აირჩიეთ ქმედება თითოეულისთვის."
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Third-Party Libraries"
-msgstr ""
+msgstr "მესამე მხარის ბიბლიოთეკები"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "This application is built with the following open source libraries:"
-msgstr ""
+msgstr "ეს აპლიკაცია აგებულია შემდეგი ღია კოდის ბიბლიოთეკებით:"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "This chapter"
-msgstr ""
+msgstr "ეს თავი"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "This editor turns plain text into a valid EPUB. You write in simple, readable source; it's packaged into a standards-compliant book."
-msgstr ""
+msgstr "ეს რედაქტორი უბრალო ტექსტს ვალიდურ EPUB-ად აქცევს. თქვენ წერთ მარტივ, ადვილად წასაკითხ წყაროში; ის კი სტანდარტების შესაბამის წიგნად იფუთება."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "This EPUB is read-only, so extensions can't be added."
-msgstr ""
+msgstr "ეს EPUB მხოლოდ წასაკითხია, ამიტომ გაფართოებების დამატება შეუძლებელია."
 
 #: src/App.svelte
 #: src/lib/components/outline/OutlineView.svelte
 #: src/lib/navigation/views/SpineView.svelte
 msgid "This EPUB wasn't created in the Simple EPUB Editor, so it can't be edited."
-msgstr ""
+msgstr "ეს EPUB არ არის შექმნილი Simple EPUB Editor-ში, ამიტომ მისი ჩასწორება შეუძლებელია."
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "This EPUB wasn't created in the Simple EPUB Editor, so it can't be repackaged."
-msgstr ""
+msgstr "ეს EPUB არ არის შექმნილი Simple EPUB Editor-ში, ამიტომ მისი ხელახლა შეფუთვა შეუძლებელია."
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "This file is empty."
-msgstr ""
+msgstr "ეს ფაილი ცარიელია."
 
 #: src/lib/content/types.ts
 msgid "This is a sample EPUB book created for demonstration purposes. It showcases the basic structure and content of an EPUB publication."
-msgstr ""
+msgstr "ეს არის სადემონსტრაციო მიზნით შექმნილი EPUB წიგნის ნიმუში. ის წარმოაჩენს EPUB პუბლიკაციის ძირითად სტრუქტურასა და შინაარსს."
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "This patchset has no changes."
-msgstr ""
+msgstr "ეს ცვლილებათა ნაკრები ცარიელია."
 
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
@@ -3584,335 +3603,335 @@ msgstr ""
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 #: src/lib/components/workspace/DuplicateProjectDialog.svelte
 msgid "Title"
-msgstr ""
+msgstr "სათაური"
 
 #: src/lib/components/metadata/fields/DateMetadataField.svelte
 msgid "Today"
-msgstr ""
+msgstr "დღეს"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Toggle device orientation"
-msgstr ""
+msgstr "მოწყობილობის ორიენტაციის გადართვა"
 
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Toggle Empty State"
-msgstr ""
+msgstr "ცარიელი მდგომარეობის გადართვა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Toggle orientation"
-msgstr ""
+msgstr "ორიენტაციის გადართვა"
 
 #: src/lib/Sidebar.svelte
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "გვერდითი პანელის გადართვა"
 
 #: src/lib/ThemeToggle.svelte
 msgid "Toggle theme"
-msgstr ""
+msgstr "თემის გადართვა"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Track changes"
-msgstr ""
+msgstr "ცვლილებების აღრიცხვა"
 
 #: src/lib/Sidebar.svelte
 msgid "Track changes is on — manage it in Settings"
-msgstr ""
+msgstr "ცვლილებების აღრიცხვა ჩართულია — მართეთ ის პარამეტრებში"
 
 #: src/App.svelte
 msgid "Transform Engine Failed"
-msgstr ""
+msgstr "გარდაქმნის ძრავის შეცდომა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform error"
-msgstr ""
+msgstr "გარდაქმნის შეცდომა"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform Error"
-msgstr ""
+msgstr "გარდაქმნის შეცდომა"
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Transform Error ({stage})"
-msgstr ""
+msgstr "გარდაქმნის შეცდომა ({stage})"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform in progress"
-msgstr ""
+msgstr "გარდაქმნა მიმდინარეობს"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transform successful"
-msgstr ""
+msgstr "გარდაქმნა წარმატებულია"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Transforming..."
-msgstr ""
+msgstr "მიმდინარეობს გარდაქმნა..."
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for e-reader devices designed for portable reading
 msgid "Travel (e-ink)"
-msgstr ""
+msgstr "სამგზავრო (e-ink)"
 
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Try adjusting your search terms"
-msgstr ""
+msgstr "სცადეთ საძიებო ტერმინების შეცვლა"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Turn off and discard base"
-msgstr ""
+msgstr "გამორთვა და საბაზისო ვერსიის წაშლა"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Turning off track changes deletes the saved base version. Continue?"
-msgstr ""
+msgstr "ცვლილებების აღრიცხვის გამორთვა წაშლის შენახულ საბაზისო ვერსიას. გავაგრძელოთ?"
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Type"
-msgstr ""
+msgstr "ტიპი"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Typesetting"
-msgstr ""
+msgstr "ტიპოგრაფია"
 
 #: src/App.svelte
 msgid "Unknown View"
-msgstr ""
+msgstr "უცნობი ხედი"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Unlink folder"
-msgstr ""
+msgstr "საქაღალდის ბმის გაუქმება"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/components/settings/TrackChangesPanel.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Untitled"
-msgstr ""
+msgstr "უსათაურო"
 
 #: src/lib/Sidebar.svelte
 msgid "Untitled Project"
-msgstr ""
+msgstr "უსათაურო პროექტი"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Update Catalog"
-msgstr ""
+msgstr "კატალოგის განახლება"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Update cover image"
-msgstr ""
+msgstr "ყდის გამოსახულების განახლება"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Updates the cover with the colour and theme above."
-msgstr ""
+msgstr "აახლებს ყდას ზემოთ მითითებული ფერითა და თემით."
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Updating..."
-msgstr ""
+msgstr "მიმდინარეობს განახლება..."
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 msgid "Updating…"
-msgstr ""
+msgstr "მიმდინარეობს განახლება…"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Upload"
-msgstr ""
+msgstr "ატვირთვა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Upload error: {error}"
-msgstr ""
+msgstr "ატვირთვის შეცდომა: {error}"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Upload failed"
-msgstr ""
+msgstr "ატვირთვა ვერ მოხერხდა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "URI"
-msgstr ""
+msgstr "URI"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "URL copied to clipboard"
-msgstr ""
+msgstr "URL დაკოპირდა გაცვლის ბუფერში"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "USB device"
-msgstr ""
+msgstr "USB-მოწყობილობა"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "USB e-reader"
-msgstr ""
+msgstr "USB ელწამკითხველი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "USB e-reader (browse…)"
-msgstr ""
+msgstr "USB ელწამკითხველი (დათვალიერება…)"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Use the download button to access the file"
-msgstr ""
+msgstr "ფაილზე წვდომისთვის გამოიყენეთ ჩამოტვირთვის ღილაკი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Use your own Dropbox app: create one in the Dropbox App Console (scoped access), enable files.content.write and files.metadata.read, and register this exact redirect URI in the app’s settings."
-msgstr ""
+msgstr "გამოიყენეთ საკუთარი Dropbox-აპლიკაცია: შექმენით ის Dropbox App Console-ში (scoped access), ჩართეთ files.content.write და files.metadata.read და დაარეგისტრირეთ ზუსტად ეს გადამისამართების URI აპლიკაციის პარამეტრებში."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Use your own Google app: create an OAuth client ID and an API key in the Google Cloud console, enable the Drive and Picker APIs, and add this app’s origin ({origin}) to the OAuth client’s Authorized JavaScript origins."
-msgstr ""
+msgstr "გამოიყენეთ საკუთარი Google-აპლიკაცია: შექმენით OAuth კლიენტის ID და API-გასაღები Google Cloud კონსოლში, ჩართეთ Drive და Picker API-ები და დაამატეთ ამ აპლიკაციის წარმომავლობა ({origin}) OAuth კლიენტის „Authorized JavaScript origins“ სიაში."
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "username"
-msgstr ""
+msgstr "მომხმარებლის სახელი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Username"
-msgstr ""
+msgstr "მომხმარებლის სახელი"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Valid"
-msgstr ""
+msgstr "ვალიდური"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Valid EPUB"
-msgstr ""
+msgstr "ვალიდური EPUB"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Validate"
-msgstr ""
+msgstr "ვალიდაცია"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Validate EPUB"
-msgstr ""
+msgstr "EPUB-ის ვალიდაცია"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "Validating..."
-msgstr ""
+msgstr "მიმდინარეობს ვალიდაცია..."
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Validation"
-msgstr ""
+msgstr "ვალიდაცია"
 
 #: src/lib/components/SpineItem.svelte
 msgid "Validation error"
-msgstr ""
+msgstr "ვალიდაციის შეცდომა"
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Validation failed: {error}"
-msgstr ""
+msgstr "ვალიდაცია ვერ მოხერხდა: {error}"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Validation issues for this chapter"
-msgstr ""
+msgstr "ამ თავის ვალიდაციის პრობლემები"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Validation report (epubcheck) for this chapter"
-msgstr ""
+msgstr "ამ თავის ვალიდაციის ანგარიში (epubcheck)"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Validation Report: {filename}"
-msgstr ""
+msgstr "ვალიდაციის ანგარიში: {filename}"
 
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Value type"
-msgstr ""
+msgstr "მნიშვნელობის ტიპი"
 
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "value:Label, value:Label"
-msgstr ""
+msgstr "value:Label, value:Label"
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Version"
-msgstr ""
+msgstr "ვერსია"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Video Insertion"
-msgstr ""
+msgstr "ვიდეოს ჩასმა"
 
 #: src/App.svelte
 msgid "View type"
-msgstr ""
+msgstr "ხედის ტიპი"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 msgid "View validation report"
-msgstr ""
+msgstr "ვალიდაციის ანგარიშის ნახვა"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Viewport"
-msgstr ""
+msgstr "Viewport"
 
 #: src/lib/components/metadata/fields/ViewportField.svelte
 msgid "Viewport height in pixels"
-msgstr ""
+msgstr "viewport-ის სიმაღლე პიქსელებში"
 
 #: src/lib/components/metadata/fields/ViewportField.svelte
 msgid "Viewport width in pixels"
-msgstr ""
+msgstr "viewport-ის სიგანე პიქსელებში"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Volume \"{volume}\" (no reader markers found — books are copied to it as-is)"
-msgstr ""
+msgstr "ტომი \\"{volume}\\" (ელწამკითხველის ნიშნულები ვერ მოიძებნა — წიგნები მასზე უცვლელად კოპირდება)"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "warnings"
-msgstr ""
+msgstr "გაფრთხილებები"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Warnings:"
-msgstr ""
+msgstr "გაფრთხილებები:"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "WebDAV"
-msgstr ""
+msgstr "WebDAV"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "WebDAV Storage"
-msgstr ""
+msgstr "WebDAV საცავი"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "WebDAV URL"
-msgstr ""
+msgstr "WebDAV URL"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "Welcome"
-msgstr ""
+msgstr "მოგესალმებით"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "What is an EPUB?"
-msgstr ""
+msgstr "რა არის EPUB?"
 
 #: src/lib/navigation/views/AboutView.svelte
 msgid "What is different about a SEED EPUB?"
-msgstr ""
+msgstr "რით განსხვავდება SEED EPUB?"
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "While locked, you can edit existing chapters, styles and scripts; structural changes are disabled."
-msgstr ""
+msgstr "ჩაკეტვის დროს შეგიძლიათ არსებული თავების, სტილებისა და სკრიპტების ჩასწორება; სტრუქტურული ცვლილებები გამორთულია."
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Wide"
-msgstr ""
+msgstr "ფართო"
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "XHTML Preview"
-msgstr ""
+msgstr "XHTML გადახედვა"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Yes"
-msgstr ""
+msgstr "დიახ"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "You have unsaved changes"
-msgstr ""
+msgstr "თქვენ გაქვთ შეუნახავი ცვლილებები"
 
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "You have unsaved project changes. Continue?"
-msgstr ""
+msgstr "თქვენ გაქვთ პროექტის შეუნახავი ცვლილებები. გავაგრძელოთ?"
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Your browser does not support the audio element."
-msgstr ""
+msgstr "თქვენი ბრაუზერი აუდიო ელემენტს მხარს არ უჭერს."
 
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Your browser does not support the video element."
-msgstr ""
+msgstr "თქვენი ბრაუზერი ვიდეო ელემენტს მხარს არ უჭერს."
 
 #: src/lib/services/spine/spine.service.ts
 msgid "Your chapter content goes here..."
-msgstr ""
+msgstr "აქ განთავსდება თქვენი თავის შინაარსი..."
