@@ -90,6 +90,11 @@
       : []),
   ]);
 
+  // Stable row identity for keyed rendering: manifest rows by id (the manifest
+  // primary key, matching selection semantics), the rest by their path.
+  const rowKey = (item: (typeof allItems)[number]): string =>
+    item._type === 'manifest' ? `manifest:${item.id}` : `${item._type}:${item.path}`;
+
   // Filter items based on filter text
   const filteredItems = $derived(
     allItems.filter(item => {
@@ -477,7 +482,7 @@
             {/if}
 
             {#if !collapsed}
-              {#each group.items as item}
+              {#each group.items as item (rowKey(item))}
                 {@const itemType = item._type}
                 {@const isSelected = isItemSelected(item, itemType)}
                 {@const hasError =

@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, untrack } from 'svelte';
   import { t } from '../../i18n';
   import PaneHeader from '../layout/PaneHeader.svelte';
+  import { previewKeyFor } from '../../manifest/signatures.js';
   import type { ManifestItem, SourceItem, ContentPreview } from '../../manifest/types';
   import type {
     WorkspaceService,
@@ -67,9 +68,12 @@
   const isImageItem = $derived(
     isManifestItem && (selectedItem as ManifestItem).mediaType.startsWith('image/')
   );
-  // The selected item's path, shown as the right-pane header label.
+  // The selected item's path, shown as the right-pane header label. Prefer the
+  // live (possibly just-renamed) item over the selectedItem prop, which goes
+  // stale after an href edit until the selection is refreshed.
   const itemLabel = $derived(
-    (selectedItem as { href?: string; path?: string } | null)?.href ??
+    liveItem?.href ??
+      (selectedItem as { href?: string; path?: string } | null)?.href ??
       (selectedItem as { href?: string; path?: string } | null)?.path ??
       ''
   );
@@ -102,6 +106,16 @@
       // normalization the service applied (e.g. a sanitized file path).
       seedEditForm(liveItem);
       editError = null;
+      // An href edit is a rename — the bytes are unchanged — so mark the new
+      // preview key as already loaded and keep the current preview/blob URL.
+      if (updates.href && workspace) {
+        loadedPreviewKey = previewKeyFor(
+          workspace.id,
+          'manifest',
+          liveItem.href,
+          liveItem.mediaType
+        );
+      }
       onWorkspaceUpdate?.(updated);
     } catch (err) {
       editError = err instanceof Error ? err.message : $t('Failed to update item');
@@ -236,10 +250,39 @@
     }
   };
 
-  $effect(() => {
-    if (selectedItem && selectedItemType && workspaceService && workspace) {
-      loadContentPreview();
+  // Identity of the bytes the preview should show. An id-only edit recomputes
+  // this to an equal string, so the effect below never re-fires and the blob
+  // URL survives; a workspace save that doesn't touch this item is likewise
+  // invisible here.
+  const previewKey = $derived.by(() => {
+    if (!selectedItem || !selectedItemType || !workspaceService || !workspace) return null;
+    if (selectedItemType === 'manifest') {
+      const item = (liveItem ?? selectedItem) as ManifestItem;
+      return previewKeyFor(workspace.id, 'manifest', item.href, item.mediaType);
     }
+    if (selectedItemType === 'source') {
+      return previewKeyFor(workspace.id, 'source', (selectedItem as SourceItem).path);
+    }
+    return previewKeyFor(workspace.id, 'opf', workspace.pathInfo.rootfilePath);
+  });
+  // Imperative bookkeeping, deliberately non-reactive: which key the current
+  // contentPreview was loaded for. persistEdit pre-seeds it on a rename (the
+  // bytes are unchanged), so the key change alone doesn't force a reload.
+  let loadedPreviewKey: string | null = null;
+
+  $effect(() => {
+    const key = previewKey;
+    if (!key) {
+      contentPreview = null;
+      cleanupBlobUrl();
+      loadedPreviewKey = null;
+      return;
+    }
+    if (key === loadedPreviewKey) return;
+    loadedPreviewKey = key;
+    // untrack: loadContentPreview reads liveItem/workspace deeply; previewKey
+    // is the single contract for when the shown bytes could differ.
+    untrack(() => loadContentPreview());
   });
 
   // Clean up on component destroy
