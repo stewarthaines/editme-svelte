@@ -15,8 +15,15 @@
  *   Reading systems multiply media pipelines and preload buffers per <audio>
  *   element; a single shared element keeps the page cheap. Clips from another
  *   source file swap the element's src (costing a re-buffer on alternation —
- *   the right trade against element multiplication). The element lives hidden
- *   in the DOM, not detached, so document-level pause sweeps can reach it.
+ *   the right trade against element multiplication).
+ *
+ * - The element must be STATIC markup, not script-created: the chapter's
+ *   transformClipProgress.js writes it into the XHTML at authoring time,
+ *   because reading systems don't reliably grant dynamically created media
+ *   elements a pipeline (iOS Books refuses to play them). This player adopts
+ *   the FIRST audio element in the document — which also lets an author
+ *   inline their own <audio controls> and keep its visible controls. If the
+ *   document carries no audio element, clips stay inert (plain styled text).
  *
  * - Playback is sequenced by the media element's OWN events, never timers:
  *   set src → 'loadedmetadata' → seek to begin → 'seeked' → play(), and the
@@ -53,16 +60,18 @@
     return /^[a-z][a-z0-9+.-]*:/i.test(src) ? src : '../' + src;
   }
 
-  var audio = null; // THE page's one shared audio element, created on demand
+  var audio = null; // THE page's one shared audio element (static markup)
   var active = null; // { span, begin, end } for the clip now playing
   var seekPlayPending = false; // play() is owed once the begin-seek completes
 
   function ensureAudio() {
     if (audio) return audio;
-    audio = document.createElement('audio');
-    audio.preload = 'auto';
-    audio.hidden = true;
-    audio.setAttribute('aria-hidden', 'true');
+    // Adopt the document's audio element (transformClipProgress.js guarantees
+    // one when the chapter has clips; an author-inlined <audio controls>
+    // takes precedence and keeps its controls). Never create one here —
+    // script-created media elements don't play in iOS Books.
+    audio = document.querySelector('audio');
+    if (!audio) return null;
 
     // New source ready → position at the active clip's begin ('seeked' follows).
     audio.addEventListener('loadedmetadata', function () {
@@ -94,7 +103,6 @@
       }
     });
 
-    (document.body || document.documentElement).appendChild(audio);
     return audio;
   }
 
@@ -109,6 +117,7 @@
 
   function play(span) {
     var el = ensureAudio();
+    if (!el) return; // no static audio element — clips stay inert
     var src = resolveSrc(span.getAttribute('data-src'));
     var begin = toSeconds(span.getAttribute('data-begin'));
     var end = toSeconds(span.getAttribute('data-end'));

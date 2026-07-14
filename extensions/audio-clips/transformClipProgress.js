@@ -1,6 +1,19 @@
 /**
- * Decorate each audio clip (span.clip, produced from the :clip directive) with
- * an inline SVG progress indicator. Three styles ship as templates below:
+ * Prepare a chapter's audio clips (span.clip, produced from the :clip
+ * directive) for playback, and decorate them with progress indicators.
+ *
+ * 1. Ensure the chapter carries a STATIC <audio> element.
+ *    Scripts/clip-player.js plays every clip through the one element already
+ *    present in the parsed XHTML — dynamically created media elements don't
+ *    reliably get a media pipeline in reading systems (iOS Books refuses to
+ *    play them). The element is added only when the chapter has clips and no
+ *    <audio> of its own, so an author who inlines an <audio controls> element
+ *    keeps it: the player adopts the first audio element it finds, visible
+ *    controls and all. The inserted element carries the first clip's source
+ *    with preload="auto", so the reader buffers the right file at page load.
+ *
+ * 2. Decorate each clip with an inline SVG progress indicator. Three styles
+ *    ship as templates below:
  *
  *   ring — Apple-Books-style circle that fills clockwise
  *   bar  — contracting bar: full at the start, empty when the clip ends
@@ -53,6 +66,23 @@ async function transformDOM(htmlDocument, idref, ctx) {
   }).join('');
 
   const clips = htmlDocument.querySelectorAll('span.clip[data-src]');
+
+  // The static playback element (see header). data-src is the OPF-relative
+  // href and chapters live one level below the OPF (Text/), so it resolves
+  // via '../' — unless it already carries a scheme (the authoring preview
+  // rewrites data-src to blob: URLs, which pass through).
+  if (clips.length > 0 && !htmlDocument.querySelector('audio')) {
+    const src = clips[0].getAttribute('data-src');
+    const resolved = /^[a-z][a-z0-9+.-]*:/i.test(src) ? src : '../' + src;
+    const audio = htmlDocument.createElement('audio');
+    audio.setAttribute('class', 'clip-audio');
+    audio.setAttribute('preload', 'auto');
+    audio.setAttribute('src', resolved);
+    // No controls and no hidden: a controls-less audio element renders
+    // nothing, and some reading systems are wary of display:none media.
+    htmlDocument.body.appendChild(audio);
+  }
+
   for (const clip of clips) {
     if (clip.querySelector('svg.clip-progress')) continue; // idempotent
 
