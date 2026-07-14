@@ -10,7 +10,7 @@
  * unwritable entry is simply a cache miss, never an error.
  */
 
-export const PROJECTS_CACHE_PREFIX = 'seedhtml_projcache_';
+const PROJECTS_CACHE_PREFIX = 'seedhtml_projcache_';
 
 const ENTRY_VERSION = 1;
 

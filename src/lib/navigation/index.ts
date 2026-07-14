@@ -13,6 +13,3 @@ export type {
   NavigationViewData,
   SettingsViewData,
 } from './types';
-
-// Re-export for convenience
-export { navigationStore as navigation } from './navigation-store';

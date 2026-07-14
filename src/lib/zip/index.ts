@@ -7,18 +7,7 @@ export { Zip } from './zip-reader.js';
 export { ZipWriter } from './zip-writer.js';
 
 // Utility functions
-export {
-  bufferToStream,
-  downloadArrayBuffer,
-  downloadBlob,
-  saveBlob,
-  streamToBlob,
-  unixTimestampToDate,
-  readString,
-  readTerminatedString,
-  readBytes,
-  readFlags,
-} from './utils.js';
+export { downloadBlob, saveBlob } from './utils.js';
 
 // Type definitions
 export type {

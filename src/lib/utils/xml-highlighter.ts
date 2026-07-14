@@ -99,7 +99,7 @@ function esc(text: string): string {
 /**
  * DOM-based highlighter for EPUB OPF content.
  */
-export class XMLHighlighter {
+class XMLHighlighter {
   highlightOPFContent(xmlContent: string, options: HighlightingOptions = {}): HighlightResult {
     const {
       focusedField = null,

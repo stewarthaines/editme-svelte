@@ -161,48 +161,6 @@ export function createMockZip(
 }
 
 /**
- * Helper function to create a mock SOURCE.zip with typical structure
- */
-export function createMockSourceZip(): MockZip {
-  return createMockZip([
-    {
-      fileName: 'SOURCE/settings.json',
-      content: JSON.stringify({
-        is_draft: false,
-        draft_id: 1,
-        text_transform: 'markdown-transform.js',
-        dom_transforms: ['custom-dom.js'],
-        version: '1.0.0',
-      }),
-    },
-    {
-      fileName: 'SOURCE/text/chapter1.txt',
-      content: '# Chapter 1\n\nThis is the first chapter.',
-    },
-    {
-      fileName: 'SOURCE/text/chapter2.txt',
-      content: '# Chapter 2\n\nThis is the second chapter.',
-    },
-    {
-      fileName: 'SOURCE/scripts/markdown-transform.js',
-      content: 'function transformText(text) { return text; }',
-    },
-    {
-      fileName: 'SOURCE/extensions/markdown-it/package.json',
-      content: JSON.stringify({
-        name: 'markdown-it',
-        version: '1.0.0',
-        main: 'index.js',
-      }),
-    },
-    {
-      fileName: 'SOURCE/extensions/markdown-it/index.js',
-      content: 'module.exports = function() { return {}; };',
-    },
-  ]);
-}
-
-/**
  * Helper function to extract mock ZIP content for testing
  */
 export async function extractMockZipContent(zipBlob: Blob): Promise<Record<string, ArrayBuffer>> {

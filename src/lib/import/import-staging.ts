@@ -12,7 +12,7 @@ import { FileStorageAPI } from '../storage/index.js';
 import { toEpubSafeFilename } from '../epub/opf-utils.js';
 
 /** Reserved workspace id used purely as an import staging area. */
-export const IMPORT_WORKSPACE_ID = 'importing';
+const IMPORT_WORKSPACE_ID = 'importing';
 
 export interface StagedFile {
   /** Path within the `importing` workspace where the bytes live. */

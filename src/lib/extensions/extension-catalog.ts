@@ -119,7 +119,7 @@ export interface ExtensionTemplates {
  * association is recorded on disk (the copied extension.json); the catalog entry
  * flattens scripts to filenames and aggregates licenses separately.
  */
-export function scriptFile(entry: unknown): string | null {
+function scriptFile(entry: unknown): string | null {
   if (typeof entry === 'string') return entry || null;
   if (entry && typeof entry === 'object') {
     const file = (entry as Record<string, unknown>).file;

@@ -6,22 +6,6 @@
  */
 
 import { expect } from 'vitest';
-import { SAMPLE_MSGIDS } from '../types.js';
-
-/**
- * Create EPUBMetadata type mock for testing (based on EPUB spec)
- */
-export function createMockEPUBMetadata() {
-  return {
-    title: 'Mock EPUB Title',
-    language: 'en',
-    identifier: 'mock-epub-123',
-    creator: ['Mock Author'],
-    publisher: 'Mock Publisher',
-    description: 'Mock EPUB description',
-    pageProgressionDirection: 'ltr' as const,
-  };
-}
 
 /**
  * Assertion helpers for complex object matching
@@ -113,18 +97,6 @@ export function expectValidationResult(
 }
 
 /**
- * Expected sample content keys for validation testing
- */
-export const EXPECTED_SAMPLE_KEYS = Object.values(SAMPLE_MSGIDS);
-
-/**
  * Available test locales
  */
 export const TEST_LOCALES = ['en', 'de', 'ar'] as const;
-
-/**
- * Helper to create test workspace ID
- */
-export function createTestWorkspaceId(): string {
-  return `test-workspace-${Date.now()}`;
-}

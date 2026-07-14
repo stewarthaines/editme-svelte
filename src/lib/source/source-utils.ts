@@ -17,7 +17,7 @@ import type { SourceFileType, SourceStats, SettingsValidation } from './types.js
  */
 export const SOURCE_ARCHIVE_NAME = 'SEED.zip';
 /** Legacy archive filename, still read on import for older EPUBs. */
-export const LEGACY_SOURCE_ARCHIVE_NAME = 'SOURCE.zip';
+const LEGACY_SOURCE_ARCHIVE_NAME = 'SOURCE.zip';
 /** Archive filenames accepted on import (preferred first). */
 export const SOURCE_ARCHIVE_NAMES = [SOURCE_ARCHIVE_NAME, LEGACY_SOURCE_ARCHIVE_NAME];
 
@@ -304,12 +304,4 @@ export function sanitizeSourcePath(path: string): string {
   }
 
   return sanitized;
-}
-
-/**
- * Get the text file path for a spine ID
- * Used by the file-backed text editor store pattern
- */
-export function getTextFilePath(spineId: string): string {
-  return `SOURCE/text/${spineId}.txt`;
 }

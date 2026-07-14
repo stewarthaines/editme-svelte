@@ -17,7 +17,7 @@
 import type { FileStorageAPI } from '../storage/index.js';
 import { normalizeGenerator, type GeneratorManifest } from '../extensions/extension-catalog.js';
 
-export const GENERATORS_ROOT = 'SOURCE/generators';
+const GENERATORS_ROOT = 'SOURCE/generators';
 
 /** A discovered generator plus where its files live in the workspace. */
 export interface InstalledGenerator {

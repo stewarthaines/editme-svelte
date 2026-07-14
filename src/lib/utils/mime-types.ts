@@ -53,21 +53,3 @@ export function getMimeType(fileName: string): string {
   const ext = fileName.split('.').pop()?.toLowerCase();
   return MIME_TYPES[ext || ''] || 'application/octet-stream';
 }
-
-/**
- * Get all supported MIME types
- * @returns Record of extension to MIME type mappings
- */
-export function getAllMimeTypes(): Record<string, string> {
-  return { ...MIME_TYPES };
-}
-
-/**
- * Check if a file extension has a known MIME type
- * @param fileName File name or path with extension
- * @returns True if extension is recognized
- */
-export function hasMimeType(fileName: string): boolean {
-  const ext = fileName.split('.').pop()?.toLowerCase();
-  return ext ? ext in MIME_TYPES : false;
-}

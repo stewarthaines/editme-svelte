@@ -127,33 +127,3 @@ export class WorkspaceError extends Error {
     this.name = 'WorkspaceError';
   }
 }
-
-export class ValidationError extends WorkspaceError {
-  constructor(
-    message: string,
-    public errors: string[],
-    workspaceId?: string
-  ) {
-    super(message, 'VALIDATION_ERROR', workspaceId);
-    this.name = 'ValidationError';
-  }
-}
-
-// Default configuration
-export const DEFAULT_WORKSPACE_CONFIG: WorkspaceConfig = {
-  cache: {
-    ttl: 24 * 60 * 60 * 1000, // 24 hours
-    maxEntries: 100,
-    enableDiskCache: true,
-  },
-  validation: {
-    strict: false,
-    checkDependencies: true,
-    allowOrphanedFiles: true,
-  },
-  performance: {
-    batchSize: 50,
-    concurrency: 5,
-    enableProgressCallbacks: true,
-  },
-};

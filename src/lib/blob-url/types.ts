@@ -70,37 +70,6 @@ export class XHTMLProcessingError extends BlobURLError {
   }
 }
 
-// Asset element selectors for XHTML processing
-export const ASSET_SELECTORS: AssetSelector[] = [
-  { tag: 'script', attr: 'src' }, // JavaScript files
-  { tag: 'link', attr: 'href' }, // Stylesheets, icons
-  { tag: 'a', attr: 'href' }, // Navigation links
-  { tag: 'audio', attr: 'src' }, // Audio files
-  { tag: 'video', attr: 'src' }, // Video files
-  { tag: 'video', attr: 'poster' }, // Video poster images
-  { tag: 'img', attr: 'src' }, // Images
-  { tag: 'object', attr: 'data' }, // Embedded objects
-  { tag: 'image', attr: 'href' }, // SVG image elements
-  { tag: '*', attr: 'data-src' }, // Custom lazy-loading attributes
-];
-
-// Error icon SVG for missing images
-export const ERROR_ICON_SVG = `data:image/svg+xml,${encodeURIComponent(`
-  <svg width="24" height="24" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" fill="#f44336" stroke="#d32f2f"/>
-    <text x="12" y="16" text-anchor="middle" fill="white" font-size="12">!</text>
-  </svg>
-`)}`;
-
-// Visual asset types that get error icons when missing
-export const VISUAL_ASSET_ELEMENTS = new Set(['img', 'video', 'audio', 'object', 'image']);
-
-// Non-visual asset types that preserve original URLs when missing
-export const NON_VISUAL_ASSET_ELEMENTS = new Set(['script', 'link']);
-
-// Navigation elements that get no special error handling
-export const NAVIGATION_ELEMENTS = new Set(['a']);
-
 // Extended File Storage API interface for OPFS optimization
 export interface ExtendedFileStorageAPI extends FileStorageAPI {
   // OPFS optimization methods

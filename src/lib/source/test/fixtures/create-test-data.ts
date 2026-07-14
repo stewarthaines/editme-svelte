@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS = {
 /**
  * Sample text file contents for testing
  */
-export const SAMPLE_TEXT_FILES = {
+const SAMPLE_TEXT_FILES = {
   'chapter1.txt':
     '# Chapter 1\n\nThis is the first chapter of our story.\n\nIt begins with a simple sentence.',
   'chapter2.txt':
@@ -32,7 +32,7 @@ export const SAMPLE_TEXT_FILES = {
 /**
  * Sample script file contents for testing
  */
-export const SAMPLE_SCRIPT_FILES = {
+const SAMPLE_SCRIPT_FILES = {
   'markdown-transform.js': `
 function transformText(text) {
   // Convert markdown-style headers
@@ -64,7 +64,7 @@ module.exports = utilities;
 /**
  * Sample extension file contents for testing
  */
-export const SAMPLE_EXTENSION_FILES = {
+const SAMPLE_EXTENSION_FILES = {
   'markdown-it/package.json': JSON.stringify(
     {
       name: 'markdown-it',
@@ -154,19 +154,6 @@ export function createEmptySourceStructure(): Record<string, string> {
 }
 
 /**
- * Create invalid SOURCE/ structure for error testing
- */
-export function createInvalidSourceStructure(): Record<string, string> {
-  return {
-    // Missing settings.json
-    'SOURCE/text/chapter1.txt': SAMPLE_TEXT_FILES['chapter1.txt'],
-    'SOURCE/invalid-file.exe': 'INVALID BINARY CONTENT',
-    'SOURCE/../traversal-attempt.txt': 'SECURITY TEST',
-    'SOURCE/scripts/broken-script.js': 'function broken() { // missing closing brace',
-  };
-}
-
-/**
  * Create large SOURCE/ structure for performance testing
  */
 export function createLargeSourceStructure(): Record<string, string | ArrayBuffer> {
@@ -228,21 +215,6 @@ export function createCorruptedSettings(): Record<string, string> {
 }
 
 /**
- * Get binary file content for testing
- */
-export function getBinaryTestData(): ArrayBuffer {
-  const buffer = new ArrayBuffer(1024);
-  const view = new Uint8Array(buffer);
-
-  // Create a simple binary pattern
-  for (let i = 0; i < view.length; i++) {
-    view[i] = (i * 17) % 256; // Simple pattern to verify integrity
-  }
-
-  return buffer;
-}
-
-/**
  * Create test data with specific file types for classification testing
  */
 export function createFileTypeTestData(): Record<string, string> {
@@ -289,27 +261,6 @@ export function createWorkspaceWithEPUBFiles(): Record<string, string> {
     // SOURCE files that should be bundled
     ...createMinimalSourceStructure(),
   };
-}
-
-/**
- * Create expected SOURCE.zip file list for validation
- */
-export function getExpectedSourceZipFiles(): string[] {
-  return [
-    'SOURCE/settings.json',
-    'SOURCE/text/chapter1.txt',
-    'SOURCE/text/chapter2.txt',
-    'SOURCE/text/appendix.txt',
-    'SOURCE/text/empty.txt',
-    'SOURCE/text/large.txt',
-    'SOURCE/scripts/markdown-transform.js',
-    'SOURCE/scripts/custom-dom.js',
-    'SOURCE/scripts/utils.js',
-    'SOURCE/extensions/markdown-it/package.json',
-    'SOURCE/extensions/markdown-it/index.js',
-    'SOURCE/extensions/highlight/package.json',
-    'SOURCE/extensions/highlight/highlight.js',
-  ].sort();
 }
 
 /**

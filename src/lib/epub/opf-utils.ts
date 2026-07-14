@@ -107,17 +107,6 @@ export function toSubject(value: string | SubjectEntry): SubjectEntry {
   return typeof value === 'string' ? { value } : value;
 }
 
-/** Display value for a single subject (tolerant of legacy strings). */
-export function subjectValue(value?: string | SubjectEntry): string {
-  if (!value) return '';
-  return typeof value === 'string' ? value : value.value;
-}
-
-/** Plain string values for a list of subjects (tolerant of legacy strings). */
-export function subjectValues(list?: (string | SubjectEntry)[]): string[] {
-  return (list ?? []).map(subjectValue).filter(Boolean);
-}
-
 /** Display name for a single creator value (tolerant of legacy strings). */
 export function creatorName(value?: Creator | string): string {
   if (!value) return '';
@@ -1340,7 +1329,7 @@ export interface DirectoryMapping {
   [mediaType: string]: string;
 }
 
-export const EPUB_DIRECTORY_MAP: DirectoryMapping = {
+const EPUB_DIRECTORY_MAP: DirectoryMapping = {
   // Text content
   'application/xhtml+xml': 'Text/',
   'text/html': 'Text/',
@@ -1468,130 +1457,4 @@ export function ensureUniqueHref(href: string, existingHrefs: string[]): string 
   let n = 1;
   while (taken.has(`${base}-${n}${ext}`.toLowerCase())) n += 1;
   return `${base}-${n}${ext}`;
-}
-
-/**
- * Extract directory from existing EPUB path
- * @param path - Full EPUB path
- * @returns Directory portion with trailing slash
- */
-export function extractDirectoryFromPath(path: string): string {
-  const lastSlash = path.lastIndexOf('/');
-  if (lastSlash === -1) return '';
-  return path.substring(0, lastSlash + 1);
-}
-
-/**
- * Validate if a path follows EPUB directory conventions
- * @param path - Full EPUB path to validate
- * @param mediaType - Expected media type
- * @returns True if path is in correct directory for media type
- */
-export function validateEPUBPath(path: string, mediaType: string): boolean {
-  const expectedDirectory = getDirectoryFromMediaType(mediaType);
-  return path.startsWith(expectedDirectory);
-}
-
-export class MetadataUtils {
-  /**
-   * Safely get an array field from metadata
-   */
-  static getArrayField<T extends ArrayMetadataFields>(metadata: EPUBMetadata, field: T): string[] {
-    const value = metadata[field];
-    return Array.isArray(value) ? value : [];
-  }
-
-  /**
-   * Safely get a string field from metadata
-   */
-  static getStringField<T extends StringMetadataFields>(
-    metadata: EPUBMetadata,
-    field: T
-  ): string | undefined {
-    const value = metadata[field];
-    return typeof value === 'string' ? value : undefined;
-  }
-
-  /**
-   * Safely get a required string field from metadata
-   */
-  static getRequiredStringField<T extends RequiredMetadataFields>(
-    metadata: EPUBMetadata,
-    field: T
-  ): string {
-    const value = metadata[field];
-    return typeof value === 'string' ? value : '';
-  }
-
-  /**
-   * Type guard to check if a field is an array field
-   */
-  static isArrayField(field: string): field is ArrayMetadataFields {
-    return [
-      'creator',
-      'contributor',
-      'subject',
-      'accessMode',
-      'accessModeSufficient',
-      'accessibilityFeature',
-      'accessibilityHazard',
-    ].includes(field);
-  }
-
-  /**
-   * Type guard to check if a field is a string field
-   */
-  static isStringField(field: string): field is StringMetadataFields {
-    return [
-      'title',
-      'language',
-      'identifier',
-      'publisher',
-      'date',
-      'description',
-      'rights',
-      'source',
-      'relation',
-      'coverage',
-      'type',
-      'format',
-      'modifiedDate',
-      'epubVersion',
-      'renditionLayout',
-      'pageProgressionDirection',
-      'renditionOrientation',
-      'renditionSpread',
-      'accessibilitySummary',
-    ].includes(field);
-  }
-
-  /**
-   * Safely update an array field in metadata
-   */
-  static updateArrayField<T extends ArrayMetadataFields>(
-    metadata: EPUBMetadata,
-    field: T,
-    updater: (current: string[]) => string[]
-  ): EPUBMetadata {
-    const currentArray = MetadataUtils.getArrayField(metadata, field);
-    const newArray = updater(currentArray);
-    return {
-      ...metadata,
-      [field]: newArray,
-    };
-  }
-
-  /**
-   * Safely update a string field in metadata
-   */
-  static updateStringField<T extends StringMetadataFields>(
-    metadata: EPUBMetadata,
-    field: T,
-    value: string | undefined
-  ): EPUBMetadata {
-    return {
-      ...metadata,
-      [field]: value,
-    };
-  }
 }

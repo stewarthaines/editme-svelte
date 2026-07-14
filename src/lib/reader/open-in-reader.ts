@@ -22,7 +22,7 @@ export function isHttpContext(): boolean {
  * True when running as an installed app (home-screen PWA): the standard
  * display-mode media query, plus Safari's legacy `navigator.standalone`.
  */
-export function isStandaloneDisplayMode(): boolean {
+function isStandaloneDisplayMode(): boolean {
   if (typeof window === 'undefined') return false;
   return (
     window.matchMedia?.('(display-mode: standalone)').matches === true ||

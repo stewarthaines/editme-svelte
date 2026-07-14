@@ -2,11 +2,6 @@
  * EPUB Library Exports
  */
 
-// Main classes
-export { EPUBUnpacker } from './EPUBUnpacker.js';
-export { EPUBPackager } from './EPUBPackager.js';
-export { OPFUtils, MetadataUtils } from './opf-utils.js';
-
 // Type definitions
 export type { UnpackResult, ValidationResult, ExtractionResult } from './EPUBUnpacker.js';
 

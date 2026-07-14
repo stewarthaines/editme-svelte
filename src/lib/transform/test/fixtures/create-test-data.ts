@@ -205,7 +205,7 @@ function transformDOM(document) {
 /**
  * Sample extension libraries for testing
  */
-export const SAMPLE_EXTENSION_LIBRARIES = {
+const SAMPLE_EXTENSION_LIBRARIES = {
   'markdown-it/markdown-it.min.js': `
 // Mock markdown-it library
 window.markdownit = function(options) {
@@ -242,40 +242,9 @@ window.Prism = {
 };
 
 /**
- * Chapter metadata for XHTML generation testing
- */
-export const SAMPLE_CHAPTER_METADATA = {
-  basic: {
-    title: 'Chapter 1: Introduction',
-    language: 'en',
-    stylesheets: ['../Styles/stylesheet.css'],
-    scripts: [],
-  },
-
-  advanced: {
-    title: 'Chapter 2: Advanced Topics',
-    language: 'en',
-    stylesheets: [
-      '../Styles/main.css',
-      '../Styles/chapter.css',
-      '../Styles/syntax-highlighting.css',
-    ],
-    scripts: ['../Scripts/reader.js', '../Scripts/interactive.js'],
-    customHead: '<meta name="chapter" content="2" />',
-  },
-
-  multilingual: {
-    title: 'Chapitre 1: Introduction',
-    language: 'fr',
-    stylesheets: ['../Styles/french.css'],
-    scripts: [],
-  },
-};
-
-/**
  * Sample plain text content for transformation testing
  */
-export const SAMPLE_PLAIN_TEXT = {
+const SAMPLE_PLAIN_TEXT = {
   markdown: `# Chapter 1: Getting Started
 
 This is the first chapter of our book. It covers the **basics** of the topic.
@@ -340,69 +309,6 @@ Just plain text paragraphs.`,
 };
 
 /**
- * Expected HTML outputs for validation
- */
-export const EXPECTED_HTML_OUTPUTS = {
-  markdownBasic: `<h1>Chapter 1: Getting Started</h1>
-<p>This is the first chapter of our book. It covers the <strong>basics</strong> of the topic.</p>
-<h2>Section 1.1: Overview</h2>
-<p>Here we provide an <em>overview</em> of what you'll learn:</p>
-<ul>
-<li>Basic concepts</li>
-<li>Key principles</li>
-<li>Practical examples</li>
-</ul>
-<h2>Section 1.2: Prerequisites</h2>
-<p>Before starting, you should have:</p>
-<ol>
-<li>Basic understanding of the topic</li>
-<li>Required software installed</li>
-<li>Sample files downloaded</li>
-</ol>`,
-
-  asciidocBasic: `<h1>User Manual</h1>
-<p>Author Name
-v1.0, 2023</p>
-<h2>Introduction</h2>
-<p>This is the introduction to our user manual.</p>
-<h3>Purpose</h3>
-<p>The purpose of this manual is to provide comprehensive documentation.</p>
-<h3>Audience</h3>
-<p>This manual is intended for:</p>
-<p>* End users
-* System administrators
-* Developers</p>`,
-};
-
-/**
- * Transform context data for testing
- */
-export const SAMPLE_TRANSFORM_CONTEXT = {
-  basic: {
-    workspaceId: 'test-workspace',
-    spineItemId: 'chapter1',
-    manifestItems: {
-      chapter1: 'blob:chapter1-url',
-      chapter2: 'blob:chapter2-url',
-      appendix1: 'blob:appendix1-url',
-    },
-  },
-
-  noManifest: {
-    workspaceId: 'test-workspace',
-    spineItemId: 'chapter1',
-  },
-
-  largeManifest: {
-    workspaceId: 'test-workspace',
-    spineItemId: 'chapter1',
-    manifestItems: Object.fromEntries(
-      Array.from({ length: 100 }, (_, i) => [`item${i}`, `blob:item${i}-url`])
-    ),
-  },
-};
-
-/**
  * Create complete workspace with transform scripts and settings
  */
 export function createCompleteTransformWorkspace(): Record<string, string> {
@@ -448,44 +354,6 @@ export function createMinimalTransformWorkspace(): Record<string, string> {
 }
 
 /**
- * Create workspace with broken scripts for error testing
- */
-export function createBrokenTransformWorkspace(): Record<string, string> {
-  return {
-    'SOURCE/settings.json': JSON.stringify(
-      {
-        transform_pipeline: {
-          text_transform: 'broken-syntax.js',
-          dom_transforms: ['runtime-error.js'],
-        },
-      },
-      null,
-      2
-    ),
-    'SOURCE/scripts/broken-syntax.js': SAMPLE_TRANSFORM_SCRIPTS['broken-syntax.js'],
-    'SOURCE/scripts/runtime-error.js': SAMPLE_TRANSFORM_SCRIPTS['runtime-error.js'],
-  };
-}
-
-/**
- * Create workspace for timeout testing
- */
-export function createTimeoutTransformWorkspace(): Record<string, string> {
-  return {
-    'SOURCE/settings.json': JSON.stringify(
-      {
-        transform_pipeline: {
-          text_transform: 'timeout-script.js',
-        },
-      },
-      null,
-      2
-    ),
-    'SOURCE/scripts/timeout-script.js': SAMPLE_TRANSFORM_SCRIPTS['timeout-script.js'],
-  };
-}
-
-/**
  * Create workspace with no settings file
  */
 export function createNoSettingsWorkspace(): Record<string, string> {
@@ -520,33 +388,6 @@ export function createMissingScriptsWorkspace(): Record<string, string> {
       2
     ),
   };
-}
-
-/**
- * Create DOM document for testing
- */
-export function createTestDocument(htmlContent: string): Document {
-  const parser = new DOMParser();
-  const fullHtml = `<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>Test Document</title></head>
-<body>${htmlContent}</body>
-</html>`;
-  return parser.parseFromString(fullHtml, 'application/xhtml+xml');
-}
-
-/**
- * Validate transform result structure
- */
-export function validateTransformResult(result: any): boolean {
-  return (
-    typeof result === 'object' &&
-    typeof result.success === 'boolean' &&
-    (result.success
-      ? typeof result.transformedText === 'string' || result.xhtmlDocument instanceof Document
-      : result.error !== undefined)
-  );
 }
 
 /**

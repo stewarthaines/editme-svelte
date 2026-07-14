@@ -12,7 +12,7 @@
 export const VALIDATION_REPORT_STORAGE_KEY = 'seedhtml_validation_report';
 
 /** localStorage key for the author's self-tracked "addressed" ticks. */
-export const VALIDATION_ADDRESSED_STORAGE_KEY = 'seedhtml_validation_addressed';
+const VALIDATION_ADDRESSED_STORAGE_KEY = 'seedhtml_validation_addressed';
 
 export interface ValidationMessage {
   level: 'error' | 'warning' | 'info';

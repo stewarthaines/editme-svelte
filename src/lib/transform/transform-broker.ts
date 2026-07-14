@@ -22,7 +22,7 @@ import type { ManifestItem } from '../epub/opf-utils.js';
 import { validateSourcePath } from '../source/source-utils.js';
 
 /** Sub-tree of SOURCE/ that transform scripts may write into. */
-export const SOURCE_DATA_PREFIX = 'SOURCE/data/';
+const SOURCE_DATA_PREFIX = 'SOURCE/data/';
 
 /**
  * Join an OPF-relative manifest href onto the content base path, mirroring
