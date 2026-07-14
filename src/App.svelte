@@ -833,16 +833,25 @@
     if (!currentWorkspaceState || pdfGenerating) return;
     pdfGenerating = true;
     try {
-      await exportPdf(
+      const { skippedChapterIds } = await exportPdf(
         currentWorkspaceState,
         fileStorage,
         workspaceService,
         appState?.epubSettings?.print
       );
+      // The PDF opened, but unparseable chapters were left out — say so, or
+      // the user ships a PDF silently missing content.
+      if (skippedChapterIds.length > 0 && appState) {
+        appState.errorMessage = $t('PDF is missing unreadable chapters: {chapters}', {
+          chapters: skippedChapterIds.join(', '),
+        });
+      }
     } catch (error) {
       console.error('PDF export failed:', error);
       if (appState) {
-        appState.errorMessage = `PDF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        appState.errorMessage = $t('PDF export failed: {message}', {
+          message: error instanceof Error ? error.message : String(error),
+        });
       }
     } finally {
       pdfGenerating = false;
@@ -867,7 +876,9 @@
     } catch (error) {
       console.error('Chapter PDF export failed:', error);
       if (appState) {
-        appState.errorMessage = `PDF export failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        appState.errorMessage = $t('PDF export failed: {message}', {
+          message: error instanceof Error ? error.message : String(error),
+        });
       }
     } finally {
       chapterPdfGenerating = false;

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13\n"
-"PO-Revision-Date: 2026-07-13\n"
+"POT-Creation-Date: 2026-07-14\n"
+"PO-Revision-Date: 2026-07-14\n"
 "Language: ka\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -746,6 +746,10 @@ msgstr "თავის შინაარსი"
 msgid "Chapter content generation"
 msgstr "თავის შინაარსის გენერაცია"
 
+#: src/lib/pdf/pdf-export.ts
+msgid "Chapter not found."
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Chapter PDF"
 msgstr "თავის PDF"
@@ -998,6 +1002,10 @@ msgstr "ფიდის ჩატვირთვა ვერ მოხერხ
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed."
 msgstr "ფიდის ჩატვირთვა ვერ მოხერხდა."
+
+#: src/lib/pdf/pdf-export.ts
+msgid "Could not open the print window. Allow pop-ups for this site to save as PDF."
+msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Could not read that catalog"
@@ -2413,6 +2421,10 @@ msgstr "ამ პროექტში აუდიოფაილები ა
 msgid "No changes to capture yet."
 msgstr "დასაფიქსირებელი ცვლილებები ჯერ არ არის."
 
+#: src/lib/pdf/pdf-export.ts
+msgid "No chapters to export."
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
 msgstr "შიგთავსი არ არის"
@@ -2505,6 +2517,10 @@ msgstr "პროექტები ჯერ არ არის"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "No proxy was detected on this host, so this only works once the app is deployed with the WebDAV proxy."
 msgstr "ამ ჰოსტზე პროქსი ვერ მოიძებნა, ამიტომ ეს იმუშავებს მხოლოდ მაშინ, როცა აპლიკაცია WebDAV პროქსით იქნება განთავსებული."
+
+#: src/lib/pdf/pdf-export.ts
+msgid "No readable chapter content."
+msgstr ""
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "No spine items yet"
@@ -2761,6 +2777,14 @@ msgstr "ბილიკი"
 msgid "PDF"
 msgstr "PDF"
 
+#: src/App.svelte
+msgid "PDF export failed: {message}"
+msgstr ""
+
+#: src/App.svelte
+msgid "PDF is missing unreadable chapters: {chapters}"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholder: <href>."
 msgstr "ადგილმჭერი: <href>."
@@ -2843,6 +2867,10 @@ msgstr "წინასწარ დაკაბადონებული"
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Prefix URI"
 msgstr "პრეფიქსის URI"
+
+#: src/lib/pdf/pdf-export.ts
+msgid "Preparing your PDF…"
+msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte

@@ -30,6 +30,20 @@ function xmlEscape(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * JSON.stringify a string for embedding inside an inline <script> that will be
+ * re-parsed as XHTML (processXHTMLForPreview). JSON.stringify alone is NOT
+ * XHTML-safe — it leaves `&` and `<` raw, so a translated label containing
+ * either would abort the XML parse and fail the whole export. Escape them (and
+ * `>`) as \uXXXX inside the JS string literal, which the XML parser never sees.
+ */
+function jsonForXhtml(value: string): string {
+  return JSON.stringify(value).replace(
+    /[<>&]/g,
+    c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')
+  );
+}
+
 /** Margin preset → uniform page margin in millimetres. */
 export const MARGIN_MM: Record<PrintSettings['margin'], number> = {
   narrow: 12,
@@ -188,7 +202,9 @@ export function chapterToSection(
   // heading; otherwise the idref fallback. Always emitted (visually hidden via
   // print.css), even when empty, so a heading-less chapter resets the named string
   // rather than inheriting the previous chapter's title.
-  const titleText = doc.querySelector('title')?.textContent?.trim() || '';
+  // head > title only: a bare 'title' selector would also match an inline SVG's
+  // accessibility <title> in the body, promoting it to the running header.
+  const titleText = doc.querySelector('head > title')?.textContent?.trim() || '';
   const heading =
     ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
       .map(tag => doc.querySelector(tag)?.textContent?.trim())
@@ -257,7 +273,11 @@ export function buildPagedDocument(
     headExtra = '',
     afterMode = 'message',
   } = opts;
-  const links = stylesheetHrefs.map(href => `<link rel="stylesheet" href="${href}" />`).join('\n');
+  // Escape hrefs: getAttribute returns the DECODED value, so a chapter linking
+  // "a&b.css" would otherwise embed a raw & and abort the XHTML re-parse.
+  const links = stylesheetHrefs
+    .map(href => `<link rel="stylesheet" href="${xmlEscape(href)}" />`)
+    .join('\n');
   // Carry the book/chapter language onto <html> so the paginated document (and
   // the print preview that shares this builder) is accessible — without it,
   // axe/EPUBCheck flag a missing lang. Both lang and xml:lang for XHTML.
@@ -279,28 +299,29 @@ export function buildPagedDocument(
   //   window.print() on this top-level window — the user's tap is the gesture
   //   Android Chrome requires; we never call print() programmatically).
   // - 'message': tell the parent preview iframe pagination is done.
-  // NB: this document is re-parsed as XHTML (processXHTMLForPreview) before it is
-  // written out, so the inline script must avoid raw &, < and > — built entirely
-  // via the DOM API, with labels embedded as JSON strings, for exactly that reason.
+  // NB: this document is re-parsed as XHTML (processXHTMLForPreview) before it
+  // is written out, so the inline script must avoid raw &, < and > — built
+  // entirely via the DOM API, with labels embedded via jsonForXhtml (which,
+  // unlike bare JSON.stringify, escapes & and < so any translated label
+  // survives the XML parse).
   const afterTail =
     afterMode === 'print-button'
       ? // Inject the toolbar (and its CSS) here, in the `after` hook, not in <head>:
         // Paged.js's polisher consumes the head stylesheet and drops @media screen
-        // rules, so anything added before pagination loses its styling. Built via the
-        // DOM API (no raw < > &) for the XHTML re-parse, labels embedded as JSON.
-        `try{var s=document.createElement('style');s.textContent=${JSON.stringify(PRINT_TOOLBAR_CSS)};document.head.appendChild(s);` +
+        // rules, so anything added before pagination loses its styling.
+        `try{var s=document.createElement('style');s.textContent=${jsonForXhtml(PRINT_TOOLBAR_CSS)};document.head.appendChild(s);` +
         `var b=document.createElement('div');b.className='pdf-export-bar';` +
         `var k=document.createElement('button');k.type='button';k.className='pdf-export-btn';` +
-        `k.textContent=${JSON.stringify(translate('Save as PDF'))};` +
+        `k.textContent=${jsonForXhtml(translate('Save as PDF'))};` +
         `k.addEventListener('click',function(){window.print();});b.appendChild(k);` +
         `var h=document.createElement('span');h.className='pdf-export-hint';` +
-        `h.textContent=${JSON.stringify(translate("Opens your device's print dialog."))};` +
+        `h.textContent=${jsonForXhtml(translate("Opens your device's print dialog."))};` +
         `b.appendChild(h);` +
         // Close: this window is always script-opened, so window.close() is
         // permitted. Essential in installed-PWA contexts (iOS standalone) where
         // the window renders without browser chrome — no tab bar, no way back.
         `var c=document.createElement('button');c.type='button';c.className='pdf-export-btn pdf-export-close';` +
-        `c.textContent=${JSON.stringify(translate('Close'))};` +
+        `c.textContent=${jsonForXhtml(translate('Close'))};` +
         `c.addEventListener('click',function(){window.close();});b.appendChild(c);` +
         `document.body.insertBefore(b,document.body.firstChild);}catch(e){}`
       : `parent.postMessage('${doneMessage}','*');`;
@@ -339,11 +360,14 @@ ${inject}</body>
 function openPdfWindow(): Window {
   const win = window.open('', '_blank');
   if (!win) {
-    throw new Error('Could not open the print window. Allow pop-ups for this site to save as PDF.');
+    throw new Error(
+      translate('Could not open the print window. Allow pop-ups for this site to save as PDF.')
+    );
   }
+  const preparing = xmlEscape(translate('Preparing your PDF…'));
   win.document.write(
-    '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Preparing…</title></head>' +
-      '<body style="font:16px system-ui,sans-serif;color:#444;padding:2rem">Preparing your PDF…</body></html>'
+    `<!DOCTYPE html><html><head><meta charset="utf-8" /><title>${preparing}</title></head>` +
+      `<body style="font:16px system-ui,sans-serif;color:#444;padding:2rem">${preparing}</body></html>`
   );
   return win;
 }
@@ -370,11 +394,15 @@ async function writePaginatedDocument(
   blobManager.setActiveWorkspace(ctx.workspaceId);
   try {
     const finalDoc = await blobManager.processXHTMLForPreview(master);
-    const manager = blobManager;
-    blobManager = undefined; // ownership passes to the close-watcher below
     win.document.open();
     win.document.write(finalDoc);
     win.document.close();
+    // Ownership passes to the close-watcher only once it exists. Clearing
+    // blobManager any earlier meant a throw during the write above (e.g. the
+    // user closed the window during the slow asset pass) skipped both cleanup
+    // paths and leaked every blob URL.
+    const manager = blobManager;
+    blobManager = undefined;
     const poll = setInterval(() => {
       if (win.closed) {
         clearInterval(poll);
@@ -390,31 +418,39 @@ async function writePaginatedDocument(
 
 /**
  * Build the combined, paginated document and trigger the print → Save as PDF
- * flow. Resolves once the print dialog has been dismissed.
+ * flow. Resolves once the document is handed to the print window. Returns the
+ * ids of chapters that could not be parsed and were left out of the PDF — the
+ * caller must surface them, or the user gets a complete-looking PDF silently
+ * missing chapters.
  */
 export async function exportPdf(
   workspace: WorkspaceState,
   fileStorage: FileStorageAPI,
   workspaceService: WorkspaceService,
   print?: PrintSettings
-): Promise<void> {
+): Promise<{ skippedChapterIds: string[] }> {
   const win = openPdfWindow();
   try {
     const chapters = await workspaceService.loadAllLinearChapterContents(workspace);
-    if (chapters.length === 0) throw new Error('No chapters to export.');
+    if (chapters.length === 0) throw new Error(translate('No chapters to export.'));
 
     // Concatenate each chapter's <body> (wrapped so it starts on a new page) and
     // collect the stylesheet links the chapters reference (deduped) so the book's
     // own styling carries through — works for app-created and imported EPUBs.
     const stylesheetHrefs = new Set<string>();
     const sections: string[] = [];
+    const skippedChapterIds: string[] = [];
     for (const chapter of chapters) {
       const wrapped = chapterToSection(chapter.xhtmlContent, chapter.id);
-      if (!wrapped) continue; // skip a malformed chapter / one with no <body>
+      if (!wrapped) {
+        // Malformed chapter / no <body> — excluded from the PDF, reported back.
+        skippedChapterIds.push(chapter.id);
+        continue;
+      }
       wrapped.hrefs.forEach(href => stylesheetHrefs.add(href));
       sections.push(wrapped.section);
     }
-    if (sections.length === 0) throw new Error('No readable chapter content.');
+    if (sections.length === 0) throw new Error(translate('No readable chapter content.'));
 
     const meta = workspace.opf.metadata;
 
@@ -449,6 +485,7 @@ export async function exportPdf(
       basePath: workspace.pathInfo.basePath,
       workspaceId: workspace.id,
     });
+    return { skippedChapterIds };
   } catch (error) {
     try {
       win.close();
@@ -475,9 +512,9 @@ export async function exportChapterPdf(
   const win = openPdfWindow();
   try {
     const [chapter] = await workspaceService.loadChapterContents(workspace, [chapterId]);
-    if (!chapter) throw new Error('Chapter not found.');
+    if (!chapter) throw new Error(translate('Chapter not found.'));
     const wrapped = chapterToSection(chapter.xhtmlContent, chapter.id);
-    if (!wrapped) throw new Error('No readable chapter content.');
+    if (!wrapped) throw new Error(translate('No readable chapter content.'));
 
     // Suggested PDF filename: book title + chapter id (no cover for a single chapter).
     const meta = workspace.opf.metadata;

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-13\n"
-"PO-Revision-Date: 2026-07-13\n"
+"POT-Creation-Date: 2026-07-14\n"
+"PO-Revision-Date: 2026-07-14\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -727,6 +727,10 @@ msgstr "Kapitelinhalt"
 msgid "Chapter content generation"
 msgstr "Erzeugung von Kapitelinhalten"
 
+#: src/lib/pdf/pdf-export.ts
+msgid "Chapter not found."
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Chapter PDF"
 msgstr "Kapitel-PDF"
@@ -979,6 +983,10 @@ msgstr "Der Feed konnte nicht geladen werden: {error}. Der Server erlaubt mögli
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed."
 msgstr "Der Feed konnte nicht geladen werden."
+
+#: src/lib/pdf/pdf-export.ts
+msgid "Could not open the print window. Allow pop-ups for this site to save as PDF."
+msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Could not read that catalog"
@@ -2394,6 +2402,10 @@ msgstr ""
 msgid "No changes to capture yet."
 msgstr "Noch keine Änderungen zu erfassen."
 
+#: src/lib/pdf/pdf-export.ts
+msgid "No chapters to export."
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "No Content"
 msgstr "Kein Inhalt"
@@ -2486,6 +2498,10 @@ msgstr "Noch keine Projekte"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "No proxy was detected on this host, so this only works once the app is deployed with the WebDAV proxy."
 msgstr "Auf diesem Host wurde kein Proxy erkannt, daher funktioniert dies erst, wenn die App mit dem WebDAV-Proxy bereitgestellt wird."
+
+#: src/lib/pdf/pdf-export.ts
+msgid "No readable chapter content."
+msgstr ""
 
 #: src/lib/components/SpineSidebar.svelte
 msgid "No spine items yet"
@@ -2742,6 +2758,14 @@ msgstr "Pfad"
 msgid "PDF"
 msgstr "PDF"
 
+#: src/App.svelte
+msgid "PDF export failed: {message}"
+msgstr ""
+
+#: src/App.svelte
+msgid "PDF is missing unreadable chapters: {chapters}"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Placeholder: <href>."
 msgstr "Platzhalter: <href>."
@@ -2824,6 +2848,10 @@ msgstr "Vorpaginiert"
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Prefix URI"
 msgstr "Präfix-URI"
+
+#: src/lib/pdf/pdf-export.ts
+msgid "Preparing your PDF…"
+msgstr ""
 
 #: src/lib/navigation/views/ThirdPartyView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
