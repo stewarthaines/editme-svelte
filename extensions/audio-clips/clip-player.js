@@ -48,12 +48,21 @@
     var src = span.getAttribute('data-src');
     var audio = players[src];
     if (!audio) {
-      audio = new Audio(resolveSrc(src));
+      // A real (hidden) DOM element, not `new Audio(...)`: a detached playing
+      // Audio object outlives any "pause everything in the document" sweep —
+      // in the authoring preview a re-render replaced the clip's control while
+      // the sound played on. In the DOM it renders nothing (no controls) but
+      // stays reachable.
+      audio = document.createElement('audio');
+      audio.src = resolveSrc(src);
       audio.preload = 'auto';
+      audio.hidden = true;
+      audio.setAttribute('aria-hidden', 'true');
       audio.addEventListener('timeupdate', function () {
         if (active && active.audio === audio && audio.currentTime >= active.end) stop();
       });
       audio.addEventListener('ended', stop);
+      (document.body || document.documentElement).appendChild(audio);
       players[src] = audio;
     }
     var begin = toSeconds(span.getAttribute('data-begin'));
