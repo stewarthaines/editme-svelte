@@ -13,6 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-14
+
+### Added
+
+- Define your own custom metadata fields from scratch: App Settings → Custom metadata catalog now has an "Add field" form (previously new fields could only be adopted from an imported book).
+- Audio clips show an animated progress indicator while playing — choose ring, bar, or wave style per clip.
+- Fixed-layout books: the device presets in the preview now show composition feedback — how the fixed page sits within each device's screen.
+- The About page has a "Download the app" section (Technical Info): save the editor as a single SEED.html file for offline use, in your interface language.
+- The brand mark — an open book, sideways — appears as the About icon and the browser-tab favicon.
+- The hosted editor now lives at `/SEED.html` (the bare address redirects there), so saving the page suggests the right filename.
+
+### Changed
+
+- The Projects view opens instantly: the project list is remembered between sessions and shows each book's cover as a thumbnail.
+- Editing a manifest entry's id or href updates just that entry instead of redrawing the whole view.
+- Live preview does less repeated work per keystroke pause — the editor no longer re-reads its transform scripts and project structure from storage on every preview refresh.
+
+### Fixed
+
+- A chapter whose text file can't be read is no longer overwritten with an empty page — the editor shows the problem and refuses to save until you actually type something.
+- Failures while auto-saving or persisting a chapter are now reported instead of silently ignored, so the preview can no longer drift out of sync with the packaged book unnoticed.
+- Switching chapters while a preview was still rendering could write one chapter's content into another's file; renders now complete before the switch.
+- PDF export names the chapters it had to skip (unreadable source) instead of silently omitting them, and no longer leaks preview resources.
+- Storage errors on Safari now report the actual cause instead of a generic message, and renaming a file to its own name no longer deletes it.
+- Extension credits (impressum) name the license itself rather than pointing at a file.
+
 ## [0.8.0] - 2026-07-11
 
 ### Added
@@ -104,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Retired the standalone `opds-server` development tool, superseded by the Publish-to-Remote plugin.
 
-[Unreleased]: https://github.com/stewarthaines/seed-html/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/stewarthaines/seed-html/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.9.0
 [0.8.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.8.0
 [0.7.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.7.0
 [0.6.0]: https://github.com/stewarthaines/seed-html/releases/tag/v0.6.0
