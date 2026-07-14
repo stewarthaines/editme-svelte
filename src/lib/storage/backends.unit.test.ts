@@ -154,3 +154,25 @@ describe('OPFSSyncBackend.readFile bad-buffer downgrade', () => {
     warn.mockRestore();
   });
 });
+
+describe('OPFSSyncBackend.getQuota wire-shape', () => {
+  it('reads the top-level quota field (regression: reading data.quota returned zeros)', async () => {
+    const backend = new OPFSSyncBackend();
+    vi.spyOn((backend as any).workerManager, 'getQuota').mockResolvedValue({
+      success: true,
+      quota: { used: 1234, available: 5678 },
+    });
+
+    await expect(backend.getQuota()).resolves.toEqual({ used: 1234, available: 5678 });
+  });
+
+  it('surfaces the worker error string on failure', async () => {
+    const backend = new OPFSSyncBackend();
+    vi.spyOn((backend as any).workerManager, 'getQuota').mockResolvedValue({
+      success: false,
+      error: 'estimate unavailable',
+    });
+
+    await expect(backend.getQuota()).rejects.toThrow('estimate unavailable');
+  });
+});

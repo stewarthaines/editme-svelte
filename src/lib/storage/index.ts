@@ -403,7 +403,9 @@ export class OPFSSyncBackend implements StorageBackend {
     if (!result.success) {
       throw new Error(result.error || 'Failed to get quota');
     }
-    return result.data?.quota || { used: 0, available: 0 };
+    // The worker sends quota TOP-LEVEL (like content/files/workspaces; only
+    // getFileInfo nests under data) — see opfs-worker.protocol.test.ts.
+    return result.quota || { used: 0, available: 0 };
   }
 
   getBackendType(): BackendType {

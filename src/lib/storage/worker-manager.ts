@@ -158,8 +158,10 @@ export class OPFSWorkerManager {
     }>;
   }
 
-  async getQuota(): Promise<OperationResult<{ quota: StorageQuota }>> {
-    return (await this.sendMessage('getQuota')) as OperationResult<{ quota: StorageQuota }>;
+  // The worker replies with quota top-level, NOT under data (the wire shape is
+  // pinned by opfs-worker.protocol.test.ts).
+  async getQuota(): Promise<OperationResult & { quota?: StorageQuota }> {
+    return (await this.sendMessage('getQuota')) as OperationResult & { quota?: StorageQuota };
   }
 
   destroy(): void {

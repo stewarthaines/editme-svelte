@@ -87,12 +87,12 @@ describe('opfs-worker wire protocol', () => {
     expect(result.data.fileInfo.lastModified).toBeInstanceOf(Date);
   });
 
-  it('getQuota returns quota TOP-LEVEL — which the backend reads from result.data, always falling back to zeros', async () => {
+  it('getQuota returns quota TOP-LEVEL, like every op except getFileInfo', async () => {
     const { result } = await roundTrip(worker, 'getQuota');
 
     expect(result.success).toBe(true);
     expect(typeof result.quota.used).toBe('number');
-    // The mismatch OPFSSyncBackend.getQuota currently papers over:
+    // OPFSSyncBackend.getQuota reads this top-level field; nothing is nested.
     expect(result.data).toBeUndefined();
   });
 
