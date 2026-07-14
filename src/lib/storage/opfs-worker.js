@@ -100,9 +100,12 @@ async function writeFile(data) {
     const syncHandle = await fileHandle.createSyncAccessHandle();
 
     try {
-      // Truncate the file first to ensure complete overwrite
+      // Truncate the file first to ensure complete overwrite. Write a
+      // Uint8Array view rather than the raw ArrayBuffer — same bytes in real
+      // browsers, but the view form is what every FileSystemSyncAccessHandle
+      // implementation (including test fakes) handles uniformly.
       syncHandle.truncate(data.content.byteLength);
-      syncHandle.write(data.content, { at: 0 });
+      syncHandle.write(new Uint8Array(data.content), { at: 0 });
       syncHandle.flush();
     } finally {
       syncHandle.close();

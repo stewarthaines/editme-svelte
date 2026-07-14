@@ -194,9 +194,12 @@ export class OPFSAsyncBackend implements StorageBackend {
       if ('createSyncAccessHandle' in fileHandle) {
         const syncHandle = await (fileHandle as any).createSyncAccessHandle();
         try {
-          // Truncate the file first to ensure complete overwrite
+          // Truncate the file first to ensure complete overwrite. Write a
+          // Uint8Array view rather than the raw ArrayBuffer — same bytes in
+          // real browsers, uniformly handled by every sync-handle
+          // implementation (including test fakes).
           syncHandle.truncate(content.byteLength);
-          syncHandle.write(content, { at: 0 });
+          syncHandle.write(new Uint8Array(content), { at: 0 });
           syncHandle.flush();
         } finally {
           syncHandle.close();
@@ -931,6 +934,10 @@ export class FileStorageAPI {
   }
 
   async renameFile(workspaceId: string, oldPath: string, newPath: string): Promise<void> {
+    // Same path: read→write→delete below would delete the file outright.
+    if (oldPath === newPath) {
+      return;
+    }
     // Read the file content
     const content = await this.manager.readFile(workspaceId, oldPath);
     // Write to new location
