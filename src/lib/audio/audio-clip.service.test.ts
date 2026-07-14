@@ -5,7 +5,7 @@
  * following the project's TDD patterns and service architecture.
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, vi, type Mocked } from 'vitest';
 import type { WorkspaceService } from '../services/workspace/workspace.service.js';
 import type { ManifestItem } from '../epub/opf-utils.js';
 import type { WorkspaceState } from '../services/workspace/workspace.service.js';
@@ -22,7 +22,7 @@ function createMockFileStorage(): FileStorageAPI {
   return mockStorage as unknown as FileStorageAPI;
 }
 
-function createMockWorkspaceService(): jest.Mocked<WorkspaceService> {
+function createMockWorkspaceService(): Mocked<WorkspaceService> {
   const mockWorkspace: WorkspaceState = {
     id: 'test-workspace',
     opf: {
@@ -51,7 +51,7 @@ function createMockWorkspaceService(): jest.Mocked<WorkspaceService> {
 describe('AudioClipService API Contract Tests', () => {
   let service: AudioClipService;
   let mockFileStorage: FileStorageAPI;
-  let mockWorkspaceService: jest.Mocked<WorkspaceService>;
+  let mockWorkspaceService: Mocked<WorkspaceService>;
 
   beforeEach(() => {
     mockFileStorage = createMockFileStorage();
@@ -519,7 +519,7 @@ describe('AudioClipService API Contract Tests', () => {
       for (const scenario of errorScenarios) {
         try {
           scenario();
-          fail('Should have thrown AudioClipServiceError');
+          expect.fail('Should have thrown AudioClipServiceError');
         } catch (error: any) {
           expect(error).toBeInstanceOf(AudioClipServiceError);
           expect(error.code).toBeDefined();

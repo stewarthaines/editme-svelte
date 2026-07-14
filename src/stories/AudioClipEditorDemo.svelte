@@ -16,9 +16,17 @@
   import { SettingsService } from '../lib/services/settings/settings.service.js';
   import { FileStorageAPI } from '../lib/storage/index.js';
   import type { WorkspaceState } from '../lib/services/workspace/workspace.service.js';
-  import type { GlobalSettings } from '../lib/types/settings.js';
-  import type { I18nStore } from '../lib/i18n/types.js';
-  import type { ThemeStore } from '../lib/theme/types.js';
+
+  // Structural matches for SettingsService's private ThemeStore/I18nStore
+  // interfaces (the old '../lib/theme/types.js' and I18nStore imports pointed
+  // at modules/exports that never existed).
+  type ThemeStore = { theme: string; systemTheme: string; preferSystemTheme: boolean };
+  type I18nStore = {
+    locale: string;
+    translations: Record<string, string>;
+    isLoading: boolean;
+    error: string | null;
+  };
 
   // Demo state
   let initialized = false;

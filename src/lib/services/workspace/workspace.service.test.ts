@@ -5,14 +5,14 @@
  * following the TDD Red-Green-Refactor cycle.
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, vi, type Mocked } from 'vitest';
 import type { FileStorageAPI } from '../../storage/index.js';
 import type { EPUBMetadata, ManifestItem, SpineItem } from '../../epub/opf-utils.js';
 import { OPFUtils } from '../../epub/opf-utils.js';
 import { WorkspaceService } from './workspace.service.js';
 
 // Test utilities and mocks
-function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
+function createMockFileStorage(): Mocked<FileStorageAPI> {
   const createdWorkspaces = new Set<string>();
   const fileStorage = new Map<string, string>(); // Simple in-memory storage for files
 
@@ -95,7 +95,7 @@ function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
 
 describe('WorkspaceService Contract Tests', () => {
   let service: WorkspaceService;
-  let mockFileStorage: jest.Mocked<FileStorageAPI>;
+  let mockFileStorage: Mocked<FileStorageAPI>;
 
   beforeEach(() => {
     mockFileStorage = createMockFileStorage();
@@ -461,7 +461,7 @@ describe('WorkspaceService Contract Tests', () => {
       // CONTRACT: All service errors must extend ServiceError
       try {
         await service.loadWorkspace('invalid-workspace');
-        fail('Should have thrown error');
+        expect.fail('Should have thrown error');
       } catch (error: any) {
         expect(error.name).toBe('WorkspaceNotFoundError');
         expect(error.workspaceId).toBe('invalid-workspace');

@@ -5,12 +5,12 @@
  * and service integration patterns.
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, vi, type Mocked } from 'vitest';
 import { EnhancedAppState } from './app-state-enhanced.svelte.js';
 import type { FileStorageAPI } from './storage/index.js';
 
 // Mock dependencies
-function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
+function createMockFileStorage(): Mocked<FileStorageAPI> {
   return {
     init: vi.fn().mockResolvedValue(undefined),
     isInitialized: vi.fn().mockReturnValue(false), // Start as not initialized
@@ -214,7 +214,7 @@ vi.mock('./services/epub/epub-processor.service.js', () => ({
 
 describe('EnhancedAppState Integration Tests', () => {
   let appState: EnhancedAppState;
-  let mockFileStorage: jest.Mocked<FileStorageAPI>;
+  let mockFileStorage: Mocked<FileStorageAPI>;
   let mockTransformExecutor: any;
   let mockI18nSystem: any;
   let mockExtensionManager: any;

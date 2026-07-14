@@ -5,12 +5,12 @@
  * following the TDD Red-Green-Refactor cycle.
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, test, expect, beforeEach, vi, afterEach, type Mocked } from 'vitest';
 import type { FileStorageAPI } from '../../storage/index.js';
 import { SettingsService, previewTypeForDevice } from './settings.service.js';
 
 // Test utilities and mocks
-function createMockFileStorage(): jest.Mocked<FileStorageAPI> {
+function createMockFileStorage(): Mocked<FileStorageAPI> {
   return {
     init: vi.fn().mockResolvedValue(undefined),
     isInitialized: vi.fn().mockReturnValue(true),
@@ -68,7 +68,7 @@ function createMockI18nStore() {
 
 describe('SettingsService Contract Tests', () => {
   let service: SettingsService;
-  let mockFileStorage: jest.Mocked<FileStorageAPI>;
+  let mockFileStorage: Mocked<FileStorageAPI>;
   let mockExtensionManager: any;
   let mockThemeStore: any;
   let mockI18nStore: any;

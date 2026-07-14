@@ -5,14 +5,14 @@
  * following the TDD Red-Green-Refactor cycle.
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, vi, type Mocked } from 'vitest';
 import type { TransformExecutor, TransformContext } from '../../transform/transform-executor.js';
 import type { TranslationFunction } from '../../i18n/types.js';
 import { SAMPLE_MSGIDS } from '../../content/types.js';
 import { ContentService } from './content.service.js';
 
 // Test utilities and mocks
-function createMockTransformExecutor(): jest.Mocked<TransformExecutor> {
+function createMockTransformExecutor(): Mocked<TransformExecutor> {
   return {
     executeTextTransform: vi.fn().mockImplementation(async (script, scriptName, text, context) => {
       // Add small delay to simulate real transformation time
@@ -88,7 +88,7 @@ function createMockI18nSystem() {
 
 describe('ContentService Contract Tests', () => {
   let service: ContentService;
-  let mockTransformExecutor: jest.Mocked<TransformExecutor>;
+  let mockTransformExecutor: Mocked<TransformExecutor>;
   let mockI18nSystem: any;
 
   beforeEach(() => {

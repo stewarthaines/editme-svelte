@@ -1,0 +1,14 @@
+{
+  "entry": [
+    "index.html",
+    "functions/**/*.ts",
+    "scripts/*.{js,mjs,cjs}",
+    "build-scripts/*.js",
+    "src/**/*.{test,spec}.ts",
+    "src/**/*.stories.svelte",
+    "src/lib/zip/test/create-fixtures.js",
+    ".storybook/**"
+  ],
+  "project": ["src/**", "build-scripts/**", "scripts/**", "functions/**"],
+  "ignore": ["src/assets/**", "src/pwa/**", "src/stories/**", "plugins/**"]
+}
