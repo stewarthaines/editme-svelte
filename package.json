@@ -74,6 +74,7 @@
     "globals": "^17.7.0",
     "happy-dom": "^18.0.1",
     "knip": "^6.26.0",
+    "opfs-mock": "^2.7.0",
     "playwright": "^1.52.0",
     "po2json": "^0.4.5",
     "prettier": "^3.6.0",
