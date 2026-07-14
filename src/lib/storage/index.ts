@@ -11,14 +11,7 @@ import { FeatureDetector } from './feature-detector.js';
 import { migrateLegacyDatabase } from './legacy-migration.js';
 
 // Export types for public API
-export type {
-  StorageBackend,
-  BackendType,
-  StorageQuota,
-  StorageCapabilities,
-  StorageError,
-  StorageErrorCode,
-} from './types.js';
+export type { StorageBackend, BackendType, StorageQuota, StorageCapabilities } from './types.js';
 
 export class StorageBackendFactory {
   private static featureDetector = new FeatureDetector();
@@ -317,21 +310,21 @@ export class OPFSSyncBackend implements StorageBackend {
   async createWorkspace(id: string): Promise<void> {
     const result = await this.workerManager.createWorkspace(id);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to create workspace');
+      throw new Error(result.error || 'Failed to create workspace');
     }
   }
 
   async deleteWorkspace(id: string): Promise<void> {
     const result = await this.workerManager.deleteWorkspace(id);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to delete workspace');
+      throw new Error(result.error || 'Failed to delete workspace');
     }
   }
 
   async listWorkspaces(): Promise<string[]> {
     const result = await this.workerManager.listWorkspaces();
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to list workspaces');
+      throw new Error(result.error || 'Failed to list workspaces');
     }
     // Fix: Access result.workspaces directly, not result.data.workspaces
     return (result as any).workspaces || [];
@@ -340,14 +333,14 @@ export class OPFSSyncBackend implements StorageBackend {
   async writeFile(workspaceId: string, path: string, content: ArrayBuffer): Promise<void> {
     const result = await this.workerManager.writeFile(workspaceId, path, content);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to write file');
+      throw new Error(result.error || 'Failed to write file');
     }
   }
 
   async readFile(workspaceId: string, path: string): Promise<ArrayBuffer> {
     const result = await this.workerManager.readFile(workspaceId, path);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to read file');
+      throw new Error(result.error || 'Failed to read file');
     }
 
     // Fix: Access result.content directly, not result.data.content
@@ -378,7 +371,7 @@ export class OPFSSyncBackend implements StorageBackend {
   async deleteFile(workspaceId: string, path: string): Promise<void> {
     const result = await this.workerManager.deleteFile(workspaceId, path);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to delete file');
+      throw new Error(result.error || 'Failed to delete file');
     }
   }
 
@@ -388,7 +381,7 @@ export class OPFSSyncBackend implements StorageBackend {
 
     const result = await this.workerManager.listFiles(workspaceId, normalizedPath);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to list files');
+      throw new Error(result.error || 'Failed to list files');
     }
     // Fix: Access result.files directly, not result.data.files
     return (result as any).files || [];
@@ -400,7 +393,7 @@ export class OPFSSyncBackend implements StorageBackend {
   ): Promise<{ size: number; lastModified: Date }> {
     const result = await this.workerManager.getFileInfo(workspaceId, path);
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to get file info');
+      throw new Error(result.error || 'Failed to get file info');
     }
     return result.data?.fileInfo || { size: 0, lastModified: new Date() };
   }
@@ -408,7 +401,7 @@ export class OPFSSyncBackend implements StorageBackend {
   async getQuota(): Promise<StorageQuota> {
     const result = await this.workerManager.getQuota();
     if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to get quota');
+      throw new Error(result.error || 'Failed to get quota');
     }
     return result.data?.quota || { used: 0, available: 0 };
   }

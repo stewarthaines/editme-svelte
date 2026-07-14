@@ -20,12 +20,12 @@ This document provides comprehensive guidance for writing tests in the seed-html
 - **What to Mock**: External dependencies only (file system, network)
 - **What NOT to Mock**: Internal business logic, state management
 
-#### Integration Tests (Vitest + Real APIs)
+#### Storage Backend Tests (contract on fakes + real-browser certification)
 
-- **Purpose**: Test feature boundaries with real dependencies where practical
-- **Environment**: Node.js with real file system (for file storage tests)
-- **Focus**: End-to-end workflows, data persistence, cross-system integration
-- **Preferred over**: Heavy mocking of internal systems
+- **Purpose**: Real I/O coverage of the storage backends (OPFS async/sync worker, IndexedDB)
+- **Mechanism**: One parameterized contract (`src/lib/storage/backend-contract.ts`) runs twice — in happy-dom against fakes (`fake-indexeddb`, `opfs-mock`, the in-process worker harness) inside `npm run test`/`validate`, and unmocked in real headless Chromium via `npm run test:storage`
+- **Why both**: the browser run certifies the fakes; any fidelity gap shows up as a unit-vs-browser diff
+- **Patterns**: per-file `import 'fake-indexeddb/auto'` + fresh `IDBFactory` per test; `import 'opfs-mock'` + `resetMockOPFS()`; the real `opfs-worker.js` script evaluated in-process by `opfs-worker-harness.ts`
 
 #### Storybook Tests (Real Browser)
 
@@ -36,11 +36,11 @@ This document provides comprehensive guidance for writing tests in the seed-html
 
 ### When to Use Each Approach
 
-| Scenario              | Unit Tests | Integration Tests | Storybook | Notes                                      |
+| Scenario              | Unit Tests | Storage suite     | Storybook | Notes                                      |
 | --------------------- | ---------- | ----------------- | --------- | ------------------------------------------ |
 | **Pure Logic**        | ✅         | ❌                | ❌        | Algorithms, validation, calculations       |
-| **API Integration**   | ❌         | ✅                | ❌        | Real file system, backend APIs             |
-| **Browser APIs**      | ❌         | ❌                | ✅        | File API, Storage API, complex DOM         |
+| **Storage backends**  | ✅ (fakes) | ✅ (`test:storage`) | ❌      | Contract on fakes in validate; certified in Chromium |
+| **Browser APIs**      | ❌         | ❌                | ✅        | Complex DOM, layout, real event timing     |
 | **User Interactions** | ❌         | ❌                | ✅        | Click flows, form submissions, navigation  |
 | **Error Handling**    | ✅         | ✅                | ✅        | Test at appropriate level for error source |
 | **Performance**       | ❌         | ❌                | ✅        | Real browser performance characteristics   |
@@ -111,13 +111,12 @@ test: {
 - Form validation and submission
 - Local storage simulation
 
-**What Doesn't Work (Use Storybook Instead):**
+**What Doesn't Work natively (use a fake, or the browser-mode suites):**
 
-- File API operations (`FileReader`, `File` objects)
-- Complex CSS layout and positioning
-- Real browser storage APIs (OPFS, IndexedDB)
-- Performance measurement APIs
-- Real browser event timing
+- OPFS and Workers — faked with `opfs-mock` + the worker harness in unit tests; proven for real by `npm run test:storage`
+- IndexedDB — faked with `fake-indexeddb` (per-file import; note its handles are not structured-cloneable)
+- Complex CSS layout and positioning (Storybook)
+- Performance measurement APIs and real browser event timing (Storybook)
 
 ## Test Development Patterns
 
@@ -465,9 +464,9 @@ npm test -- settings-manager.test.ts
 
 ## Reference Examples
 
-- **Unit Tests**: `src/lib/storage/file-storage-api.test.ts`
-- **Integration Tests**: `src/lib/workspace/workspace-manager.test.ts`
-- **Storybook Tests**: `src/stories/Backend/FileStorage.stories.ts`
-- **Accessibility Tests**: `src/stories/Components/UI/Button.stories.ts`
+- **Backend contract (fakes + certification)**: `src/lib/storage/backend-contract.ts`, `backends.unit.test.ts`, `backends.browser.test.ts`
+- **Worker protocol / lifecycle**: `src/lib/storage/opfs-worker.protocol.test.ts`, `worker-manager.test.ts`
+- **Facade / manager**: `src/lib/storage/storage-api.test.ts`
+- **fake-indexeddb pattern**: `src/lib/storage/legacy-migration.test.ts`
 
 This testing strategy ensures comprehensive coverage across different environments while maintaining fast feedback loops and realistic testing conditions.

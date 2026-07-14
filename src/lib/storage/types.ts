@@ -52,66 +52,14 @@ export interface StorageBackend {
 }
 
 /**
- * Configuration options for storage backend initialization
- */
-export interface StorageConfig {
-  /** Database name for IndexedDB backend */
-  dbName?: string;
-  /** Database version for IndexedDB backend */
-  dbVersion?: number;
-  /** Worker timeout in milliseconds for OPFS sync backend */
-  workerTimeout?: number;
-  /** Enable debug logging */
-  debug?: boolean;
-}
-
-/**
- * Error types that can be thrown by storage operations
- */
-export class StorageError extends Error {
-  constructor(
-    message: string,
-    public code: StorageErrorCode,
-    public cause?: Error
-  ) {
-    super(message);
-    this.name = 'StorageError';
-  }
-}
-
-export enum StorageErrorCode {
-  NOT_INITIALIZED = 'NOT_INITIALIZED',
-  BACKEND_UNAVAILABLE = 'BACKEND_UNAVAILABLE',
-  QUOTA_EXCEEDED = 'QUOTA_EXCEEDED',
-  PERMISSION_DENIED = 'PERMISSION_DENIED',
-  FILE_NOT_FOUND = 'FILE_NOT_FOUND',
-  WORKSPACE_NOT_FOUND = 'WORKSPACE_NOT_FOUND',
-  INVALID_PATH = 'INVALID_PATH',
-  OPERATION_TIMEOUT = 'OPERATION_TIMEOUT',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
-}
-
-/**
- * Result type for operations that may fail
+ * Result of a worker operation. `error` is a plain message string — that is
+ * what opfs-worker.js actually sends (`error.message`), pinned by
+ * opfs-worker.protocol.test.ts.
  */
 export interface OperationResult<T = void> {
   success: boolean;
   data?: T;
-  error?: StorageError;
-}
-
-/**
- * Events emitted by the storage system
- */
-export interface StorageEvents {
-  'quota-warning': { used: number; available: number; threshold: number };
-  'quota-exceeded': { used: number; available: number };
-  'backend-changed': { from: BackendType; to: BackendType };
-  'workspace-created': { workspaceId: string };
-  'workspace-deleted': { workspaceId: string };
-  'file-written': { workspaceId: string; path: string; size: number };
-  'file-deleted': { workspaceId: string; path: string };
+  error?: string;
 }
 
 /**
@@ -227,23 +175,4 @@ export interface DirectoryUtils {
   ensureDirectoryPath(handle: OPFSDirectoryHandle, path: string): Promise<OPFSDirectoryHandle>;
   getFileFromPath(handle: OPFSDirectoryHandle, path: string): Promise<OPFSFileHandle>;
   listDirectoryContents(handle: OPFSDirectoryHandle, basePath?: string): Promise<string[]>;
-}
-
-/**
- * Storage quota and monitoring
- */
-export interface QuotaManager {
-  getCurrentQuota(): Promise<StorageQuota>;
-  estimateFileSize(content: ArrayBuffer): number;
-  checkQuotaBeforeWrite(content: ArrayBuffer): Promise<boolean>;
-  onQuotaExceeded(handler: (quota: StorageQuota) => void): void;
-}
-
-/**
- * Event emitter for storage events
- */
-export interface StorageEventEmitter {
-  on<K extends keyof StorageEvents>(event: K, handler: (data: StorageEvents[K]) => void): void;
-  off<K extends keyof StorageEvents>(event: K, handler: (data: StorageEvents[K]) => void): void;
-  emit<K extends keyof StorageEvents>(event: K, data: StorageEvents[K]): void;
 }
