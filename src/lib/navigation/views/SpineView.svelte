@@ -591,6 +591,12 @@
             if (manifestItem.href && blobURLManager) {
               blobURLManager.revokeFileBlob(manifestItem.href);
             }
+            // A transform script's content changed under an unchanged settings
+            // list — the pipeline's script cache can't see that, so drop it
+            // before the forced render re-reads the pipeline.
+            if (manifestItem.type === 'transform') {
+              previewManager.invalidateTransformScripts();
+            }
             previewManager.forcePreviewUpdate();
           }
         } catch (error) {

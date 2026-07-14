@@ -233,6 +233,15 @@ export class SpinePreviewManager {
   }
 
   /**
+   * Drop the pipeline's cached transform scripts. Must be called after saving
+   * an edited transform script so the next render re-reads it — settings-list
+   * changes are picked up automatically, script content edits are not.
+   */
+  invalidateTransformScripts(): void {
+    this.transformPipeline.invalidateScriptCache();
+  }
+
+  /**
    * Run a generator on demand and return the produced source text (to insert at the
    * editor caret). Supplies the same brokered file-access context as a transform run
    * (workspace manifest + base path), scoped to the active chapter via spineItemId.

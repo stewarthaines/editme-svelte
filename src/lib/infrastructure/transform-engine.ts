@@ -33,6 +33,17 @@ export interface TransformBrokerContext {
   manifest: ManifestItem[];
 }
 
+/** Content equality for transform-script bundles (drives the send dedup). */
+function sameTransformScripts(a: TransformScripts, b: TransformScripts): boolean {
+  const aDom = a.domTransforms ?? [];
+  const bDom = b.domTransforms ?? [];
+  return (
+    a.textTransform === b.textTransform &&
+    aDom.length === bDom.length &&
+    aDom.every((script, i) => script === bDom[i])
+  );
+}
+
 /** Result of running a generator: the produced source text (to insert at the caret). */
 export interface GeneratorResult {
   success: boolean;
@@ -55,6 +66,12 @@ export class TransformEngine {
   // File-access context for the current transform run. Broker requests from the
   // iframe are scoped against this; null means file access is unavailable.
   private brokerContext: TransformBrokerContext | null = null;
+  // The scripts the iframe currently holds (a defensive copy of the last
+  // successful send), so a content-identical setTransformScripts — which the
+  // pipeline issues on every render — skips the message round-trip. The iframe
+  // lives for the whole app session, so this only resets on cleanup or a
+  // failed send (iframe state unknown).
+  private lastScriptsSent: TransformScripts | null = null;
 
   constructor(
     blobURLManager: BlobURLManager,
@@ -79,14 +96,24 @@ export class TransformEngine {
   }
 
   /**
-   * Update transform scripts (when switching spine items or loading new scripts)
+   * Update transform scripts (when switching spine items or loading new
+   * scripts). A no-op when the iframe already holds identical scripts.
    */
   async setTransformScripts(scripts: TransformScripts): Promise<void> {
     if (!this.iframe) {
       throw new Error('Transform engine not initialized');
     }
 
+    if (this.lastScriptsSent && sameTransformScripts(this.lastScriptsSent, scripts)) {
+      return;
+    }
+
+    this.lastScriptsSent = null;
     await this.sendMessage('SET_TRANSFORM_SCRIPTS', scripts);
+    this.lastScriptsSent = {
+      textTransform: scripts.textTransform,
+      domTransforms: [...(scripts.domTransforms ?? [])],
+    };
   }
 
   /**
@@ -288,6 +315,7 @@ export class TransformEngine {
       pending.reject(new Error('Transform engine shutting down'));
     }
     this.pendingMessages.clear();
+    this.lastScriptsSent = null;
 
     // Remove iframe
     if (this.iframe) {

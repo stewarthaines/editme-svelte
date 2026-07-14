@@ -21,6 +21,15 @@ import { resolveTransformPath } from '../settings/dom-transforms.js';
  * Spine-specific transform pipeline using global transform engine
  */
 export class SpineTransformPipeline {
+  // Loaded transform scripts, keyed by the settings that selected them. The
+  // settings file is still read on EVERY load (one storage read), so a changed
+  // text_transform / dom_transforms list always misses the cache; only the
+  // per-script file reads are skipped. Script CONTENT edits are invisible to
+  // the key — the spine editor invalidates explicitly when it saves a
+  // transform script (see invalidateScriptCache). Out-of-band writers
+  // (plugins) are not covered; they'd need the same explicit call.
+  private scriptCache: { key: string; scripts: TransformScripts } | null = null;
+
   constructor(
     private workspaceId: string,
     private fileStorage: FileStorageAPI,
@@ -128,7 +137,20 @@ export class SpineTransformPipeline {
   }
 
   /**
-   * Load transform scripts from workspace settings
+   * Drop the cached transform scripts so the next render re-reads them from
+   * storage. Callers that change a transform script's CONTENT without touching
+   * the settings (the spine editor's live script editing) must call this —
+   * settings-list changes are caught by the per-load settings read instead.
+   */
+  invalidateScriptCache(): void {
+    this.scriptCache = null;
+  }
+
+  /**
+   * Load transform scripts from workspace settings. The settings are read from
+   * storage on every call; the script files themselves are served from cache
+   * while the configured pipeline (text_transform + dom_transforms) is
+   * unchanged and the previous load was complete.
    */
   async loadTransformScripts(): Promise<TransformScripts> {
     try {
@@ -141,6 +163,18 @@ export class SpineTransformPipeline {
         // Load settings and resolve transform scripts
         const settings = await this.settingsService.loadEPUBSettings(this.workspaceId);
 
+        const cacheKey = JSON.stringify([
+          settings.text_transform ?? '',
+          settings.dom_transforms ?? [],
+        ]);
+        if (this.scriptCache?.key === cacheKey) {
+          return this.scriptCache.scripts;
+        }
+
+        // An unreadable script must not be cached: the next render retries
+        // (the file may still be being written on a fresh unpack).
+        let complete = true;
+
         if (settings.text_transform) {
           const content = await this.readScriptWithRetry(
             resolveTransformPath(settings.text_transform)
@@ -148,6 +182,7 @@ export class SpineTransformPipeline {
           // Leave textTransform empty if unreadable; the engine passes the input
           // through unchanged rather than erroring.
           if (content !== null) scripts.textTransform = content;
+          else complete = false;
         }
 
         if (settings.dom_transforms && settings.dom_transforms.length > 0) {
@@ -156,8 +191,13 @@ export class SpineTransformPipeline {
             const content = await this.readScriptWithRetry(resolveTransformPath(scriptName));
             // Skip an unreadable DOM transform rather than queueing an empty one.
             if (content !== null) domTransforms.push(content);
+            else complete = false;
           }
           scripts.domTransforms = domTransforms;
+        }
+
+        if (complete) {
+          this.scriptCache = { key: cacheKey, scripts };
         }
       }
 

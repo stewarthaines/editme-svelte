@@ -1,6 +1,6 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { within } from 'storybook/test';
+  import { within, waitFor, fireEvent } from 'storybook/test';
   import App from '../../App.svelte';
   import { seedProject } from '../utils/seed-project';
   import { advancedMode } from '../../lib/stores/advanced-mode';
@@ -75,57 +75,55 @@ function transformDOM(htmlDocument) {
       ? item.href
       : `${basePath}/${item.href}`;
   }
+
+  /**
+   * Shared loader: a seeded project whose pipeline runs the universal text
+   * transform plus the marker DOM transform. Wired by hand because the
+   * seedProject `extensions` option needs the dev-served /extensions/ catalog,
+   * which test:stories does not provide. Advanced Mode is forced on (the EPUB
+   * Settings section and the editor's transform-file entries need it) — set
+   * through the store, not raw localStorage, because the persisted store reads
+   * its value at module load, before loaders run.
+   */
+  async function seedMarkerProject(title) {
+    advancedMode.current = true;
+
+    const seeded = await seedProject({ title, author: 'Storybook', view: 'spine' });
+
+    const { fileStorage, workspaceId } = seeded;
+    await fileStorage.writeTextFile(
+      workspaceId,
+      'SOURCE/scripts/transformText.js',
+      transformTextJS
+    );
+    await fileStorage.writeTextFile(workspaceId, MARKER_TRANSFORM_PATH, MARKER_TRANSFORM);
+    await fileStorage.writeTextFile(workspaceId, 'SOURCE/preview/head.xml', '');
+    await fileStorage.writeTextFile(
+      workspaceId,
+      'SOURCE/settings.json',
+      JSON.stringify(
+        {
+          version: '1.0.0',
+          text_transform: 'SOURCE/scripts/transformText.js',
+          dom_transforms: [MARKER_TRANSFORM_PATH],
+          preview: {
+            autoUpdate: { responsive: true, device: true, pdf: false },
+            head: 'preview/head.xml',
+            includeHead: { responsive: true, device: false, pdf: false },
+          },
+        },
+        null,
+        2
+      )
+    );
+
+    return seeded;
+  }
 </script>
 
 <Story
   name="Removing a DOM transform takes effect on the next render"
-  loaders={[
-    async () => {
-      // The EPUB Settings section only renders in Advanced Mode. Set it through
-      // the store, not raw localStorage — the persisted store reads its value
-      // at module load, before loaders run.
-      advancedMode.current = true;
-
-      const seeded = await seedProject({
-        title: 'Transform Pipeline Book',
-        author: 'Storybook',
-        view: 'spine',
-      });
-
-      // Wire the transform pipeline by hand (the seedProject `extensions`
-      // option needs the dev-served /extensions/ catalog, which test:stories
-      // does not provide): the universal text transform plus the marker DOM
-      // transform, and a settings.json routing renders through both.
-      const { fileStorage, workspaceId } = seeded;
-      await fileStorage.writeTextFile(
-        workspaceId,
-        'SOURCE/scripts/transformText.js',
-        transformTextJS
-      );
-      await fileStorage.writeTextFile(workspaceId, MARKER_TRANSFORM_PATH, MARKER_TRANSFORM);
-      await fileStorage.writeTextFile(workspaceId, 'SOURCE/preview/head.xml', '');
-      await fileStorage.writeTextFile(
-        workspaceId,
-        'SOURCE/settings.json',
-        JSON.stringify(
-          {
-            version: '1.0.0',
-            text_transform: 'SOURCE/scripts/transformText.js',
-            dom_transforms: [MARKER_TRANSFORM_PATH],
-            preview: {
-              autoUpdate: { responsive: true, device: true, pdf: false },
-              head: 'preview/head.xml',
-              includeHead: { responsive: true, device: false, pdf: false },
-            },
-          },
-          null,
-          2
-        )
-      );
-
-      return { seeded };
-    },
-  ]}
+  loaders={[async () => ({ seeded: await seedMarkerProject('Transform Pipeline Book') })]}
   parameters={{
     docs: {
       description: {
@@ -192,6 +190,81 @@ function transformDOM(htmlDocument) {
       }
     } finally {
       // Don't leak Advanced Mode into other stories sharing this browser.
+      advancedMode.current = false;
+    }
+  }}
+>
+  <App />
+</Story>
+
+<Story
+  name="Editing a transform script live takes effect on the next render"
+  loaders={[async () => ({ seeded: await seedMarkerProject('Transform Live Edit Book') })]}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          'The iterate-on-a-transform workflow: opens a chapter, switches the editor pane to the DOM transform script via the file picker, rewrites it in place, and asserts the next persisted render carries the new script’s output. The settings list never changes here, so this passes only if saving the script invalidates the pipeline’s script cache.',
+      },
+    },
+  }}
+  play={async ({ canvas, userEvent, loaded }) => {
+    const { seeded } = loaded;
+    const ch1Path = chapterPath(seeded, 'chapter01');
+    const MARKER_V2 = 'MARKER-DOM-TRANSFORM-V2';
+    try {
+      await canvas.findByText('Transform Live Edit Book', {}, { timeout: 60000 });
+
+      // Open the chapter and wait for the v1 marker to reach the persisted XHTML.
+      const chapter = await canvas.findByTestId('spine-item-chapter01', {}, { timeout: 60000 });
+      await userEvent.click(chapter);
+      await pollFile(seeded, ch1Path, content => content.includes(MARKER));
+
+      // Switch pane 1 to the transform script via the file picker (transform
+      // entries are Advanced-mode-only, forced on in the loader).
+      const picker = await canvas.findByRole(
+        'combobox',
+        { name: 'Select file for pane 1' },
+        { timeout: 30000 }
+      );
+      const option = await within(picker).findByRole(
+        'option',
+        { name: 'transformMarker.js' },
+        { timeout: 30000 }
+      );
+      await userEvent.selectOptions(picker, option);
+
+      // The pane loads the script from storage; wait until it's in the editor.
+      const editor = await canvas.findByRole(
+        'textbox',
+        { name: 'Pane 1 content' },
+        { timeout: 30000 }
+      );
+      await waitFor(
+        () => {
+          if (!editor.value.includes('transformDOM')) {
+            throw new Error('transform script not loaded into the pane yet');
+          }
+        },
+        { timeout: 30000 }
+      );
+
+      // Rewrite the script in place (same path, same settings list — only the
+      // content changes). fireEvent.input rather than keyboard typing: the
+      // script contains {} which userEvent.type treats as key syntax.
+      await fireEvent.input(editor, {
+        target: { value: MARKER_TRANSFORM.replace(MARKER, MARKER_V2) },
+      });
+
+      // The auto-save must invalidate the script cache and re-render: the v2
+      // marker reaches the persisted chapter, and v1's is gone from it.
+      const finalXhtml = await pollFile(seeded, ch1Path, content => content.includes(MARKER_V2));
+      if (finalXhtml.includes(MARKER)) {
+        throw new Error(
+          'Stale transform scripts: the render after editing the script still used the old version.'
+        );
+      }
+    } finally {
       advancedMode.current = false;
     }
   }}
