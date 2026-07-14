@@ -781,6 +781,22 @@
   }
 
   /**
+   * Pause any playing media before a same-document rewrite. document.open()
+   * is not a navigation, so the old document never unloads — and a PLAYING
+   * audio/video element detached by the rewrite keeps playing (browsers
+   * protect it from GC until it pauses), with its stop control gone.
+   */
+  function pausePreviewMedia(iframeDoc: Document): void {
+    for (const media of iframeDoc.querySelectorAll<HTMLMediaElement>('audio, video')) {
+      try {
+        media.pause();
+      } catch {
+        // A dead/foreign media element must not block the rewrite.
+      }
+    }
+  }
+
+  /**
    * Update iframe with new XHTML content while preserving scroll position
    */
   function updatePreviewContent(content: string): void {
@@ -798,6 +814,7 @@
       pendingScrollRestore = { anchor: scrollAnchor, fallbackScrollTop: scrollTop };
 
       // Update content (preserves XHTML and blob URLs)
+      pausePreviewMedia(iframeDoc);
       iframeDoc.open();
       iframeDoc.write(content);
       iframeDoc.close();
@@ -874,6 +891,7 @@
     // scroll anchors or auto-run axe against Paged.js wrapper elements.
     pendingScrollRestore = null;
 
+    pausePreviewMedia(iframeDoc);
     iframeDoc.open();
     iframeDoc.write(doc);
     iframeDoc.close();

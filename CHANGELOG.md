@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Book covers in the Projects list are now full-height tiles — every row the same height, covers sharper on high-resolution displays, and covers that aren't book-shaped are cropped instead of stretched. (Thumbnails regenerate once on first load.)
 
+### Fixed
+
+- Audio playing in the chapter preview stops when the preview re-renders — previously the sound kept playing with its stop control gone until the clip ran out.
+
 ## [0.9.0] - 2026-07-14
 
 ### Added
