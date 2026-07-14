@@ -283,6 +283,55 @@ describe('SpinePreviewManager pipeline', () => {
     expect(h.onPreviewUpdate).toHaveBeenCalledTimes(1);
   });
 
+  it('loads the workspace exactly once per render and threads it through', async () => {
+    const h = makeHarness({});
+
+    h.manager.updateContent('text', 'content');
+    await vi.advanceTimersByTimeAsync(20);
+    h.finishTransform();
+    await vi.advanceTimersByTimeAsync(0);
+
+    // One load feeds the broker context, chapter metadata, and manifest persistence.
+    expect(h.workspaceService.loadWorkspace).toHaveBeenCalledTimes(1);
+    expect(h.transformEngine.executeTransform).toHaveBeenCalledWith(
+      'content',
+      expect.anything(),
+      'ch1',
+      expect.objectContaining({ basePath: 'OEBPS' })
+    );
+    expect(h.workspaceService.writeFile).toHaveBeenCalledWith(
+      'ws-1',
+      CH1_XHTML_PATH,
+      expect.anything()
+    );
+  });
+
+  it('a workspace load failure still previews (default metadata, no ctx) but surfaces a persistence error', async () => {
+    const h = makeHarness({
+      loadWorkspace: async () => {
+        throw new Error('opf unreadable');
+      },
+    });
+
+    h.manager.updateContent('text', 'content');
+    await vi.advanceTimersByTimeAsync(20);
+    h.finishTransform();
+    await vi.advanceTimersByTimeAsync(0);
+
+    // Transform ran without a brokered file-access context...
+    expect(h.transformEngine.executeTransform).toHaveBeenCalledWith(
+      'content',
+      expect.anything(),
+      'ch1',
+      undefined
+    );
+    // ...the preview still updated, but nothing was written and the
+    // preview/EPUB divergence was reported.
+    expect(h.onPreviewUpdate).toHaveBeenCalledTimes(1);
+    expect(h.workspaceService.writeFile).not.toHaveBeenCalled();
+    expect(h.onError).toHaveBeenCalledWith(expect.objectContaining({ stage: 'persistence' }));
+  });
+
   it('surfaces auto-save failures via onError', async () => {
     const h = makeHarness({
       autoSave: true,

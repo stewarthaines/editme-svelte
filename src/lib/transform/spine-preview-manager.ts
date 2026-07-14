@@ -300,22 +300,30 @@ export class SpinePreviewManager {
         }
       }
 
-      // Step 2: Execute transform pipeline. Supply the workspace's manifest +
-      // base path so transform scripts get the brokered file-access ctx (read
-      // manifest items, read/write SOURCE/data/). NB loadWorkspace re-reads and
-      // re-parses the OPF on every call (only pathInfo is cached) — this runs
-      // per debounced render, not per keystroke, which keeps it tolerable.
-      let brokerContext: { basePath: string; manifest: ManifestItem[] } | undefined;
+      // Step 2: Load the workspace ONCE for this render (loadWorkspace re-reads
+      // and re-parses the OPF on every call; only pathInfo is cached) and thread
+      // it through the transform context, metadata generation, and manifest
+      // persistence below. The manifest can't change mid-render — the only OPF
+      // writer this render triggers is its own updateContentProperties step.
+      let workspace: WorkspaceState | null = null;
+      let workspaceError: unknown;
       try {
-        const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-        brokerContext = {
-          basePath: workspace.pathInfo.basePath,
-          manifest: workspace.opf.manifest,
-        };
-      } catch {
-        // Without workspace context, transforms still run — just without ctx file access.
-        brokerContext = undefined;
+        workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
+      } catch (error) {
+        // Without workspace context, transforms still run — just without ctx
+        // file access and with default metadata. Persistence, which cannot
+        // proceed without the manifest, reports the error below.
+        workspaceError = error;
       }
+
+      // The brokered file-access ctx for transform scripts (read manifest
+      // items, read/write SOURCE/data/).
+      const brokerContext: { basePath: string; manifest: ManifestItem[] } | undefined = workspace
+        ? {
+            basePath: workspace.pathInfo.basePath,
+            manifest: workspace.opf.manifest,
+          }
+        : undefined;
 
       const transformResult = await this.transformPipeline.executeTransform(
         this.currentContent.text,
@@ -334,16 +342,22 @@ export class SpinePreviewManager {
       // The transform engine returns a full <body> element; extract its inner
       // HTML (so the shared template wraps it consistently) AND its attributes
       // (so a class/data-* a DOM transform set on <body> survives).
-      const metadata = await this.generateChapterMetadata();
+      const metadata = await this.generateChapterMetadata(workspace);
       const { content, bodyAttributes } = this.extractBody(transformResult.html || '');
       const xhtml = generateXHTMLDocument(content, metadata, bodyAttributes);
       if (epoch !== this.renderEpoch) return;
 
       // Step 4: Save XHTML as spine item content to manifest (unless the
       // chapter's source was unreadable and the user hasn't edited yet — see
-      // suppressPersist).
+      // suppressPersist). A failed workspace load makes persistence impossible;
+      // that's a real divergence between preview and packaged EPUB, so it is
+      // surfaced the same way a failed write is.
       if (this.config.persistToManifest && !this.suppressPersist) {
-        await this.saveXHTMLToManifest(xhtml);
+        if (workspace) {
+          await this.saveXHTMLToManifest(xhtml, workspace);
+        } else {
+          this.handleError('persistence', workspaceError);
+        }
       }
 
       // Step 5: Process XHTML for blob URL substitution (preview only)
@@ -406,13 +420,11 @@ export class SpinePreviewManager {
   }
 
   /**
-   * Save generated XHTML as spine item content to manifest
+   * Save generated XHTML as spine item content to manifest. The workspace is
+   * supplied by the render that produced the XHTML (loaded once per render).
    */
-  private async saveXHTMLToManifest(xhtml: string): Promise<void> {
+  private async saveXHTMLToManifest(xhtml: string, workspace: WorkspaceState): Promise<void> {
     try {
-      // Load workspace to get proper path info and manifest
-      const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-
       // Find the current spine item in manifest
       const manifestItem = workspace.opf.manifest.find(item => item.id === this.spineItemId);
       if (!manifestItem) {
@@ -484,9 +496,13 @@ export class SpinePreviewManager {
   }
 
   /**
-   * Auto-generate chapter metadata from workspace configuration
+   * Auto-generate chapter metadata from workspace configuration. The workspace
+   * is the render's single per-render load; when it failed to load (null),
+   * defaults apply — language 'en', reflowable viewport, no CSS/JS discovery.
    */
-  private async generateChapterMetadata(): Promise<ChapterMetadata> {
+  private async generateChapterMetadata(
+    workspace: WorkspaceState | null
+  ): Promise<ChapterMetadata> {
     // Title: the authored chapter title from the sidecar (SOURCE/text/{id}.json),
     // falling back to the spine item id when none has been set.
     const meta = await readChapterMeta(this.fileStorage, this.workspaceId, this.spineItemId);
@@ -496,20 +512,12 @@ export class SpinePreviewManager {
     let viewport = 'width=device-width, initial-scale=1.0';
 
     // Language: get from workspace EPUB metadata (fallback to 'en')
-    let language = 'en';
-    try {
-      const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-      language = primaryLanguage(workspace?.opf?.metadata) || 'en';
-    } catch (error) {
-      console.warn('Could not load workspace language, using default:', error);
-    }
+    const language = primaryLanguage(workspace?.opf?.metadata) || 'en';
 
     // Auto-discover CSS and JS files from manifest
     const stylesheets: string[] = [];
     const scripts: string[] = [];
-    try {
-      const workspace = await this.workspaceService.loadWorkspace(this.workspaceId);
-
+    if (workspace) {
       // Fixed-layout publications carry a single package-level viewport
       // (rendition:viewport); fall back to the shared default if it is absent.
       if (workspace.opf.metadata.renditionLayout === 'pre-paginated') {
@@ -532,8 +540,6 @@ export class SpinePreviewManager {
         .forEach(item => {
           scripts.push(item.href); // Use manifest href directly - already relative to OPF
         });
-    } catch {
-      // No CSS/JS files found, that's okay
     }
 
     return {
