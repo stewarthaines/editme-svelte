@@ -1702,6 +1702,7 @@ msgstr "Coverbild erzeugen"
 msgid "Generate patchset"
 msgstr "Änderungssatz erzeugen"
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Generate PDF"
 msgstr "PDF erstellen"
@@ -2688,14 +2689,17 @@ msgstr "Überschreiben?"
 msgid "Package a project to see it here."
 msgstr "Packen Sie ein Projekt, um es hier zu sehen."
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package as READ.html"
 msgstr "Als READ.html verpacken"
 
 #: src/App.svelte
+#: src/lib/navigation/views/AboutView.svelte
 msgid "Package EPUB"
 msgstr "EPUB packen"
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package EPUB without SEED"
 msgstr "EPUB ohne SEED verpacken"
@@ -3265,13 +3269,13 @@ msgstr "Secret Access Key"
 msgid "Secret Key"
 msgstr "Secret Key"
 
-#: src/lib/navigation/views/AboutView.svelte
-msgid "SEED.html exports an EPUB that embeds its own SEED.zip source, a PDF, and a READ.html web book; only the EPUB can return to the app for further editing."
-msgstr "SEED.html exportiert ein EPUB, das seine eigene SEED.zip-Source einbettet, ein PDF und ein READ.html-Webbuch; nur das EPUB kann zur weiteren Bearbeitung in die App zurückkehren."
-
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "SEED.html is a single file, and this page is the whole app. Keep your own copy and it will keep working even if this website goes away — a fully offline editor."
 msgstr "SEED.html ist eine einzige Datei, und diese Seite ist die ganze App. Bewahren Sie Ihre eigene Kopie auf, und sie funktioniert weiter, selbst wenn diese Website verschwindet — ein vollständig offline nutzbarer Editor."
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
+msgstr "SEED.html packt ein EPUB, das seine eigene SEED.zip-Source in sich trägt und zur weiteren Bearbeitung in die App zurückkehren kann, dazu drei Einweg-Ausgaben: ein PDF, ein EPUB ohne SEED und ein READ.html-Webbuch."
 
 #: src/App.svelte
 msgid "Select a spine item to see the preview here"

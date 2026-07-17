@@ -88,18 +88,21 @@
         )}
       </p>
 
-      <!-- SEED.html publishes four outputs: PDF, a plain EPUB, and a READ.html web
-           book are one-way destinations; the EPUB that embeds SEED.zip has a dashed
-           return arrow — only it can be re-imported, edited and republished.
-           Decorative; the aria-label and caption carry the meaning for screen
-           readers. -->
+      <!-- A literal miniature of the Projects view, and around it the files its
+           buttons put on the user's disk. The sidebar's Package EPUB button
+           (drawn as the real button, icon-only like the collapsed sidebar) makes
+           the EPUB+SEED.zip below — the dashed arc back is "Import from file",
+           the one file that returns. The three generate buttons in the details
+           pane each point a straight arrow at their file in the one-way group,
+           labeled with the button text. Decorative; the aria-label and caption
+           carry the meaning for screen readers. -->
       <figure class="reach-figure">
         <svg
           class="reach-graphic seed-graphic"
-          viewBox="0 0 420 280"
+          viewBox="0 0 420 288"
           role="img"
           aria-label={$t(
-            'SEED.html exports an EPUB that embeds its own SEED.zip source, a PDF, and a READ.html web book; only the EPUB can return to the app for further editing.'
+            'SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book.'
           )}
         >
           <defs>
@@ -116,69 +119,102 @@
             </marker>
           </defs>
 
-          <!-- The app: a two-pane editor with a sidebar -->
+          <!-- The app, drawn literally as the Projects view: sidebar with the
+               Package EPUB button at its foot (icon-only, as when the sidebar is
+               collapsed), the projects list with the current project highlighted,
+               and the details pane with the three generate buttons. -->
           <g class="g-app">
-            <rect x="28" y="24" width="108" height="112" rx="8" />
-            <line x1="28" y1="42" x2="136" y2="42" />
-            <text x="35" y="37" class="lbl small">SEED.html</text>
-            <!-- sidebar + two-pane dividers -->
-            <line x1="50" y1="42" x2="50" y2="136" />
-            <line x1="94" y1="42" x2="94" y2="136" />
+            <rect x="24" y="24" width="132" height="124" rx="8" />
+            <line x1="24" y1="42" x2="156" y2="42" />
+            <text x="31" y="37" class="lbl small">SEED.html</text>
+            <!-- sidebar + pane dividers -->
+            <line x1="48" y1="42" x2="48" y2="148" />
+            <line x1="96" y1="42" x2="96" y2="148" />
             <!-- sidebar nav items -->
-            <line x1="34" y1="56" x2="44" y2="56" />
-            <line x1="34" y1="68" x2="44" y2="68" />
-            <line x1="34" y1="80" x2="44" y2="80" />
-            <!-- pane 1 (editor) + pane 2 (preview) content -->
-            <line x1="58" y1="58" x2="86" y2="58" />
-            <line x1="58" y1="72" x2="86" y2="72" />
-            <line x1="58" y1="86" x2="80" y2="86" />
-            <line x1="100" y1="58" x2="128" y2="58" />
-            <line x1="100" y1="72" x2="122" y2="72" />
+            <line x1="30" y1="56" x2="42" y2="56" />
+            <line x1="30" y1="68" x2="42" y2="68" />
+            <line x1="30" y1="80" x2="42" y2="80" />
+            <!-- projects list: the current project highlighted, two more below -->
+            <rect class="highlight" x="52" y="52" width="40" height="14" rx="2" />
+            <line x1="56" y1="78" x2="88" y2="78" />
+            <line x1="56" y1="92" x2="88" y2="92" />
+            <!-- details pane: metadata lines above the three generate buttons -->
+            <line x1="102" y1="56" x2="148" y2="56" />
+            <line x1="102" y1="68" x2="140" y2="68" />
           </g>
 
-          <!-- EPUB round-trip: publish out (solid, horizontal), return to edit (dashed, flat parabola) -->
+          <!-- The Package EPUB button at the sidebar's foot (real button, real
+               tokens, dark-mode tonal treatment — see the pkg-btn styles) -->
+          <g class="g-pkg-btn">
+            <rect class="pkg-btn" x="29" y="127" width="14" height="14" rx="3" />
+            <!-- Phosphor 'Package' (regular), from the app's icon subset. -->
+            <path
+              class="pkg-btn-icon"
+              transform="translate(31 129) scale(0.0391)"
+              d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"
+            />
+          </g>
+
+          <!-- The three generate buttons in the details pane -->
+          <g class="g-app">
+            <rect x="100" y="86" width="48" height="14" rx="3" />
+            <rect x="100" y="106" width="48" height="14" rx="3" />
+            <rect x="100" y="126" width="48" height="14" rx="3" />
+          </g>
+
+          <!-- EPUB round-trip, below the sidebar button: publish down (solid),
+               import from file back in (dashed) — opposing arcs, a cycle -->
           <g class="g-arrows">
-            <path d="M136 72 L288 72" marker-end="url(#seed-arrowhead)" />
+            <path d="M44 148 C 32 164, 32 180, 44 194" marker-end="url(#seed-arrowhead)" />
             <path
               class="return"
-              d="M288 92 C 237 108, 187 108, 136 92"
+              d="M76 196 C 88 180, 88 164, 76 150"
               marker-end="url(#seed-arrowhead)"
             />
           </g>
 
-          <!-- PDF: one-way destination, set a little further from the app -->
+          <!-- One-way outputs: a straight arrow from each button to its file -->
           <g class="g-arrows">
-            <path d="M136 112 C 214 112, 250 178, 302 178" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 93 L242 62" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 113 L242 142" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 133 L242 216" marker-end="url(#seed-arrowhead)" />
           </g>
 
-          <!-- READ.html web book: one-way destination below the PDF -->
-          <g class="g-arrows">
-            <path d="M136 126 C 214 126, 240 240, 296 240" marker-end="url(#seed-arrowhead)" />
-          </g>
-
-          <!-- Output 1: an EPUB that embeds its own SEED.zip source (the round-trip output) -->
+          <!-- The round-trip file on disk: an EPUB with its SEED.zip source inside -->
           <g class="g-book">
-            <rect x="288" y="55" width="76" height="50" rx="5" />
-            <line x1="300" y1="55" x2="300" y2="105" />
-            <rect class="inner" x="322" y="68" width="30" height="20" rx="3" />
-            <text x="326" y="124" class="lbl center">EPUB+SEED.zip</text>
+            <rect x="40" y="196" width="76" height="50" rx="5" />
+            <line x1="52" y1="196" x2="52" y2="246" />
+            <rect class="inner" x="74" y="209" width="30" height="20" rx="3" />
+            <text x="78" y="266" class="lbl small center">EPUB+SEED.zip</text>
           </g>
 
-          <!-- Output 2: PDF — a portrait page with a folded corner, one-way -->
-          <g class="g-dest">
-            <path d="M304 148 L334 148 L346 160 L346 206 L304 206 Z" />
-            <path d="M334 148 L334 160 L346 160" />
-            <text x="356" y="181" class="lbl">PDF</text>
+          <!-- The one-way group, in project-details button order -->
+          <g class="g-group">
+            <rect class="group" x="250" y="26" width="156" height="240" rx="10" />
           </g>
 
-          <!-- Output 3: READ.html — a browser window carrying the book, one-way -->
+          <!-- Generate PDF: a portrait page with a folded corner -->
           <g class="g-dest">
-            <rect x="304" y="222" width="52" height="38" rx="4" />
-            <line x1="304" y1="232" x2="356" y2="232" />
-            <line x1="309" y1="227" x2="313" y2="227" />
-            <line x1="314" y1="242" x2="346" y2="242" />
-            <line x1="314" y1="250" x2="340" y2="250" />
-            <text x="364" y="245" class="lbl small">READ.html</text>
+            <path d="M313 36 L343 36 L355 48 L355 90 L313 90 Z" />
+            <path d="M343 36 L343 48 L355 48" />
+            <text x="328" y="104" class="lbl small center">{$t('Generate PDF')}</text>
+          </g>
+
+          <!-- Package EPUB without SEED: the same book shape, nothing inside -->
+          <g class="g-dest">
+            <rect x="298" y="122" width="60" height="44" rx="5" />
+            <line x1="310" y1="122" x2="310" y2="166" />
+            <text x="328" y="180" class="lbl small center">{$t('Package EPUB without SEED')}</text>
+          </g>
+
+          <!-- Package as READ.html: a browser window carrying the book -->
+          <g class="g-dest">
+            <rect x="302" y="198" width="52" height="38" rx="4" />
+            <line x1="302" y1="208" x2="354" y2="208" />
+            <line x1="307" y1="203" x2="311" y2="203" />
+            <line x1="312" y1="218" x2="344" y2="218" />
+            <line x1="312" y1="226" x2="338" y2="226" />
+            <text x="328" y="250" class="lbl small center">{$t('Package as READ.html')}</text>
           </g>
         </svg>
         <figcaption class="reach-caption">
@@ -283,6 +319,41 @@
   /* The re-import/edit arrow is dashed to read as a return, not a publish. */
   .seed-graphic .return {
     stroke-dasharray: 5 4;
+  }
+
+  /* Quiet container around the one-way outputs: a grouping, not a thing. */
+  .seed-graphic .group {
+    stroke-dasharray: 2 5;
+    opacity: 0.55;
+  }
+
+  /* The Package EPUB label drawn as the actual sidebar button: same tokens,
+     same dark-mode tonal treatment (see .package-epub-button in App.svelte). */
+  .seed-graphic .pkg-btn {
+    fill: var(--color-button-primary-bg);
+    stroke: var(--color-button-primary-bg);
+    stroke-width: 1.5;
+  }
+
+  .seed-graphic .pkg-btn-icon {
+    fill: white;
+    stroke: none;
+  }
+
+  /* The current project's row in the miniature projects list. */
+  .seed-graphic .highlight {
+    fill: var(--color-bg-accent);
+    stroke: var(--color-border-accent);
+    stroke-width: 1;
+  }
+
+  :global([data-theme='dark']) .seed-graphic .pkg-btn {
+    fill: var(--color-surface-elevated);
+    stroke: var(--color-border-accent);
+  }
+
+  :global([data-theme='dark']) .seed-graphic .pkg-btn-icon {
+    fill: var(--color-text-link);
   }
 
   .seed-graphic .small {

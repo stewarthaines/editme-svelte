@@ -1683,6 +1683,7 @@ msgstr ""
 msgid "Generate patchset"
 msgstr ""
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Generate PDF"
 msgstr ""
@@ -2669,14 +2670,17 @@ msgstr ""
 msgid "Package a project to see it here."
 msgstr ""
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package as READ.html"
 msgstr ""
 
 #: src/App.svelte
+#: src/lib/navigation/views/AboutView.svelte
 msgid "Package EPUB"
 msgstr ""
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package EPUB without SEED"
 msgstr ""
@@ -3246,12 +3250,12 @@ msgstr ""
 msgid "Secret Key"
 msgstr ""
 
-#: src/lib/navigation/views/AboutView.svelte
-msgid "SEED.html exports an EPUB that embeds its own SEED.zip source, a PDF, and a READ.html web book; only the EPUB can return to the app for further editing."
-msgstr ""
-
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "SEED.html is a single file, and this page is the whole app. Keep your own copy and it will keep working even if this website goes away — a fully offline editor."
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
 msgstr ""
 
 #: src/App.svelte
