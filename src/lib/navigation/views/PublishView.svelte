@@ -213,7 +213,7 @@
     pluginAttempt += 1;
   }
 
-  // Reading in the vendored bene tab needs dist/bene/ served over HTTP.
+  // Reading in the vendored READ.html tab needs dist/read/ served over HTTP.
   const canRead = isHttpContext();
 
   async function handleRead(filename: string) {

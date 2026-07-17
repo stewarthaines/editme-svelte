@@ -16,8 +16,8 @@ __screenshots__/
 # as-is, not formatted as app modules
 src/assets/
 
-# Vendored bene reader build and Paged.js polyfill (third-party, served as-is)
-public/bene/
+# Vendored READ.html reader build and Paged.js polyfill (third-party, served as-is)
+public/read/
 public/paged.polyfill.js
 patches/
 

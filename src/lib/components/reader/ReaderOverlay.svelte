@@ -1,5 +1,5 @@
 <!--
-  Full-screen in-app host for the vendored bene reader, used in standalone
+  Full-screen in-app host for the vendored READ.html reader, used in standalone
   (installed-PWA) display mode where a script-opened window would render without
   browser chrome and strand the user (see src/lib/reader/open-in-reader.ts). A
   host-owned close bar sits above the reader iframe; Escape also closes.
@@ -12,7 +12,7 @@
     url,
     onClose,
   }: {
-    /** Resolved bene reader URL (same-origin). */
+    /** Resolved READ.html reader URL (same-origin). */
     url: string;
     onClose?: () => void;
   } = $props();

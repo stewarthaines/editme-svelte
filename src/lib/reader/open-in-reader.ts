@@ -1,13 +1,13 @@
 /**
- * Open a packaged EPUB in the vendored bene reader (public/bene/ → dist/bene/),
- * via bene's `?preload=<url>` loader.
+ * Open a packaged EPUB in the vendored READ.html reader (public/read/ →
+ * dist/read/), via its `?book=<url>` deep link.
  *
  * In a browser the reader opens as a new tab. In an installed PWA (standalone
  * display mode) a script-opened window renders without browser chrome — no tab
  * bar, no way back — so there the reader opens as an in-app overlay instead
  * (ReaderOverlay.svelte, driven by the `readerOverlayUrl` store below).
  *
- * HTTP-only, like PDF export and plugins: dist/bene/ is unreachable from the
+ * HTTP-only, like PDF export and plugins: dist/read/ is unreachable from the
  * file:// single-file build, so gate any Read affordance on isHttpContext().
  */
 
@@ -55,7 +55,7 @@ export function openEpubInReader(blob: Blob): void {
  * only when the remote allows cross-origin reads (CORS).
  */
 export function openEpubUrlInReader(url: string): void {
-  const readerUrl = new URL(`bene/index.html?preload=${encodeURIComponent(url)}`, document.baseURI)
+  const readerUrl = new URL(`read/READ.html?book=${encodeURIComponent(url)}`, document.baseURI)
     .href;
   if (isStandaloneDisplayMode()) {
     readerOverlayUrl.set(readerUrl);
