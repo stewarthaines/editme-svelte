@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > pins) are intentionally omitted — this log describes what changed for someone who
 > _uses_ the editor, not the commit history.
 
-## [Unreleased]
+## [0.10.0] - 2026-07-17
 
 ### Added
 
@@ -20,19 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The Read button opens books in READ.html, a new reader built alongside SEED.html. Interactive features — audio clips, for example — actually play there, after a one-time per-book confirmation.
-
-### Fixed
-
-- Books packaged as READ.html open from disk in Chrome, not just over the web.
-- The reader's address reads read/READ.html, not read/READ.
-
+- The Read button opens books in READ.html, a new reader built alongside SEED.html. Interactive features — audio clips, for example — actually play there, after a one-time per-book confirmation — and the book can be downloaded from the reader.
 - Book covers in the Projects list are now full-height tiles — every row the same height, covers sharper on high-resolution displays, and covers that aren't book-shaped are cropped instead of stretched. (Thumbnails regenerate once on first load.)
 - Packaged EPUB filenames use hyphens instead of spaces (`Title-Author-Date.epub`), so published download links work reliably in reading apps. Set your own pattern per project in EPUB Settings → Packaged Filename.
+- The About page's outputs diagram is a small map of the Projects view: every package button and the file it makes, with the two that can return to be edited again.
 
 ### Fixed
 
 - Audio clips now play and seek reliably in Apple Books. Encode clip audio at a constant bit rate (CBR) — VBR files seek unreliably in reading systems.
+- Books packaged as READ.html open from disk in Chrome, not just over the web.
+- The reader's address reads read/READ.html, not read/READ.
 - The preview header no longer stacks its controls three rows deep in narrow panes; long chapter filenames shorten with an ellipsis.
 - Audio playing in the chapter preview stops when the preview re-renders, instead of playing on with no way to stop it.
 
