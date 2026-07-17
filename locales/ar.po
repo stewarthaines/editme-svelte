@@ -2575,10 +2575,6 @@ msgstr ""
 msgid "Only needed if the saved connection stops working."
 msgstr ""
 
-#: src/lib/navigation/views/AboutView.svelte
-msgid "Only the EPUB — with SEED.zip inside — can be reopened, edited, and republished."
-msgstr ""
-
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
 msgstr ""
@@ -2679,6 +2675,7 @@ msgstr ""
 msgid "Package as READ.html"
 msgstr ""
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package as SEED.html"
 msgstr ""
@@ -3266,7 +3263,7 @@ msgid "SEED.html is a single file, and this page is the whole app. Keep your own
 msgstr ""
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
+msgid "SEED.html makes two outputs that can return for further editing — an EPUB carrying its SEED.zip source, and a SEED.html web page wrapping the app and the book together — plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
 msgstr ""
 
 #: src/App.svelte
@@ -3720,6 +3717,10 @@ msgstr ""
 
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Turning off track changes deletes the saved base version. Continue?"
+msgstr ""
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "Two outputs come back to be edited again: the EPUB with SEED.zip inside, and the SEED.html web page that wraps it."
 msgstr ""
 
 #: src/lib/components/metadata/CollectionsEditor.svelte

@@ -2594,10 +2594,6 @@ msgstr "Ein mit dem Editor erstelltes EPUB, das sich auf Smartphones, Tablets un
 msgid "Only needed if the saved connection stops working."
 msgstr "Nur nötig, wenn die gespeicherte Verbindung nicht mehr funktioniert."
 
-#: src/lib/navigation/views/AboutView.svelte
-msgid "Only the EPUB — with SEED.zip inside — can be reopened, edited, and republished."
-msgstr "Nur das EPUB – mit SEED.zip darin – kann erneut geöffnet, bearbeitet und neu veröffentlicht werden."
-
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Open a project to add extensions"
 msgstr "Öffnen Sie ein Projekt, um Erweiterungen hinzuzufügen"
@@ -2698,6 +2694,7 @@ msgstr "Packen Sie ein Projekt, um es hier zu sehen."
 msgid "Package as READ.html"
 msgstr "Als READ.html verpacken"
 
+#: src/lib/navigation/views/AboutView.svelte
 #: src/lib/navigation/views/WorkspaceView.svelte
 msgid "Package as SEED.html"
 msgstr "Als SEED.html verpacken"
@@ -3285,8 +3282,8 @@ msgid "SEED.html is a single file, and this page is the whole app. Keep your own
 msgstr "SEED.html ist eine einzige Datei, und diese Seite ist die ganze App. Bewahren Sie Ihre eigene Kopie auf, und sie funktioniert weiter, selbst wenn diese Website verschwindet — ein vollständig offline nutzbarer Editor."
 
 #: src/lib/navigation/views/AboutView.svelte
-msgid "SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
-msgstr "SEED.html packt ein EPUB, das seine eigene SEED.zip-Source in sich trägt und zur weiteren Bearbeitung in die App zurückkehren kann, dazu drei Einweg-Ausgaben: ein PDF, ein EPUB ohne SEED und ein READ.html-Webbuch."
+msgid "SEED.html makes two outputs that can return for further editing — an EPUB carrying its SEED.zip source, and a SEED.html web page wrapping the app and the book together — plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book."
+msgstr "SEED.html erzeugt zwei Ausgaben, die zur weiteren Bearbeitung zurückkehren können — ein EPUB mit seiner SEED.zip-Source und eine SEED.html-Webseite, die App und Buch gemeinsam umschließt — dazu drei Einweg-Ausgaben: ein PDF, ein EPUB ohne SEED und ein READ.html-Webbuch."
 
 #: src/App.svelte
 msgid "Select a spine item to see the preview here"
@@ -3740,6 +3737,10 @@ msgstr "Ausschalten und Basis verwerfen"
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Turning off track changes deletes the saved base version. Continue?"
 msgstr "Das Ausschalten der Änderungsverfolgung löscht die gespeicherte Basisversion. Fortfahren?"
+
+#: src/lib/navigation/views/AboutView.svelte
+msgid "Two outputs come back to be edited again: the EPUB with SEED.zip inside, and the SEED.html web page that wraps it."
+msgstr "Zwei Ausgaben kommen zur weiteren Bearbeitung zurück: das EPUB mit SEED.zip darin und die SEED.html-Webseite, die es umschließt."
 
 #: src/lib/components/metadata/CollectionsEditor.svelte
 #: src/lib/components/metadata/TitleEditor.svelte

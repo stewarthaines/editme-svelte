@@ -102,7 +102,7 @@
           viewBox="0 0 420 288"
           role="img"
           aria-label={$t(
-            'SEED.html packages an EPUB that carries its own SEED.zip source and can return to the app for further editing, plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book.'
+            'SEED.html makes two outputs that can return for further editing — an EPUB carrying its SEED.zip source, and a SEED.html web page wrapping the app and the book together — plus three one-way outputs: a PDF, an EPUB without SEED, and a READ.html web book.'
           )}
         >
           <defs>
@@ -155,11 +155,12 @@
             />
           </g>
 
-          <!-- The three generate buttons in the details pane -->
+          <!-- The four generate buttons in the details pane -->
           <g class="g-app">
-            <rect x="100" y="86" width="48" height="14" rx="3" />
-            <rect x="100" y="106" width="48" height="14" rx="3" />
-            <rect x="100" y="126" width="48" height="14" rx="3" />
+            <rect x="100" y="82" width="48" height="12" rx="3" />
+            <rect x="100" y="99" width="48" height="12" rx="3" />
+            <rect x="100" y="116" width="48" height="12" rx="3" />
+            <rect x="100" y="133" width="48" height="12" rx="3" />
           </g>
 
           <!-- EPUB round-trip, below the sidebar button: publish down (solid),
@@ -175,9 +176,29 @@
 
           <!-- One-way outputs: a straight arrow from each button to its file -->
           <g class="g-arrows">
-            <path d="M156 93 L242 62" marker-end="url(#seed-arrowhead)" />
-            <path d="M156 113 L242 142" marker-end="url(#seed-arrowhead)" />
-            <path d="M156 133 L242 216" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 88 L242 62" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 105 L242 142" marker-end="url(#seed-arrowhead)" />
+            <path d="M156 122 L242 216" marker-end="url(#seed-arrowhead)" />
+          </g>
+
+          <!-- Package as SEED.html: solid down to its file, dashed arc back —
+               the second output that returns (opening the file imports the book) -->
+          <g class="g-arrows">
+            <path d="M156 139 L188 196" marker-end="url(#seed-arrowhead)" />
+            <path
+              class="return"
+              d="M160 198 C 148 178, 142 164, 138 150"
+              marker-end="url(#seed-arrowhead)"
+            />
+          </g>
+
+          <!-- The SEED.html file on disk: a browser window carrying the book AND the app -->
+          <g class="g-book">
+            <rect x="152" y="198" width="62" height="46" rx="4" />
+            <line x1="152" y1="208" x2="214" y2="208" />
+            <line x1="157" y1="203" x2="161" y2="203" />
+            <rect class="inner" x="172" y="216" width="24" height="20" rx="3" />
+            <text x="184" y="266" class="lbl small center">{$t('Package as SEED.html')}</text>
           </g>
 
           <!-- The round-trip file on disk: an EPUB with its SEED.zip source inside -->
@@ -218,7 +239,9 @@
           </g>
         </svg>
         <figcaption class="reach-caption">
-          {$t('Only the EPUB — with SEED.zip inside — can be reopened, edited, and republished.')}
+          {$t(
+            'Two outputs come back to be edited again: the EPUB with SEED.zip inside, and the SEED.html web page that wraps it.'
+          )}
         </figcaption>
       </figure>
 
