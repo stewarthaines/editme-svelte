@@ -1,9 +1,12 @@
 name: Deploy to Cloudflare Pages
 
+# Manual-trigger only (2026-07-18): Codeberg action runners are so rarely
+# available that push-triggered deploys sat queued for days. Production
+# deploys happen locally instead — `npm run build:i18n && npm run
+# build:plugins && npm run deploy` — see docs/DEPLOYMENT.md. This workflow
+# stays for the day runners are dependable again.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:

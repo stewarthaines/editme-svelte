@@ -185,12 +185,13 @@ will only forward to matching hosts — recommended for any public/multi-user
 deployment. When unset, the built-in guards above apply but any public host is
 allowed.
 
-**Deploying from Codeberg:** Cloudflare's one-click Git integration supports
-GitHub/GitLab only. From a Codeberg repo, deploy via Wrangler in CI:
+**Deploying:** Cloudflare's one-click Git integration supports GitHub/GitLab
+only, and Codeberg's action runners proved too rarely available for
+push-triggered deploys (the workflow in `.forgejo/workflows/deploy.yml` is
+manual-trigger only). Production deploys run locally via Wrangler:
 
 ```bash
-npm run build:i18n && npm run build:plugins
-npx wrangler pages deploy dist
+npm run build:i18n && npm run build:plugins && npm run deploy
 ```
 
 > The proxy only exists on a Functions-capable host (Cloudflare Pages, Netlify,
