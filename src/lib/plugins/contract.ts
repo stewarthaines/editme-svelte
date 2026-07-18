@@ -60,11 +60,21 @@ export interface InitMessage {
    */
   projectId: string;
   /**
-   * Live handle to the shared output directory (the packaged-epub area). The
-   * plugin operates within this handle and never navigates the core's OPFS by
-   * path. Structured-cloneable across same-origin postMessage.
+   * Live handle to the shared output directory (the packaged-epub area).
+   * Structured-cloneable across same-origin postMessage in Chromium — but
+   * WebKit (iPadOS Safari) refuses to clone handles into iframes, so this
+   * field is absent there and the plugin resolves its own handle from
+   * `opfsDirPath` instead.
    */
-  opfsDirHandle: FileSystemDirectoryHandle;
+  opfsDirHandle?: FileSystemDirectoryHandle;
+  /**
+   * OPFS path segments of the same directory, from
+   * `navigator.storage.getDirectory()` — plain strings, cloneable everywhere.
+   * Plugins are same-origin, so their iframe sees the same OPFS root and can
+   * walk these segments to an equivalent handle when `opfsDirHandle` is
+   * absent.
+   */
+  opfsDirPath?: string[];
 }
 
 /**
@@ -130,12 +140,28 @@ export interface ReadEpubMessage {
 export type MainToPlugin = InitMessage | ContextMessage;
 export type PluginToMain = PluginReadyMessage | InsertMessage | NavigateMessage | ReadEpubMessage;
 
-/** Build an `init` message for a given output-dir handle. */
+/**
+ * The OPFS path of a workspace's directory, as segments from the storage
+ * root. This layout (`workspaces/<id>`) is the storage backend's stable
+ * on-disk shape (see src/lib/storage/index.ts getWorkspaceDirectoryHandle);
+ * it is part of this contract so plugins can resolve handles themselves
+ * where handles can't ride postMessage.
+ */
+export function workspaceOpfsPath(workspaceId: string): string[] {
+  return ['workspaces', workspaceId];
+}
+
+/**
+ * Build an `init` message. Pass the handle where it can be cloned; hosts
+ * catching a DataCloneError re-send with `opfsDirHandle` omitted and the
+ * plugin walks `opfsDirPath` instead.
+ */
 export function createInitMessage(
   projectId: string,
-  opfsDirHandle: FileSystemDirectoryHandle
+  opfsDirHandle: FileSystemDirectoryHandle | undefined,
+  opfsDirPath: string[]
 ): InitMessage {
-  return { type: 'init', projectId, opfsDirHandle };
+  return { type: 'init', projectId, opfsDirHandle, opfsDirPath };
 }
 
 /** Build a `context` message carrying the inheritable host environment. */

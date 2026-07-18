@@ -162,13 +162,14 @@ describe('init hand-off with a real OPFS directory handle', () => {
     await writable.write(new Blob(['epub-bytes']));
     await writable.close();
 
-    const init = createInitMessage('publish', dir);
+    const init = createInitMessage('publish', dir, ['workspaces', 'publish']);
     expect(isInitMessage(init)).toBe(true);
-    expect(init.opfsDirHandle.kind).toBe('directory');
+    expect(init.opfsDirHandle?.kind).toBe('directory');
+    expect(init.opfsDirPath).toEqual(['workspaces', 'publish']);
 
     // Mirror the plugin's findEpubFile: iterate the handed handle for *.epub.
     const epubs: string[] = [];
-    for await (const entry of init.opfsDirHandle.values()) {
+    for await (const entry of init.opfsDirHandle!.values()) {
       if (entry.kind === 'file' && entry.name.endsWith('.epub')) epubs.push(entry.name);
     }
     expect(epubs).toEqual(['book.epub']);

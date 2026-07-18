@@ -18,6 +18,7 @@
     createContextMessage,
     isPluginReadyMessage,
     isInsertMessage,
+    workspaceOpfsPath,
   } from '$lib/plugins/contract';
 
   interface Props {
@@ -95,17 +96,18 @@
       return;
     }
     const targetOrigin = new URL(pluginUrl, window.location.href).origin;
+    // projectId is the workspace id at every call site, so it also names the
+    // OPFS directory the handle points at.
+    const dirPath = workspaceOpfsPath(projectId);
     try {
-      frameWindow.postMessage(createInitMessage(projectId, handle), targetOrigin);
-    } catch (error) {
-      // Diagnostic: Safari (iPadOS) has been seen refusing to structured-clone
-      // a FileSystemDirectoryHandle into an iframe (DataCloneError) where
-      // Chromium allows it — surface what was posted and fail over cleanly.
-      console.error(
-        `⚠️ Plugin init postMessage failed — handle: ${(handle as { constructor?: { name?: string } })?.constructor?.name}`,
-        error
-      );
-      pluginFailed = true;
+      frameWindow.postMessage(createInitMessage(projectId, handle, dirPath), targetOrigin);
+    } catch {
+      // WebKit (iPadOS Safari) refuses to structured-clone a
+      // FileSystemDirectoryHandle into an iframe (DataCloneError). Re-send
+      // without the handle: the plugin walks opfsDirPath to an equivalent
+      // handle itself (same origin, same OPFS root).
+      console.warn('Plugin init: handle not cloneable here; plugin will resolve by OPFS path.');
+      frameWindow.postMessage(createInitMessage(projectId, undefined, dirPath), targetOrigin);
     }
   }
 

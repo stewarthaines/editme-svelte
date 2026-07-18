@@ -10,7 +10,9 @@
     isPluginReadyMessage,
     isNavigateMessage,
     isReadEpubMessage,
+    workspaceOpfsPath,
   } from '$lib/plugins/contract';
+  import { PUBLISH_WORKSPACE_ID } from '$lib/workspace/types';
   import { isHttpContext, openEpubInReader, openEpubUrlInReader } from '$lib/reader/open-in-reader';
 
   interface Props {
@@ -146,18 +148,16 @@
       return;
     }
     const targetOrigin = new URL(pluginUrl, window.location.href).origin;
+    const dirPath = workspaceOpfsPath(PUBLISH_WORKSPACE_ID);
     try {
-      frameWindow.postMessage(createInitMessage(projectId, handle), targetOrigin);
-    } catch (error) {
-      // Diagnostic: Safari (iPadOS) has been seen refusing to structured-clone
-      // a FileSystemDirectoryHandle into an iframe (DataCloneError) where
-      // Chromium allows it — surface exactly what was posted instead of dying
-      // as an unhandled rejection with the plugin stuck uninitialised.
-      console.error(
-        `⚠️ Plugin init postMessage failed — handle: ${(handle as { constructor?: { name?: string } })?.constructor?.name}`,
-        error
-      );
-      pluginFailed = true;
+      frameWindow.postMessage(createInitMessage(projectId, handle, dirPath), targetOrigin);
+    } catch {
+      // WebKit (iPadOS Safari) refuses to structured-clone a
+      // FileSystemDirectoryHandle into an iframe (DataCloneError). Re-send
+      // without the handle: the plugin walks opfsDirPath to an equivalent
+      // handle itself (same origin, same OPFS root).
+      console.warn('Plugin init: handle not cloneable here; plugin will resolve by OPFS path.');
+      frameWindow.postMessage(createInitMessage(projectId, undefined, dirPath), targetOrigin);
     }
   }
 

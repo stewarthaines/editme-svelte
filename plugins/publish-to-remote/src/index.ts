@@ -40,20 +40,37 @@ function handleContext(message: ContextMessage) {
   activeIdentifier.set(message.activeIdentifier);
 }
 
-function handleInit(message: InitMessage) {
-  const { projectId, opfsDirHandle } = message;
+async function handleInit(message: InitMessage) {
+  const { projectId, opfsDirHandle, opfsDirPath } = message;
 
-  if (!projectId || !opfsDirHandle) {
-    console.error('Invalid init message: missing projectId or opfsDirHandle');
+  if (!projectId) {
+    console.error('Invalid init message: missing projectId');
     return;
   }
 
-  if (typeof opfsDirHandle !== 'object') {
-    console.error('Invalid OPFS directory handle');
+  if (opfsDirHandle && typeof opfsDirHandle === 'object') {
+    dirHandle.set(opfsDirHandle);
     return;
   }
 
-  dirHandle.set(opfsDirHandle);
+  // No handle rode the message (WebKit refuses to clone handles into
+  // iframes) — walk the OPFS path to an equivalent handle ourselves: the
+  // plugin iframe is same-origin, so it sees the same OPFS root.
+  if (Array.isArray(opfsDirPath) && opfsDirPath.length > 0) {
+    try {
+      let dir = await navigator.storage.getDirectory();
+      for (const segment of opfsDirPath) {
+        dir = await dir.getDirectoryHandle(segment, { create: true });
+      }
+      dirHandle.set(dir);
+      return;
+    } catch (error) {
+      console.error('Failed to resolve OPFS dir from path:', opfsDirPath, error);
+      return;
+    }
+  }
+
+  console.error('Invalid init message: no opfsDirHandle and no usable opfsDirPath');
 }
 
 function initPlugin() {

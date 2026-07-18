@@ -12,8 +12,12 @@ export interface InitMessage {
   /**
    * Live handle to the project workspace root. The plugin navigates the
    * EPUB-standard container structure (META-INF/container.xml → OPF) itself.
+   * Absent where handles can't be cloned into iframes (WebKit/iPadOS).
    */
-  opfsDirHandle: FileSystemDirectoryHandle;
+  opfsDirHandle?: FileSystemDirectoryHandle;
+  /** OPFS path segments to the same directory; the plugin walks these when
+      the handle is absent (same origin, same OPFS root). */
+  opfsDirPath?: string[];
 }
 
 /** main → plugin, ambient host environment; re-sent on any change. */

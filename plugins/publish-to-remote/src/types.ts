@@ -3,7 +3,11 @@
 export type InitMessage = {
   type: 'init';
   projectId: string;
-  opfsDirHandle: FileSystemDirectoryHandle;
+  /** Absent where handles can't be cloned into iframes (WebKit/iPadOS). */
+  opfsDirHandle?: FileSystemDirectoryHandle;
+  /** OPFS path segments to the same directory; the plugin walks these when
+      the handle is absent (same origin, same OPFS root). */
+  opfsDirPath?: string[];
 };
 
 // main → plugin: ambient host environment the plugin inherits and applies to its
