@@ -124,7 +124,9 @@ async function readFile(data) {
     const content = await file.arrayBuffer();
     return { success: true, content };
   } catch (error) {
-    return { success: false, error: error.message };
+    // Echo the workspace/path so the main thread's failure log can name what
+    // was asked for (Safari's NotFoundError message alone identifies nothing).
+    return { success: false, error: error.message, path: data.workspaceId + '/' + data.path };
   }
 }
 

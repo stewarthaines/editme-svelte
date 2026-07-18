@@ -45,10 +45,11 @@ export class OPFSWorkerManager {
     const { result, id, type } = event.data as WorkerResponse;
 
     // Log only worker errors, not every successful readFile response
+    const reply = result as { success?: boolean; error?: string; path?: string; content?: unknown };
     if (type === 'readFile' && result && !result.success) {
-      console.warn(`⚠️ Worker readFile failed: ${(result as any).error}`);
-    } else if (type === 'readFile' && result && (result as any).content === null) {
-      console.warn(`⚠️ Empty ArrayBuffer received for ${(result as any).path || 'unknown path'}`);
+      console.warn(`⚠️ Worker readFile failed for ${reply.path || 'unknown path'}: ${reply.error}`);
+    } else if (type === 'readFile' && result && reply.content === null) {
+      console.warn(`⚠️ Empty ArrayBuffer received for ${reply.path || 'unknown path'}`);
     }
 
     if (this.pendingMessages.has(id)) {
@@ -88,7 +89,26 @@ export class OPFSWorkerManager {
       const id = ++this.messageId;
       this.pendingMessages.set(id, { resolve, reject });
 
-      this.worker!.postMessage({ type, data, id } as WorkerMessage);
+      try {
+        this.worker!.postMessage({ type, data, id } as WorkerMessage);
+      } catch (error) {
+        // Diagnostic for clone failures (e.g. Safari refusing a payload type
+        // Chromium accepts): name the operation and the payload's shape, and
+        // reject properly instead of leaving an unhandled rejection + timeout.
+        this.pendingMessages.delete(id);
+        const shape =
+          data && typeof data === 'object'
+            ? Object.entries(data as Record<string, unknown>)
+                .map(
+                  ([k, v]) =>
+                    `${k}: ${(v as { constructor?: { name?: string } })?.constructor?.name ?? typeof v}`
+                )
+                .join(', ')
+            : typeof data;
+        console.error(`⚠️ Worker postMessage failed for '${type}' — payload { ${shape} }`, error);
+        reject(error instanceof Error ? error : new Error(String(error)));
+        return;
+      }
 
       setTimeout(() => {
         if (this.pendingMessages.has(id)) {

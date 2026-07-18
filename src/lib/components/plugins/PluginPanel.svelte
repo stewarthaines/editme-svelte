@@ -95,7 +95,18 @@
       return;
     }
     const targetOrigin = new URL(pluginUrl, window.location.href).origin;
-    frameWindow.postMessage(createInitMessage(projectId, handle), targetOrigin);
+    try {
+      frameWindow.postMessage(createInitMessage(projectId, handle), targetOrigin);
+    } catch (error) {
+      // Diagnostic: Safari (iPadOS) has been seen refusing to structured-clone
+      // a FileSystemDirectoryHandle into an iframe (DataCloneError) where
+      // Chromium allows it — surface what was posted and fail over cleanly.
+      console.error(
+        `⚠️ Plugin init postMessage failed — handle: ${(handle as { constructor?: { name?: string } })?.constructor?.name}`,
+        error
+      );
+      pluginFailed = true;
+    }
   }
 
   // Hand the ambient app environment (theme/locale/dir + the active locale's

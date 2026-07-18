@@ -17,6 +17,12 @@ const dirname =
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Listen on all interfaces so devices on the LAN (e.g. an iPad running
+  // Safari, remote-inspected from desktop Safari) can reach the dev server
+  // at http://<machine-ip>:5173.
+  server: {
+    host: true,
+  },
   resolve: {
     alias: {
       '$lib': path.resolve(dirname, 'src/lib'),
