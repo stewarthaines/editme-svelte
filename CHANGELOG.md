@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The reader's home is now readitinabook.com/READ.html — the two products sit side by side at the site root. Old /read/READ.html links redirect.
 - Books open in the reader on older browsers too, back to iOS 16 / late-2022 versions.
+- The reader is updated to READ.html 0.4.0: a Download button while reading, catalog browsing with covers and format choices, and an Update available marker when a catalog offers a newer version of a book you have.
+
+### Fixed
+
+- Importing from a catalog no longer fails on older browsers or unusual setups where the browser can't mint the project's identifier.
+- Remote-publishing and audio-clip plugin panels work on iPad Safari, which refuses to hand browser storage folders across to plugins the way desktop Chrome does; the plugins now find their folders themselves.
+- Saving remote credentials, validation reports, and audio-clip libraries works on Safari versions that lack the newer file-writing API (before 18.2).
 
 ## [0.10.0] - 2026-07-17
 
