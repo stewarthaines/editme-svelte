@@ -1,0 +1,18 @@
+{
+  "name": "READ.html",
+  "short_name": "READ.html",
+  "description": "A reader for EPUB books that works in your browser.",
+  "start_url": "/READ.html",
+  "scope": "/READ.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23ffffff'/%3E%3Cpath d='M256 136 C 208 104 136 104 100 120 V 396 C 136 380 208 380 256 408 C 304 380 376 380 412 396 V 120 C 376 104 304 104 256 136 Z M256 136 V 408' fill='none' stroke='%231a1a1a' stroke-width='26' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

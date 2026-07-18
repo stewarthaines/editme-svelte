@@ -13,9 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Install the reader as its own app: visit readitinabook.com/READ.html and use your browser's Install option. Books read there also work offline once visited.
+
 ### Changed
 
 - The reader's home is now readitinabook.com/READ.html — the two products sit side by side at the site root. Old /read/READ.html links redirect.
+- Books open in the reader on older browsers too, back to iOS 16 / late-2022 versions.
 
 ## [0.10.0] - 2026-07-17
 
