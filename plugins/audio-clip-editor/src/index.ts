@@ -10,7 +10,7 @@
 import { mount } from 'svelte';
 import App from './App.svelte';
 import './styles.css';
-import { dirHandle, projectId } from './store.js';
+import { dirHandle, dirPath, projectId } from './store.js';
 import { setPluginMessages } from './i18n.js';
 import type { ContextMessage, InitMessage, MainToPlugin } from './types.js';
 
@@ -45,6 +45,7 @@ async function handleInit(message: InitMessage) {
     return;
   }
   projectId.set(message.projectId);
+  dirPath.set(Array.isArray(message.opfsDirPath) ? message.opfsDirPath : null);
 
   if (message.opfsDirHandle?.kind === 'directory') {
     dirHandle.set(message.opfsDirHandle);

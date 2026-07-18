@@ -8,7 +8,8 @@
   its regions.
 -->
 <script lang="ts">
-  import { dirHandle } from './store.js';
+  import { dirHandle, dirPath } from './store.js';
+  import { randomUUID } from './uuid.js';
   import { t } from './i18n.js';
   import { listAudioItems, readFile } from './opf.js';
   import { loadTemplate } from './template.js';
@@ -85,7 +86,7 @@
   function persist(): void {
     const handle = $dirHandle;
     if (!handle) return;
-    saveClips(handle, store).catch((err: unknown) => {
+    saveClips(handle, $dirPath, store).catch((err: unknown) => {
       errorMessage = err instanceof Error ? err.message : String(err);
     });
   }
@@ -96,7 +97,7 @@
   }
 
   function handleCreate(begin: number, end: number): void {
-    const clip: ClipRegion = { id: crypto.randomUUID(), begin, end, label: '' };
+    const clip: ClipRegion = { id: randomUUID(), begin, end, label: '' };
     updateClips([...clips, clip]);
     selectedClipId = clip.id;
   }

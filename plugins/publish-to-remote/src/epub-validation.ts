@@ -1,4 +1,5 @@
 import { EpubCheck } from '@likecoin/epubcheck-ts';
+import { writeOpfsFile } from './opfs-write.js';
 
 export interface ValidationReport {
   filename: string;
@@ -140,20 +141,8 @@ export function clearLatestReport(filename: string): void {
 export async function saveValidationReport(
   report: ValidationReport,
 ): Promise<void> {
-  const root = await navigator.storage.getDirectory();
-  const validationDir = await root.getDirectoryHandle('validations', {
-    create: true,
-  });
-
-  // Sanitize filename for storage
   const reportName = `${report.filename}.json`;
-  const fileHandle = await validationDir.getFileHandle(reportName, {
-    create: true,
-  });
-
-  const writable = await fileHandle.createWritable();
-  await writable.write(JSON.stringify(report, null, 2));
-  await writable.close();
+  await writeOpfsFile(['validations', reportName], JSON.stringify(report, null, 2));
 }
 
 export async function loadValidationReport(

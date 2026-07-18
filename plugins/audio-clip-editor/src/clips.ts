@@ -6,6 +6,8 @@
  * style; the schema is plugin-private and the host never reads it.
  */
 
+import { writeOpfsFile } from './opfs-write.js';
+
 export interface ClipRegion {
   id: string;
   /** Seconds. */
@@ -55,10 +57,22 @@ export async function loadClips(root: FileSystemDirectoryHandle): Promise<ClipSt
   return emptyStore();
 }
 
-export async function saveClips(root: FileSystemDirectoryHandle, store: ClipStore): Promise<void> {
+export async function saveClips(
+  root: FileSystemDirectoryHandle,
+  rootPath: string[] | null,
+  store: ClipStore,
+): Promise<void> {
+  const json = JSON.stringify(store, null, 2);
   const dir = await dataDir(root, true);
   const fileHandle = await dir.getFileHandle(FILENAME, { create: true });
-  const writable = await fileHandle.createWritable();
-  await writable.write(JSON.stringify(store, null, 2));
-  await writable.close();
+  if (typeof fileHandle.createWritable === 'function') {
+    const writable = await fileHandle.createWritable();
+    await writable.write(json);
+    await writable.close();
+    return;
+  }
+  // Safari main thread lacks createWritable — write through the sync-access
+  // worker, which needs the absolute OPFS path (init's opfsDirPath + ours).
+  if (!rootPath) throw new Error('createWritable unavailable and no OPFS path known');
+  await writeOpfsFile([...rootPath, ...DATA_DIR, FILENAME], json);
 }

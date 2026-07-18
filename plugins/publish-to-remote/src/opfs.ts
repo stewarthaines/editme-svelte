@@ -8,6 +8,7 @@ import type {
   S3Credentials,
   CatalogEntryMeta,
 } from './types.js';
+import { writeOpfsFile } from './opfs-write.js';
 
 const CREDENTIALS_FILENAME = 'credentials.json';
 const REMOTES_FILENAME = 'remotes.json';
@@ -121,13 +122,7 @@ export async function readCredentials(): Promise<S3Credentials | null> {
 }
 
 export async function writeCredentials(creds: S3Credentials): Promise<void> {
-  const root = await navigator.storage.getDirectory();
-  const fileHandle = await root.getFileHandle(CREDENTIALS_FILENAME, {
-    create: true,
-  });
-  const writable = await fileHandle.createWritable();
-  await writable.write(JSON.stringify(creds, null, 2));
-  await writable.close();
+  await writeOpfsFile([CREDENTIALS_FILENAME], JSON.stringify(creds, null, 2));
 }
 
 export async function deleteCredentials(): Promise<void> {
@@ -187,11 +182,5 @@ export async function readRemotes(): Promise<RemotesStore> {
 }
 
 export async function writeRemotes(store: RemotesStore): Promise<void> {
-  const root = await navigator.storage.getDirectory();
-  const fileHandle = await root.getFileHandle(REMOTES_FILENAME, {
-    create: true,
-  });
-  const writable = await fileHandle.createWritable();
-  await writable.write(JSON.stringify(store, null, 2));
-  await writable.close();
+  await writeOpfsFile([REMOTES_FILENAME], JSON.stringify(store, null, 2));
 }
