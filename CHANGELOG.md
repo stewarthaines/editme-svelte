@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > pins) are intentionally omitted — this log describes what changed for someone who
 > _uses_ the editor, not the commit history.
 
+## [Unreleased]
+
+### Changed
+
+- The reader's home is now readitinabook.com/READ.html — the two products sit side by side at the site root. Old /read/READ.html links redirect.
+
 ## [0.10.0] - 2026-07-17
 
 ### Added
