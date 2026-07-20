@@ -19,6 +19,7 @@ src/assets/
 # Vendored READ.html reader build and Paged.js polyfill (third-party, served as-is)
 public/read/
 public/paged.polyfill.js
+public/sr-preview/
 patches/
 
 # Vendored minified libraries (e.g. axe-core for the accessibility check)

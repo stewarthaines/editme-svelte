@@ -24,6 +24,9 @@
     VALIDATION_REPORT_STORAGE_KEY,
   } from '$lib/plugins/validation-report';
   import { snippetAroundClick } from './preview-click.js';
+  import { resolveAnnounceTarget, walkAnnouncements, type VsrLike } from './sr-walk.js';
+  import { SpeechService } from '$lib/speech/speech.service.js';
+  import { isHttpContext } from '$lib/reader/open-in-reader.js';
   import { buildPagedDocument, chapterToSection, MARGIN_MM } from '$lib/pdf/pdf-export.js';
   import type { PrintSettings, PreviewSettings } from '$lib/services/settings/settings.service.js';
   import {
@@ -39,7 +42,7 @@
     CircleHalf,
   } from 'phosphor-svelte';
   import { layoutStore } from '../../stores/layout';
-  import { persisted, asBoolean, asInt, asEnum } from '../../state/persisted.svelte.js';
+  import { persisted, asBoolean, asInt, asEnum, asString } from '../../state/persisted.svelte.js';
   import { parseFxlViewport } from '$lib/epub/fixed-layout.js';
 
   // Props using Svelte 5 runes syntax
@@ -165,9 +168,10 @@
   let a11yViolations = $state<AxeViolation[]>([]);
   let a11yAutoTimer: ReturnType<typeof setTimeout> | undefined;
 
-  // The header's panel toggles (Accessibility / EpubCheck / Reader) are mutually
-  // exclusive — at most one panel open at a time in the band below the header.
-  type PanelId = 'a11y' | 'epubcheck' | 'reader';
+  // The header's panel toggles (Accessibility / EpubCheck / Reader / Screen
+  // reader) are mutually exclusive — at most one panel open at a time in the
+  // band below the header.
+  type PanelId = 'a11y' | 'epubcheck' | 'reader' | 'sr';
   let activePanel = $state<PanelId | null>(null);
 
   // --- Validation report -------------------------------------------------------
@@ -275,8 +279,10 @@
       const doc = previewIframe?.contentDocument;
       if (doc) clearHighlights(doc);
     }
+    if (activePanel === 'sr' && next !== 'sr') teardownSrInstrumentation();
     activePanel = next;
     if (next === 'a11y') void runA11yCheck();
+    if (next === 'sr') void openSrPanel();
   }
 
   // Toggle a panel (button behaviour): re-selecting the open one closes it.
@@ -299,6 +305,10 @@
     if (readerModeActive) {
       list.push({ id: 'reader', label: $t('Reader'), disabled: false });
     }
+    if (canSrPreview && selectedDevice.current !== 'print') {
+      // <!-- i18n: preview Checks dropdown entry — announcement preview -->
+      list.push({ id: 'sr', label: $t('Screen reader'), disabled: !xhtmlContent });
+    }
     return list;
   });
 
@@ -320,6 +330,272 @@
     clearTimeout(a11yAutoTimer);
     a11yAutoTimer = setTimeout(() => void runA11yCheck(), 500);
   }
+
+  // --- Screen reader announcement preview ---------------------------------------
+  // Walks a hovered preview block with the vendored virtual screen reader
+  // (public/sr-preview/, lazy-loaded into the preview iframe like axe-core) and
+  // captions the announcement phrases over the preview; optionally speaks them.
+  // A simulator: phrasing approximates the accessibility tree, not any specific
+  // screen reader's dialect. HTTP-only — the bundle is fetched from the origin.
+  const canSrPreview = isHttpContext();
+
+  interface VsrWindow extends Window {
+    __seedVsr?: VsrLike;
+  }
+
+  let srLoadError = $state(false);
+  let srWalking = $state(false);
+  let srPhrases = $state<string[]>([]);
+  let srCaptionOpen = $state(false);
+  let srCaptionLabel = $state('');
+  let srDocLang = $state('');
+  let srVoices = $state<SpeechSynthesisVoice[]>([]);
+  let srCaptionListEl = $state<HTMLOListElement | null>(null);
+  let srAbort: AbortController | null = null;
+  let srHoverTarget: Element | null = null;
+  const speech = new SpeechService();
+
+  const srSpeak = persisted('seedhtml_sr_speak', false, asBoolean);
+  // Rate is stored ×10 (5–20 → 0.5×–2.0×) to keep the integer codec.
+  const srRate = persisted('seedhtml_sr_rate', 10, asInt({ min: 5, max: 20 }));
+  const srVoice = persisted('seedhtml_sr_voice', '', asString);
+
+  // Voices for the picker: the preview document's language first, rest after.
+  const srVoiceOptions = $derived.by(() => {
+    const matching = srDocLang ? speech.voicesForLang(srVoices, srDocLang) : [];
+    return [...matching, ...srVoices.filter(v => !matching.includes(v))];
+  });
+
+  /**
+   * Load the vendored virtual screen reader into the preview iframe (once per
+   * iframe Window — the module global survives document.open() rewrites, same
+   * as win.axe). The inline script uses dynamic import so both resolution and
+   * failure surface as events the host can await.
+   */
+  function loadVsr(doc: Document, win: VsrWindow): Promise<void> {
+    if (win.__seedVsr) return Promise.resolve();
+    return new Promise<void>((resolve, reject) => {
+      const cleanup = () => {
+        clearTimeout(timer);
+        win.removeEventListener('seed-vsr-ready', onReady);
+        win.removeEventListener('seed-vsr-error', onError);
+      };
+      const onReady = () => {
+        cleanup();
+        resolve();
+      };
+      const onError = () => {
+        cleanup();
+        reject(new Error('Failed to load the virtual screen reader'));
+      };
+      const timer = setTimeout(onError, 10000);
+      win.addEventListener('seed-vsr-ready', onReady);
+      win.addEventListener('seed-vsr-error', onError);
+      const script = doc.createElement('script');
+      script.setAttribute('data-seed-sr-loader', '');
+      const url = new URL('sr-preview/virtual-screen-reader.js', document.baseURI).href;
+      script.textContent =
+        `import(${JSON.stringify(url)})` +
+        `.then(m => { window.__seedVsr = m.virtual; window.dispatchEvent(new Event('seed-vsr-ready')); })` +
+        `.catch(() => window.dispatchEvent(new Event('seed-vsr-error')));`;
+      doc.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Make the current preview document announceable: load the library and add
+   * the hover affordance. Called on panel open and again after every rewrite
+   * and device re-key while the panel is active (the fresh document wiped the
+   * injected pieces; the library itself is cached on the Window / by http).
+   */
+  async function ensureSrReady(): Promise<void> {
+    const doc = previewIframe?.contentDocument;
+    const win = previewIframe?.contentWindow as VsrWindow | null;
+    if (!doc || !win || !doc.body) return;
+    srLoadError = false;
+    try {
+      await loadVsr(doc, win);
+    } catch (error) {
+      console.error('Screen reader preview failed to load:', error);
+      srLoadError = true;
+      return;
+    }
+    srDocLang =
+      doc.documentElement.getAttribute('lang') ??
+      doc.documentElement.getAttribute('xml:lang') ??
+      '';
+    setupSrInstrumentation(doc);
+  }
+
+  /** Inject the announce button + styles into the preview document (idempotent). */
+  function setupSrInstrumentation(doc: Document): void {
+    if (doc.querySelector('[data-seed-sr-style]')) return;
+    const style = doc.createElement('style');
+    style.setAttribute('data-seed-sr-style', '');
+    style.textContent = `
+      [data-seed-sr-target] {
+        outline: 2px dashed #7c3aed !important;
+        outline-offset: 3px;
+      }
+      button[data-seed-sr-announce] {
+        position: absolute;
+        display: none;
+        transform: translateX(-100%);
+        z-index: 2147483647;
+        font: 600 12px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #fff;
+        background: #7c3aed;
+        border: 0;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      }
+    `;
+    doc.head.appendChild(style);
+
+    const button = doc.createElement('button');
+    button.type = 'button';
+    button.setAttribute('data-seed-sr-announce', '');
+    button.textContent = $t('Announce');
+    button.addEventListener('click', event => {
+      // Keep the click from reaching the click-to-source document listener.
+      event.preventDefault();
+      event.stopPropagation();
+      if (srHoverTarget) void announceElement(srHoverTarget);
+    });
+    doc.body.appendChild(button);
+
+    doc.addEventListener('mouseover', handleSrMouseOver);
+    doc.documentElement.addEventListener('mouseleave', handleSrMouseLeave);
+  }
+
+  /** Remove every injected piece and stop any activity. Library stays cached. */
+  function teardownSrInstrumentation(): void {
+    cancelSrActivity();
+    srCaptionOpen = false;
+    srHoverTarget = null;
+    const doc = previewIframe?.contentDocument;
+    if (!doc) return;
+    doc.removeEventListener('mouseover', handleSrMouseOver);
+    doc.documentElement.removeEventListener('mouseleave', handleSrMouseLeave);
+    doc
+      .querySelectorAll('[data-seed-sr-style], [data-seed-sr-announce], [data-seed-sr-loader]')
+      .forEach(el => el.remove());
+    doc
+      .querySelectorAll('[data-seed-sr-target]')
+      .forEach(el => el.removeAttribute('data-seed-sr-target'));
+  }
+
+  function handleSrMouseOver(event: MouseEvent): void {
+    if (srWalking) return;
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const doc = target.ownerDocument;
+    const button = doc.querySelector<HTMLButtonElement>('button[data-seed-sr-announce]');
+    if (!button || target === button || button.contains(target)) return;
+    const block = resolveAnnounceTarget(target);
+    if (!block || block === srHoverTarget) return;
+    setSrHover(doc, button, block);
+  }
+
+  function handleSrMouseLeave(): void {
+    if (srWalking) return;
+    const doc = previewIframe?.contentDocument;
+    const button = doc?.querySelector<HTMLButtonElement>('button[data-seed-sr-announce]');
+    if (doc && button) setSrHover(doc, button, null);
+  }
+
+  /** Move the hover outline + announce button to a block (or clear with null). */
+  function setSrHover(doc: Document, button: HTMLButtonElement, block: Element | null): void {
+    srHoverTarget?.removeAttribute('data-seed-sr-target');
+    srHoverTarget = block;
+    if (!block) {
+      button.style.display = 'none';
+      return;
+    }
+    block.setAttribute('data-seed-sr-target', '');
+    const win = doc.defaultView;
+    const rect = block.getBoundingClientRect();
+    const scrollX = win?.scrollX ?? 0;
+    const scrollY = win?.scrollY ?? 0;
+    button.style.display = 'block';
+    // Top-right of the block, kept inside the document (translateX right-aligns).
+    button.style.left = `${Math.max(rect.right + scrollX, 60)}px`;
+    button.style.top = `${Math.max(rect.top + scrollY - 26, scrollY + 2)}px`;
+  }
+
+  /** Abort the running walk and silence queued speech. Caption content stands. */
+  function cancelSrActivity(): void {
+    srAbort?.abort();
+    srAbort = null;
+    speech.cancel();
+    srWalking = false;
+  }
+
+  /** Caption heading for a walk target, e.g. `<li>` — or the whole chapter. */
+  function srLabelFor(el: Element): string {
+    const doc = previewIframe?.contentDocument;
+    return el === doc?.body ? $t('Whole chapter') : `<${el.tagName.toLowerCase()}>`;
+  }
+
+  /** Walk one element, streaming phrases into the caption (and speech). */
+  async function announceElement(el: Element): Promise<void> {
+    const win = previewIframe?.contentWindow as VsrWindow | null;
+    const vsr = win?.__seedVsr;
+    if (!vsr) return;
+    cancelSrActivity();
+    const controller = new AbortController();
+    srAbort = controller;
+    srPhrases = [];
+    srCaptionLabel = srLabelFor(el);
+    srCaptionOpen = true;
+    srWalking = true;
+    const lang = srDocLang || undefined;
+    try {
+      await walkAnnouncements(vsr, el, {
+        signal: controller.signal,
+        onPhrase: phrase => {
+          srPhrases = [...srPhrases, phrase];
+          if (srSpeak.current) {
+            speech.speak(
+              phrase,
+              { rate: srRate.current / 10, voiceURI: srVoice.current || null, lang },
+              srVoices
+            );
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Screen reader walk failed:', error);
+    } finally {
+      if (srAbort === controller) srWalking = false;
+    }
+  }
+
+  function announceChapter(): void {
+    const body = previewIframe?.contentDocument?.body;
+    if (body) void announceElement(body);
+  }
+
+  function closeSrCaption(): void {
+    cancelSrActivity();
+    srCaptionOpen = false;
+  }
+
+  async function openSrPanel(): Promise<void> {
+    void speech.getVoices().then(voices => (srVoices = voices));
+    await ensureSrReady();
+  }
+
+  // Keep the caption scrolled to the newest phrase as the walk streams.
+  $effect(() => {
+    void srPhrases.length;
+    srCaptionListEl?.lastElementChild?.scrollIntoView({ block: 'nearest' });
+  });
+
+  // Component teardown: never leave queued speech playing.
+  $effect(() => () => cancelSrActivity());
 
   // Preview configuration
   const DEVICE_PRESETS = [
@@ -815,6 +1091,10 @@
 
       // Update content (preserves XHTML and blob URLs)
       pausePreviewMedia(iframeDoc);
+      // A screen-reader walk must not keep stepping through the dying document,
+      // and its queued speech would outlive the rewrite.
+      cancelSrActivity();
+      srHoverTarget = null;
       iframeDoc.open();
       iframeDoc.write(content);
       iframeDoc.close();
@@ -830,6 +1110,9 @@
 
       // The rewrite invalidated any prior axe results; re-check if the panel is open.
       scheduleAutoA11yCheck();
+
+      // The fresh document dropped the announce affordances; re-add them.
+      if (activePanel === 'sr') void ensureSrReady();
     } catch (error) {
       console.error('Failed to update preview content:', error);
     }
@@ -1285,6 +1568,10 @@
       // Set up interactivity first
       setupIframeInteractivity(iframeDoc);
 
+      // Device re-key rebuilt the iframe (fresh Window): reload + re-instrument
+      // the screen reader preview when its panel is open.
+      if (activePanel === 'sr') void ensureSrReady();
+
       // Fixed-layout: measure the page against its declared viewport, then clip.
       measureFxlPage(iframeDoc);
 
@@ -1729,6 +2016,88 @@
     </div>
   {/if}
 
+  <!-- Screen reader announcement panel: hover affordance options + whole-chapter
+       walk, in the same band as the other checks. HTTP-only (vendored library). -->
+  {#if activePanel === 'sr'}
+    <div class="a11y-panel reader-panel" role="region" aria-label={$t('Screen reader preview')}>
+      <div class="a11y-panel-header">
+        <strong>{$t('Screen reader preview')}</strong>
+        <button
+          type="button"
+          class="btn btn-icon"
+          onclick={() => togglePanel('sr')}
+          aria-label={$t('Close screen reader panel')}
+          title={$t('Close')}
+        >
+          <X size={16} aria-hidden="true" />
+        </button>
+      </div>
+
+      <div class="reader-panel-body">
+        {#if srLoadError}
+          <p class="reader-note">{$t('Could not load the screen reader preview.')}</p>
+        {:else}
+          <!-- i18n: instruction shown in the screen reader preview panel -->
+          <p class="reader-note sr-hint">
+            {$t(
+              'Hover a block in the preview and press Announce to see what a screen reader would say.'
+            )}
+          </p>
+
+          <label class="reader-toggle">
+            <input type="checkbox" bind:checked={srSpeak.current} />
+            <span>{$t('Speak announcements aloud')}</span>
+          </label>
+
+          <div class="reader-field">
+            <label class="reader-label" for="sr-rate">{$t('Rate')}</label>
+            <div class="sr-rate-control">
+              <input
+                id="sr-rate"
+                type="range"
+                min="5"
+                max="20"
+                step="1"
+                bind:value={srRate.current}
+              />
+              <span class="sr-rate-readout">{(srRate.current / 10).toFixed(1)}×</span>
+            </div>
+          </div>
+
+          {#if srVoiceOptions.length > 0}
+            <div class="reader-field">
+              <label class="reader-label" for="sr-voice">{$t('Voice')}</label>
+              <select id="sr-voice" class="sr-voice-select" bind:value={srVoice.current}>
+                <option value="">{$t('Default voice')}</option>
+                {#each srVoiceOptions as voice (voice.voiceURI)}
+                  <option value={voice.voiceURI}>{voice.name} ({voice.lang})</option>
+                {/each}
+              </select>
+            </div>
+          {/if}
+
+          <div class="sr-chapter-row">
+            {#if srWalking}
+              <button type="button" class="sr-chapter-btn" onclick={cancelSrActivity}>
+                {$t('Stop')}
+              </button>
+              <span class="reader-note">{$t('Announcing…')}</span>
+            {:else}
+              <button type="button" class="sr-chapter-btn" onclick={announceChapter}>
+                {$t('Read whole chapter')}
+              </button>
+            {/if}
+          </div>
+
+          <!-- i18n: fidelity note under the screen reader preview options -->
+          <p class="reader-note">
+            {$t('Approximate announcements — real screen readers word things differently.')}
+          </p>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
   <!-- Preview content -->
   <div class="preview-content" bind:this={previewContentEl}>
     {#if showSource}
@@ -1757,6 +2126,34 @@
           <div class="print-paginating" role="status">
             <div class="status-spinner"></div>
             <span>{$t('Paginating…')}</span>
+          </div>
+        {/if}
+        <!-- Screen reader caption: the announced block's phrases, streamed over the
+             bottom of the preview (VoiceOver-caption style). One block at a time. -->
+        {#if activePanel === 'sr' && srCaptionOpen}
+          <div
+            class="sr-caption"
+            role="region"
+            aria-live="polite"
+            aria-label={$t('Screen reader announcements')}
+          >
+            <div class="sr-caption-header">
+              <span class="sr-caption-label">{srCaptionLabel}</span>
+              <button
+                type="button"
+                class="sr-caption-close"
+                onclick={closeSrCaption}
+                aria-label={$t('Close announcements')}
+                title={$t('Close')}
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
+            <ol class="sr-caption-list" bind:this={srCaptionListEl}>
+              {#each srPhrases as phrase, i (i)}
+                <li class:current={srWalking && i === srPhrases.length - 1}>{phrase}</li>
+              {/each}
+            </ol>
           </div>
         {/if}
         <div class="preview-frame-wrapper">
@@ -2272,6 +2669,122 @@
     margin: 0;
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
+  }
+
+  /* --- Screen reader preview panel + caption --------------------------------- */
+
+  .sr-rate-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .sr-rate-control input[type='range'] {
+    width: 120px;
+  }
+
+  .sr-rate-readout {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
+    min-width: 2.5em;
+  }
+
+  .sr-voice-select {
+    max-width: 16rem;
+    font-size: var(--text-sm);
+    padding: var(--space-1);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+  }
+
+  .sr-chapter-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .sr-chapter-btn {
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .sr-chapter-btn:hover {
+    background: var(--color-bg-secondary);
+  }
+
+  /* The caption is deliberately dark in both themes — the VoiceOver caption-panel
+     look — so announced phrases read as system captions over the book page. */
+  .sr-caption {
+    position: absolute;
+    inset-block-end: var(--space-3);
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    width: min(34rem, calc(100% - 2 * var(--space-3)));
+    max-height: 38%;
+    background: rgba(20, 20, 22, 0.88);
+    color: #f5f5f6;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sr-caption-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .sr-caption-label {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: var(--text-xs);
+    color: rgba(245, 245, 246, 0.7);
+  }
+
+  .sr-caption-close {
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  .sr-caption-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .sr-caption-list {
+    margin: 0;
+    padding: var(--space-1) 0;
+    list-style: none;
+    overflow-y: auto;
+  }
+
+  .sr-caption-list li {
+    padding: 2px var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .sr-caption-list li.current {
+    background: rgba(255, 255, 255, 0.14);
   }
 
   /* Content-size + timing overlay: top-centre of the viewport, hidden until the

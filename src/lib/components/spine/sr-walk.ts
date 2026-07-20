@@ -10,7 +10,8 @@
  */
 
 /** Elements an author can announce individually — the deepest match wins. */
-export const ANNOUNCEABLE_SELECTOR = 'h1, h2, h3, h4, h5, h6, p, li, figure, table, blockquote, aside, dl, pre';
+export const ANNOUNCEABLE_SELECTOR =
+  'h1, h2, h3, h4, h5, h6, p, li, figure, table, blockquote, aside, dl, pre';
 
 /**
  * The block the hover affordance should target for an event target: the

@@ -186,6 +186,8 @@ export default [
       'public/paged.polyfill.js',
       // Vendored READ.html reader build (minified) — see public/read/VENDORED.md.
       'public/read/**',
+      // Vendored virtual screen reader bundle — see public/sr-preview/VENDORED.md.
+      'public/sr-preview/**',
       // Ignore specific generated files
       '**/lcov-report/',
       '**/coverage-report/',

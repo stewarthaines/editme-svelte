@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-17\n"
-"PO-Revision-Date: 2026-07-17\n"
+"POT-Creation-Date: 2026-07-20\n"
+"PO-Revision-Date: 2026-07-20\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -443,6 +443,14 @@ msgstr "KI-Hinweis"
 msgid "Already in the catalog"
 msgstr "Bereits im Katalog"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Announce"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Announcing…"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "API Key"
 msgstr "API-Schlüssel"
@@ -507,6 +515,11 @@ msgstr "Übernommene anwenden"
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Applying…"
 msgstr "Wird angewendet…"
+
+#: src/lib/components/spine/PreviewPane.svelte
+#. fidelity note under the screen reader preview options
+msgid "Approximate announcements — real screen readers word things differently."
+msgstr ""
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Approximate start position"
@@ -832,6 +845,10 @@ msgstr ""
 msgid "Close accessibility panel"
 msgstr "Barrierefreiheitsbereich schließen"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Close announcements"
+msgstr ""
+
 #: src/lib/components/reader/ReaderOverlay.svelte
 msgid "Close reader"
 msgstr ""
@@ -839,6 +856,10 @@ msgstr ""
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Close reading preview panel"
 msgstr "Lesevorschau schließen"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Close screen reader panel"
+msgstr ""
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Close validation panel"
@@ -987,6 +1008,10 @@ msgstr "Der Feed konnte nicht geladen werden: {error}. Der Server erlaubt mögli
 #: src/lib/components/workspace/OPDSImportDialog.svelte
 msgid "Could not load the feed."
 msgstr "Der Feed konnte nicht geladen werden."
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Could not load the screen reader preview."
+msgstr ""
 
 #: src/lib/pdf/pdf-export.ts
 msgid "Could not open the print window. Allow pop-ups for this site to save as PDF."
@@ -1162,6 +1187,10 @@ msgstr "Standardmäßig aktiviert"
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default value"
 msgstr "Standardwert"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Default voice"
+msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -1776,6 +1805,11 @@ msgstr "Projektbereiche ausblenden"
 #. Device category for tablet reading in comfortable home settings
 msgid "Home (tablet)"
 msgstr "Zuhause (Tablet)"
+
+#: src/lib/components/spine/PreviewPane.svelte
+#. instruction shown in the screen reader preview panel
+msgid "Hover a block in the preview and press Announce to see what a screen reader would say."
+msgstr ""
 
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Human-readable summary of the accessibility of this publication"
@@ -2953,6 +2987,7 @@ msgid "Publisher"
 msgstr "Verlag"
 
 #: plugins/audio-clip-editor/src/App.svelte
+#: src/lib/components/spine/PreviewPane.svelte
 msgid "Rate"
 msgstr ""
 
@@ -2969,6 +3004,10 @@ msgstr "Rendert die Vorschau beim Bearbeiten live neu."
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Read"
 msgstr "Lesen"
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Read whole chapter"
+msgstr ""
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"
@@ -3253,6 +3292,19 @@ msgstr "Gespeicherte Feeds…"
 msgid "Saving…"
 msgstr "Wird gespeichert…"
 
+#: src/lib/components/spine/PreviewPane.svelte
+#. preview Checks dropdown entry — announcement preview
+msgid "Screen reader"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Screen reader announcements"
+msgstr ""
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Screen reader preview"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Scrolled (continuous)"
 msgstr "Gescrollt (durchgehend)"
@@ -3437,6 +3489,10 @@ msgstr "Quelltext"
 msgid "Source on GitHub"
 msgstr "Quellcode auf GitHub"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Speak announcements aloud"
+msgstr ""
+
 #: src/App.svelte
 msgid "Spine"
 msgstr "Spine"
@@ -3476,6 +3532,7 @@ msgid "Status:"
 msgstr "Status:"
 
 #: plugins/audio-clip-editor/src/App.svelte
+#: src/lib/components/spine/PreviewPane.svelte
 msgid "Stop"
 msgstr ""
 
@@ -3922,6 +3979,10 @@ msgstr "Viewport-Höhe in Pixeln"
 msgid "Viewport width in pixels"
 msgstr "Viewport-Breite in Pixeln"
 
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Voice"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Volume \"{volume}\" (no reader markers found — books are copied to it as-is)"
 msgstr "Laufwerk \"{volume}\" (keine Reader-Kennung gefunden — Bücher werden unverändert kopiert)"
@@ -3961,6 +4022,10 @@ msgstr "Was unterscheidet ein SEED-EPUB?"
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "While locked, you can edit existing chapters, styles and scripts; structural changes are disabled."
 msgstr "Solange gesperrt, können Sie bestehende Kapitel, Stile und Skripte bearbeiten; strukturelle Änderungen sind deaktiviert."
+
+#: src/lib/components/spine/PreviewPane.svelte
+msgid "Whole chapter"
+msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Wide"
