@@ -71,6 +71,7 @@
     readEpubIdentity,
     findWorkspaceByIdentifier,
   } from './lib/import/boot-payload.js';
+  import { parseBookParam } from './lib/import/book-param.js';
   import { downloadBlob } from './lib/zip/index.js';
   import { showToast } from './lib/stores/toast.svelte.js';
   import ReaderOverlay from './lib/components/reader/ReaderOverlay.svelte';
@@ -1076,6 +1077,53 @@
   // static markup and runs on every load of such a file, so the dc:identifier
   // dedupe is what prevents silent duplicate projects. Returns true when a
   // payload was handled (the artifact's own state wins over any URL hash).
+  // Shared by the embedded-payload boot and the ?book= deep link: when the
+  // book's dc:identifier already matches a project here, offer to reopen it
+  // (the reader's "Edit in SEED.html" link is a durable button a user will
+  // press twice); otherwise import a fresh copy.
+  const importOrReopenEpub = async (
+    payload: Uint8Array,
+    filename: string,
+    notice?: string
+  ): Promise<void> => {
+    if (!appState) return;
+    const identity = await readEpubIdentity(payload);
+    if (identity.identifier) {
+      const existing = await findWorkspaceByIdentifier(
+        fileStorage,
+        await workspaceService.listWorkspaces(),
+        identity.identifier
+      );
+      if (existing) {
+        const openExisting = confirm(
+          $t(
+            '“{title}” is already a project in this browser. OK opens it; Cancel imports a fresh copy.',
+            {
+              title: identity.title || $t('Untitled'),
+            }
+          )
+        );
+        if (openExisting) {
+          await appState.loadWorkspace(existing);
+          const firstSpineItem = appState.workspace?.opf?.spine?.[0];
+          if (firstSpineItem) {
+            appState.selectChapter(firstSpineItem.idref);
+            navigationStore.navigateTo('spine');
+          } else {
+            navigationStore.navigateTo('metadata');
+          }
+          return;
+        }
+      }
+    }
+
+    const file = new File([payload as BlobPart], filename, {
+      type: 'application/epub+zip',
+    });
+    await handleEpubImport(file);
+    if (notice) showToast(notice, 'info', 10000);
+  };
+
   const handleEmbeddedPayloadBoot = async (): Promise<boolean> => {
     let payload: Uint8Array | null = null;
     try {
@@ -1088,52 +1136,40 @@
     if (!payload || !appState) return false;
 
     try {
-      const identity = await readEpubIdentity(payload);
-      if (identity.identifier) {
-        const existing = await findWorkspaceByIdentifier(
-          fileStorage,
-          await workspaceService.listWorkspaces(),
-          identity.identifier
-        );
-        if (existing) {
-          const openExisting = confirm(
-            $t(
-              '“{title}” is already a project in this browser. OK opens it; Cancel imports a fresh copy.',
-              {
-                title: identity.title || $t('Untitled'),
-              }
-            )
-          );
-          if (openExisting) {
-            await appState.loadWorkspace(existing);
-            const firstSpineItem = appState.workspace?.opf?.spine?.[0];
-            if (firstSpineItem) {
-              appState.selectChapter(firstSpineItem.idref);
-              navigationStore.navigateTo('spine');
-            } else {
-              navigationStore.navigateTo('metadata');
-            }
-            return true;
-          }
-        }
-      }
-
-      const file = new File([payload as BlobPart], 'embedded.epub', {
-        type: 'application/epub+zip',
-      });
-      await handleEpubImport(file);
-      showToast(
+      await importOrReopenEpub(
+        payload,
+        'embedded.epub',
         $t(
           'Project imported — your edits live in this browser. Use the package buttons to save your work as files.'
-        ),
-        'info',
-        10000
+        )
       );
     } catch (error) {
       console.error('Embedded payload import failed:', error);
       alert($t('This file carries a book, but the book could not be read.'));
     }
     return true;
+  };
+
+  // ?book= deep link — the reader's "Edit in SEED.html" hand-off (see
+  // process/BOOK_PARAM_IMPORT.md). Fetch mirrors the reader's own ?book=
+  // handling: no-store, as-is, CORS applies, no proxy. The caller has already
+  // cleared the param from the URL.
+  const handleBookParamImport = async (url: string): Promise<void> => {
+    try {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Failed to download EPUB: ${response.status} ${response.statusText}`);
+      }
+      const payload = new Uint8Array(await response.arrayBuffer());
+      // response.url follows redirects, so the filename reflects where the
+      // book actually came from.
+      const filename = extractFilenameFromUrl(response.url || url);
+      await importOrReopenEpub(payload, filename);
+    } catch (error) {
+      console.error('Failed to import book from URL:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to import EPUB: ${errorMessage}`);
+    }
   };
 
   // Initialize app state
@@ -1204,10 +1240,19 @@
         await refreshHasProjects();
 
         // A book-carrying artifact imports (or reopens) its payload; otherwise
-        // check the hash after appState is fully ready.
+        // a ?book= deep link (the READ.html hand-off), then the legacy hash
+        // form — all after appState is fully ready.
         const payloadHandled = await handleEmbeddedPayloadBoot();
-        if (!payloadHandled && window.location.hash) {
-          handleHashChange();
+        if (!payloadHandled) {
+          const bookUrl = parseBookParam(window.location.search);
+          if (bookUrl) {
+            // Read once and clear BEFORE the fetch: a failed import must not
+            // leave a URL that re-fires the download on every reload.
+            history.replaceState(null, '', window.location.pathname);
+            await handleBookParamImport(bookUrl);
+          } else if (window.location.hash) {
+            handleHashChange();
+          }
         }
       } catch (error) {
         console.error('Failed to initialize app:', error);

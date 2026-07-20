@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Transform and generator scripts can read the book's language (`ctx.language`) to produce locale-aware output, like dates written out in the book's own language.
+- Opening a book link from READ.html's "Edit in SEED.html" now lands in the editor: `SEED.html?book=<url>` downloads the book and imports it — or offers to reopen the project if it's already here.
 
 ## [0.11.0] - 2026-07-18
 
