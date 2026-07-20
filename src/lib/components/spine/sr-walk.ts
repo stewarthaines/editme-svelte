@@ -38,6 +38,53 @@ export function isTerminalPhrase(phrase: string, prev: string, first: string): b
   );
 }
 
+// Role tokens as spoken by real screen readers. The virtual screen reader's
+// phrases use raw ARIA role tokens ("listitem", "doc-noteref"), which no TTS
+// voice can pronounce; captions keep them verbatim, speech gets these.
+const SPOKEN_ROLES: Record<string, string> = {
+  listitem: 'list item',
+  columnheader: 'column header',
+  rowheader: 'row header',
+  rowgroup: 'row group',
+  'graphics-document': 'graphic',
+  'graphics-object': 'graphic object',
+  'graphics-symbol': 'graphic symbol',
+  'doc-noteref': 'note reference',
+  'doc-footnote': 'footnote',
+  'doc-endnote': 'endnote',
+  'doc-endnotes': 'endnotes',
+  'doc-pagebreak': 'page break',
+  'doc-toc': 'table of contents',
+};
+
+function spokenRole(token: string): string {
+  const mapped = SPOKEN_ROLES[token];
+  if (mapped) return mapped;
+  // remaining DPUB roles read fine once the prefix and hyphens go
+  if (token.startsWith('doc-')) return token.slice(4).replaceAll('-', ' ');
+  return token;
+}
+
+/**
+ * The spoken form of an announcement phrase. Rewrites the leading role token
+ * (also after "end of ") to its spoken vocabulary, and "position x, set size
+ * y" to "x of y" — the way real screen readers voice list context. Applied to
+ * the speech path only; captions show the phrase verbatim.
+ */
+export function speakablePhrase(phrase: string): string {
+  const isEnd = phrase.startsWith('end of ');
+  const body = isEnd ? phrase.slice('end of '.length) : phrase;
+  // Role announcements are a lowercase token alone or followed by a comma;
+  // anything else is content text and passes through untouched.
+  const match = body.match(/^([a-z][a-z-]*)(?:,|$)/);
+  if (!match) return phrase;
+  const rewritten = (spokenRole(match[1]) + body.slice(match[1].length)).replace(
+    /\bposition (\d+), set size (\d+)/,
+    '$1 of $2'
+  );
+  return isEnd ? `end of ${rewritten}` : rewritten;
+}
+
 /** The subset of the virtual screen reader the walk driver needs. */
 export interface VsrLike {
   start(options: { container: Element; displayCursor?: boolean }): Promise<void>;

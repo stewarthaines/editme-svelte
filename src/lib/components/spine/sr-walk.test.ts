@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   resolveAnnounceTarget,
   isTerminalPhrase,
+  speakablePhrase,
   walkAnnouncements,
   type VsrLike,
 } from './sr-walk';
@@ -33,6 +34,39 @@ describe('resolveAnnounceTarget', () => {
 
   it('returns null outside any announceable block', () => {
     expect(resolveAnnounceTarget(el('plain-b'))).toBeNull();
+  });
+});
+
+describe('speakablePhrase', () => {
+  it('speaks role tokens as words and list context as "x of y"', () => {
+    expect(speakablePhrase('listitem, level 2, position 3, set size 12')).toBe(
+      'list item, level 2, 3 of 12'
+    );
+    expect(speakablePhrase('end of listitem, level 1, position 1, set size 3')).toBe(
+      'end of list item, level 1, 1 of 3'
+    );
+  });
+
+  it('speaks graphics and DPUB roles', () => {
+    expect(speakablePhrase('graphics-document')).toBe('graphic');
+    expect(speakablePhrase('doc-noteref, note 1')).toBe('note reference, note 1');
+    expect(speakablePhrase('end of doc-footnote')).toBe('end of footnote');
+    expect(speakablePhrase('doc-pagebreak')).toBe('page break');
+    // unmapped DPUB roles: prefix dropped
+    expect(speakablePhrase('doc-glossary')).toBe('glossary');
+  });
+
+  it('speaks table roles', () => {
+    expect(speakablePhrase('columnheader, Date')).toBe('column header, Date');
+    expect(speakablePhrase('end of rowgroup')).toBe('end of row group');
+  });
+
+  it('leaves ordinary roles and content text untouched', () => {
+    expect(speakablePhrase('paragraph')).toBe('paragraph');
+    expect(speakablePhrase('table, December broadcasts')).toBe('table, December broadcasts');
+    expect(speakablePhrase('The listitem token appears in this sentence.')).toBe(
+      'The listitem token appears in this sentence.'
+    );
   });
 });
 

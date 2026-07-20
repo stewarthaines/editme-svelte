@@ -24,7 +24,12 @@
     VALIDATION_REPORT_STORAGE_KEY,
   } from '$lib/plugins/validation-report';
   import { snippetAroundClick } from './preview-click.js';
-  import { resolveAnnounceTarget, walkAnnouncements, type VsrLike } from './sr-walk.js';
+  import {
+    resolveAnnounceTarget,
+    speakablePhrase,
+    walkAnnouncements,
+    type VsrLike,
+  } from './sr-walk.js';
   import { SpeechService } from '$lib/speech/speech.service.js';
   import { isHttpContext } from '$lib/reader/open-in-reader.js';
   import { buildPagedDocument, chapterToSection, MARGIN_MM } from '$lib/pdf/pdf-export.js';
@@ -591,7 +596,7 @@
           srPhrases = [...srPhrases, phrase];
           if (srSpeak.current) {
             speech.speak(
-              phrase,
+              speakablePhrase(phrase),
               { rate: srRate.current / 10, voiceURI: srVoice.current || null, lang },
               srVoices
             );
