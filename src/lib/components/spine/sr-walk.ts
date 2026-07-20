@@ -49,6 +49,15 @@ export interface VsrLike {
 export interface WalkOptions {
   /** Aborts between steps; already-emitted phrases stand. */
   signal: AbortSignal;
+  /**
+   * Walk only this element, announced with its full document context. The
+   * session still starts on `container` (ancestry outside the session's
+   * container doesn't exist for the virtual screen reader — a nested li
+   * walked as the container announces as "level 1"), and the cursor jumps to
+   * the target via a transient tabindex + focus, which the virtual screen
+   * reader follows like a real one.
+   */
+  target?: Element;
   /** Pause between steps so the in-preview cursor is followable. */
   stepDelayMs?: number;
   onPhrase: (phrase: string) => void;
@@ -58,20 +67,42 @@ export interface WalkOptions {
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+/** Poll until the last spoken phrase changes from `previous` (or time out). */
+async function awaitPhraseChange(
+  vsr: VsrLike,
+  previous: string,
+  timeoutMs = 1500
+): Promise<string> {
+  const started = Date.now();
+  for (;;) {
+    const phrase = await vsr.lastSpokenPhrase();
+    if (phrase !== previous) return phrase;
+    if (Date.now() - started > timeoutMs) return phrase;
+    await delay(50);
+  }
+}
+
 /**
- * Walk `container`, emitting each announcement phrase in order, including the
- * terminal "end of …" phrase. Always stops the virtual screen reader, even on
- * abort or error; stop() failures are swallowed (the target document may have
- * been rewritten under the walk).
+ * Walk `container` — or just `target` within it — emitting each announcement
+ * phrase in order, including the terminal "end of …" phrase. Always stops the
+ * virtual screen reader, even on abort or error; stop() failures are swallowed
+ * (the target document may have been rewritten under the walk).
  */
 export async function walkAnnouncements(
   vsr: VsrLike,
   container: Element,
-  { signal, stepDelayMs = 90, onPhrase, maxSteps = 2000 }: WalkOptions
+  { signal, target, stepDelayMs = 90, onPhrase, maxSteps = 2000 }: WalkOptions
 ): Promise<void> {
   try {
     await vsr.start({ container, displayCursor: true });
-    const first = await vsr.lastSpokenPhrase();
+    let first = await vsr.lastSpokenPhrase();
+    if (target && target !== container) {
+      const ownTabindex = target.getAttribute('tabindex');
+      if (ownTabindex === null) target.setAttribute('tabindex', '-1');
+      (target as HTMLElement).focus?.({ preventScroll: true });
+      first = await awaitPhraseChange(vsr, first);
+      if (ownTabindex === null) target.removeAttribute('tabindex');
+    }
     onPhrase(first);
     let prev = first;
     for (let i = 0; i < maxSteps && !signal.aborted; i++) {

@@ -579,9 +579,14 @@
     srCaptionOpen = true;
     srWalking = true;
     const lang = srDocLang || undefined;
+    // The session always starts on the body so the target announces with its
+    // full document context (list nesting level, position, set size); the
+    // cursor then jumps to the target inside walkAnnouncements.
+    const body = previewIframe?.contentDocument?.body;
     try {
-      await walkAnnouncements(vsr, el, {
+      await walkAnnouncements(vsr, body ?? el, {
         signal: controller.signal,
+        target: el === body ? undefined : el,
         onPhrase: phrase => {
           srPhrases = [...srPhrases, phrase];
           if (srSpeak.current) {

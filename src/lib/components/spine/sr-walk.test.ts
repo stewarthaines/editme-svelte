@@ -118,6 +118,47 @@ describe('walkAnnouncements', () => {
     expect(calls[calls.length - 1]).toBe('stop');
   });
 
+  it('jumps to a target via focus, announces full context, stops at its end', async () => {
+    // Session starts on the container ('document'); focusing the target moves
+    // the cursor to the nested listitem, announced with document-level context.
+    const timeline = [
+      'document',
+      'listitem, level 2, position 2, set size 3',
+      'inner b',
+      'end of listitem, level 2, position 2, set size 3',
+      'end of list',
+    ];
+    let index = 0;
+    const stop = vi.fn(async () => {});
+    const vsr: VsrLike = {
+      start: async () => {},
+      next: async () => {
+        if (index < timeline.length - 1) index++;
+      },
+      stop,
+      lastSpokenPhrase: async () => timeline[index],
+    };
+    const container = document.createElement('div');
+    const target = document.createElement('li');
+    container.appendChild(target);
+    // simulate the virtual screen reader following DOM focus
+    (target as HTMLElement).focus = () => {
+      index = 1;
+    };
+    const heard: string[] = [];
+    await walkAnnouncements(vsr, container, {
+      signal: new AbortController().signal,
+      stepDelayMs: 0,
+      target,
+      onPhrase: phrase => heard.push(phrase),
+    });
+    // the container's own announcement is skipped; the walk ends with the
+    // target's end phrase, never reaching content past the target
+    expect(heard).toEqual(timeline.slice(1, 4));
+    expect(target.hasAttribute('tabindex')).toBe(false);
+    expect(stop).toHaveBeenCalled();
+  });
+
   it('always stops the reader when the walk throws, and swallows stop() failures', async () => {
     const stop = vi.fn(async () => {
       throw new Error('document rewritten');
