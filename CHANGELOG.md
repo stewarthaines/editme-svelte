@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > pins) are intentionally omitted — this log describes what changed for someone who
 > _uses_ the editor, not the commit history.
 
+## [0.13.0] - 2026-07-21
+
+### Added
+
+- Hear your book the way assistive technology presents it: pick "Screen reader" from the preview's Checks, hover any block, and press Announce — what a screen reader would say appears as captions over the preview, and can be spoken aloud with a choice of voice and speed.
+- Two announcement styles, one per audience: Screen reader announces structure (headings with levels, list positions, image descriptions); Read aloud voices only the text, the way reading apps' built-in narration does.
+- Announcements follow the app's language for structure and the book's language for the text — the same split real screen readers use. German announcement vocabulary is included.
+
+### Changed
+
+- The announcement voice picker offers voices for the book's language and the app's language instead of the platform's entire voice list.
+
 ## [0.12.0] - 2026-07-20
 
 ### Added
