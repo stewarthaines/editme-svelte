@@ -369,10 +369,16 @@
   const srRate = persisted('seedhtml_sr_rate', 10, asInt({ min: 5, max: 20 }));
   const srVoice = persisted('seedhtml_sr_voice', '', asString);
 
-  // Voices for the picker: the preview document's language first, rest after.
+  // Voices for the picker: the book's language first, then the app locale's —
+  // the picked voice reads only the book's text, so voices in other languages
+  // are noise and are dropped (macOS installs dozens). Only when neither
+  // language matches any installed voice does the full list appear, rather
+  // than an empty picker.
   const srVoiceOptions = $derived.by(() => {
-    const matching = srDocLang ? speech.voicesForLang(srVoices, srDocLang) : [];
-    return [...matching, ...srVoices.filter(v => !matching.includes(v))];
+    const book = srDocLang ? speech.voicesForLang(srVoices, srDocLang) : [];
+    const app = speech.voicesForLang(srVoices, $currentLocale).filter(v => !book.includes(v));
+    const relevant = [...book, ...app];
+    return relevant.length > 0 ? relevant : srVoices;
   });
 
   /**
