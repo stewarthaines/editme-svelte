@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20\n"
-"PO-Revision-Date: 2026-07-20\n"
+"POT-Creation-Date: 2026-07-21\n"
+"PO-Revision-Date: 2026-07-21\n"
 "Language: zh-Hant\n"
 "Language-Team: \n"
 "Last-Translator: \n"
@@ -175,6 +175,10 @@ msgstr ""
 msgid "{sel}/{total}"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "{x} of {y}"
+msgstr ""
+
 #: src/lib/content/types.ts
 msgid ""
 "# Achievement *Unlocked!*\n"
@@ -235,6 +239,10 @@ msgstr ""
 msgid "About SEED.html"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "abstract"
+msgstr ""
+
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Accept all changes in {name}"
 msgstr ""
@@ -275,6 +283,10 @@ msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility issues"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "acknowledgments"
 msgstr ""
 
 #: src/lib/navigation/views/PublishView.svelte
@@ -416,6 +428,10 @@ msgstr ""
 msgid "Advanced Mode required for extension management"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "afterword"
+msgstr ""
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
 msgstr ""
@@ -446,6 +462,10 @@ msgstr ""
 
 #: src/lib/Sidebar.svelte
 msgid "Append Item"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "appendix"
 msgstr ""
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
@@ -514,6 +534,10 @@ msgstr ""
 msgid "Are you sure you want to delete this item?"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "article"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Audio Clip Directive"
 msgstr ""
@@ -574,6 +598,14 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "back link"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "banner"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Basic"
 msgstr ""
@@ -586,8 +618,24 @@ msgstr ""
 msgid "Basic mode"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "bibliography"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "bibliography entry"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "bibliography reference"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Binary file - preview not available"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "block quote"
 msgstr ""
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
@@ -635,6 +683,10 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "caption"
+msgstr ""
+
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Capture your changes as a patchset to review and apply to the matching project."
 msgstr ""
@@ -675,6 +727,10 @@ msgstr ""
 msgid "Catalogs"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "cell"
+msgstr ""
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certification"
 msgstr ""
@@ -706,6 +762,10 @@ msgstr ""
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Changes"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "chapter"
 msgstr ""
 
 #: src/lib/content/types.ts
@@ -841,6 +901,10 @@ msgstr ""
 msgid "Close validation panel"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "code"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Code block processing"
 msgstr ""
@@ -858,6 +922,14 @@ msgstr ""
 msgid "Collections"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "colophon"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "column header"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for mobile phone reading while traveling or commuting
 msgid "Commute (phone)"
@@ -868,8 +940,16 @@ msgstr ""
 msgid "Compact"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "complementary"
+msgstr ""
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Complex Interactive"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "conclusion"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -914,6 +994,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Connecting to storage..."
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "content information"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -1001,6 +1085,10 @@ msgstr ""
 msgid "Could not read the project: {error}"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "cover"
+msgstr ""
+
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Cover"
@@ -1079,6 +1167,14 @@ msgstr ""
 msgid "Credential of the certifier"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "credit"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "credits"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "CSS @page size, e.g. \"140mm 216mm\" or \"A4 landscape\"."
 msgstr ""
@@ -1151,6 +1247,10 @@ msgstr ""
 msgid "Decrease text size"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "dedication"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default"
@@ -1166,6 +1266,10 @@ msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Default voice"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "definition"
 msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
@@ -1214,6 +1318,10 @@ msgstr ""
 msgid "Delete the selected clip from the library"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "deletion"
+msgstr ""
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Demo Controls"
 msgstr ""
@@ -1248,6 +1356,10 @@ msgstr ""
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/Toast.svelte
 msgid "Dismiss"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "document"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1391,6 +1503,334 @@ msgstr ""
 msgid "Embed the editor in the EPUB so the book can be reopened and edited."
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "emphasis"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of abstract"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of acknowledgments"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of afterword"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of appendix"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of article"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of back link"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of banner"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography entry"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography reference"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of block quote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of caption"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of cell"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of chapter"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of code"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of colophon"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of column header"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of complementary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of conclusion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of content information"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of cover"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of credit"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of credits"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of dedication"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of definition"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of deletion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of document"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of emphasis"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of endnote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of endnotes"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of epigraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of epilogue"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of errata"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of example"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of figure"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of footnote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of foreword"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of form"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of glossary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of glossary reference"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic object"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic symbol"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of heading"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of image"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of index"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of insertion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of introduction"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of link"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of list"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of list item"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of main"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of navigation"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of note"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of note reference"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of notice"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of page break"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of page list"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of paragraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of part"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of preface"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of prologue"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of pull quote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of questions and answers"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of region"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of row"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of row group"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of row header"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of search"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of separator"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of strong"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of subscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of subtitle"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of superscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of table"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of table of contents"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of term"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of time"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of tip"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "endnote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "endnotes"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Endpoint URL"
 msgstr ""
@@ -1435,6 +1875,14 @@ msgstr ""
 msgid "Enter title"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "epigraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "epilogue"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "EPUB"
 msgstr ""
@@ -1465,6 +1913,10 @@ msgstr ""
 msgid "EPUB Settings"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "errata"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1481,6 +1933,10 @@ msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Everything up to date."
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "example"
 msgstr ""
 
 #: src/lib/components/metadata/TitleEditor.svelte
@@ -1629,6 +2085,10 @@ msgstr ""
 msgid "Fetch"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "figure"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "File Path"
 msgstr ""
@@ -1686,8 +2146,20 @@ msgstr ""
 msgid "Font:"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "footnote"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Force reading-system colours"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "foreword"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "form"
 msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
@@ -1737,6 +2209,14 @@ msgstr ""
 msgid "Get Started"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "glossary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "glossary reference"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Cloud API key"
 msgstr ""
@@ -1757,8 +2237,24 @@ msgstr ""
 msgid "Google Drive setup failed: {error}"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "graphic"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "graphic object"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "graphic symbol"
+msgstr ""
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Hazards"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "heading"
 msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
@@ -1810,6 +2306,10 @@ msgstr ""
 
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Ignore changes (don't import)"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "image"
 msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1882,6 +2382,10 @@ msgstr ""
 msgid "Increase text size"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "index"
+msgstr ""
+
 #: src/App.svelte
 msgid "Initializing application..."
 msgstr ""
@@ -1929,6 +2433,14 @@ msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Insert the clip directive at the editor cursor"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "insertion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "introduction"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
@@ -2099,6 +2611,10 @@ msgstr ""
 msgid "Left to Right"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "level {n}"
+msgstr ""
+
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "License"
@@ -2118,12 +2634,24 @@ msgstr ""
 msgid "Light text on a dark cover"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "link"
+msgstr ""
+
 #: src/lib/Sidebar.svelte
 msgid "Link folder…"
 msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Linked folder: {name}"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "list"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "list item"
 msgstr ""
 
 #: src/lib/components/audio/AudioClipEditor.svelte
@@ -2229,6 +2757,10 @@ msgstr ""
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "macOS sidecar file"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "main"
 msgstr ""
 
 #: src/lib/Sidebar.svelte
@@ -2346,6 +2878,10 @@ msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Narrow"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "navigation"
 msgstr ""
 
 #: src/App.svelte
@@ -2566,9 +3102,21 @@ msgstr ""
 msgid "Not validated"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "note"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "note reference"
+msgstr ""
+
 #: src/lib/components/SpineSidebar.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Nothing to import — the file(s) already match the existing content."
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "notice"
 msgstr ""
 
 #: src/lib/components/Toast.svelte
@@ -2729,6 +3277,14 @@ msgstr ""
 msgid "Packaging…"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "page break"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "page list"
+msgstr ""
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Page Progression"
 msgstr ""
@@ -2755,6 +3311,14 @@ msgstr ""
 
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 2 content"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "paragraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "part"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -2870,6 +3434,10 @@ msgstr ""
 msgid "Pre-paginated"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "preface"
+msgstr ""
+
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Prefix URI"
 msgstr ""
@@ -2927,6 +3495,10 @@ msgstr ""
 msgid "Projects"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "prologue"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Properties"
 msgstr ""
@@ -2955,6 +3527,14 @@ msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Publisher"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "pull quote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "questions and answers"
 msgstr ""
 
 #: plugins/audio-clip-editor/src/App.svelte
@@ -3046,6 +3626,10 @@ msgstr ""
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Refresh"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "region"
 msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
@@ -3206,6 +3790,18 @@ msgstr ""
 msgid "Route uploads through the app proxy (for servers without CORS)"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "row"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "row group"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "row header"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Run top-to-bottom over the generated DOM."
 msgstr ""
@@ -3284,6 +3880,10 @@ msgstr ""
 msgid "Scrolled (per document)"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "search"
+msgstr ""
+
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Search projects"
 msgstr ""
@@ -3342,6 +3942,10 @@ msgstr ""
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Selected folder: {name}"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "separator"
 msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
@@ -3507,6 +4111,10 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "strong"
+msgstr ""
+
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Subject authority"
 msgstr ""
@@ -3523,6 +4131,14 @@ msgstr ""
 msgid "Subjects"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "subscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "subtitle"
+msgstr ""
+
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Subtitle"
 msgstr ""
@@ -3534,6 +4150,10 @@ msgstr ""
 #: src/lib/components/metadata/AccessibilityFields.svelte
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "Summary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "superscript"
 msgstr ""
 
 #: src/lib/ThemeToggle.svelte
@@ -3557,8 +4177,20 @@ msgstr ""
 msgid "System"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "table"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "table of contents"
+msgstr ""
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Technical Info"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "term"
 msgstr ""
 
 #: src/lib/components/metadata/SubjectEditor.svelte
@@ -3679,6 +4311,14 @@ msgstr ""
 
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "This patchset has no changes."
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "time"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "tip"
 msgstr ""
 
 #: plugins/publish-to-remote/src/App.svelte

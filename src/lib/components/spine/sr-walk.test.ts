@@ -1,9 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
   resolveAnnounceTarget,
+  isStructuralPhrase,
   isTerminalPhrase,
   speakablePhrase,
   walkAnnouncements,
+  type SpokenLookup,
   type VsrLike,
 } from './sr-walk';
 
@@ -52,7 +54,6 @@ describe('speakablePhrase', () => {
     expect(speakablePhrase('doc-noteref, note 1')).toBe('note reference, note 1');
     expect(speakablePhrase('end of doc-footnote')).toBe('end of footnote');
     expect(speakablePhrase('doc-pagebreak')).toBe('page break');
-    // unmapped DPUB roles: prefix dropped
     expect(speakablePhrase('doc-glossary')).toBe('glossary');
   });
 
@@ -67,6 +68,51 @@ describe('speakablePhrase', () => {
     expect(speakablePhrase('The listitem token appears in this sentence.')).toBe(
       'The listitem token appears in this sentence.'
     );
+  });
+
+  it('passes unknown future roles through as English', () => {
+    expect(speakablePhrase('doc-futurerole')).toBe('futurerole');
+    expect(speakablePhrase('end of doc-futurerole')).toBe('end of futurerole');
+  });
+
+  it('resolves vocabulary through the lookup — per-role end msgids, no concatenation', () => {
+    const seen: Array<[string, Record<string, string | number> | undefined]> = [];
+    const spoken: SpokenLookup = (msgid, params) => {
+      seen.push([msgid, params]);
+      return `«${msgid}»`;
+    };
+    expect(speakablePhrase('end of listitem, level 2, position 3, set size 12', spoken)).toBe(
+      '«end of list item», «level {n}», «{x} of {y}»'
+    );
+    expect(seen).toEqual([
+      ['end of list item', undefined],
+      ['level {n}', { n: '2' }],
+      ['{x} of {y}', { x: '3', y: '12' }],
+    ]);
+    expect(speakablePhrase('doc-noteref, note 1', spoken)).toBe('«note reference», note 1');
+  });
+
+  it('never sends content text through the lookup', () => {
+    const spoken = vi.fn((msgid: string) => msgid);
+    expect(speakablePhrase('Recorded in the village of Kotelia.', spoken)).toBe(
+      'Recorded in the village of Kotelia.'
+    );
+    expect(spoken).not.toHaveBeenCalled();
+  });
+});
+
+describe('isStructuralPhrase', () => {
+  it('recognises role and end-of phrases', () => {
+    expect(isStructuralPhrase('listitem, level 2, position 3, set size 12')).toBe(true);
+    expect(isStructuralPhrase('paragraph')).toBe(true);
+    expect(isStructuralPhrase('end of doc-footnote')).toBe(true);
+    expect(isStructuralPhrase('table, December broadcasts')).toBe(true);
+  });
+
+  it('classifies content text as content, even lowercase with commas', () => {
+    expect(isStructuralPhrase('Recorded in the village of Kotelia.')).toBe(false);
+    expect(isStructuralPhrase('hello, world')).toBe(false);
+    expect(isStructuralPhrase('მრავალხმიანობა')).toBe(false);
   });
 });
 

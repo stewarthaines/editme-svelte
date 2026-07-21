@@ -16,7 +16,7 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import type { TransformError } from '$lib/types/spine-editor.js';
-  import { t } from '$lib/i18n';
+  import { t, translate, currentLocale } from '$lib/i18n';
   import ChapterValidationPanel from './ChapterValidationPanel.svelte';
   import {
     readValidationReport,
@@ -25,6 +25,7 @@
   } from '$lib/plugins/validation-report';
   import { snippetAroundClick } from './preview-click.js';
   import {
+    isStructuralPhrase,
     resolveAnnounceTarget,
     speakablePhrase,
     walkAnnouncements,
@@ -351,7 +352,9 @@
 
   let srLoadError = $state(false);
   let srWalking = $state(false);
-  let srPhrases = $state<string[]>([]);
+  // caption: what the author reads (structural vocabulary in the app locale);
+  // verbatim: the library's raw phrase, kept reachable as the row's title.
+  let srPhrases = $state<{ caption: string; verbatim: string }[]>([]);
   let srCaptionOpen = $state(false);
   let srCaptionLabel = $state('');
   let srDocLang = $state('');
@@ -593,13 +596,24 @@
         signal: controller.signal,
         target: el === body ? undefined : el,
         onPhrase: phrase => {
-          srPhrases = [...srPhrases, phrase];
+          // Structure follows the listener, content follows the book — the
+          // convention real screen readers use. Structural phrases render and
+          // speak in the app locale's vocabulary and default voice; content is
+          // spoken verbatim with the book-language voice, and only content
+          // gets the author's picked voice.
+          const structural = isStructuralPhrase(phrase);
+          const caption = structural ? speakablePhrase(phrase, translate) : phrase;
+          srPhrases = [...srPhrases, { caption, verbatim: phrase }];
           if (srSpeak.current) {
-            speech.speak(
-              speakablePhrase(phrase),
-              { rate: srRate.current / 10, voiceURI: srVoice.current || null, lang },
-              srVoices
-            );
+            if (structural) {
+              speech.speak(caption, { rate: srRate.current / 10, lang: $currentLocale }, srVoices);
+            } else {
+              speech.speak(
+                phrase,
+                { rate: srRate.current / 10, voiceURI: srVoice.current || null, lang },
+                srVoices
+              );
+            }
           }
         },
       });
@@ -2175,8 +2189,13 @@
               </button>
             </div>
             <ol class="sr-caption-list" bind:this={srCaptionListEl}>
-              {#each srPhrases as phrase, i (i)}
-                <li class:current={srWalking && i === srPhrases.length - 1}>{phrase}</li>
+              {#each srPhrases as item, i (i)}
+                <li
+                  class:current={srWalking && i === srPhrases.length - 1}
+                  title={item.caption === item.verbatim ? undefined : item.verbatim}
+                >
+                  {item.caption}
+                </li>
               {/each}
             </ol>
           </div>

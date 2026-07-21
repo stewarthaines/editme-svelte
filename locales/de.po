@@ -5,8 +5,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: SEED.html\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20\n"
-"PO-Revision-Date: 2026-07-20\n"
+"POT-Creation-Date: 2026-07-21\n"
+"PO-Revision-Date: 2026-07-21\n"
 "Language: de\n"
 "Language-Team: \n"
 "Last-Translator: Claude (machine first pass)\n"
@@ -175,6 +175,11 @@ msgstr "{path} (Zeile {line})"
 msgid "{sel}/{total}"
 msgstr "{sel}/{total}"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "{x} of {y}"
+msgstr "{x} von {y}"
+
 #: src/lib/content/types.ts
 msgid ""
 "# Achievement *Unlocked!*\n"
@@ -254,6 +259,10 @@ msgstr "Ein SEED-EPUB ist ein lebendiges Dokument statt einer Sackgasse des Publ
 msgid "About SEED.html"
 msgstr "Über SEED.html"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "abstract"
+msgstr ""
+
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "Accept all changes in {name}"
 msgstr "Alle Änderungen in {name} übernehmen"
@@ -295,6 +304,10 @@ msgstr "Barrierefreiheitsmerkmale"
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Accessibility issues"
 msgstr "Barrierefreiheitsprobleme"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "acknowledgments"
+msgstr ""
 
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Actions"
@@ -435,6 +448,10 @@ msgstr "Erweiterter Modus"
 msgid "Advanced Mode required for extension management"
 msgstr "Für die Erweiterungsverwaltung ist der erweiterte Modus erforderlich"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "afterword"
+msgstr ""
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "AI Disclaimer"
 msgstr "KI-Hinweis"
@@ -444,12 +461,14 @@ msgid "Already in the catalog"
 msgstr "Bereits im Katalog"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Announce"
-msgstr ""
+msgstr "Ansagen"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Announcing…"
-msgstr ""
+msgstr "Ansage läuft …"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "API Key"
@@ -466,6 +485,11 @@ msgstr "App-Einstellungen"
 #: src/lib/Sidebar.svelte
 msgid "Append Item"
 msgstr "Element anhängen"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "appendix"
+msgstr "Anhang"
 
 #: src/lib/metadata/custom-meta-catalog.svelte.ts
 msgid "Apple Books"
@@ -533,6 +557,11 @@ msgstr "Möchten Sie das Kapitel '{name}' wirklich löschen? Dadurch werden das 
 msgid "Are you sure you want to delete this item?"
 msgstr "Möchten Sie dieses Element wirklich löschen?"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "article"
+msgstr "Artikel"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Audio Clip Directive"
 msgstr ""
@@ -593,6 +622,15 @@ msgstr "Verfügbar im Online-Betrieb"
 msgid "Back"
 msgstr "Zurück"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "back link"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "banner"
+msgstr "Banner"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Basic"
 msgstr "Einfach"
@@ -605,9 +643,27 @@ msgstr "Generelle Informationen"
 msgid "Basic mode"
 msgstr "Einfacher Modus"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "bibliography"
+msgstr "Literaturverzeichnis"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "bibliography entry"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "bibliography reference"
+msgstr ""
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "Binary file - preview not available"
 msgstr "Binärdatei – keine Vorschau verfügbar"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "block quote"
+msgstr "Zitatblock"
 
 #: src/lib/components/workspace/CreateProjectDialog.svelte
 msgid "Bold, emphasis and heading styles only."
@@ -654,6 +710,11 @@ msgstr "Integriert"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "caption"
+msgstr "Beschriftung"
+
 #: src/lib/components/settings/TrackChangesPanel.svelte
 msgid "Capture your changes as a patchset to review and apply to the matching project."
 msgstr "Erfassen Sie Ihre Änderungen als Änderungssatz, der im passenden Projekt überprüft und angewendet werden kann."
@@ -694,6 +755,11 @@ msgstr "Katalog-URL"
 msgid "Catalogs"
 msgstr "Kataloge"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "cell"
+msgstr "Zelle"
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Certification"
 msgstr "Zertifizierung"
@@ -726,6 +792,11 @@ msgstr "Geänderte Dateien"
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Changes"
 msgstr "Änderungen"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "chapter"
+msgstr "Kapitel"
 
 #: src/lib/content/types.ts
 msgid "Chapter 1: Getting Started"
@@ -841,8 +912,9 @@ msgid "Close accessibility panel"
 msgstr "Barrierefreiheitsbereich schließen"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Close announcements"
-msgstr ""
+msgstr "Ansagen schließen"
 
 #: src/lib/components/reader/ReaderOverlay.svelte
 msgid "Close reader"
@@ -853,12 +925,17 @@ msgid "Close reading preview panel"
 msgstr "Lesevorschau schließen"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Close screen reader panel"
-msgstr ""
+msgstr "Screenreader-Bereich schließen"
 
 #: src/lib/components/spine/ChapterValidationPanel.svelte
 msgid "Close validation panel"
 msgstr "Validierungsbereich schließen"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "code"
+msgstr ""
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Code block processing"
@@ -877,6 +954,15 @@ msgstr "Name der Sammlung"
 msgid "Collections"
 msgstr "Sammlungen"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "colophon"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "column header"
+msgstr "Spaltenüberschrift"
+
 #: src/lib/components/spine/PreviewPane.svelte
 #. Device category for mobile phone reading while traveling or commuting
 msgid "Commute (phone)"
@@ -887,9 +973,19 @@ msgstr "Pendeln (Smartphone)"
 msgid "Compact"
 msgstr "Kompakt"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "complementary"
+msgstr "Ergänzung"
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Complex Interactive"
 msgstr "Komplex interaktiv"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "conclusion"
+msgstr "Schluss"
 
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
@@ -934,6 +1030,10 @@ msgstr "Mit Google Drive verbinden, um Dateien anzuzeigen."
 #: plugins/publish-to-remote/src/App.svelte
 msgid "Connecting to storage..."
 msgstr "Verbindung zum Speicher wird hergestellt..."
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "content information"
+msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Content is {cw}×{ch}px; the declared page is {pw}×{ph}px"
@@ -1005,8 +1105,9 @@ msgid "Could not load the feed."
 msgstr "Der Feed konnte nicht geladen werden."
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Could not load the screen reader preview."
-msgstr ""
+msgstr "Die Screenreader-Vorschau konnte nicht geladen werden."
 
 #: src/lib/pdf/pdf-export.ts
 msgid "Could not open the print window. Allow pop-ups for this site to save as PDF."
@@ -1019,6 +1120,11 @@ msgstr "Dieser Katalog konnte nicht gelesen werden"
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Could not read the project: {error}"
 msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "cover"
+msgstr "Cover"
 
 #: src/lib/components/metadata/SimpleMetadataView.svelte
 #: src/lib/navigation/views/PublishView.svelte
@@ -1098,6 +1204,14 @@ msgstr "Urheber"
 msgid "Credential of the certifier"
 msgstr "Qualifikation des Zertifizierers"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "credit"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "credits"
+msgstr ""
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "CSS @page size, e.g. \"140mm 216mm\" or \"A4 landscape\"."
 msgstr "CSS-@page-Größe, z. B. \"140mm 216mm\" oder \"A4 landscape\"."
@@ -1170,6 +1284,11 @@ msgstr "Deklarierte Seitengröße (Fixed Layout)"
 msgid "Decrease text size"
 msgstr "Schrift verkleinern"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "dedication"
+msgstr "Widmung"
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 #: src/lib/components/settings/GeneratorSettings.svelte
 msgid "Default"
@@ -1184,8 +1303,14 @@ msgid "Default value"
 msgstr "Standardwert"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Default voice"
-msgstr ""
+msgstr "Standardstimme"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "definition"
+msgstr "Definition"
 
 #: plugins/audio-clip-editor/src/App.svelte
 #: plugins/publish-to-remote/src/components/LocalEpubList.svelte
@@ -1233,6 +1358,10 @@ msgstr "Projekt löschen: {title}"
 msgid "Delete the selected clip from the library"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "deletion"
+msgstr ""
+
 #: src/stories/preview/ContentPreviewDemo.svelte
 msgid "Demo Controls"
 msgstr "Demo-Steuerung"
@@ -1268,6 +1397,11 @@ msgstr "In diesem Buch entdeckt"
 #: src/lib/components/Toast.svelte
 msgid "Dismiss"
 msgstr "Verwerfen"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "document"
+msgstr "Dokument"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "DOM Transforms"
@@ -1410,6 +1544,354 @@ msgstr "Element"
 msgid "Embed the editor in the EPUB so the book can be reopened and edited."
 msgstr "Den Editor in das EPUB einbetten, damit das Buch erneut geöffnet und bearbeitet werden kann."
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "emphasis"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of abstract"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of acknowledgments"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of afterword"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of appendix"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of article"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of back link"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of banner"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography entry"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of bibliography reference"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of block quote"
+msgstr "Ende des Zitatblocks"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of caption"
+msgstr "Ende der Beschriftung"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of cell"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of chapter"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of code"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of colophon"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of column header"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of complementary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of conclusion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of content information"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of cover"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of credit"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of credits"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of dedication"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of definition"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of deletion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of document"
+msgstr "Dokumentende"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of emphasis"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of endnote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of endnotes"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of epigraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of epilogue"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of errata"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of example"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of figure"
+msgstr "Ende der Abbildung"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of footnote"
+msgstr "Ende der Fußnote"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of foreword"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of form"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of glossary"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of glossary reference"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic object"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of graphic symbol"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of heading"
+msgstr "Ende der Überschrift"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of image"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of index"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of insertion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of introduction"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of link"
+msgstr "Ende des Links"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of list"
+msgstr "Listenende"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of list item"
+msgstr "Ende des Listeneintrags"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of main"
+msgstr "Ende des Hauptbereichs"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of navigation"
+msgstr "Ende der Navigation"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of note"
+msgstr "Ende der Anmerkung"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of note reference"
+msgstr "Ende des Anmerkungsverweises"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of notice"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of page break"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of page list"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of paragraph"
+msgstr "Absatzende"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of part"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of preface"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of prologue"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of pull quote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of questions and answers"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of region"
+msgstr "Ende der Region"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of row"
+msgstr "Zeilenende"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of row group"
+msgstr "Ende der Zeilengruppe"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of row header"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of search"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of separator"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of strong"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of subscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of subtitle"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of superscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "end of table"
+msgstr "Tabellenende"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of table of contents"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of term"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of time"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "end of tip"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "endnote"
+msgstr "Endnote"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "endnotes"
+msgstr "Endnoten"
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Endpoint URL"
 msgstr "Endpunkt-URL"
@@ -1454,6 +1936,15 @@ msgstr "Räumliche oder zeitliche Abdeckung eingeben"
 msgid "Enter title"
 msgstr "Titel eingeben"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "epigraph"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "epilogue"
+msgstr "Epilog"
+
 #: plugins/publish-to-remote/src/components/RemoteFileList.svelte
 msgid "EPUB"
 msgstr "EPUB"
@@ -1484,6 +1975,10 @@ msgstr "EPUB-Eigenschaften"
 msgid "EPUB Settings"
 msgstr "EPUB-Einstellungen"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "errata"
+msgstr ""
+
 #: src/lib/components/spine/PreviewPane.svelte
 #: src/lib/components/workspace/WorkspaceItem.svelte
 #: src/lib/navigation/views/SettingsView.svelte
@@ -1501,6 +1996,11 @@ msgstr "Obligatorische Informationen"
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Everything up to date."
 msgstr "Alles auf dem neuesten Stand."
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "example"
+msgstr "Beispiel"
 
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Expanded"
@@ -1648,6 +2148,11 @@ msgstr "Es konnten nicht alle Dateien hochgeladen werden"
 msgid "Fetch"
 msgstr "Abrufen"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "figure"
+msgstr "Abbildung"
+
 #: src/lib/components/manifest/ManifestPreview.svelte
 msgid "File Path"
 msgstr "Dateipfad"
@@ -1705,9 +2210,23 @@ msgstr "Schriftgröße:"
 msgid "Font:"
 msgstr "Schrift:"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "footnote"
+msgstr "Fußnote"
+
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Force reading-system colours"
 msgstr "Farben des Lesesystems erzwingen"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "foreword"
+msgstr "Geleitwort"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "form"
+msgstr ""
 
 #: src/lib/components/metadata/AdvancedFields.svelte
 msgid "Format"
@@ -1756,6 +2275,15 @@ msgstr "Generatoren"
 msgid "Get Started"
 msgstr "Loslegen"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "glossary"
+msgstr "Glossar"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "glossary reference"
+msgstr ""
+
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Google Cloud API key"
 msgstr "Google-Cloud-API-Schlüssel"
@@ -1776,9 +2304,27 @@ msgstr "Google-Drive-Anmeldedaten nicht konfiguriert"
 msgid "Google Drive setup failed: {error}"
 msgstr "Google-Drive-Einrichtung fehlgeschlagen: {error}"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "graphic"
+msgstr "Grafik"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "graphic object"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "graphic symbol"
+msgstr ""
+
 #: src/lib/components/metadata/AccessibilityFields.svelte
 msgid "Hazards"
 msgstr "Gefahren"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "heading"
+msgstr "Überschrift"
 
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "hidden file"
@@ -1830,6 +2376,11 @@ msgstr "Änderungen ignorieren"
 #: src/lib/components/import/ImportReviewDialog.svelte
 msgid "Ignore changes (don't import)"
 msgstr "Änderungen ignorieren (nicht importieren)"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "image"
+msgstr "Grafik"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Image Insertion"
@@ -1901,6 +2452,11 @@ msgstr "Neu"
 msgid "Increase text size"
 msgstr "Schrift vergrößern"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "index"
+msgstr "Index"
+
 #: src/App.svelte
 msgid "Initializing application..."
 msgstr "Anwendung wird initialisiert..."
@@ -1949,6 +2505,15 @@ msgstr ""
 #: plugins/audio-clip-editor/src/App.svelte
 msgid "Insert the clip directive at the editor cursor"
 msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "insertion"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "introduction"
+msgstr "Einleitung"
 
 #: plugins/publish-to-remote/src/components/ValidationModal.svelte
 msgid "Invalid"
@@ -2118,6 +2683,11 @@ msgstr "Leer lassen, um Bücher auf die oberste Ebene des Geräts zu kopieren."
 msgid "Left to Right"
 msgstr "Links nach rechts"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "level {n}"
+msgstr "Ebene {n}"
+
 #: src/lib/components/extensions/ExtensionItem.svelte
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "License"
@@ -2137,6 +2707,11 @@ msgstr "Hell"
 msgid "Light text on a dark cover"
 msgstr "Heller Text auf dunklem Cover"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "link"
+msgstr "Link"
+
 #: src/lib/Sidebar.svelte
 msgid "Link folder…"
 msgstr "Ordner verknüpfen…"
@@ -2144,6 +2719,16 @@ msgstr "Ordner verknüpfen…"
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "Linked folder: {name}"
 msgstr "Verknüpfter Ordner: {name}"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "list"
+msgstr "Liste"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "list item"
+msgstr "Listeneintrag"
 
 #: src/lib/components/audio/AudioClipEditor.svelte
 msgid "Load clip data from selected text"
@@ -2249,6 +2834,11 @@ msgstr ""
 #: src/lib/components/folder-sync/FolderSyncReviewDialog.svelte
 msgid "macOS sidecar file"
 msgstr "macOS-Begleitdatei"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "main"
+msgstr "Hauptbereich"
 
 #: src/lib/Sidebar.svelte
 msgid "Main navigation"
@@ -2366,6 +2956,11 @@ msgstr "Name der zertifizierenden Stelle"
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Narrow"
 msgstr "Schmal"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "navigation"
+msgstr "Navigation"
 
 #: src/App.svelte
 #: src/lib/Sidebar.svelte
@@ -2585,10 +3180,25 @@ msgstr "Nicht angegeben"
 msgid "Not validated"
 msgstr "Nicht validiert"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "note"
+msgstr "Anmerkung"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "note reference"
+msgstr "Anmerkungsverweis"
+
 #: src/lib/components/SpineSidebar.svelte
 #: src/lib/components/manifest/ManifestContainer.svelte
 msgid "Nothing to import — the file(s) already match the existing content."
 msgstr "Nichts zu importieren – die Datei(en) stimmen bereits mit dem vorhandenen Inhalt überein."
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "notice"
+msgstr "Hinweis"
 
 #: src/lib/components/Toast.svelte
 msgid "Notifications"
@@ -2748,6 +3358,16 @@ msgstr "Dateiname des gepackten EPUBs"
 msgid "Packaging…"
 msgstr "Wird verpackt…"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "page break"
+msgstr "Seitenumbruch"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "page list"
+msgstr "Seitenliste"
+
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Page Progression"
 msgstr "Seitenfortschritt"
@@ -2775,6 +3395,16 @@ msgstr "Inhalt von Bereich 1"
 #: src/lib/components/spine/EditorPane.svelte
 msgid "Pane 2 content"
 msgstr "Inhalt von Bereich 2"
+
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "paragraph"
+msgstr "Absatz"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "part"
+msgstr "Teil"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Password"
@@ -2889,6 +3519,11 @@ msgstr "Position"
 msgid "Pre-paginated"
 msgstr "Vorpaginiert"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "preface"
+msgstr "Vorwort"
+
 #: src/lib/components/settings/CustomMetaCatalogSettings.svelte
 msgid "Prefix URI"
 msgstr "Präfix-URI"
@@ -2946,6 +3581,11 @@ msgstr "Projekt-Einstellungen"
 msgid "Projects"
 msgstr "Projekte"
 
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "prologue"
+msgstr "Prolog"
+
 #: src/lib/components/manifest/ManifestTable.svelte
 msgid "Properties"
 msgstr "Eigenschaften"
@@ -2976,10 +3616,19 @@ msgstr "Veröffentlicht"
 msgid "Publisher"
 msgstr "Verlag"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "pull quote"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "questions and answers"
+msgstr ""
+
 #: plugins/audio-clip-editor/src/App.svelte
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Rate"
-msgstr ""
+msgstr "Geschwindigkeit"
 
 #: plugins/publish-to-remote/src/components/RemoteSelector.svelte
 msgid "Re-check the device and refresh its book list"
@@ -2996,8 +3645,9 @@ msgid "Read"
 msgstr "Lesen"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Read whole chapter"
-msgstr ""
+msgstr "Ganzes Kapitel vorlesen"
 
 #: src/lib/components/workspace/WorkspaceItem.svelte
 msgid "Read-only"
@@ -3066,6 +3716,11 @@ msgstr "Umfließbar"
 #: src/lib/navigation/views/PublishView.svelte
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "region"
+msgstr "Region"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Region (optional)"
@@ -3225,6 +3880,21 @@ msgstr "Rechte"
 msgid "Route uploads through the app proxy (for servers without CORS)"
 msgstr "Uploads über den App-Proxy leiten (für Server ohne CORS)"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "row"
+msgstr "Zeile"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "row group"
+msgstr "Zeilengruppe"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "row header"
+msgstr "Zeilenüberschrift"
+
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Run top-to-bottom over the generated DOM."
 msgstr "Laufen von oben nach unten über das erzeugte DOM."
@@ -3284,16 +3954,19 @@ msgstr "Wird gespeichert…"
 
 #: src/lib/components/spine/PreviewPane.svelte
 #. preview Checks dropdown entry — announcement preview
+# proposed seed — needs native review
 msgid "Screen reader"
-msgstr ""
+msgstr "Screenreader"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Screen reader announcements"
-msgstr ""
+msgstr "Screenreader-Ansagen"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Screen reader preview"
-msgstr ""
+msgstr "Screenreader-Vorschau"
 
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Scrolled (continuous)"
@@ -3302,6 +3975,10 @@ msgstr "Gescrollt (durchgehend)"
 #: src/lib/components/metadata/BasicInfoFields.svelte
 msgid "Scrolled (per document)"
 msgstr "Gescrollt (pro Dokument)"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "search"
+msgstr ""
 
 #: src/lib/components/workspace/WorkspaceList.svelte
 msgid "Search projects"
@@ -3362,6 +4039,10 @@ msgstr "Ansicht wählen"
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Selected folder: {name}"
 msgstr "Ausgewählter Ordner: {name}"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "separator"
+msgstr ""
 
 #: src/lib/components/spine/PreviewPane.svelte
 msgid "Sepia"
@@ -3480,8 +4161,9 @@ msgid "Source on GitHub"
 msgstr "Quellcode auf GitHub"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Speak announcements aloud"
-msgstr ""
+msgstr "Ansagen laut vorlesen"
 
 #: src/App.svelte
 msgid "Spine"
@@ -3526,6 +4208,10 @@ msgstr "Status:"
 msgid "Stop"
 msgstr ""
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "strong"
+msgstr ""
+
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Subject authority"
 msgstr "Themen-Klassifikation"
@@ -3542,6 +4228,15 @@ msgstr "Themenbegriff"
 msgid "Subjects"
 msgstr "Themen"
 
+#: src/lib/components/spine/sr-walk.ts
+msgid "subscript"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "subtitle"
+msgstr "Untertitel"
+
 #: src/lib/components/metadata/TitleEditor.svelte
 msgid "Subtitle"
 msgstr "Untertitel"
@@ -3554,6 +4249,10 @@ msgstr "Ausreichende Zugriffsmodi"
 #: src/lib/components/metadata/OPFPreview.svelte
 msgid "Summary"
 msgstr "Zusammenfassung"
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "superscript"
+msgstr ""
 
 #: src/lib/ThemeToggle.svelte
 msgid "Switch to {mode} theme"
@@ -3576,9 +4275,24 @@ msgstr "Syntax"
 msgid "System"
 msgstr "System"
 
+#: src/lib/components/spine/sr-walk.ts
+# seeded from NVDA-de role vocabulary (nvaccess/nvda de.po) — needs native review
+msgid "table"
+msgstr "Tabelle"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "table of contents"
+msgstr "Inhaltsverzeichnis"
+
 #: src/lib/navigation/views/ThirdPartyView.svelte
 msgid "Technical Info"
 msgstr "Technische Informationen"
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "term"
+msgstr "Begriff"
 
 #: src/lib/components/metadata/SubjectEditor.svelte
 msgid "Term (e.g. FIC028000)"
@@ -3699,6 +4413,15 @@ msgstr "Dies ist ein Beispiel-EPUB-Buch, das zu Demonstrationszwecken erstellt w
 #: src/lib/components/track-changes/PatchsetReviewDialog.svelte
 msgid "This patchset has no changes."
 msgstr "Dieser Änderungssatz enthält keine Änderungen."
+
+#: src/lib/components/spine/sr-walk.ts
+msgid "time"
+msgstr ""
+
+#: src/lib/components/spine/sr-walk.ts
+# proposed seed (standard AT terminology) — needs native review
+msgid "tip"
+msgstr "Tipp"
 
 #: plugins/publish-to-remote/src/App.svelte
 #: src/lib/components/metadata/SimpleMetadataView.svelte
@@ -3970,8 +4693,9 @@ msgid "Viewport width in pixels"
 msgstr "Viewport-Breite in Pixeln"
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Voice"
-msgstr ""
+msgstr "Stimme"
 
 #: plugins/publish-to-remote/src/components/ConfigureForm.svelte
 msgid "Volume \"{volume}\" (no reader markers found — books are copied to it as-is)"
@@ -4014,8 +4738,9 @@ msgid "While locked, you can edit existing chapters, styles and scripts; structu
 msgstr "Solange gesperrt, können Sie bestehende Kapitel, Stile und Skripte bearbeiten; strukturelle Änderungen sind deaktiviert."
 
 #: src/lib/components/spine/PreviewPane.svelte
+# proposed seed — needs native review
 msgid "Whole chapter"
-msgstr ""
+msgstr "Ganzes Kapitel"
 
 #: src/lib/navigation/views/SettingsView.svelte
 msgid "Wide"
