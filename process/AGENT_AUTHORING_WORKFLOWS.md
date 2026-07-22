@@ -56,13 +56,32 @@ Two flavors, split by origin and by cross-site storage partitioning:
 - **Same-origin harness** — a page on readitinabook.com wrapping the app in an iframe. The parent has full DOM reach through the app frame into the nested preview iframe; same OPFS, so the author's real projects are visible; it watches the preview as DOM and geometry (richer than pixels for an agent). Missing piece is only a "refresh after external write" poke. Effectively W4 built beside the app instead of inside it.
 - **Cross-origin embed** — an agent's own page or sandbox iframes the hosted app. Same-origin policy forces a deliberate postMessage **embed bridge** (read-file / write-file / get-rendered-xhtml / refresh), and cross-site storage partitioning means the author's projects are _not_ visible — the project travels through the bridge (post the archive in, get it back out). This turns SEED into an embeddable EPUB engine (the StackBlitz/CodeSandbox embed-SDK shape) and upgrades W3 from UI-driving to a programmatic surface for agent sandboxes. In-repo precedents for the message pattern: the plugin 4-message contract, the transform-iframe broker, the Paged.js handshake. Security: origin allowlist plus explicit user consent, following the reader's trust-prompt pattern.
 
+### W6 — Live-session bridge (local MCP server + trusted plugin)
+
+The scenario that motivated this section was lived before it was designed: an agent collaborating on `page.css` for the author's real project — reading the stylesheet out of OPFS, proposing rules, the author applying them, screenshots closing the loop. The question is how that works against the author's _normal, un-instrumented_ browser. Nothing external can reach into a tab — by design — but the tab can volunteer:
+
+```
+agent (MCP client) ⇄ local bridge process (MCP server) ⇄ WebSocket to localhost ⇄ SEED plugin in the author's tab
+```
+
+Pages may open WebSockets to localhost (mixed-content-exempt), and the plugin side is already solved architecture: plugins are trusted, hold the workspace handle, and speak the established message contract. The bridge exposes the same brokered surface as every other workflow — list/read/write project files, get rendered XHTML, trigger re-render — as MCP tools any agent can call.
+
+Two load-bearing details:
+
+- **Capture is tiered, and pixels are the last resort.** (1) DOM + computed geometry — cheap, exact, and often _better_ than pixels for an agent ("the figure is 180×420 at x=213; the caption wrapped to two lines"). (2) Approximate raster via SVG foreignObject → canvas — same-origin, no permission, close but not pixel-perfect. (3) True pixels via `getDisplayMedia({ preferCurrentTab })` — real screenshots behind a once-per-session browser share prompt. There is deliberately no silent-screenshot API on the platform.
+- **The plugin is the only correct writer, not a transport convenience.** Raw OPFS writes behind the app's back get clobbered by the next save or never render (the established onWorkspaceUpdate lesson); writes must route through the app's services and update propagation. The folder-sync review dialog is the ready-made approval gate for externally arriving changes.
+
+Security: the bridge binds to localhost with a pairing token displayed in-app; the plugin shows a persistent "agent connected" indicator; the user installs both halves deliberately — consistent with the plugins-are-trusted stance.
+
+Status: the read side is proven (this session, via an instrumented browser); the volunteer channel — plugin + bridge — is the missing piece.
+
 ## The design insight
 
-Every workflow consumes the same capability surface: _read SOURCE files, read rendered XHTML, write SOURCE files, refresh the preview_ — plus the same knowledge: _the authoring contract_. W1 ships the surface as clipboard text, W2 as files in an archive, W4 as a plugin's broker, W5 as a postMessage bridge. Build the context pack and the contract once; transports vary.
+Every workflow consumes the same capability surface: _read SOURCE files, read rendered XHTML, write SOURCE files, refresh the preview_ — plus the same knowledge: _the authoring contract_. W1 ships the surface as clipboard text, W2 as files in an archive, W4 as a plugin's broker, W5 as a postMessage bridge, W6 as MCP tools over a localhost WebSocket. Build the context pack and the contract once; transports vary.
 
 ## Sequencing implied (not started)
 
 1. Resolve the `settings.json` schema discrepancy; write the canonical end-to-end authoring contract.
 2. W1's "Copy context for AI" affordance (smallest build, serves the stated scenario directly, works on mobile and offline-app).
 3. Distribution: `/llms.txt` + hosted markdown contract; `AGENTS.md` generated into SOURCE/; a seed-authoring Agent Skill (SKILL.md + contract + harness template).
-4. W5 bridge / W4 plugin when the demand is proven — same brokered surface, so nothing in 1–3 is throwaway.
+4. W6 bridge when the live-collaboration demand is proven (it is the closest fit to the lived workflow) / W5 embed / W4 plugin — same brokered surface throughout, so nothing in 1–3 is throwaway.
