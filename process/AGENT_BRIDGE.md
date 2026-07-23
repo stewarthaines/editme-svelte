@@ -41,7 +41,7 @@ The module ships as a **lazily fetched static asset**, not core-bundle code — 
 
 - Core carries only the sidebar button plus a loader stub (~0.5KB): clicking "Allow agent assistance" runs `import(new URL('agent-bridge/module.js', document.baseURI))` and hands the module a context object with the stores/services its tools need.
 - The asset is served by the **dev middleware only** (same mechanism as the plugins/extensions dev catalogs), and `file:` exclusion falls out of the same http-only gating as axe. Shipping it in production someday means publishing the asset to `public/` plus the one-line button-gate change (see UX) — a trivial rebuild, deferred rather than baked in.
-- Cost accounting: production/single-file bundle ≈ 0 bytes beyond the folded button guard (string-absence check added to `scripts/smoke-build.js` alongside the size budget); the module's real weight (~6–8KB source) is fetched only when the author clicks.
+- Cost accounting (measured at phase 1): the loader, module, protocol strings, and button markup are all absent from the production bundle (string-absence canary in `scripts/smoke-build.js`); the residue is ~1KB — the button's scoped CSS rules (Svelte styles aren't branch-folded) and the `Robot` glyph riding in the generated icon subset. The module's real weight is fetched only when the author clicks.
 - The module runs in the app realm with full service access — everything that motivated Option B over the plugin framing — while matching a plugin's distribution economics.
 
 ### App module (asset: served at `agent-bridge/module.js`; source under `src/assets/` or a dev-middleware-mapped location — decide at build time)
@@ -63,6 +63,8 @@ Phase 1 (read-only — parity with the spike, plus the two reads only the app ca
 | `seed_get_selection`      | last click-to-source hit: `{ text, documentPosition, elementType, chapterId }` — deixis; needs PreviewPane to record its `onPreviewClick` payload into a store the module reads (small addition) |
 
 Phase 2 (writes — designed, not in scope for the first build): `seed_write_file` restricted to `SOURCE/text/`, `OEBPS/Styles/`, `SOURCE/scripts/`, `SOURCE/preview/`; carries the content hash from the agent's prior read, rejected on mismatch ("changed since read"). Writes route through app services so state propagation and track-changes copy-on-write hold by construction; open-editor dirty state refuses the write. OPF/settings stay excluded until service-level mutations exist. Consent steps up: first write per session prompts in the overlay feed (allow once / allow this session).
+
+Phase 2 also owes the overlay an accessibility pass (`aria-live` on the action feed so connected screen reader users hear what the agent does — the trust surface should not be sighted-only).
 
 Phase 3 (capture): geometry (element rects from the preview document — the app has same-origin access), then `getDisplayMedia` pixels. Recorded in W6; not designed here.
 

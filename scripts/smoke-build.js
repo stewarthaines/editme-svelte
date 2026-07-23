@@ -28,7 +28,10 @@ const MOUNT_TIMEOUT_MS = 20000;
 // failure. Raised 1010→1040 on 2026-07-17: the READ.html reader swap, the Package
 // as READ.html / SEED.html exports, and the About outputs diagram grew the build
 // to ~1027KB (the breach accumulated while smoke wasn't being run per-commit).
-const SIZE_BUDGET_KB = 1040;
+// Raised 1040→1060 on 2026-07-23: v0.13's screen reader announcement preview
+// (panel, caption overlay, spoken vocabulary) shipped at ~1050KB — another
+// breach that accumulated unnoticed; the agent-bridge button adds ~0.5KB more.
+const SIZE_BUDGET_KB = 1060;
 
 // Console errors that are noise, not boot failures.
 const IGNORED_CONSOLE = [/favicon\.ico/i, /Failed to load resource.*favicon/i];
@@ -91,6 +94,14 @@ function artifactChecks() {
     problems.push(
       `[artifact] dist/index.html is ${sizeKB.toFixed(1)}KB — over the ${SIZE_BUDGET_KB}KB budget (raise SIZE_BUDGET_KB deliberately if this growth is intended)`
     );
+  }
+
+  // The agent bridge is dev-only (process/AGENT_BRIDGE.md): its loader and
+  // module are dynamically imported behind import.meta.env.DEV, so no bridge
+  // code may reach the production bundle. The wire-protocol hello token is the
+  // canary — it appears in every bridge file and nowhere else.
+  if (html.includes('seed-agent-bridge') || html.includes('agent-bridge/module')) {
+    problems.push('[artifact] agent bridge code leaked into the production bundle');
   }
 
   // The i18n anchor must survive the single-file inlining: it is the injection

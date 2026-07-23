@@ -305,6 +305,23 @@ export default defineConfig({
         });
       },
     },
+    // Dev only: serve the agent bridge module (process/AGENT_BRIDGE.md). The
+    // module is an app-realm asset fetched when the author clicks "Allow agent
+    // assistance"; serving it only here is what makes the feature dev-only —
+    // production never carries or serves the file.
+    {
+      name: 'serve-agent-bridge-dev',
+      apply: 'serve',
+      configureServer(server) {
+        server.middlewares.use('/agent-bridge/module.js', async (_req, res) => {
+          const file = await fs.readFile(
+            path.join(dirname, 'src', 'lib', 'agent-bridge', 'module.js')
+          );
+          res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
+          res.end(file);
+        });
+      },
+    },
     // Dev only: serve the vendored reader at its branded root URL. In production
     // functions/READ.html.ts (a Pages Function) owns /READ.html; Vite doesn't run
     // Pages Functions, so without this the request falls through to the SPA HTML

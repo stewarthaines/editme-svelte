@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { randomUUID } from './lib/utils/uuid.js';
-  import { Package } from 'phosphor-svelte';
+  import { Package, Robot } from 'phosphor-svelte';
+  import { workspaceOpfsPath } from './lib/plugins/contract.js';
+  import { primaryLanguage } from './lib/epub/opf-utils.js';
+  import type { AgentBridge } from './lib/agent-bridge/loader.svelte.js';
   import LayoutManager from './lib/LayoutManager.svelte';
   import Toast from './lib/components/Toast.svelte';
   import { navigationStore } from './lib/navigation';
@@ -325,6 +328,13 @@
     documentPosition: number;
     elementType: string;
   }) => {
+    // Deixis for the agent bridge: the last thing the author pointed at.
+    lastPreviewClick = {
+      kind: 'click',
+      ...detail,
+      chapterId: spinePreviewData.spineItemId,
+      at: Date.now(),
+    };
     // Dispatch custom event to SpineView to handle text selection
     const spineViewElement = document.querySelector('[data-spine-view]');
     if (spineViewElement) {
@@ -336,6 +346,42 @@
       );
     }
   };
+
+  // --- Agent bridge (dev-only; process/AGENT_BRIDGE.md) ------------------------
+  // The loader stub and module are dynamically imported behind import.meta.env.DEV,
+  // so production and file: builds carry none of this beyond the folded guards.
+  let lastPreviewClick = $state<Record<string, unknown> | null>(null);
+  let agentBridge = $state<AgentBridge | null>(null);
+  let agentMountEl = $state<HTMLDivElement>();
+
+  async function toggleAgentBridge(): Promise<void> {
+    if (!import.meta.env.DEV) return;
+    if (!agentBridge) {
+      const { createAgentBridge } = await import('./lib/agent-bridge/loader.svelte.js');
+      agentBridge = createAgentBridge(() => ({
+        wsUrl: 'ws://localhost:8747',
+        mountEl: agentMountEl!,
+        getProjectInfo: () => ({
+          workspaceId: currentWorkspaceState?.id ?? null,
+          title: appState?.workspace?.opf?.metadata?.title ?? null,
+          language: primaryLanguage(appState?.workspace?.opf?.metadata) || null,
+        }),
+        getWorkspaceDir: async () => {
+          const id = currentWorkspaceState?.id;
+          if (!id) return null;
+          let dir = await navigator.storage.getDirectory();
+          for (const segment of workspaceOpfsPath(id)) dir = await dir.getDirectoryHandle(segment);
+          return dir;
+        },
+        getRenderedXhtml: () =>
+          spinePreviewData.xhtmlContent
+            ? { chapterId: spinePreviewData.spineItemId, xhtml: spinePreviewData.xhtmlContent }
+            : null,
+        getLastClick: () => lastPreviewClick,
+      }));
+    }
+    await agentBridge.toggle();
+  }
 
   // Handle manifest item deletion
   const handleManifestItemDelete = async (detail: { itemId: string }) => {
@@ -1373,6 +1419,21 @@
     {#snippet sidebarFooter()}
       {#if currentWorkspaceState}
         <div class="package-epub-section">
+          {#if import.meta.env.DEV}
+            <!-- Dev-only, deliberately untranslated: absent from production builds. -->
+            <!-- i18n-ignore -->
+            <button
+              class="agent-toggle"
+              class:active={agentBridge?.status === 'connected' ||
+                agentBridge?.status === 'connecting'}
+              onclick={toggleAgentBridge}
+              aria-pressed={agentBridge?.status === 'connected'}
+              title={agentBridge?.detail || 'Allow agent assistance'}
+              aria-label="Allow agent assistance"
+            >
+              <Robot size={18} aria-hidden="true" />
+            </button>
+          {/if}
           <button
             class="package-epub-button"
             onclick={() => handlePackageRequest(currentWorkspaceState.id)}
@@ -1645,6 +1706,10 @@
 
 <!-- App-wide toast host for fleeting notifications (see Toast.svelte). -->
 <Toast />
+{#if import.meta.env.DEV}
+  <!-- Agent activity overlay mount: the bridge module paints into this. -->
+  <div bind:this={agentMountEl}></div>
+{/if}
 
 <!-- In-app reader (standalone/installed-PWA mode only — a script-opened reader
      window would render without browser chrome there and strand the user). -->
@@ -1762,6 +1827,26 @@
     border-bottom: 1px solid var(--color-warning, var(--color-border-default));
     font-size: var(--text-sm);
     text-align: center;
+  }
+
+  /* Agent bridge toggle (dev-only; the guard folds the button out of
+     production, this rule is a few inert bytes there) */
+  .agent-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-primary);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    min-height: 36px;
+  }
+
+  .agent-toggle.active {
+    border-color: var(--color-interactive-primary);
+    color: var(--color-interactive-primary);
   }
 
   /* Package EPUB button styling */

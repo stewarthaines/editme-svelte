@@ -1,17 +1,16 @@
 /**
- * Agent bridge (dev-only spike) — the process-side half of the W6 live-session
- * bridge (process/AGENT_AUTHORING_WORKFLOWS.md).
+ * Agent bridge (dev-only) — the process-side half of the live-session bridge
+ * (process/AGENT_BRIDGE.md).
  *
  * Speaks MCP (newline-delimited JSON-RPC over stdio) to a coding agent, and
- * relays tool calls to the Agent Bridge plugin running in the author's SEED
- * tab over a localhost WebSocket. Read-only tools; the plugin executes them
- * against the open project's workspace.
+ * relays tool calls over a localhost WebSocket to the app module the author
+ * enabled with "Allow agent assistance". Read-only tools; the app executes
+ * them against the open project.
  *
- * Run with a dev server + the plugin's panel open, then register e.g.:
- *   claude mcp add seed-bridge -- node scripts/agent-bridge.mjs
+ * Register once:  claude mcp add seed-bridge -- node scripts/agent-bridge.mjs
  *
- * Hand-rolled JSON-RPC rather than the MCP SDK: three methods, dev-only, no
- * new dependencies (ws is already hoisted by vite).
+ * Hand-rolled JSON-RPC rather than the MCP SDK: a handful of methods,
+ * dev-only, no new dependencies (ws is already hoisted by vite).
  */
 import { WebSocketServer } from 'ws';
 import { createInterface } from 'node:readline';
@@ -25,7 +24,19 @@ let tabProject = null;
 let nextRequestId = 1;
 const pending = new Map(); // request id → { resolve, reject, timer }
 
+// Fail alive on a taken port (design resolution 5, process/AGENT_BRIDGE.md):
+// the MCP server keeps running and every tool call returns the explanation
+// in-band, where the agent reads it — a crashed process would leave the user
+// a dead server and a mystery.
+let bindError = null;
 const wss = new WebSocketServer({ host: '127.0.0.1', port: PORT });
+wss.on('error', error => {
+  bindError =
+    error?.code === 'EADDRINUSE'
+      ? `port ${PORT} is in use — another agent session or an orphaned bridge is already running`
+      : String(error?.message ?? error);
+  process.stderr.write(`[bridge] ${bindError}\n`);
+});
 wss.on('connection', socket => {
   tab?.close();
   tab = socket;
@@ -58,9 +69,10 @@ wss.on('connection', socket => {
 });
 
 function callTab(tool, params) {
+  if (bindError) return Promise.reject(new Error(bindError));
   if (!tab || tab.readyState !== 1) {
     return Promise.reject(
-      new Error('No SEED tab connected — open the Agent Bridge panel in the app (dev server).')
+      new Error('No SEED tab connected — click "Allow agent assistance" in the app (dev server).')
     );
   }
   const id = nextRequestId++;
@@ -99,6 +111,18 @@ const TOOLS = [
       required: ['path'],
     },
   },
+  {
+    name: 'seed_get_rendered_xhtml',
+    description:
+      "The currently previewed chapter's generated XHTML — the transform pipeline's output the author is looking at right now.",
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'seed_get_selection',
+    description:
+      'What the author last pointed at in the preview: the clicked element type, a text snippet, its position, and the chapter. { kind: "none" } when nothing has been clicked.',
+    inputSchema: { type: 'object', properties: {} },
+  },
 ];
 
 const respond = (id, result) =>
@@ -109,14 +133,19 @@ const respondError = (id, code, message) =>
 async function handleToolCall(name, args) {
   switch (name) {
     case 'seed_project_info': {
+      if (bindError) return { connected: false, error: bindError };
       const connected = !!tab && tab.readyState === 1;
-      if (!connected) return { connected, hint: 'open the Agent Bridge panel in the SEED tab' };
+      if (!connected) return { connected, hint: 'click "Allow agent assistance" in the SEED tab' };
       return { connected, ...(await callTab('project_info', {})) };
     }
     case 'seed_list_files':
       return callTab('list_files', {});
     case 'seed_read_file':
       return callTab('read_file', { path: args?.path });
+    case 'seed_get_rendered_xhtml':
+      return callTab('get_rendered_xhtml', {});
+    case 'seed_get_selection':
+      return callTab('get_selection', {});
     default:
       throw new Error('unknown tool: ' + name);
   }
