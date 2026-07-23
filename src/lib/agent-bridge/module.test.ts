@@ -99,6 +99,7 @@ function makeContext(overrides: Record<string, unknown> = {}) {
           image_template: '![<alt>](<href>)',
         })
       ),
+      scripts: fakeDir({ 'SYNTAX.md': fakeFile('# divergences: emphasis roles are swapped') }),
     }),
   });
   const statuses: Array<[string, string | undefined]> = [];
@@ -187,6 +188,7 @@ describe('agent bridge module', () => {
     expect(response.result.files.map(f => f.path)).toEqual([
       'OEBPS/audio.mp3',
       'OEBPS/Styles/page.css',
+      'SOURCE/scripts/SYNTAX.md',
       'SOURCE/settings.json',
     ]);
     expect(response.result.files[1].size).toBe(19);
@@ -274,6 +276,10 @@ describe('agent bridge module', () => {
       'SOURCE/scripts/transformDom.js',
     ]);
     expect(response.result.hint).toContain('generated');
+    // the SYNTAX.md sibling of the text transform is picked up from the project
+    expect(
+      (response.result as { syntaxReference?: { source: string; text: string } }).syntaxReference
+    ).toEqual({ source: 'project', text: '# divergences: emphasis roles are swapped' });
   });
 
   it('write policy: pipeline inputs and standalone assets only', () => {

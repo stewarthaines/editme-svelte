@@ -186,13 +186,39 @@ async function handleTool(ctx, session, ui, tool, params) {
       const transforms = settings
         ? [settings.text_transform, ...(settings.dom_transforms ?? [])].filter(Boolean)
         : [];
+      // Syntax reference: divergence notes for the source syntax the text
+      // transform defines (SYNTAX.md convention). Prefer the project's own
+      // installed copy; fall back to the served extensions catalog for
+      // projects installed before the convention existed.
+      let syntaxReference = null;
+      const textTransform = settings?.text_transform;
+      if (typeof textTransform === 'string' && textTransform.includes('/')) {
+        const transformDir = textTransform.slice(0, textTransform.lastIndexOf('/'));
+        try {
+          const file = await (await resolveFile(dir, `${transformDir}/SYNTAX.md`)).getFile();
+          syntaxReference = { source: 'project', text: await file.text() };
+        } catch {
+          const match = /^SOURCE\/extensions\/([^/]+)\//.exec(textTransform);
+          if (match) {
+            try {
+              const response = await fetch(
+                new URL(`extensions/${match[1]}/SYNTAX.md`, document.baseURI)
+              );
+              if (response.ok) syntaxReference = { source: 'catalog', text: await response.text() };
+            } catch {
+              // offline or not served — omit
+            }
+          }
+        }
+      }
       return {
         ...ctx.getProjectInfo(),
         settings,
         ...(settingsError ? { settingsError } : {}),
         // the scripts that produce chapter XHTML — read them before editing
         transformScripts: transforms,
-        hint: 'chapter XHTML is generated: source text → text_transform → dom_transforms in order; read the scripts and one source/rendered pair before proposing markup',
+        ...(syntaxReference ? { syntaxReference } : {}),
+        hint: 'chapter XHTML is generated: source text → text_transform → dom_transforms in order; read the scripts and one source/rendered pair before proposing markup, and follow syntaxReference where present — the source syntax is NOT Markdown unless it says so',
       };
     }
     case 'write_file':

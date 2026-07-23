@@ -163,6 +163,23 @@ export class ExtensionManager {
       );
     }
 
+    // Optional, by convention rather than declaration: an agent-facing syntax
+    // reference travels with the extension when the catalog serves one. Its
+    // absence is normal (most extensions have none) — never an install error.
+    try {
+      const url = resolveExtensionFileUrl(entry.id, 'SYNTAX.md', { baseUrl: options.baseUrl });
+      const response = await fetchImpl(url);
+      if (response.ok) {
+        await this.fileStorage.writeFile(
+          workspaceId,
+          `SOURCE/extensions/${entry.id}/SYNTAX.md`,
+          await response.arrayBuffer()
+        );
+      }
+    } catch {
+      // no syntax reference served — fine
+    }
+
     // Generators → SOURCE/generators/<gen.id>/ (generator.json + script + license),
     // so extension-made and hand-made generators share one on-disk shape and discovery
     // only scans SOURCE/generators/. The scripts were copied flat into the served

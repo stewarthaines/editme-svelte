@@ -152,6 +152,13 @@ for (const dirent of dirents) {
     await fs.copyFile(src, dest);
     entryUrls.push(`extensions/${id}/${asset.file}`);
   }
+  // Optional syntax reference (agent-facing divergence notes for the source
+  // syntax the extension's text transform defines) — copied when present,
+  // never required. Consumed by the agent bridge; see docs/AGENT_AUTHORING.md.
+  if (await exists(path.join(dir, 'SYNTAX.md'))) {
+    await fs.copyFile(path.join(dir, 'SYNTAX.md'), path.join(destDir, 'SYNTAX.md'));
+    entryUrls.push(`extensions/${id}/SYNTAX.md`);
+  }
   if (!ok) continue;
   precache.push(...entryUrls);
 
