@@ -276,7 +276,13 @@ async function writeFile(ctx, session, ui, params) {
     }
     const currentBytes = new Uint8Array(await currentFile.arrayBuffer());
     if ((await contentHash(currentBytes)) !== expectedHash) {
-      throw new Error('changed since read — re-read the file and retry with its current hash');
+      // States only what is known (a mistyped hash and a concurrent edit look
+      // identical from here), and deliberately does NOT include the current
+      // hash: handing it back invites a blind retry that would skip the
+      // safety property — seeing the current content before overwriting it.
+      throw new Error(
+        "expected_hash does not match the file's current content — read the file again and retry with the hash from that read"
+      );
     }
     // Dirty check applies to text files only (binary never opens in a text pane).
     const diskText = isText ? new TextDecoder().decode(currentBytes) : null;
@@ -295,7 +301,20 @@ async function writeFile(ctx, session, ui, params) {
   }
   if (isText) await ctx.writeTextFile(path, text, requestWorkspaceId);
   else await ctx.writeBinaryFile(path, bytes, requestWorkspaceId);
-  return { written: true, size: bytes.length, hash: await contentHash(bytes) };
+  // Read-back ack (incident recommendation 1): the acked size/hash come from
+  // the bytes actually stored, not the request payload — a misdirected or
+  // lost write becomes a same-turn error instead of a silent lie.
+  const storedDir = await ctx.getWorkspaceDir();
+  const storedBytes = new Uint8Array(
+    await (await (await resolveFile(storedDir, path)).getFile()).arrayBuffer()
+  );
+  const storedHash = await contentHash(storedBytes);
+  if (storedHash !== (await contentHash(bytes))) {
+    throw new Error(
+      `write verification failed: stored bytes at ${path} do not match the payload (stored ${storedBytes.length} bytes, ${storedHash.slice(0, 12)}…) — report this to the author`
+    );
+  }
+  return { written: true, size: storedBytes.length, hash: storedHash, verified: true };
 }
 
 function base64ToBytes(base64) {
@@ -309,7 +328,11 @@ async function walk(dir, prefix, out) {
   for await (const [name, entry] of dir.entries()) {
     const path = prefix ? prefix + '/' + name : name;
     if (entry.kind === 'directory') await walk(entry, path, out);
-    else out.push({ path, size: (await entry.getFile()).size });
+    else {
+      const file = await entry.getFile();
+      // mtime enables write-journal forensics (incident recommendation 3)
+      out.push({ path, size: file.size, mtime: file.lastModified ?? null });
+    }
   }
 }
 
@@ -325,7 +348,9 @@ function describeAction(tool, params, result) {
   if (tool === 'read_file' && params && typeof params.path === 'string')
     return `read ${params.path}`;
   if (tool === 'write_file' && params && typeof params.path === 'string')
-    return result ? `wrote ${params.path} (${result.size} bytes)` : `write ${params.path}`;
+    return result
+      ? `wrote ${params.path} (${result.size} bytes, ${result.hash?.slice(0, 8) ?? '?'})`
+      : `write ${params.path}`;
   if (tool === 'list_files') return 'listed project files';
   if (tool === 'get_rendered_xhtml') return 'read rendered chapter';
   if (tool === 'get_selection') return 'read last click';

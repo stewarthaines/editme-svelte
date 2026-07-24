@@ -76,8 +76,10 @@ function fakeDir(entries: Record<string, ReturnType<typeof fakeFile> | object>):
 
 function makeContext(overrides: Record<string, unknown> = {}) {
   // page.css content and the workspace id are mutable so tests can change the
-  // world while a consent prompt sits open (the revalidation scenarios).
+  // world while a consent prompt sits open (the revalidation scenarios); the
+  // write fakes persist into them so read-back acks verify.
   let cssContent = 'body { color: red }';
+  let mp3Bytes = new Uint8Array([0, 1, 2, 0]);
   let workspaceId = 'ws-1';
   const cssFile = {
     kind: 'file' as const,
@@ -86,10 +88,18 @@ function makeContext(overrides: Record<string, unknown> = {}) {
       return { size: data.length, arrayBuffer: async () => data.buffer };
     },
   };
+  const mp3File = {
+    kind: 'file' as const,
+    getFile: async () => ({
+      size: mp3Bytes.length,
+      arrayBuffer: async () =>
+        mp3Bytes.buffer.slice(mp3Bytes.byteOffset, mp3Bytes.byteOffset + mp3Bytes.byteLength),
+    }),
+  };
   const workspace = fakeDir({
     OEBPS: fakeDir({
       Styles: fakeDir({ 'page.css': cssFile }),
-      'audio.mp3': fakeFile(new Uint8Array([0, 1, 2, 0])),
+      'audio.mp3': mp3File,
     }),
     SOURCE: fakeDir({
       'settings.json': fakeFile(
@@ -111,8 +121,12 @@ function makeContext(overrides: Record<string, unknown> = {}) {
     getWorkspaceDir: async () => workspace,
     getRenderedXhtml: () => ({ chapterId: 'ch-1', xhtml: '<html/>' }),
     getLastClick: () => null,
-    writeTextFile: vi.fn(async () => {}),
-    writeBinaryFile: vi.fn(async () => {}),
+    writeTextFile: vi.fn(async (path: string, text: string) => {
+      if (path === 'OEBPS/Styles/page.css') cssContent = text;
+    }),
+    writeBinaryFile: vi.fn(async (path: string, bytes: Uint8Array) => {
+      if (path === 'OEBPS/audio.mp3') mp3Bytes = bytes.slice();
+    }),
     isFileDirty: vi.fn(() => false),
     ...overrides,
   };
@@ -340,16 +354,56 @@ describe('agent bridge module', () => {
     allow.click();
     await waitFor(() => socket.sent.length > before);
     const response = JSON.parse(socket.sent[socket.sent.length - 1]);
-    expect(response).toMatchObject({ id: 1, ok: true, result: { written: true, size: 20 } });
+    // read-back ack: size/hash reflect the stored bytes, marked verified
+    expect(response).toMatchObject({
+      id: 1,
+      ok: true,
+      result: {
+        written: true,
+        size: 20,
+        verified: true,
+        hash: await sha256('body { color: blue }'),
+      },
+    });
     expect(ctx.writeTextFile).toHaveBeenCalledWith(
       'OEBPS/Styles/page.css',
       'body { color: blue }',
       'ws-1'
     );
     expect(ctx.writeBinaryFile).not.toHaveBeenCalled();
-    // feed shows the write
+    // feed shows the write with the stored hash prefix (journal correlation)
     const items = [...ctx.mountEl.querySelectorAll('li')].map(li => li.textContent);
-    expect(items.some(t => t?.includes('wrote OEBPS/Styles/page.css (20 bytes)'))).toBe(true);
+    const expectedPrefix = (await sha256('body { color: blue }')).slice(0, 8);
+    expect(
+      items.some(t => t?.includes(`wrote OEBPS/Styles/page.css (20 bytes, ${expectedPrefix})`))
+    ).toBe(true);
+  });
+
+  it('read-back ack catches a write that did not land', async () => {
+    // a write fake that swallows the bytes: stored content never changes
+    const { ctx } = makeContext({ writeTextFile: vi.fn(async () => {}) });
+    start(ctx);
+    const socket = FakeWebSocket.last!;
+    socket.open();
+    socket.onmessage?.({
+      data: JSON.stringify({
+        id: 1,
+        tool: 'write_file',
+        params: {
+          path: 'OEBPS/Styles/page.css',
+          text: 'body { color: blue }',
+          expectedHash: await sha256('body { color: red }'),
+        },
+      }),
+    });
+    await waitFor(() =>
+      [...ctx.mountEl.querySelectorAll('button')].some(b => b.textContent === 'Allow once')
+    );
+    [...ctx.mountEl.querySelectorAll('button')].find(b => b.textContent === 'Allow once')!.click();
+    await waitFor(() => socket.sent.some(s => s.includes('verification failed')));
+    const response = JSON.parse(socket.sent[socket.sent.length - 1]);
+    expect(response).toMatchObject({ id: 1, ok: false });
+    expect(response.error).toContain('stored bytes');
   });
 
   it('Allow this session skips the prompt for the next write', async () => {
@@ -357,16 +411,16 @@ describe('agent bridge module', () => {
     start(ctx);
     const socket = FakeWebSocket.last!;
     socket.open();
-    const hash = await sha256('body { color: red }');
-    const send = (id: number) =>
+    // writes persist now, so each expectedHash reflects the prior write
+    const send = (id: number, text: string, expectedHash: string) =>
       socket.onmessage?.({
         data: JSON.stringify({
           id,
           tool: 'write_file',
-          params: { path: 'OEBPS/Styles/page.css', text: 'x', expectedHash: hash },
+          params: { path: 'OEBPS/Styles/page.css', text, expectedHash },
         }),
       });
-    send(1);
+    send(1, 'x', await sha256('body { color: red }'));
     await waitFor(() =>
       [...ctx.mountEl.querySelectorAll('button')].some(b => b.textContent === 'Allow this session')
     );
@@ -374,7 +428,7 @@ describe('agent bridge module', () => {
       .find(b => b.textContent === 'Allow this session')!
       .click();
     await waitFor(() => socket.sent.filter(s => s.includes('"written"')).length === 1);
-    send(2);
+    send(2, 'y', await sha256('x'));
     await waitFor(() => socket.sent.filter(s => s.includes('"written"')).length === 2);
     // no second prompt appeared
     expect(
@@ -418,10 +472,7 @@ describe('agent bridge module', () => {
     const cases: Array<[object, string]> = [
       [{ path: 'OEBPS/Text/ch1.xhtml', text: 'x', expectedHash: goodHash }, 'not writable'],
       [{ path: 'OEBPS/Styles/missing.css', text: 'x', expectedHash: goodHash }, 'does not exist'],
-      [
-        { path: 'OEBPS/Styles/page.css', text: 'x', expectedHash: 'deadbeef' },
-        'changed since read',
-      ],
+      [{ path: 'OEBPS/Styles/page.css', text: 'x', expectedHash: 'deadbeef' }, 'does not match'],
       [{ path: 'OEBPS/Styles/page.css', text: 'x', expectedHash: goodHash }, 'unsaved changes'],
     ];
     for (const [params, fragment] of cases) {
@@ -461,7 +512,7 @@ describe('agent bridge module', () => {
     // the author edits the file while the prompt sits open
     setCss('author version');
     [...ctx.mountEl.querySelectorAll('button')].find(b => b.textContent === 'Allow once')!.click();
-    await waitFor(() => socket.sent.some(s => s.includes('changed since read')));
+    await waitFor(() => socket.sent.some(s => s.includes('does not match')));
     expect(ctx.writeTextFile).not.toHaveBeenCalled();
   });
 
