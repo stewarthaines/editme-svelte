@@ -20,6 +20,8 @@ src/assets/
 public/read/
 public/paged.polyfill.js
 public/sr-preview/
+# Vendored foliate-js renderer for the READ.html device preview (third-party, served as-is)
+public/foliate/
 patches/
 
 # Vendored minified libraries (e.g. axe-core for the accessibility check)

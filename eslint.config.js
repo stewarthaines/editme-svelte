@@ -188,6 +188,9 @@ export default [
       'public/read/**',
       // Vendored virtual screen reader bundle — see public/sr-preview/VENDORED.md.
       'public/sr-preview/**',
+      // Vendored foliate-js renderer for the READ.html device preview — see
+      // public/foliate/VENDORED.md.
+      'public/foliate/**',
       // Ignore specific generated files
       '**/lcov-report/',
       '**/coverage-report/',
