@@ -64,3 +64,20 @@ The very first write attempt failed with _"changed since read — re-read the fi
 Restored `SOURCE/text/georgian-folk-song-in-the-uk.txt` from the agent's retained payload via `seed_write_file` (expected_hash `2773201b…` → new hash `92989689…`, byte-identical to the original write). Verified `contents.txt` intact.
 
 **Full sweep completed after the repair:** every other file written this session (writes #1–#9, #11, #13) was re-read and its current hash compared against the ack table — all 11 match exactly. The incident is confined to the single georgian-folk-song → contents clobber; no truncation, cross-contamination, or drift anywhere else in the write set.
+
+## Resolution (2026-07-24)
+
+**Root cause found, reproduced, and fixed — family (b), and the bug predates the bridge.**
+
+Mechanism (confirmed by deterministic reproduction at a ~100ms navigation offset; safe at 0ms and 250ms):
+
+1. A bridge write dispatches `seed:source-files-changed`; SpineView reloads the written chapter's editor store, which arms the store subscription's 300ms save debounce.
+2. The author navigates to another chapter. `switchToSpineItem` repoints the preview manager's `spineItemId` — clearing the manager's own debounce but not SpineView's store-subscription timers.
+3. The surviving debounce fires: its file write is path-consistent (closure-captured), but it then feeds `previewManager.updateContent('text', …)` — into a manager now pointed at the NEW chapter.
+4. The manager's next render begins with `autoSaveChangedContent()`, which persists `currentContent.text` under `SOURCE/text/${this.spineItemId}.txt` — the old chapter's content under the new chapter's path. Wholesale, one file, after all acks. (It also renders and persists that content as the new chapter's XHTML.)
+
+This matches every observation: the clobbered bytes were the _post-edit_ content of another chapter; the write acks were all truthful; imprint between the implicated writes was untouched (its store was never open); and the window was author navigation after the batch. `switchToSpineItem` documents a sibling of this bug fixed earlier ("swapping mid-flight wrote the old chapter's output into the new chapter's file") — same family, different surviving timer. Ordinary typing followed by a fast chapter switch could always trigger this; the bridge's reconciliation reload made the trigger mechanical.
+
+**Fix:** the store subscription now feeds the preview manager only when its file is the currently selected chapter (`SpineView.svelte`, save subscription). Verified by re-running the reproduction across a dense offset sweep (50–200ms): no clobber at any offset.
+
+**Hardening landed alongside** (recommendations 1, 3, 6): read-back acks (ack size/hash computed from stored bytes), feed lines carry the stored hash prefix and `seed_list_files` returns mtimes, and the hash-mismatch error now states only what is known — deliberately without echoing the current hash, which would invite a blind retry that skips re-reading the content. Recommendation 2 was verified already true by inspection (no shared per-write state; family (a) ruled out). Recommendation 5 is superseded by read-back acks.

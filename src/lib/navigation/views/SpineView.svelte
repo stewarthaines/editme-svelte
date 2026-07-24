@@ -581,7 +581,15 @@
 
           // Step 2: Then update preview (reads from saved file)
           if (manifestItem.type === 'text') {
-            previewManager.updateContent('text', state.content);
+            // Guard against the chapter-switch race (BRIDGE_WRITE_CLOBBER_INCIDENT):
+            // this debounce can outlive a navigation, and the preview manager
+            // saves its text under the CURRENT spine item — pushing a stale
+            // store's content into it writes chapter A's text to chapter B's
+            // file. Only the store belonging to the selected chapter may feed
+            // the manager; the file write above was path-consistent regardless.
+            if (manifestItem.path === `SOURCE/text/${selectedItemId}.txt`) {
+              previewManager.updateContent('text', state.content);
+            }
           } else if (manifestItem.type === 'preview-head') {
             // The preview head isn't part of the rendered XHTML — it's injected by
             // the preview pane. Update our copy and re-emit so the pane re-injects.
