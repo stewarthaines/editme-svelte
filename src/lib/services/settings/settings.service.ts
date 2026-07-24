@@ -64,11 +64,11 @@ export interface PrintSettings {
 }
 
 /**
- * The three preview "types" the preview pane renders. Several device presets map to
+ * The preview "types" the preview pane renders. Several device presets map to
  * `device` (phone/tablet/e-ink); the responsive "Fill" preset is `responsive`; the
- * Paged.js print preview is `pdf`.
+ * Paged.js print preview is `pdf`; the foliate-powered reader preview is `read`.
  */
-export type PreviewType = 'responsive' | 'device' | 'pdf';
+export type PreviewType = 'responsive' | 'read' | 'device' | 'pdf';
 
 /**
  * Authoring-time preview settings (preview pane only — these never affect the
@@ -92,18 +92,20 @@ export interface PreviewSettings {
  * Responsive and Device previews auto-update; the PDF preview does not.
  */
 export const DEFAULT_PREVIEW: PreviewSettings = {
-  autoUpdate: { responsive: true, device: true, pdf: false },
+  autoUpdate: { responsive: true, read: true, device: true, pdf: false },
   head: 'preview/head.xml',
-  includeHead: { responsive: true, device: false, pdf: false },
+  includeHead: { responsive: true, read: false, device: false, pdf: false },
 };
 
 /**
  * Map a preview device preset's `category` to its preview type. Responsive "Fill"
- * is `responsive`, the Paged.js print preview is `pdf`, and every other category
- * (commute / home / travel) is a `device`.
+ * is `responsive`, the foliate reader preview is `read`, the Paged.js print
+ * preview is `pdf`, and every other category (commute / home / travel) is a
+ * `device`.
  */
 export function previewTypeForDevice(category: string): PreviewType {
   if (category === 'responsive') return 'responsive';
+  if (category === 'read') return 'read';
   if (category === 'print') return 'pdf';
   return 'device';
 }
@@ -457,6 +459,7 @@ export class SettingsService {
           autoUpdate: {
             responsive:
               settings.preview?.autoUpdate?.responsive ?? DEFAULT_PREVIEW.autoUpdate.responsive,
+            read: settings.preview?.autoUpdate?.read ?? DEFAULT_PREVIEW.autoUpdate.read,
             device: settings.preview?.autoUpdate?.device ?? DEFAULT_PREVIEW.autoUpdate.device,
             pdf: settings.preview?.autoUpdate?.pdf ?? DEFAULT_PREVIEW.autoUpdate.pdf,
           },
@@ -464,6 +467,7 @@ export class SettingsService {
           includeHead: {
             responsive:
               settings.preview?.includeHead?.responsive ?? DEFAULT_PREVIEW.includeHead.responsive,
+            read: settings.preview?.includeHead?.read ?? DEFAULT_PREVIEW.includeHead.read,
             device: settings.preview?.includeHead?.device ?? DEFAULT_PREVIEW.includeHead.device,
             pdf: settings.preview?.includeHead?.pdf ?? DEFAULT_PREVIEW.includeHead.pdf,
           },

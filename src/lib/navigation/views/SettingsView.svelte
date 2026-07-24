@@ -383,6 +383,7 @@
   // preview/head.xml fragment (edited via the spine editor's file dropdown).
   const PREVIEW_TYPES: ReadonlyArray<{ key: PreviewType }> = [
     { key: 'responsive' },
+    { key: 'read' },
     { key: 'device' },
     { key: 'pdf' },
   ];
@@ -394,6 +395,9 @@
     switch (key) {
       case 'responsive':
         return $t('Responsive');
+      case 'read':
+        // i18n-ignore: product name, not translated
+        return 'READ.html';
       case 'device':
         return $t('Device');
       case 'pdf':

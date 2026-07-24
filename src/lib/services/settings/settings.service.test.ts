@@ -271,9 +271,9 @@ describe('SettingsService Contract Tests', () => {
         image_template: '![<alt>](<href>)',
         video_template: '<video src="<href>" controls="controls"></video>',
         preview: {
-          autoUpdate: { responsive: true, device: true, pdf: false },
+          autoUpdate: { responsive: true, read: true, device: true, pdf: false },
           head: 'preview/head.xml',
-          includeHead: { responsive: true, device: false, pdf: false },
+          includeHead: { responsive: true, read: false, device: false, pdf: false },
         },
       });
     });
@@ -295,9 +295,9 @@ describe('SettingsService Contract Tests', () => {
         include_seed_html_in_package: false,
         track_changes: false,
         preview: {
-          autoUpdate: { responsive: true, device: true, pdf: false },
+          autoUpdate: { responsive: true, read: true, device: true, pdf: false },
           head: 'preview/head.xml',
-          includeHead: { responsive: true, device: false, pdf: false },
+          includeHead: { responsive: true, read: false, device: false, pdf: false },
         },
       });
     });
@@ -316,17 +316,17 @@ describe('SettingsService Contract Tests', () => {
       const result = await service.loadEPUBSettings('workspace-123');
 
       expect(result.preview).toEqual({
-        autoUpdate: { responsive: true, device: true, pdf: true },
+        autoUpdate: { responsive: true, read: true, device: true, pdf: true },
         head: 'preview/head.xml',
-        includeHead: { responsive: true, device: false, pdf: false },
+        includeHead: { responsive: true, read: false, device: false, pdf: false },
       });
     });
 
     test('loadEPUBSettings preserves a fully-specified preview block', async () => {
       const preview = {
-        autoUpdate: { responsive: false, device: false, pdf: true },
+        autoUpdate: { responsive: false, read: false, device: false, pdf: true },
         head: 'preview/custom-head.xml',
-        includeHead: { responsive: true, device: true, pdf: true },
+        includeHead: { responsive: true, read: true, device: true, pdf: true },
       };
       mockFileStorage.readTextFile.mockResolvedValue(
         JSON.stringify({
@@ -575,6 +575,10 @@ describe('previewTypeForDevice', () => {
 
   test('maps the print category to pdf', () => {
     expect(previewTypeForDevice('print')).toBe('pdf');
+  });
+
+  test('maps the read category to read', () => {
+    expect(previewTypeForDevice('read')).toBe('read');
   });
 
   test('maps every other device category to device', () => {
