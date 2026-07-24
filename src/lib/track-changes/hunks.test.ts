@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildReviewGroups, applySelectedHunks, diffSegments } from './hunks.js';
+import { buildReviewGroups, applySelectedHunks, diffSegments, markIntraLine } from './hunks.js';
 
 // Three edits separated by unchanged lines → three independent groups.
 const current = Array.from({ length: 20 }, (_, i) => `line ${i + 1}`).join('\n') + '\n';
@@ -69,5 +69,51 @@ describe('diffSegments (editor revert view)', () => {
         revertPatch.hunks.map(() => true)
       )
     ).toBe(base);
+  });
+});
+
+describe('markIntraLine', () => {
+  it('word granularity marks the edited words, not the whole line', () => {
+    const { removed, added } = markIntraLine(
+      ['The quick brown fox jumps.'],
+      ['The quick red fox jumps.'],
+      'word'
+    );
+    expect(removed[0].filter(r => r.changed).map(r => r.text)).toEqual(['brown']);
+    expect(added[0].filter(r => r.changed).map(r => r.text)).toEqual(['red']);
+    // unchanged runs reassemble the rest of the line
+    expect(removed[0].map(r => r.text).join('')).toBe('The quick brown fox jumps.');
+    expect(added[0].map(r => r.text).join('')).toBe('The quick red fox jumps.');
+  });
+
+  it('char granularity pins a one-character code edit', () => {
+    const { removed, added } = markIntraLine(
+      ['  max-height: 22em;'],
+      ['  max-height: 24em;'],
+      'char'
+    );
+    expect(removed[0].filter(r => r.changed).map(r => r.text)).toEqual(['2']);
+    expect(added[0].filter(r => r.changed).map(r => r.text)).toEqual(['4']);
+  });
+
+  it('spans multiple lines with index-aligned output', () => {
+    const { removed, added } = markIntraLine(
+      ['alpha one', 'beta two'],
+      ['alpha uno', 'beta two'],
+      'word'
+    );
+    expect(removed).toHaveLength(2);
+    expect(added).toHaveLength(2);
+    expect(removed[0].some(r => r.changed)).toBe(true);
+    expect(removed[1].some(r => r.changed)).toBe(false);
+  });
+
+  it('pure insertions and deletions come back unmarked', () => {
+    const inserted = markIntraLine([], ['brand new line'], 'word');
+    expect(inserted.added).toEqual([[{ text: 'brand new line', changed: false }]]);
+    expect(inserted.removed).toEqual([]);
+    const deleted = markIntraLine(['gone'], [], 'char');
+    expect(deleted.removed).toEqual([[{ text: 'gone', changed: false }]]);
+    expect(deleted.added).toEqual([]);
   });
 });

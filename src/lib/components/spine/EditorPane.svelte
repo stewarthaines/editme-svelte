@@ -47,7 +47,7 @@
   } from '$lib/import/import-media.js';
   import { showToast } from '$lib/stores/toast.svelte.js';
   import { BASE_PREFIX } from '$lib/track-changes/base-snapshot.js';
-  import { diffSegments, applySelectedHunks } from '$lib/track-changes/hunks.js';
+  import { diffSegments, applySelectedHunks, markIntraLine } from '$lib/track-changes/hunks.js';
   import { persisted, asInt } from '$lib/state/persisted.svelte.js';
 
   // Editor text size: a ladder of px steps applied to the editing textareas AND
@@ -953,8 +953,13 @@
   {/if}
 {/snippet}
 
-<!-- Base→current diff with a per-change revert button (right edge of each change). -->
+<!-- Base→current diff with a per-change revert button (right edge of each change).
+     Changed lines carry intra-line marks: word-granular for prose (reads as
+     edited words), character-granular for code files (a one-character change
+     shows exactly). Whole-line color still carries removed/added. -->
 {#snippet revertableDiff(segments: import('$lib/track-changes/hunks.js').DiffSegment[], pane: 1 | 2)}
+  {@const granularity =
+    (pane === 1 ? pane1SelectedFile : pane2SelectedFile) === 'text' ? 'word' : 'char'}
   <div class="diff-view">
     {#each segments as seg, si (si)}
       {#if seg.type === 'context'}
@@ -966,19 +971,22 @@
           </div>
         {/each}
       {:else}
+        {@const marks = markIntraLine(seg.removed, seg.added, granularity)}
         <div class="change-region">
           <div class="change-lines">
-            {#each seg.removed as line, li (li)}
+            {#each marks.removed as runs, li (li)}
               <div class="diff-line diff-remove">
                 <span class="diff-sign" aria-hidden="true">-</span><span class="diff-text"
-                  >{line || ' '}</span
+                  >{#each runs as run, ri (ri)}<span class:diff-mark={run.changed}>{run.text}</span
+                    >{:else}{' '}{/each}</span
                 >
               </div>
             {/each}
-            {#each seg.added as line, li (li)}
+            {#each marks.added as runs, li (li)}
               <div class="diff-line diff-add">
                 <span class="diff-sign" aria-hidden="true">+</span><span class="diff-text"
-                  >{line || ' '}</span
+                  >{#each runs as run, ri (ri)}<span class:diff-mark={run.changed}>{run.text}</span
+                    >{:else}{' '}{/each}</span
                 >
               </div>
             {/each}
@@ -1532,6 +1540,20 @@
   .diff-remove {
     background-color: var(--color-error-bg, rgb(200 0 0 / 0.12));
     color: var(--color-error-text, inherit);
+  }
+
+  /* The intra-line changed runs: a stronger wash over the line's tint, so the
+     eye lands on what actually changed within the line. */
+  .diff-add .diff-mark {
+    background-color: rgb(0 160 0 / 0.28);
+    border-radius: 2px;
+  }
+
+  .diff-remove .diff-mark {
+    background-color: rgb(220 0 0 / 0.25);
+    border-radius: 2px;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
   }
 
   /* A change region: its diff lines, with a revert button pinned to the right. */

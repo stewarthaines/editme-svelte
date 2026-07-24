@@ -9,7 +9,14 @@
  * and `applyPatch` with a hunk subset to produce the merged result.
  */
 
-import { structuredPatch, applyPatch, diffLines, type StructuredPatch } from 'diff';
+import {
+  structuredPatch,
+  applyPatch,
+  diffLines,
+  diffWordsWithSpace,
+  diffChars,
+  type StructuredPatch,
+} from 'diff';
 
 export type FilePatch = StructuredPatch;
 
@@ -102,6 +109,50 @@ export function diffSegments(
   flush();
   const revertPatch = structuredPatch('current', 'base', current, base, '', '', { context: 0 });
   return { segments, revertPatch };
+}
+
+/** One run of a line: rendered as-is, or highlighted as the changed part. */
+export interface MarkedRun {
+  text: string;
+  changed: boolean;
+}
+
+/**
+ * Intra-line marks for a change region: which parts of the removed/added lines
+ * actually differ. `word` granularity reads naturally for prose; `char` is
+ * precise for code, where a one-character selector edit should show exactly.
+ * A pure insertion or deletion has no counterpart to compare against — every
+ * run is returned unmarked, and the whole-line color carries the meaning.
+ * Output arrays are index-aligned with the input line arrays.
+ */
+export function markIntraLine(
+  removed: string[],
+  added: string[],
+  granularity: 'word' | 'char'
+): { removed: MarkedRun[][]; added: MarkedRun[][] } {
+  const unmarked = (lines: string[]) => lines.map(line => [{ text: line, changed: false }]);
+  if (removed.length === 0 || added.length === 0) {
+    return { removed: unmarked(removed), added: unmarked(added) };
+  }
+  const differ = granularity === 'word' ? diffWordsWithSpace : diffChars;
+  const parts = differ(removed.join('\n'), added.join('\n'));
+
+  // Rebuild each side's lines from the diff parts, splitting runs on newlines.
+  const build = (side: 'removed' | 'added'): MarkedRun[][] => {
+    const lines: MarkedRun[][] = [[]];
+    for (const part of parts) {
+      if (side === 'removed' && part.added) continue;
+      if (side === 'added' && part.removed) continue;
+      const changed = Boolean(part.added || part.removed);
+      const pieces = part.value.split('\n');
+      pieces.forEach((piece, i) => {
+        if (i > 0) lines.push([]);
+        if (piece) lines[lines.length - 1].push({ text: piece, changed });
+      });
+    }
+    return lines;
+  };
+  return { removed: build('removed'), added: build('added') };
 }
 
 /**
