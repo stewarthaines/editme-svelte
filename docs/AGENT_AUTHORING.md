@@ -11,6 +11,29 @@ You are assisting an author inside SEED.html, a browser-based EPUB editor. This 
 5. Match the project's insertion templates: `image_template` (placeholders `<href>`, `<alt>`), `video_template`, `audio_clip_template` in settings show how this project embeds media in source text. Use them; don't invent markup.
 6. `SOURCE/preview/head.xml` (when configured) is authoring-time-only markup injected into previews — never part of the packaged book. Don't put production styles there.
 
+## Writing transform scripts
+
+The pipeline runs sandboxed in an iframe: no storage, no fetch — file access only through `ctx`. Each function may be sync or async. (Full contract for extension developers: `src/lib/transform/TRANSFORM_CONTEXT.md` in the app repo.)
+
+```js
+// Text transform (settings.text_transform): plain-text source → HTML string.
+function transformText(plainText, idref, ctx) { /* return html string */ }
+
+// DOM transform (settings.dom_transforms, run in order): mutate and return
+// the chapter document. Parsed as HTML — use document.createElement, no
+// namespaces; the packager serialises to XHTML downstream.
+function transformDOM(document, idref, ctx) { /* return document */ }
+```
+
+`ctx` essentials (guard `if (!ctx) return …` — it can be absent for secondary callers):
+
+- `ctx.idref` — current spine item id; `ctx.language` — the book's primary language (BCP 47), for locale-aware output.
+- `ctx.manifest` (read-only OPF manifest) and `ctx.basePath`.
+- `await ctx.readManifestText(href)` / `readManifestDataURL(href)` — read a declared manifest item (text / data: URL for binary).
+- `await ctx.readSourceText(path)` — read from `SOURCE/`; `await ctx.writeSourceText(path, text)` — write, **scoped to `SOURCE/data/` only**.
+
+Rules that bite: transforms must be deterministic per render (no `Date.now()`-dependent markup — the preview re-renders constantly); a missing asset should degrade gracefully (`try/catch` around `ctx` reads, return the document unchanged), never throw the render dead; and DOM transforms see the *text transform's output*, so their selectors depend on what the text transform and earlier DOM transforms produced — read the whole configured chain.
+
 ## Writing CSS for EPUB (reflowable content)
 
 The book will be read in reading systems spanning modern WebKit/Blink down to ancient e-ink firmware, and every reading system overrides author styles (fonts, sizes, colors, margins) at the reader's whim. Write CSS that degrades to acceptable, not CSS that requires support:
