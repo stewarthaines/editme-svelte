@@ -157,6 +157,9 @@
   // include/editing head.xml marks the preview stale when auto-update is off.
   let renderedHead = '';
   let printSafetyTimer: ReturnType<typeof setTimeout> | undefined;
+  // Page index to restore after Paged.js finishes repaginating (same-chapter
+  // re-render only); consumed by the PAGED_DONE handler.
+  let pendingPrintPage: number | null = null;
 
   interface AxeViolation {
     id: string;
@@ -992,14 +995,22 @@
     }
   });
 
-  // Paged.js pings the parent when pagination finishes: drop the spinner and fit
-  // the rendered pages to the pane width.
+  // Paged.js pings the parent when pagination finishes: drop the spinner, fit
+  // the rendered pages to the pane width, and restore the pre-render page.
   $effect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== previewIframe?.contentWindow || event.data !== PAGED_DONE) return;
       clearTimeout(printSafetyTimer);
       printPaginating = false;
       fitPrintToWidth();
+      if (pendingPrintPage !== null) {
+        const pages =
+          previewIframe?.contentDocument?.querySelectorAll<HTMLElement>('.pagedjs_page');
+        // Clamp: the edit may have shortened the chapter below the saved page.
+        const target = pages?.[Math.min(pendingPrintPage, (pages?.length ?? 1) - 1)];
+        target?.scrollIntoView({ behavior: 'instant', block: 'start' });
+        pendingPrintPage = null;
+      }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
@@ -1260,6 +1271,21 @@
     // Print output has a different DOM than the live preview; don't carry over
     // scroll anchors or auto-run axe against Paged.js wrapper elements.
     pendingScrollRestore = null;
+
+    // Keep the reader's place across re-renders of the SAME chapter: remember
+    // the page currently at the top of the viewport, by index — pixel offsets
+    // don't survive repagination, page boundaries do. A chapter switch (or
+    // arriving from a non-print render) starts at page one.
+    pendingPrintPage = null;
+    if (renderedType === 'pdf' && renderedChapterId === chapterId) {
+      const pages = iframeDoc.querySelectorAll<HTMLElement>('.pagedjs_page');
+      for (let i = 0; i < pages.length; i++) {
+        if (pages[i].getBoundingClientRect().bottom > 1) {
+          pendingPrintPage = i;
+          break;
+        }
+      }
+    }
 
     pausePreviewMedia(iframeDoc);
     iframeDoc.open();
